@@ -51,6 +51,7 @@ Les versions publiées (tag `vX.Y.Z`) sont construites par `.github/workflows/re
 | [data/](data/README.md) | Données de jeu (schémas BitCraftPublic, valeurs) |
 | [models/](models/README.md) | Modèles de vision `.onnx` |
 | [tools/](tools/README.md) | Scripts utilitaires |
+| [executable/](executable/README.md) | Dernier .exe validé (les anciens restent sur le PC) |
 
 ## Notes
 

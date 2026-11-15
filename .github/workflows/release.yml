@@ -1,5 +1,5 @@
-# Build et publication du .exe sur tag vX.Y.Z (D-010)
-name: release
+# Construit et publie le .exe quand un tag vX.Y.Z est poussé (D-010)
+name: Publication du .exe
 
 on:
   push:
@@ -10,37 +10,38 @@ permissions:
   contents: write
 
 jobs:
-  release:
+  publication:
+    name: Construction et publication
     runs-on: windows-latest
     steps:
-      - name: Checkout
+      - name: Récupération du code
         uses: actions/checkout@v4
 
-      - name: Setup .NET 10
+      - name: Installation de .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.x"
 
-      - name: Tests
+      - name: Lancement des tests
         run: dotnet test BitcraftBot.sln -c Release
 
       # Le tag vaut "v0.1.0" ; MSBuild attend "0.1.0"
-      - name: Version depuis le tag
+      - name: Lecture de la version depuis le tag
         shell: pwsh
         run: echo "VERSION=$('${{ github.ref_name }}'.TrimStart('v'))" >> $env:GITHUB_ENV
 
-      - name: Publish (self-contained, single-file)
+      - name: Publication du .exe unique (autonome, compressé)
         run: >
           dotnet publish src/BitcraftBot.App -c Release -r win-x64
           --self-contained true -p:PublishSingleFile=true
           -p:Version=${{ env.VERSION }}
           -o publish
 
-      - name: Renommer le .exe avec la version
+      - name: Renommage du .exe avec la version
         shell: pwsh
         run: Rename-Item publish/BitcraftBot.exe "BitcraftBot-${{ github.ref_name }}.exe"
 
-      - name: GitHub Release
+      - name: Création de la Release GitHub
         uses: softprops/action-gh-release@v2
         with:
           files: publish/BitcraftBot-${{ github.ref_name }}.exe

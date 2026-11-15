@@ -2,7 +2,6 @@
 
 Scripts utilitaires : capture d'écran, annotation d'images, extraction des schémas de BitCraftPublic.
 
-Aucun outil à ce jour.
-
 | Outil | Rôle | Usage |
 |---|---|---|
+| `valider-exe.ps1` | Publie le .exe d'une version validée, archive l'ancien (D-020) | `powershell -ExecutionPolicy Bypass -File tools/valider-exe.ps1 -Version 0.1.0` |
