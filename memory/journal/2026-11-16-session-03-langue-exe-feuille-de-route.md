@@ -20,5 +20,9 @@ Appliquer la réponse de Julien sur la langue, mettre en place le stockage du .e
 ## Questions ouvertes créées (liens Q-NNN)
 - [Q-010](../questions-ouvertes/Q-010-poids-exe-historique-git.md).
 
+## Suite de la session : réponses de Julien
+- D-021 (bois), D-022 (`Num 5`, 15 min), D-023 (Claude code tout). Q-006 résolue. Q-011 créée (touches, incohérence caméra).
+
 ## Prochaines étapes
-- Julien : réponses R1 à R8, captures C1 à C10, vidéo V1.
+- Julien : captures dans `images/analyse/` (pas de vidéo).
+- Claude : tri, renommage, description, puis Q-001, Q-002, Q-011.

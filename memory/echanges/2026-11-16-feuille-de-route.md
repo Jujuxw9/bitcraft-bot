@@ -20,6 +20,18 @@
 | R7 | Distance et temps de trajet entre la zone de récolte et la Banque | Faisabilité du MVP |
 | R8 | Mode de travail : Claude code tout et explique, ou Julien écrit une partie du code ? | Projet d'apprentissage |
 
+### Réponses de Julien (2026-11-16)
+- R1 : arbres → bois, hache, zone au choix de Claude → D-021.
+- R2 : clic au sol aujourd'hui ; ZQSD/WASD possible et sans doute plus simple → Q-011.
+- R3 : survol (contour vert) puis **un** clic droit ; l'action continue tant qu'il y a endurance et place → D-021.
+- R4 : ZQSD/WASD bouge la caméra, W recentre (incohérence à lever) → Q-011.
+- R5 : pavé numérique, Claude choisit → `Num 5` (D-022).
+- R6 : 15 min (D-022).
+- R7 : inconnu, de 15 s à 2 min ; il faut savoir trouver la Banque → Q-002.
+- R8 : Claude code tout, Julien suit l'architecture → D-023.
+- Vidéo V1 : **abandonnée** pour l'instant, captures seules.
+- Captures : déposées dans `images/analyse/` sans ordre ni nommage ; Claude trie, renomme et décrit.
+
 ## Étape 2 — Captures d'écran (dans `images/analyse/`)
 
 Conditions : 1920×1080 fenêtré sans bordure, échelle UI par défaut, jeu en anglais, monde 1.0 (D-006, D-015). Format PNG, écran entier. Nommage : `20261116_analyse_sujet_001.png`.

@@ -10,5 +10,7 @@ La position absolue est lisible par OCR (D-018). Comment se déplacer et cartogr
 - Déplacement vers une cible (clic au sol, touches).
 - Mémorisation des ressources et obstacles rencontrés (carte construite par le bot).
 - Points de passage enregistrés par Julien en complément.
+- Infos de Julien (2026-11-16) : la Banque peut être à 15 s comme à 2 min de marche. Le bot doit savoir **trouver** la Banque (carte ou vue), pas seulement y retourner.
+- Touches et mode de déplacement : voir Q-011.
 ## Ce qui bloque
 Captures du HUD et de la carte nécessaires.

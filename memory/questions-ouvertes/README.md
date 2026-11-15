@@ -7,11 +7,12 @@
 | [Q-003](Q-003-interface-consignes-n3.md) | Interface de consignes N3 | Basse | Ouverte |
 | [Q-004](Q-004-source-valeurs-donnees.md) | Source des valeurs de données de jeu | Haute | Ouverte |
 | [Q-005](Q-005-langue-code.md) | Langue du code | Moyenne | Résolue → D-012 |
-| [Q-006](Q-006-premier-type-ressource.md) | Premier type de ressource testé | Haute | Ouverte |
+| [Q-006](Q-006-premier-type-ressource.md) | Premier type de ressource testé | Haute | Résolue → D-021 |
 | [Q-007](Q-007-monde-joue.md) | Monde joué | Moyenne | Résolue → D-015 |
 | [Q-008](Q-008-deconnexion-cadence.md) | Déconnexion automatique et cadence | Moyenne | Ouverte |
 | [Q-009](Q-009-langue-messages-commit.md) | Langue des messages de commit | Basse | Résolue → D-019 |
 | [Q-010](Q-010-poids-exe-historique-git.md) | Poids des .exe dans l'historique Git | Basse | Ouverte |
+| [Q-011](Q-011-touches-deplacement-camera.md) | Touches de déplacement et de caméra | Haute | Ouverte |
 
 ## Gabarit
 

@@ -12,6 +12,8 @@
 - Ne pas inventer : ce qui n'est pas vérifié est marqué « À vérifier ».
 - **Langue (D-019)** : seules les lignes de code sont en anglais. Tout le reste en français : commentaires, commits, docs, `memory/`, messages des scripts, textes de l'interface.
 
+- **Code (D-023)** : Claude code tout, en autonomie. Julien ne lit pas le code. Expliquer l'architecture et le comportement, jamais les lignes de code. Tenir `memory/technique/architecture.md` à jour.
+
 ## En fin de session
 
 - Ajouter un fichier dans `memory/journal/` (gabarit dans `memory/journal/README.md`).
