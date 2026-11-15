@@ -10,7 +10,7 @@
 
 - Respecter les décisions validées. Toute proposition contraire passe par une nouvelle question ouverte (`memory/questions-ouvertes/Q-NNN-*.md`).
 - Ne pas inventer : ce qui n'est pas vérifié est marqué « À vérifier ».
-- Code : identifiants et noms de fichiers en anglais, commentaires en français (D-012).
+- **Langue (D-019)** : seules les lignes de code sont en anglais. Tout le reste en français : commentaires, commits, docs, `memory/`, messages des scripts, textes de l'interface.
 
 ## En fin de session
 

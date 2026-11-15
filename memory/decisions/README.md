@@ -15,13 +15,15 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-009](D-009-langage-csharp.md) | Langage : C# / .NET 10, WPF | Validée | 2026-11-15 |
 | [D-010](D-010-distribution.md) | Distribution : .exe unique en GitHub Releases | Validée | 2026-11-15 |
 | [D-011](D-011-memoire.md) | Mémoire du projet : dossier memory/ | Validée | 2026-11-15 |
-| [D-012](D-012-langue.md) | Langue : doc en français, code en anglais | Validée | 2026-11-15 |
+| [D-012](D-012-langue.md) | Langue : doc en français, code en anglais | Remplacée par D-019 | 2026-11-15 |
 | [D-013](D-013-dossier-images.md) | Dossier images : structure et nommage | Validée | 2026-11-15 |
 | [D-014](D-014-repo-public.md) | Repo public, licence MIT | Validée | 2026-11-15 |
 | [D-015](D-015-monde-langue-jeu.md) | Monde 1.0, jeu en anglais | Validée | 2026-11-15 |
 | [D-016](D-016-depot-banque.md) | Dépôt à la Banque | Validée | 2026-11-15 |
 | [D-017](D-017-recolte-generique.md) | Récolte générique | Validée | 2026-11-15 |
 | [D-018](D-018-localisation-ocr-hud.md) | Localisation par OCR du HUD | Validée | 2026-11-15 |
+| [D-019](D-019-francais-partout.md) | Français partout, sauf le code | Validée | 2026-11-16 |
+| [D-020](D-020-exe-valide-dans-repo.md) | Le .exe validé est versionné dans le repo | Validée | 2026-11-16 |
 
 ## Gabarit
 

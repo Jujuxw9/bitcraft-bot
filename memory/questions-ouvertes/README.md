@@ -10,7 +10,8 @@
 | [Q-006](Q-006-premier-type-ressource.md) | Premier type de ressource testé | Haute | Ouverte |
 | [Q-007](Q-007-monde-joue.md) | Monde joué | Moyenne | Résolue → D-015 |
 | [Q-008](Q-008-deconnexion-cadence.md) | Déconnexion automatique et cadence | Moyenne | Ouverte |
-| [Q-009](Q-009-langue-messages-commit.md) | Langue des messages de commit | Basse | Ouverte |
+| [Q-009](Q-009-langue-messages-commit.md) | Langue des messages de commit | Basse | Résolue → D-019 |
+| [Q-010](Q-010-poids-exe-historique-git.md) | Poids des .exe dans l'historique Git | Basse | Ouverte |
 
 ## Gabarit
 
