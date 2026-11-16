@@ -240,3 +240,4 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_jauge-metier-zoom_001.png` | 2026-11-16 | Zoom : jauge verticale à gauche de la minicarte, hache et « 25 » | 1.0 (build 26707176) |
 | `analyse/20261116_analyse_coupe-panneau-action-bas_001.png` | 2026-11-16 | Coupe en cours, panneau d'action en bas (« Chop », 822/12000, 11 coups, 1,59 s), pas de panneau en haut | 1.0 (build 26707176) |
 | `reference-ui/coordonnees/*.png` | 2026-11-16 | **26 découpes** de la ligne des coordonnées (nom = valeur attendue), jour et nuit, dont 1 capture directe du bot. Servent à fabriquer et tester les modèles de chiffres. Versionnées | 1.0 |
+| `reference-ui/jauge-metier/*.png` | 2026-11-16 | **4 découpes** de la jauge de métier (coin = (1480, 0), nom = métier_niveau_pourcentage) : Forestry 23 / 36 %, Forestry 25 / 95 % ×2, jauge absente. Versionnées | 1.0 |

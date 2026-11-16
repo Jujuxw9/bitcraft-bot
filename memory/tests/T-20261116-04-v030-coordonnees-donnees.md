@@ -1,6 +1,6 @@
-# T-20261116-04 — v0.3.0 : coordonnées par modèles de chiffres et données du jeu
+# T-20261116-04 — v0.3.1 : coordonnées par modèles, données du jeu, jauge de métier
 - **Type** : perception
-- **Version testée** : v0.3.0 (commit indiqué en première ligne du journal)
+- **Version testée** : v0.3.1 (commit indiqué en première ligne du journal)
 - **Durée** : 10 min
 
 ## Objectif
@@ -9,14 +9,15 @@
 
 ## Conditions (résolution, réglages jeu, zone)
 - Jeu 1920×1080, fenêtré sans bordure, anglais. Endroit calme.
-- Bot : `artifacts/v0.3.0/BitcraftBot.exe`. Le bot **n'agit pas** sur le jeu (banc d'essai désactivé par défaut).
+- Bot : `artifacts/v0.3.1/BitcraftBot.exe`. Le bot **n'agit pas** sur le jeu (banc d'essai désactivé par défaut).
 
 ## Procédure
 1. Lancer le bot. Dans le journal : « Données du jeu chargées … 878 ressources ».
 2. Démarrer. **Marcher** dans plusieurs directions pendant 2 à 3 min (fonds variés : herbe, eau, rochers, ciel clair).
-3. Couper un arbre 30 s. Le journal doit dire « Mature Oak Tree confirmé par les données du jeu ».
+3. Couper un arbre 30 s. Le journal doit dire « Mature Oak Tree confirmé par les données du jeu » et « Action en cours : Forestry niv. …, … % ». À l'arrêt : « Fin d'action ».
 4. Si possible : refaire 2 de **nuit**.
-5. Arrêter et dire « journal v0.3.0 prêt ».
+5. Si possible : une action d'un **autre métier** (miner, cueillir), avec une capture **écran complet** de la jauge, pour apprendre son icône.
+6. Arrêter et dire « journal v0.3.1 prêt ».
 
 ## Résultat (OK / KO, métriques)
 **Essais de Claude (2026-11-16, 18:55 à 19:07, de jour, jeu ouvert par Julien, lecture seule)** :
@@ -34,3 +35,5 @@
 
 ## Suites
 - Si un échec apparaît : récupérer l'image et l'ajouter aux exemples, puis relancer `tools/ModelesChiffres`.
+
+**Ajout v0.3.1 (jauge de métier, essais de Claude de 19:13 à 19:20)** : 132 tests automatiques OK ; 4 exemples (Forestry 23 à 36 %, Forestry 25 à 95 % ×2, jauge absente) ; en direct « Forestry niv. 26, 24 % » vérifié à l'œil ; jauge absente quand Julien ne coupe pas. Position : une fois 10 lectures ratées sur 60 (cause inconnue, pas reproduite : 60/60 juste après).

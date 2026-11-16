@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.3.0** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12.
+> État : **v0.3.1** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -226,3 +226,28 @@ Le journal indique « position lue X % du temps (dont Y % par les modèles de ch
 
 ### Autres changements v0.3.0
 - Changement de zone noté seulement s'il est lu **2 fois de suite** (évite « S A Pe Meadows »).
+
+## 13. v0.3.1 : jauge de métier (demande de Julien)
+
+Pendant une action (coupe, minage…), le jeu affiche à gauche de la minicarte une **jauge verticale** : icône du métier, niveau, remplissage vers le niveau suivant.
+
+```
+  ┌─┐  y 22  = 100 %
+  │ │
+  │ │  traits blancs à 75 / 50 / 25 %
+  │█│  ← haut du vert = remplissage
+  │█│
+  └─┘  y 245 = 0 %
+  🪓    icône → métier (comparée aux icônes connues)
+  26    niveau → mêmes modèles de chiffres que les coordonnées
+```
+
+| Étape | Comment |
+|---|---|
+| Jauge présente ? | Les deux bords gris clair du cadre sur 80 % de la hauteur, et l'intérieur vert, sombre ou trait blanc. Sinon : « aucune action » |
+| Pourcentage | Ligne la plus haute où l'intérieur est vert |
+| Niveau | Lecture par modèles de chiffres (section 12) |
+| Métier | Empreinte de l'icône blanche comparée aux icônes apprises (`tools/ModelesChiffres`, dossier `images/reference-ui/jauge-metier/`). Icône inconnue = « métier ? », sans invention |
+
+Journal : « Action en cours : Forestry niv. 26, 24 % », « Niveau gagné : Forestry passe niveau 27 », « Fin d'action » (après 2 s sans jauge). Le résumé toutes les 30 s inclut la jauge.
+Lecture : ~0,1 ms. Seule l'icône **Forestry** est connue pour l'instant.

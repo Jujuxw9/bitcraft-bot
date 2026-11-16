@@ -35,7 +35,7 @@ Le patch du 10 novembre (« Starfell Reawakened ») : santé des ressources mult
 
 ### Mise à jour du jeu **aujourd'hui**, sans note de version
 - Build public **26707176**, mis en ligne le 2026-11-16 à 17:51 (heure de Paris) (source : api.steamcmd.net). Aucune actualité Steam publiée.
-- Ce qui a changé n'est pas connu. Nouveautés vues dans les captures de ce soir (peut-être liées) : panneau d'action en bas (section 4), jauge verticale du métier en haut à droite. **À vérifier**.
+- Ce qui a changé n'est pas connu. Le panneau d'action en bas (section 4) est peut-être lié. **À vérifier**. La jauge de métier, elle, existait déjà : elle est sur la capture de référence de 01:59 (Forestry 23).
 - La lecture des coordonnées a été testée après cette mise à jour : OK.
 
 ## 3. Captures du chiffre 5 (C1 du lot 5) : OK
@@ -64,7 +64,7 @@ Le patch du 10 novembre (« Starfell Reawakened ») : santé des ressources mult
 - La coupe **s'arrête à 4/100 d'endurance** (pas à 0) : le panneau du bas **disparaît**, celui du haut reste.
 - Endurance : de 84 à 4 en ~215 s, soit ~0,37 par seconde. **À vérifier** : les données donnent 0,75 par coup (ce qui ferait ~0,47/s).
 - Au-dessus de l'endurance : minuteurs des bonus (« 27s », « 11m »).
-- Jauge verticale à gauche de la minicarte, avec une hache et un nombre (24, puis 25) : progression du métier Forestry. **À vérifier**.
+- Jauge verticale à gauche de la minicarte, avec une hache et un nombre (24, puis 25) : progression du métier Forestry. Confirmé par Julien ; lue par le bot depuis la v0.3.1 (section 6).
 
 ### Captures de 18:32 et 19:00
 - `info-bulle-feu-proche_001` : survol de l'icône verte = « Nearby Flame : A nearby flame is keeping enemies away » (bonus du feu de camp, Q-014).
@@ -79,3 +79,22 @@ Le patch du 10 novembre (« Starfell Reawakened ») : santé des ressources mult
 | Fin d'endurance | Le bot doit considérer « coupe arrêtée » quand le panneau du bas disparaît, pas attendre 0 |
 | Choix de l'arbre | Q-019 |
 | Maker's Tree | Exclu par l'étiquette des données (`Wonder Resource`) |
+
+## 6. Jauge de métier (demande de Julien, v0.3.1)
+
+Julien : « prendre l'info quand je réalise une action : quelle profession, quel niveau, quel pourcentage ».
+
+| Élément | Position (1920×1080) | Lecture |
+|---|---|---|
+| Barre | x 1537-1548, de y 22 (100 %) à y 245 (0 %), cadre gris clair, traits blancs à 75 / 50 / 25 % (y 78, 134, 190) | Hauteur du vert (17, 182, 74) |
+| Icône du métier | y 255-292 | Comparée aux icônes connues (Forestry = hache, seule connue) |
+| Niveau | y 298-310 | Mêmes modèles de chiffres que les coordonnées |
+
+- **Visible seulement pendant une action** (et peu après) : absente quand Julien ne coupe pas (vérifié en direct à 19:16).
+- Essais en direct : « Forestry niv. 26, 24 % » vérifié à l'œil ; Julien est passé du niveau 25 (95 %) au 26 entre 19:13 et 19:18.
+- Lecture : ~0,1 ms.
+- Les autres métiers (Mining, Foraging…) : icônes inconnues pour l'instant → métier « ? », mais niveau et pourcentage lus. Une capture par métier suffit pour l'apprendre.
+
+## 7. Réglages du jeu changés par Julien (2026-11-16, pour information)
+- **Heure en 24 h** (ex. « 19:13 » en haut de la minicarte).
+- **Carte sans animation d'ouverture** : elle s'ouvre instantanément (touche ou icône). Utile pour la navigation (Q-002).

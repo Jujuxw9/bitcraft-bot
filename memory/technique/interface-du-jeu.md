@@ -32,3 +32,10 @@ Inventaire, Compendium, carte, Banque, Vault, Character, Quest Log, chariot, etc
 - **Montée de niveau / succès** : triangle bleu qui descend du centre du haut de l'écran (« FORESTRY / LEVEL 22 »). Il cache la **santé de la cible** pendant quelques secondes.
 - Autres : message d'inventaire plein (centre), « Carrying Cargo » (bas), « Entering / Leaving SNOWREST », gains d'objets (gauche).
 - Le bot doit les **reconnaître** et considérer les valeurs cachées comme « masquées », pas « illisibles ». Détails : Q-018.
+
+## Réglages du jeu choisis par Julien (2026-11-16)
+- Heure affichée en **24 h** (en haut de la minicarte, ex. « 19:13 »).
+- Ouverture de la carte **sans animation** : instantanée. À garder pour le bot (Q-002).
+
+## Jauge de métier
+Barre verticale à gauche de la minicarte, visible pendant une action : icône du métier, niveau, remplissage. Lue depuis la v0.3.1 (`technique/analyse-lot5-2026-11-16.md`, section 6).
