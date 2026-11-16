@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.3.3** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14. v0.3.3 (jauge fiable) : section 15.
+> État : **v0.3.4** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14. v0.3.3 (jauge fiable) : section 15. v0.3.4 (montée de niveau) : section 16.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -267,3 +267,12 @@ Problème vu grâce aux images de diagnostic de la v0.3.2 : l'intérieur vide de
 - Icônes connues : **Forestry** (hache), **Foraging** (baies), **Mining** (pioche). 12 exemples dans `images/reference-ui/jauge-metier/` (jour, nuit, ciel clair, info-bulle, absente).
 - Résultat sur les 57 captures de Julien : jauge lue à chaque action, aucune fausse jauge. En direct : Mining 40/40.
 - **Faim** : alerte seulement après 4 lectures basses de suite (une info-bulle cachait la ligne de faim).
+
+## 16. v0.3.4 : montée de niveau
+
+Journal v0.3.2 du 16/11 à 20:08 : pendant le bandeau de montée de niveau (Mining 16), la faim est lue à 0 %, la vie à ~0 %, la cible « Lim MINING » et sa santé 30/30000.
+- Quand la jauge montre un **niveau gagné**, la vie, la faim et la cible sont **ignorées 8 s** (Q-018).
+- La cible n'est notée que si elle est lue **2 fois de suite** (un nom raté isolé est ignoré).
+- Vérifié en rejouant la séquence du 16/11 : niveau noté, aucune fausse alerte.
+
+Rappel : si une fenêtre (inventaire…) recouvre la jauge, elle n'est pas lue. C'est normal (cas de 20:02:56). Le bot fermera ses fenêtres avant d'agir (Q-015).

@@ -19,7 +19,7 @@
 | [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Moyenne | Ouverte (barre active : point blanc, vu le 16/11) |
 | [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Mise en œuvre en v0.3.0 (modèles de chiffres), à confirmer par T-20261116-04 |
 | [Q-017](Q-017-mode-test-mouvements.md) | Mode test : mouvements « humains » souris et caméra | Moyenne | Résolue → D-035 |
-| [Q-018](Q-018-notifications-ecran.md) | Notifications à l'écran qui masquent le HUD | Moyenne | Ouverte (proposition : v0.3) |
+| [Q-018](Q-018-notifications-ecran.md) | Notifications à l'écran qui masquent le HUD | Moyenne | En partie traitée (montée de niveau, v0.3.4) |
 | [Q-019](Q-019-identifier-arbre-sans-cliquer.md) | Savoir si un arbre est vieux ou jeune avant de le couper | Haute | Résolue → D-036 |
 
 ## Gabarit

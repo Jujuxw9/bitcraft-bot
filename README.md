@@ -6,7 +6,7 @@ Agent autonome pour BitCraft Online : perception écran, prise de décision et a
 
 ## État
 
-**v0.3.3** : la fenêtre du bot affiche le jeu en direct, **lit le HUD** (position par modèles de chiffres, zone, vie, endurance, faim, cible, jauge de métier), télécharge et vérifie les **données du jeu** (BitCraft_GameData, jamais republiées), surveille sa consommation CPU/RAM, et propose un **banc d'essai des mouvements** souris / caméra (désactivé par défaut). Capture du jeu avec `Num 0`. Arrêt d'urgence `Num 5`, durée maximale, journaux. Dernière version validée : v0.1.0 (`executable/`).
+**v0.3.4** : la fenêtre du bot affiche le jeu en direct, **lit le HUD** (position par modèles de chiffres, zone, vie, endurance, faim, cible, jauge de métier), télécharge et vérifie les **données du jeu** (BitCraft_GameData, jamais republiées), surveille sa consommation CPU/RAM, et propose un **banc d'essai des mouvements** souris / caméra (désactivé par défaut). Capture du jeu avec `Num 0`. Arrêt d'urgence `Num 5`, durée maximale, journaux. Dernière version validée : v0.1.0 (`executable/`).
 
 Prochaine étape : v0.4, viser et couper un vieil arbre (D-036). Architecture : [memory/technique/architecture.md](memory/technique/architecture.md). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md).
 

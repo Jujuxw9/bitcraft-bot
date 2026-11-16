@@ -29,3 +29,6 @@ Une brique « **événements à l'écran** » qui :
 
 ## Ce qui bloque
 Rien. Utile si possible : une **vidéo de 10 s** d'une montée de niveau (pour voir l'animation et sa durée).
+
+## Mise en œuvre partielle (v0.3.4, 2026-11-16)
+Montée de niveau détectée par la jauge de métier (niveau +1) : vie, faim et cible ignorées 8 s. Cas réel : Mining 16 à 20:08 (faim lue 0 %, cible « Lim MINING »). Toujours utile : une vidéo de 10 s d'une montée de niveau (lot 6, V6) pour mesurer la durée exacte du bandeau.
