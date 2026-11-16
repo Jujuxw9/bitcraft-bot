@@ -7,6 +7,10 @@
     <ProjectReference Include="..\BitcraftBot.GameData\BitcraftBot.GameData.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Assets\bitcraftbot.ico" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
@@ -16,6 +20,8 @@
     <!-- La version est fixée dans Directory.Build.props, à la racine -->
     <AssemblyName>BitcraftBot</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Logo du bot (généré par tools/generer-icone.ps1) -->
+    <ApplicationIcon>Assets\bitcraftbot.ico</ApplicationIcon>
     <!-- Compression du .exe unique : 125 Mo -> 58 Mo (limite GitHub : 100 Mo, D-020) -->
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
     <!-- Intègre aussi les DLL natives de WPF : un seul fichier .exe à copier (D-010) -->
