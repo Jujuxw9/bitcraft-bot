@@ -1,0 +1,13 @@
+<Project>
+  <!-- Réglages communs à tous les projets de la solution -->
+  <PropertyGroup>
+    <!-- Version du bot : à changer à chaque nouvelle version (D-010) -->
+    <Version>0.1.0</Version>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <!-- En Release, les infos de débogage sont intégrées aux DLL : aucun .pdb à côté du .exe -->
+    <DebugType Condition="'$(Configuration)' == 'Release'">embedded</DebugType>
+  </PropertyGroup>
+</Project>

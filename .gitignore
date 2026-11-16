@@ -499,9 +499,15 @@ images/**
 !images/reference-ui/**
 
 # Modèles ONNX : Git ne sait pas filtrer par taille.
-# Convention : tout modèle > 50 Mo va dans models/large/ (ignoré).
+# Convention : tout modèle > 50 Mo va dans models/large/
+
+# Journaux de session du bot (D-031) : restent sur le PC
+**/journaux/ (ignoré).
 # Les modèles < 50 Mo restent dans models/ et sont versionnés.
 models/large/
+
+# Journaux de session du bot (D-031) : restent sur le PC
+**/journaux/
 
 # Anciennes versions du .exe : restent sur le PC, jamais poussées (D-020)
 executable/anciennes-versions/

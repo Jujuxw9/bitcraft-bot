@@ -13,10 +13,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>0.0.1</Version>
+    <!-- La version est fixée dans Directory.Build.props, à la racine -->
     <AssemblyName>BitcraftBot</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- Compression du .exe unique : 125 Mo -> 58 Mo (limite GitHub : 100 Mo, D-020) -->
     <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-  </PropertyGroup>
+    <!-- Intègre aussi les DLL natives de WPF : un seul fichier .exe à copier (D-010) -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>  </PropertyGroup>
 
 </Project>
