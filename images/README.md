@@ -245,3 +245,4 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_barre-action-1-endurance-vide_001.png` | 2026-11-16 | Endurance 0/100 : compétences 2 et 3 en rouge avec un éclair | 1.0 |
 | `analyse/20261116_analyse_inventaire-plein-chariot_001.png` | 2026-11-16 | Inventaire 25 cases occupées + chariot 144/250 (sans message) | 1.0 |
 | `analyse/20261116_analyse_capture-bot_195816.png` à `_200332` | 2026-11-16 | **57 captures Num 0** (exactes) : coupe et survol de nuit, info-bulle d'aliment, inventaire et chariot superposés, cueillette (Daisy), minage (Limestone). Détail : `memory/technique/interface-du-jeu.md` | 1.0 (build 26707176) |
+| `analyse/20261116_analyse_capture-bot_201030.png` à `_201044` | 2026-11-16 | 5 captures Num 0 : personnage près d'un Limestone, caméra qui tourne, **lac** à gauche (exemples d'eau, Q-020). Annoncées comme A, B, C du lot 6, mais ne les montrent pas | 1.0 (build 26707176) |

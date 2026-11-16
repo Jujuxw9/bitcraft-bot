@@ -7,6 +7,6 @@
 5. État : **v0.3.4** (`artifacts/v0.3.4/`) : position lue 98-100 % (jour et nuit), jauge de métier fiable (Forestry, Foraging, Mining), données BitCraft_GameData vérifiées (D-033), capture du jeu avec **Num 0** (validée), images de diagnostic, faim confirmée sur 4 lectures, montée de niveau gérée (Q-018).
 6. Constats clés : survol = contour vert seulement ; choix d'arbre = plus grand contour, clic droit, lire le nom, annuler si jeune (D-036) ; panneau d'action en bas pendant la coupe ; barre active = point blanc à droite des flèches ; Maker's Tree interdit.
 7. Jeu mis à jour le 16/11 à 17:51 (build 26707176) sans note. Réglages de Julien : heure en 24 h, carte sans animation. Patch notes : API Steam (`technique/sources.md`).
-8. À faire par Julien : reste du lot 6 (A, B, C, E, F, I, vidéos V4 et V6), avec **Num 0** ; essayer Shift + E pour manger.
-9. Plan : v0.4 = premières actions (viser et couper un vieil arbre, D-036), mouvements avec un but (D-037). Repas : D-032 (Shift + E à vérifier). Écorce seulement (D-027), endurance pleine avant relance (D-028).
+8. À faire par Julien : répondre à **Q-020** (exploration bêta : rayon, durée, ennemi, captures d'eau) ; refaire A, B, C du lot 6 (les 5 captures de 20:10 ne les montrent pas) ; dire s'il faut pousser les **5 commits locaux** en attente.
+9. Plan : prochaine version = onglet **« Bêta : exploration »** (Q-020 : herbe seulement, survol avant clic pour refuser tout contour vert, éviter l'eau, minicarte, W), puis v0.4 coupe d'un vieil arbre (D-036). Mouvements avec un but (D-037). Repas : D-032 (Shift + E à vérifier).
 10. Plan des versions v0.1 → v0.6 (MVP) : dans la [feuille de route](2026-11-16-feuille-de-route.md).

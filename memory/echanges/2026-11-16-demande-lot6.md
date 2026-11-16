@@ -13,6 +13,9 @@ Reste du lot 5, mis à jour. **Nouveau : les captures se font avec le bot** (v0.
 - **H** (autres métiers) : fait (Foraging et Mining appris).
 - Essai des mouvements : retour reçu (D-037).
 
+## Reçu le 2026-11-16 à 20:10 (5 captures Num 0) : A, B, C non trouvés
+Julien a dit « A B C OK », mais les 5 captures (20:10:30 à 20:10:44) montrent seulement le personnage près du rocher (Limestone), la caméra qui tourne, et un **lac** à gauche. Pas de hêtre (A), pas de vieil arbre à côté d'un jeune (B), pas de panneau après un clic droit lointain (C). **À refaire.** Les captures servent quand même pour **l'eau** (Q-020).
+
 ## Déjà fait (merci)
 - Chiffre 5 (C1), vidéos de survol (V1, V2), coupe jusqu'à l'endurance vide (V3), barres d'action, inventaire plein.
 - Lecture **de nuit** des coordonnées : vérifiée par Claude en direct (30/30, 2026-11-16 à 19:49).

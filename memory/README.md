@@ -36,7 +36,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [README.md](decisions/README.md) — tableau D-001 à D-037
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-019
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-020
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
