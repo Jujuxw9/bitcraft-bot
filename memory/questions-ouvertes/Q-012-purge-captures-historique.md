@@ -1,5 +1,5 @@
 # Q-012 — Effacer les captures déjà poussées de l'historique Git ?
-- **Statut** : Ouverte
+- **Statut** : Résolue (2026-11-16, choix de Julien : on ne réécrit pas l'historique, voir `images/HISTORIQUE.md`)
 - **Priorité** : Basse
 - **Créée le** : 2026-11-16
 ## Question

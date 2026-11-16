@@ -13,7 +13,8 @@
 | [Q-009](Q-009-langue-messages-commit.md) | Langue des messages de commit | Basse | Résolue → D-019 |
 | [Q-010](Q-010-poids-exe-historique-git.md) | Poids des .exe dans l'historique Git | Basse | Ouverte |
 | [Q-011](Q-011-touches-deplacement-camera.md) | Touches de déplacement et de caméra | Haute | Résolue → D-024 |
-| [Q-012](Q-012-purge-captures-historique.md) | Effacer les captures déjà poussées de l'historique Git ? | Basse | Ouverte |
+| [Q-012](Q-012-purge-captures-historique.md) | Effacer les captures déjà poussées de l'historique Git ? | Basse | Résolue (non) |
+| [Q-013](Q-013-ecorce-ou-troncs.md) | Quel « bois » ramener : écorce, troncs, ou les deux ? | Haute | Ouverte |
 
 ## Gabarit
 

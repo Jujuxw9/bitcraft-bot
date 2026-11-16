@@ -494,6 +494,7 @@ config.local.json
 images/**
 !images/**/
 !images/README.md
+!images/HISTORIQUE.md
 !images/**/.gitkeep
 !images/reference-ui/**
 

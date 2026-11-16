@@ -19,5 +19,5 @@ Le lot 1 pèse 116 Mo. Julien va envoyer beaucoup plus de captures. Git garde to
 
 ## Conséquences
 - **Pas de sauvegarde automatique.** Si le disque meurt, les captures sont perdues. Conseil : copier `images/` de temps en temps sur un disque externe ou un cloud.
-- Les 96 captures déjà poussées restent dans l'historique Git (116 Mo). Les retirer demande de réécrire l'historique (voir Q-012).
+- Les 96 captures déjà poussées restent dans l'historique Git (116 Mo). Julien choisit de ne pas réécrire l'historique (Q-012). Explication : `images/HISTORIQUE.md`.
 - Un autre PC ou un autre agent n'aura pas les images : l'index `images/README.md` décrit chaque capture.

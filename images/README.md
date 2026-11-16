@@ -126,3 +126,59 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_recolte-roche-inventaire-plein_001.png` | 2026-11-16 | Message **« Some items couldn't fit in your inventory and were dropped on the ground »** (inventaire plein) | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_recolte-roche_002.png` | 2026-11-16 | Récolte de « Limestone Rock Formation » (pioche) à côté d'une souche d'arbre | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_recolte-roche-inventaire-plein_002.png` | 2026-11-16 | Message **« Some items couldn't fit in your inventory and were dropped on the ground »** (inventaire plein) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre-sac-au-sol_001.png` | 2026-11-16 | Arbre abattu (Young Beech Tree) : **« Item Pouch »** au sol avec un **Rough Wood Trunk**, boutons Claim All / Release, minuteur, « Owned by ChatGPT » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre-sac-au-sol_002.png` | 2026-11-16 | Arbre abattu (Young Beech Tree) : **« Item Pouch »** au sol avec un **Rough Wood Trunk**, boutons Claim All / Release, minuteur, « Owned by ChatGPT » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_001.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre_004.png` | 2026-11-16 | « Mature Oak Tree » (12 000 points) : survol et coupe, contour vert | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre_005.png` | 2026-11-16 | « Mature Oak Tree » (12 000 points) : survol et coupe, contour vert | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre_006.png` | 2026-11-16 | « Mature Oak Tree » (12 000 points) : survol et coupe, contour vert | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-buisson_001.png` | 2026-11-16 | Récolte de « Strawberry Bush » (Foraging) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-cereales_001.png` | 2026-11-16 | Récolte de « Wild Grains » (Foraging) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-cereales_002.png` | 2026-11-16 | Récolte de « Wild Grains » (Foraging) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-objet_001.png` | 2026-11-16 | Inventaire ouvert + info-bulle d'objet (Basic Berry, Plain Roasted Fish) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-objet_002.png` | 2026-11-16 | Inventaire ouvert + info-bulle d'objet (Basic Berry, Plain Roasted Fish) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_charge-cargo_001.png` | 2026-11-16 | Message **« Carrying Cargo : movement speed encumbered »** (tronc porté) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-radeau_001.png` | 2026-11-16 | Info-bulle « Raft » (transport de cargaison sur l'eau) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-charrette_001.png` | 2026-11-16 | Info-bulle « Cart » (transport de cargaison) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-ferralith_001.png` | 2026-11-16 | Minage de « Large Ferralith Vein » (Tier 1, 30 000 points, pioche) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-ferralith_002.png` | 2026-11-16 | Minage de « Large Ferralith Vein » (Tier 1, 30 000 points, pioche) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-ferralith_003.png` | 2026-11-16 | Minage de « Large Ferralith Vein » (Tier 1, 30 000 points, pioche) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-ferralith_004.png` | 2026-11-16 | Minage de « Large Ferralith Vein » (Tier 1, 30 000 points, pioche) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-ferralith_005.png` | 2026-11-16 | Minage de « Large Ferralith Vein » (Tier 1, 30 000 points, pioche) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-boue_001.png` | 2026-11-16 | Récolte de « Mud Mound » (argile) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-boue_002.png` | 2026-11-16 | Récolte de « Mud Mound » (argile) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-batons_001.png` | 2026-11-16 | Ramassage de « Sticks » (Forestry, sans outil) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-batons_002.png` | 2026-11-16 | Ramassage de « Sticks » (Forestry, sans outil) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_peche_001.png` | 2026-11-16 | Pêche « Briny Guppi » : poisson avec contour vert ou rouge dans l'eau | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_peche_002.png` | 2026-11-16 | Pêche « Briny Guppi » : poisson avec contour vert ou rouge dans l'eau | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_peche_003.png` | 2026-11-16 | Pêche « Briny Guppi » : poisson avec contour vert ou rouge dans l'eau | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_peche_004.png` | 2026-11-16 | Pêche « Briny Guppi » : poisson avec contour vert ou rouge dans l'eau | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_peche_005.png` | 2026-11-16 | Pêche « Briny Guppi » : poisson avec contour vert ou rouge dans l'eau | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_002.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_003.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_004.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_005.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_006.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_007.png` | 2026-11-16 | Coupe de « Young Beech Tree » / « Young Oak Tree » (Tier 1, 3 000 points), gain « Rough Tree Bark », souches autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_endurance-vide_001.png` | 2026-11-16 | **Endurance 0/100** : compétences 2 et 3 grisées en rouge | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_endurance-basse_001.png` | 2026-11-16 | Endurance 3/100, veine de ferralith survolée | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-competence_001.png` | 2026-11-16 | Info-bulles des compétences de la barre d'action (Autoattack, Strike, On Guard, Sprint) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-competence_002.png` | 2026-11-16 | Info-bulles des compétences de la barre d'action (Autoattack, Strike, On Guard, Sprint) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-competence_003.png` | 2026-11-16 | Info-bulles des compétences de la barre d'action (Autoattack, Strike, On Guard, Sprint) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-competence_004.png` | 2026-11-16 | Info-bulles des compétences de la barre d'action (Autoattack, Strike, On Guard, Sprint) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-vie_001.png` | 2026-11-16 | Info-bulle Health (100/100, régénération) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-endurance_001.png` | 2026-11-16 | Info-bulle **Stamina** : sert à récolter, crafter, courir ; régénération passive | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-teleportation_001.png` | 2026-11-16 | Info-bulle Teleportation Energy (Waystones) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-faim_001.png` | 2026-11-16 | Info-bulle **Hunger 70/100** : à 0, le personnage perd de la vie | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-plante_001.png` | 2026-11-16 | Récolte de « Wild Starbulb Plant » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-plante_002.png` | 2026-11-16 | Récolte de « Wild Starbulb Plant » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-plante_003.png` | 2026-11-16 | Récolte de « Wild Starbulb Plant » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-plante_004.png` | 2026-11-16 | Récolte de « Wild Starbulb Plant » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-plante_005.png` | 2026-11-16 | Récolte de « Wild Starbulb Plant » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-arbre-distance_001.png` | 2026-11-16 | **Arbres survolés de loin** : contour vert sur des arbres éloignés | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-arbre-distance_002.png` | 2026-11-16 | **Arbres survolés de loin** : contour vert sur des arbres éloignés | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-arbre-distance_003.png` | 2026-11-16 | **Arbres survolés de loin** : contour vert sur des arbres éloignés | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-arbre-distance_004.png` | 2026-11-16 | **Arbres survolés de loin** : contour vert sur des arbres éloignés | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-arbre-distance_005.png` | 2026-11-16 | **Arbres survolés de loin** : contour vert sur des arbres éloignés | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre-temps-restant_001.png` | 2026-11-16 | Coupe « Young Beech Tree » 905/3000 : info-bulle **« Estimated time left: 2m 24s »** au survol du panneau d'action | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre-niveau_001.png` | 2026-11-16 | Montée de niveau « Forestry Level 22 », gains « Rough Tree Bark 29 » et « Owl Feather » | 1.0 (build affiché : Early-Access-2-082daa0e) |

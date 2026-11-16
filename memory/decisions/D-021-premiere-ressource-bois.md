@@ -22,6 +22,11 @@ Le MVP doit commencer par un seul type de ressource (Q-006).
 - Arbre observé : `Mature Oak Tree`, `Tier 1 - Tree`, 12 000 points de santé, conditions `Axe Tier 1` et `Lv. 1 Forestry` remplies.
 - Inventaire plein : message « Some items couldn't fit in your inventory and were dropped on the ground ». La récolte continue et le bois tombe au sol : le bot doit s'arrêter avant.
 
+## Constats du lot 3 (2026-11-16)
+- Un arbre donne de l'**écorce** (« Rough Tree Bark », inventaire) pendant la coupe, puis un **tronc** (« Rough Wood Trunk », cargaison lourde) dans un sac au sol quand il tombe. Choix à faire : Q-013.
+- Jeunes arbres : 3 000 points (quelques minutes). Vieux arbres : 12 000 points.
+- L'endurance tombe à 0 après environ 9 min de récolte et remonte de +15/min.
+
 ## Alternatives écartées
 - Autres ressources (minerai, fleurs…) : plus tard, l'architecture reste générique (D-017).
 

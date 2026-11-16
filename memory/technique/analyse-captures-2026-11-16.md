@@ -132,3 +132,42 @@ Sur deux captures à 10 s d'écart, la santé de l'arbre passe de 6746 à 6716. 
 | M7 carte du monde | ✘ |
 | M8 survol avec Alt | ✘ |
 | M9 raccourcis de fenêtres | ✘ |
+
+---
+
+# Lot 3 (56 captures, 01:07 à 01:15)
+
+Fichiers `recolte-*`, `peche`, `charge-cargo`, `endurance-*`, `info-bulle-*`, `survol-arbre-distance` dans `images/analyse/`.
+
+## 13. Ce que donne un arbre : écorce **et** tronc (découverte majeure)
+- Pendant la coupe : gain d'objets d'inventaire **« Rough Tree Bark »** (écorce), parfois « Owl Feather ».
+- Quand l'arbre tombe (santé à 0) : il laisse une **souche** et un **« Rough Wood Trunk »** (tronc) dans un **« Item Pouch »** posé au sol.
+  - Fenêtre Item Pouch : boutons **Claim All** et **Release** (ou Destroy), minuteur (~51 s), « Owned by ChatGPT ».
+- Le tronc est une **cargaison** : une fois porté, message **« Carrying Cargo : Carrying a heavy cargo, movement speed encumbered »**. Le personnage est ralenti.
+- Les info-bulles **Cart** (charrette) et **Raft** (radeau) parlent de « Cargo Storage Slots » : la cargaison se transporte à part de l'inventaire.
+- **À vérifier** : la Banque accepte-t-elle les troncs ? Combien de troncs peut-on porter à la fois ?
+
+## 14. Taille des arbres
+| Arbre | Santé |
+|---|---|
+| Young Beech Tree, Young Oak Tree | 3 000 |
+| Mature Oak Tree | 12 000 |
+
+Exemple réel : Young Beech Tree à 905/3000, info-bulle **« Estimated time left: 2m 24s »** (au survol du panneau d'action). Un jeune arbre prend donc quelques minutes. Le chiffre de la section 11 (arbre interminable) était faux pour les jeunes arbres. Les vieux arbres prennent environ 4 fois plus longtemps.
+
+## 15. Endurance : contrainte n°1 de la boucle
+- Info-bulle Stamina : « Used for gather, crafting, or running », régénération passive **+15/1m**.
+- Observé : 82 à 01:02, **0/100 à 01:11** (récolte continue). Soit environ 9 min de récolte pour une barre pleine.
+- À 0 : les compétences 2 et 3 de la barre d'action passent en rouge. **À vérifier** : la récolte s'arrête-t-elle seule ?
+- Remontée de 0 à 100 : environ 7 min.
+- Conséquence : sur une session de 15 min, le bot passera environ un tiers du temps à attendre. Le bot lit la barre jaune (texte `NN/100`) et attend qu'elle remonte.
+
+## 16. Autres jauges
+- **Faim** (Hunger) : 70/100. Info-bulle : à 0, le personnage meurt de faim et perd de la vie. Raccourci « Quick Eat » : Maj+E. À surveiller sur les longues sessions.
+- **Énergie de téléportation** (Waystones) : 100/100.
+
+## 17. Survol à distance
+Le contour vert apparaît aussi sur des **arbres éloignés** (série `survol-arbre-distance`). Le bot peut donc repérer un arbre loin à l'écran, puis faire un clic droit pour que le personnage y aille.
+
+## 18. Autres récoltes vues (pour plus tard, D-017)
+Strawberry Bush, Wild Grains, Wild Starbulb Plant, Mud Mound (argile), Sticks (bâtons, sans outil), Large Ferralith Vein (30 000 points, pioche), Briny Guppi (pêche, contour vert ou rouge sur le poisson). Toutes ont le même panneau cible et le même panneau d'action : **une seule méthode de lecture pour toutes les ressources**.
