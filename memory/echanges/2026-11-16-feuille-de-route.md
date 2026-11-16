@@ -82,5 +82,5 @@ Les 3 premières versions sont sans risque pour le compte : le bot regarde, il n
 | Version | Contenu | État |
 |---|---|---|
 | v0.3.0 à v0.3.4 | Lecture fiable : position par modèles de chiffres, jauge de métier, données du jeu (D-033), capture Num 0, diagnostics, notifications de niveau | **Fait** (`artifacts/v0.3.4/`) |
-| v0.3.x (bêta) | Onglet **« Bêta : exploration »** : déplacements autonomes dans l'herbe, survol avant clic (jamais de contour vert), éviter l'eau, caméra avec W (Q-020) | **Prochaine**, après les réponses de Julien |
+| v0.3.x (bêta) | Onglet **« Bêta : exploration »** : déplacements autonomes dans l'herbe, survol avant clic (jamais de contour vert), éviter l'eau, caméra avec W (Q-020) | **Prochaine** (réglages validés : D-038) |
 | v0.4 | Première vraie action : viser un vieil arbre (plus grand contour), clic droit, lire le nom, annuler si jeune (D-036), mouvements avec un but (D-037) | À venir |

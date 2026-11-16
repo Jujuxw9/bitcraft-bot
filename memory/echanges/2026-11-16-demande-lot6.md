@@ -43,3 +43,18 @@ Julien a dit « A B C OK », mais les 5 captures (20:10:30 à 20:10:44) montrent
 
 ## Essai simple des mouvements (facultatif, 5 min)
 Rappel : le bot a un onglet **Tests** où **la souris bouge toute seule** pendant 30 s (gestes « humains »). Tu l'as lancé à 18:11 (le journal le montre). Ce que je veux savoir, en une phrase : **quand la souris bougeait seule, est-ce que ça ressemblait à une main humaine, ou à un robot ?** (trop rapide, trop lent, trop régulier…). Si tu ne t'en souviens plus : onglet Tests → cocher « Activer le banc d'essai » → « Lancer le test souris » → regarder sans toucher la souris.
+
+## Mise à jour du 2026-11-16 (fin de session 08) : une seule vidéo à la place
+Julien préfère filmer plutôt que faire une capture par élément. **Oui, une vidéo suffit** : Claude en extrait lui-même les images.
+Rappel : la vidéo est compressée (texte un peu flou). Elle sert à voir les **objets et l'eau**, pas à apprendre les chiffres. Pour les chiffres, les captures Num 0 restent meilleures.
+
+### Vidéo « lot 6 » (OBS, 1920×1080, 30 images/s, 3 à 5 min, sans parler)
+Dans cet ordre, en restant **2 à 3 s** immobile sur chaque élément :
+1. **A** : survoler un **Mature Beech Tree** (hêtre), puis le couper 10 s.
+2. **B** : se placer pour voir un **vieil arbre et un jeune** côte à côte ; survoler l'un, puis l'autre.
+3. **C** : **clic droit sur un arbre loin** ; laisser le personnage marcher 3 s ; puis **clic gauche à côté du personnage** pour annuler (D-036).
+4. **Eau** : marcher jusqu'à une **rive** (lac ou rivière) ; tourner lentement la caméra (Q puis D) pour montrer l'eau sous plusieurs angles ; W pour recentrer.
+5. **Herbe** : 10 s de survol lent de **l'herbe vide** autour du personnage (aucun contour vert ne doit apparaître).
+6. Si possible, **de nuit** : refaire le point 4 (l'eau de nuit).
+
+Reste à part (quand l'occasion se présente) : E (bonus de nourriture, Shift + E), F (inventaire qui déborde), I (ennemi, sans risque), V4 (Set destination), V6 (montée de niveau).

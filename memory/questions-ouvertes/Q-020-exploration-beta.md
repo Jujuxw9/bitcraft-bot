@@ -1,5 +1,5 @@
 # Q-020 — Onglet « Bêta : exploration » (déplacements autonomes dans l'herbe)
-- **Statut** : Ouverte (demande de Julien du 2026-11-16, 20:15 ; proposition de Claude ci-dessous, à valider)
+- **Statut** : Résolue → D-038 (rayon 100 réglable, 5 min réglable, ennemi = arrêt + alerte)
 - **Priorité** : Haute (prochaine version)
 - **Créée le** : 2026-11-16
 - **Liens** : D-035 (banc d'essai), D-037 (mouvements avec intention), D-024 (commandes), D-029 (zone sans ennemis), Q-014, Q-002

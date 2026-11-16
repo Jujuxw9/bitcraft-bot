@@ -41,6 +41,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-035](D-035-banc-essai-mouvements.md) | v0.2.2 : banc d'essai des mouvements humains | Validée | 2026-11-16 |
 | [D-036](D-036-choix-arbre-clic-droit.md) | Choisir un vieil arbre : viser le plus grand, cliquer, lire, annuler si besoin | Validée | 2026-11-16 |
 | [D-037](D-037-mouvements-avec-intention.md) | Mouvements de souris et de caméra guidés par une intention | Validée | 2026-11-16 |
+| [D-038](D-038-exploration-beta.md) | Onglet « Bêta : exploration » : règles et réglages | Validée | 2026-11-16 |
 
 ## Gabarit
 
