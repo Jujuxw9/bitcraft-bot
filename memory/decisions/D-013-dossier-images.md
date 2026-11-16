@@ -15,4 +15,4 @@ Structure et nommage décrits dans [images/README.md](../../images/README.md). N
 - Images en vrac : non exploitables.
 
 ## Conséquences
-- Les images d'entraînement sont versionnées.
+- ~~Les images d'entraînement sont versionnées.~~ Remplacé par D-026 (2026-11-16) : les captures restent en local, seuls l'index et `reference-ui/` sont versionnés.

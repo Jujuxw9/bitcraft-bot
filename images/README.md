@@ -11,6 +11,10 @@
 | `sauvegarde/` | Copies de sécurité |
 | `archives/` | Images obsolètes (ex. UI d'avant un patch) |
 
+## Stockage (D-026)
+
+Les captures restent **sur le PC** (ignorées par Git). Seuls ce fichier et `reference-ui/` sont poussés. Penser à copier `images/` de temps en temps sur un disque externe.
+
 ## Nommage
 
 `AAAAMMJJ_categorie_sujet_NNN.png`

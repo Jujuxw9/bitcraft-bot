@@ -1,5 +1,5 @@
 # Q-011 — Touches de déplacement et de caméra
-- **Statut** : Ouverte (réponse proposée : D-024)
+- **Statut** : Résolue → D-024
 - **Priorité** : Haute
 - **Créée le** : 2026-11-16
 ## Question

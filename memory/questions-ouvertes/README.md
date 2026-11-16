@@ -12,7 +12,8 @@
 | [Q-008](Q-008-deconnexion-cadence.md) | Déconnexion automatique et cadence | Moyenne | Ouverte |
 | [Q-009](Q-009-langue-messages-commit.md) | Langue des messages de commit | Basse | Résolue → D-019 |
 | [Q-010](Q-010-poids-exe-historique-git.md) | Poids des .exe dans l'historique Git | Basse | Ouverte |
-| [Q-011](Q-011-touches-deplacement-camera.md) | Touches de déplacement et de caméra | Haute | Ouverte (réponse proposée : D-024) |
+| [Q-011](Q-011-touches-deplacement-camera.md) | Touches de déplacement et de caméra | Haute | Résolue → D-024 |
+| [Q-012](Q-012-purge-captures-historique.md) | Effacer les captures déjà poussées de l'historique Git ? | Basse | Ouverte |
 
 ## Gabarit
 

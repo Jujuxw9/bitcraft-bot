@@ -27,7 +27,9 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-021](D-021-premiere-ressource-bois.md) | Première ressource : le bois (arbres) | Validée | 2026-11-16 |
 | [D-022](D-022-reglages-securite-defaut.md) | Réglages par défaut de la sécurité | Validée | 2026-11-16 |
 | [D-023](D-023-autonomie-code-claude.md) | Claude code tout, Julien suit l'architecture | Validée | 2026-11-16 |
-| [D-024](D-024-commandes-du-bot.md) | Commandes utilisées par le bot | Proposée | 2026-11-16 |
+| [D-024](D-024-commandes-du-bot.md) | Commandes utilisées par le bot | Validée | 2026-11-16 |
+| [D-025](D-025-jour-et-nuit.md) | Le bot fonctionne de jour comme de nuit | Validée | 2026-11-16 |
+| [D-026](D-026-captures-en-local.md) | Captures d'écran en local, pas dans Git | Validée | 2026-11-16 |
 
 ## Gabarit
 

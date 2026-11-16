@@ -7,5 +7,6 @@ BitCraftPublic ne contient que les schémas. D'où viennent les valeurs (items, 
 ## Pistes / options
 - Exports communautaires fiables (à chercher).
 - Saisie manuelle depuis le jeu.
+- **Pistes du 2026-11-16** (liens fournis par Julien) : exports JSON du dépôt Snipey/Hexel (juil. 2025, avant la 1.0) et API communautaire **Bitjita** (bitjita.com). Voir [sources.md](../technique/sources.md).
 ## Ce qui bloque
 Aucune source identifiée. La 1.0 a changé les données : les exports antérieurs sont peut-être obsolètes.

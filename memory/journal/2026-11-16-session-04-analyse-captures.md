@@ -14,12 +14,16 @@ Trier, renommer et analyser les 80 captures déposées par Julien dans `images/a
 
 - **Lot 2** (16 captures de récoltes) : panneau cible lisible (nom, santé, outil), panneau d'action, gain d'objets, message d'inventaire plein. Analyse ajoutée (sections 8 à 12).
 
+- Analyse de 4 dépôts GitHub fournis par Julien : bots Discord uniquement ; pistes de données Bitjita et Hexel ajoutées à `sources.md`.
+- Captures retirées du suivi Git (restent sur le PC).
+
 ## Décisions prises (liens D-NNN)
-- [D-024](../decisions/D-024-commandes-du-bot.md) **proposée** (tout à la souris, réglages du jeu inchangés).
+- [D-024](../decisions/D-024-commandes-du-bot.md) validée (tout à la souris, ZQSD pour la caméra si besoin).
+- [D-025](../decisions/D-025-jour-et-nuit.md) jour et nuit, [D-026](../decisions/D-026-captures-en-local.md) captures en local.
 - D-016 et D-018 complétées (Banque confirmée, correction de l'horloge).
 
 ## Questions ouvertes créées (liens Q-NNN)
-Aucune. Q-001, Q-002, Q-011 complétées.
+[Q-012](../questions-ouvertes/Q-012-purge-captures-historique.md) (effacer les captures de l'historique). Q-011 résolue. Q-001, Q-002, Q-004 complétées.
 
 ## Points à signaler
 - Le build affiché est `Early-Access-2-082daa0e` alors que le menu annonce la 1.0. **À vérifier** avec Julien.

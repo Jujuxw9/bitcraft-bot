@@ -11,4 +11,9 @@
 | store.steampowered.com/app/3454650 | Config requise, 12 professions, UI en français disponible | Moyenne |
 | bitcraftonline.com/discover | Présentation marketing | Faible |
 | bitcraftonline.com | Liens support, EULA, Discord | Faible |
+| github.com/Snipey/Hexel | Bot Discord (TypeScript, juil. 2025). Contient des **exports JSON des tables de jeu** : `item_desc`, `resource_desc`, `extraction_recipe_desc`, `crafting_recipe_desc`… (`src/data/region/`) | **Haute** pour Q-004 : valeurs réelles, mais **d'avant la 1.0** (À vérifier : écarts avec la 1.0) |
+| bitjita.com (API, ex. `/api/crafts`) | Site communautaire qui expose les données du jeu en lecture seule | **Haute** pour Q-004 : source possiblement à jour en 1.0 (À vérifier : quelles routes, conditions d'usage) |
+| github.com/EisPaprika/bitcraft-bot | Bot Discord Python (avr. 2026) : infos de craft d'une colonie via l'API Bitjita | Faible : exemple d'appel à Bitjita |
+| github.com/KascadeKyle/bitcraft-job-bot | Bot Discord JavaScript (mars 2026) : suivi des crafts via l'API Bitjita | Faible : exemple d'appel à Bitjita |
+| github.com/Lebenet/KoF_bot | Bot Discord TypeScript du « Royaume de France » (août 2026) : commandes, crafts, colonies, Google Sheets | Faible : aucun lien avec la vision ou le pilotage du jeu |
 | spacetimedb.com/docs | Docs SpacetimeDB 2.0, SDK TypeScript/Rust/C#/C++ | Faible pour l'option A (pas de connexion directe au serveur) ; utile pour lire le code serveur |

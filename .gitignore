@@ -489,8 +489,13 @@ $RECYCLE.BIN/
 config.local.json
 **/config.local.json
 
-# Images d'entraînement : VERSIONNÉES (ne jamais les ignorer)
-!images/entrainement/**/*.png
+# Captures d'écran : restent sur le PC (D-026).
+# Versionnés : l'index images/README.md, les .gitkeep et images/reference-ui/.
+images/**
+!images/**/
+!images/README.md
+!images/**/.gitkeep
+!images/reference-ui/**
 
 # Modèles ONNX : Git ne sait pas filtrer par taille.
 # Convention : tout modèle > 50 Mo va dans models/large/ (ignoré).
