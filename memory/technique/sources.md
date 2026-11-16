@@ -23,4 +23,12 @@
 | bitcraft.fandom.com | Ancien wiki communautaire | Faible : sans doute moins à jour que wiki.gg |
 | bitcraftplanner.com, bitcraftcalculator.web.app, bitcraftulator.com | Planificateurs et calculateurs de craft | Faible pour le MVP ; utile pour le niveau N2 (D-003) |
 | reddit.com/r/BitCraftOnline (sujet calculateur) | Annonce d'un calculateur communautaire | Faible |
+| **github.com/BitCraftToolBox/BitCraft_GameData** (branche `cereal/cs`) | **Tables de données du jeu en JSON, mises à jour chaque jour** (2026-11-15 = après la 1.0) : ressources, objets, recettes | **Très haute** : source proposée pour Q-004 (D-033). Pas de licence : ne pas recopier dans notre dépôt |
+| bitcraftonline.com/news/bitcraft-online-1-0-patch-notes | Notes de version 1.0 | Haute : changements de mécaniques et d'interface |
+| steamdb.info/app/3454650/patchnotes, store.steampowered.com/news/app/3454650 | Historique des mises à jour | Haute : surveiller les patchs qui peuvent casser la lecture de l'écran |
+| bitjita.com/status, status.technobezz.com/fr/bitcraft | État des serveurs | Moyenne : savoir si un problème vient du jeu |
+| bitjita.com/stats, steamdb.info/app/3454650/charts | Statistiques de joueurs | Faible |
+| bitcrafted.info, bitcraft-helper.com, bitcraftdex (Reddit) | Bases de données et aides communautaires | Faible : doublons de BitCraft_GameData |
+| bitcraftonline.com/news/spacetimedb-and-bitcraft | Article technique sur le serveur | Faible pour nous (pas de connexion au serveur) |
+| jeuxonline.info, actugaming.net | Articles de presse sur la sortie 1.0 | Faible |
 | spacetimedb.com/docs | Docs SpacetimeDB 2.0, SDK TypeScript/Rust/C#/C++ | Faible pour l'option A (pas de connexion directe au serveur) ; utile pour lire le code serveur |

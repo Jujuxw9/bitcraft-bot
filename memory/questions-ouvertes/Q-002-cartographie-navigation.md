@@ -16,5 +16,6 @@ La position absolue est lisible par OCR (D-018). Comment se déplacer et cartogr
 - **Lot 4 (2026-11-16)** : la grande carte affiche les coordonnées sous la souris (`Keldan (R18) | (8918, 6700)`) et propose « Set destination ». Piste principale pour aller à la Banque. Voir analyse, section 19.
 - « Set destination » sur la grande carte : **fonctionne** (Julien, 2026-11-16). Il faut zoomer et cliquer dans une zone **déjà découverte**, pas trop loin. Le personnage s'y rend.
 - Trajet observé (vidéo) : zone de minage → Banque en environ 30 s, caméra recentrée avec W.
+- **Idée de Julien (2026-11-16)** : sur la grande carte ouverte et dézoomée, le fond est sombre, donc les textes ressortent mieux. Piste de secours si la lecture des coordonnées sous la minicarte devient difficile (ex. de nuit). Pour l'instant inutile : lecture à 100 % sur 30 s de jour.
 ## Ce qui bloque
 Captures du HUD et de la carte nécessaires.

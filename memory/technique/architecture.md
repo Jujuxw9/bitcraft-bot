@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.2.0** (2026-11-16). Le bot regarde le jeu et **lit le HUD**, mais n'agit pas encore dessus. Détails de la v0.2 : section 8.
+> État : **v0.2.1** (2026-11-16). Le bot regarde le jeu et **lit le HUD**, mais n'agit pas encore dessus. v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Limite connue : section 10.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -128,3 +128,27 @@ Capture 18-19 ms par image, lecture complète du HUD 37-47 ms, position lue 100 
 
 ### Tests automatiques
 60 tests, dont une lecture complète d'une **vraie capture du jeu** (`images/reference-ui/`) : position, zone, région, vie, endurance, faim et cible doivent toutes être justes.
+
+## 9. v0.2.1 : onglets et surveillance CPU/RAM
+
+- **Fenêtre** : s'ouvre agrandie sur l'écran où elle était (2e écran). Position « normale » mémorisée.
+- **Onglets** :
+  - **Supervision** : image du jeu, lecture du HUD, commandes, sécurité. En bas : dernier événement et compteurs d'alertes / erreurs.
+  - **Journal** : tout le journal en couleur, filtrable par niveau (Erreurs, Alertes, Infos, Détails).
+  - **Système** : CPU et RAM du bot (avec courbes sur 2 min), du jeu (processus « BitCraft ») et du PC. Seuils réglables.
+- **Niveaux du journal** : `ERREUR`, `ALERTE`, `INFO`, `DÉTAIL` (le détail : mesure CPU/RAM chaque minute).
+- **Surveillance** (`ResourceMonitor`, `ResourceGuard` dans Core), chaque seconde, en lecture seule :
+  | Mesure | Seuil par défaut | Effet |
+  |---|---|---|
+  | RAM du bot | 600 Mo | ALERTE |
+  | RAM du bot | 1 200 Mo | ERREUR + **arrêt de la session** (si « Arrêt sur anomalie » coché) |
+  | CPU du bot | 25 % pendant 10 s | ALERTE |
+  | RAM libre du PC | 10 % | ALERTE |
+  Le journal ne note que les **changements d'état** (passage en alerte, retour à la normale).
+- **Mesures réelles** (2026-11-16) : bot 2 à 5 % de CPU, 175 Mo au lancement puis environ 300 Mo en session (images de 8 Mo capturées 5 fois par seconde). Jeu : environ 2,5 Go de RAM. PC : 32 Go, environ 14 Go libres.
+- **À améliorer** : réutiliser les mêmes zones mémoire pour les images capturées, pour stabiliser la RAM du bot.
+
+## 10. Limite connue de la lecture de la position
+
+L'OCR de Windows lit parfois le **2** de la police du HUD comme un « Q » (`E 6692` → `E 6 69 Q`). Depuis la v0.2.1, une lecture douteuse est **rejetée** (position « illisible ») au lieu d'être fausse.
+Solution prévue : **reconnaître les chiffres par comparaison avec des modèles** (la police du HUD ne change pas). C'est plus fiable et plus rapide que l'OCR pour des nombres. Image de test : `images/reference-ui/20261116_reference-ui_hud-cueillette-buisson_002.png`.

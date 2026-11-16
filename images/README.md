@@ -231,3 +231,4 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_carte-repere-destination_001.png` | 2026-11-16 | Zoom carte du monde : repère de destination posé près d'une zone non découverte | 1.0 |
 | `analyse/20261116_analyse_video-trajet-banque-camera-w_001.mp4` | 2026-11-16 | **Vidéo 30 s** : trajet de la zone de minage (Ferralith Vein) jusqu'à la Banque de Snowrest, caméra recentrée avec W, interface Bank ouverte à l'arrivée | 1.0 |
 | `reference-ui/20261116_reference-ui_hud-coupe-arbre_001.png` | 2026-11-16 | **Image de référence des tests** : écran complet 1920×1080 (capture exacte par le bot), coupe d'un Mature Oak Tree 893/12000, endurance 65/100, position N 8927, E 6707. Versionnée. | 1.0 |
+| `reference-ui/20261116_reference-ui_hud-cueillette-buisson_002.png` | 2026-11-16 | **Image de référence (cas difficile)** : position `N 8933, E 6692` où l'OCR lit le 2 comme « Q ». Servira à tester la lecture des chiffres par modèles. Versionnée. | 1.0 |

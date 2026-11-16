@@ -14,6 +14,14 @@
 
 - **Code (D-023)** : Claude code tout, en autonomie. Julien ne lit pas le code. Expliquer l'architecture et le comportement, jamais les lignes de code. Tenir `memory/technique/architecture.md` à jour.
 
+## Méthode de travail avec Julien (2026-11-16)
+
+- Julien n'est pas technique : il a le besoin, Claude a les compétences. L'échange doit être fluide.
+- **Tester en interne chaque livrable** avant de le donner : tests automatiques + essai réel sur le PC.
+- **Poser une question au moindre doute** sur une fonction ou un livrable, plutôt que supposer.
+- **Rappeler à la fin de chaque message les questions encore sans réponse.**
+- Liens envoyés par Julien : les évaluer et les ranger dans `memory/technique/sources.md`.
+
 ## En fin de session
 
 - Ajouter un fichier dans `memory/journal/` (gabarit dans `memory/journal/README.md`).
