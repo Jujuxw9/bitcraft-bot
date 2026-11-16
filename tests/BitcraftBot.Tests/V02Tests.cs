@@ -13,8 +13,8 @@ public class HudParserTests
     [InlineData("N 8927, E 6707", 8927, 6707)]
     [InlineData("N 8927. E 6707", 8927, 6707)]
     [InlineData("N8927,E6707", 8927, 6707)]
-    [InlineData("N 8g27, E 67O7", 8927, 6707)]
-    [InlineData("n 8968, e 6730", 8968, 6730)]
+    [InlineData("N 8927, E 67O7", 8927, 6707)]
+
     [InlineData("N 8932, E 6 69 7", 8932, 6697)] // espaces insérés par l'OCR (vu en réel)
     [InlineData("N 8 932, E 6697", 8932, 6697)]
     public void ParseCoordinates_Ok(string text, int north, int east) =>
@@ -24,6 +24,7 @@ public class HudParserTests
     [InlineData("")]
     [InlineData("SAFE MEADOWS")]
     [InlineData("N , E")]
+    [InlineData("N 8933, E 6 69 Q")] // vu en réel : le 2 lu comme Q ; refusé plutôt que faux
     public void ParseCoordinates_Rejects(string text) => Assert.Null(HudParser.ParseCoordinates(text));
 
     [Theory]

@@ -25,6 +25,15 @@ public sealed class LocalSettings
     // Affiche les zones lues sur l'image du jeu.
     public bool ShowZones { get; set; } = true;
 
+    // Fenêtre agrandie au démarrage, sur l'écran où elle était (demande de Julien).
+    public bool StartMaximized { get; set; } = true;
+
+    // Arrêt sur anomalie (RAM du bot critique).
+    public bool AnomalyStopEnabled { get; set; } = true;
+
+    // Seuils de surveillance CPU / RAM (onglet Système).
+    public BitcraftBot.Core.Monitoring.ResourceLimits Limits { get; set; } = new();
+
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     public static string DefaultPath => Path.Combine(AppContext.BaseDirectory, FileName);

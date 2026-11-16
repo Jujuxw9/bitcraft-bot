@@ -35,118 +35,213 @@
             <Setter Property="Margin" Value="0,0,6,0" />
             <Setter Property="MinWidth" Value="90" />
         </Style>
+        <Style TargetType="TabItem">
+            <Setter Property="Padding" Value="14,5" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="#26282C" />
+            <Setter Property="BorderBrush" Value="#3C3F44" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="Margin" Value="0,0,10,10" />
+        </Style>
     </Window.Resources>
 
-    <Grid Margin="8">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="130" MinHeight="60" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="270" />
-        </Grid.ColumnDefinitions>
+    <TabControl x:Name="Tabs" Background="#1E1F22" BorderBrush="#3C3F44" Margin="4">
 
-        <!-- Image du jeu en direct, avec les zones lues en surimpression -->
-        <Border Grid.Row="0" Grid.Column="0" Background="Black" BorderBrush="#3C3F44" BorderThickness="1">
-            <Grid>
-                <Viewbox Stretch="Uniform">
-                    <Grid x:Name="FrameHost">
-                        <Image x:Name="GameImage" Stretch="Fill" RenderOptions.BitmapScalingMode="LowQuality" />
-                        <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False" />
+        <!-- ONGLET 1 : SUPERVISION -->
+        <TabItem Header="Supervision">
+            <Grid Margin="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="280" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Image du jeu en direct, avec les zones lues en surimpression -->
+                <Border Grid.Row="0" Grid.Column="0" Background="Black" BorderBrush="#3C3F44" BorderThickness="1">
+                    <Grid>
+                        <Viewbox Stretch="Uniform">
+                            <Grid x:Name="FrameHost">
+                                <Image x:Name="GameImage" Stretch="Fill" RenderOptions.BitmapScalingMode="LowQuality" />
+                                <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False" />
+                            </Grid>
+                        </Viewbox>
+                        <TextBlock x:Name="NoImageText" Text="Pas d'image. Cliquez sur « Démarrer »."
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9AA0A6" />
                     </Grid>
-                </Viewbox>
-                <TextBlock x:Name="NoImageText" Text="Pas d'image. Cliquez sur « Démarrer »."
-                           HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9AA0A6" />
-            </Grid>
-        </Border>
-
-        <!-- Panneau d'état et de commande -->
-        <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="8,0,0,0">
-            <StackPanel>
-                <Border x:Name="StatusBorder" Background="#3C3F44" CornerRadius="4" Padding="8">
-                    <StackPanel>
-                        <TextBlock x:Name="StatusText" Text="ARRÊTÉ" FontSize="18" FontWeight="Bold" />
-                        <TextBlock x:Name="StatusDetail" Text="Aucune session en cours." TextWrapping="Wrap" />
-                    </StackPanel>
                 </Border>
 
-                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                    <Button x:Name="StartButton" Content="Démarrer" Click="StartButton_Click" />
-                    <Button x:Name="StopButton" Content="Arrêter" Click="StopButton_Click" IsEnabled="False" />
+                <!-- Panneau d'état et de commande -->
+                <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="8,0,0,0">
+                    <StackPanel>
+                        <Border x:Name="StatusBorder" Background="#3C3F44" CornerRadius="4" Padding="8">
+                            <StackPanel>
+                                <TextBlock x:Name="StatusText" Text="ARRÊTÉ" FontSize="18" FontWeight="Bold" />
+                                <TextBlock x:Name="StatusDetail" Text="Aucune session en cours." TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button x:Name="StartButton" Content="Démarrer" Click="StartButton_Click" />
+                            <Button x:Name="StopButton" Content="Arrêter" Click="StopButton_Click" IsEnabled="False" />
+                        </StackPanel>
+                        <TextBlock Text="Arrêt d'urgence : touche Num 5 (même quand le jeu est au premier plan)."
+                                   TextWrapping="Wrap" Foreground="#F28B82" Margin="0,6,0,0" />
+
+                        <TextBlock Text="LECTURE DU HUD" Style="{StaticResource SectionTitle}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Position" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="HudPosition" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="1" Text="Zone" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="HudZone" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="2" Text="Vie" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HudHealth" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="3" Text="Endurance" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="HudStamina" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="4" Text="Faim" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="4" Grid.Column="1" x:Name="HudHunger" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="5" Text="Cible" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="5" Grid.Column="1" x:Name="HudTarget" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="6" Text="Santé cible" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="6" Grid.Column="1" x:Name="HudTargetHealth" Text="—" Style="{StaticResource HudValue}" />
+                            <TextBlock Grid.Row="7" Text="Lecture" Style="{StaticResource HudLabel}" />
+                            <TextBlock Grid.Row="7" Grid.Column="1" x:Name="HudReadTime" Text="—" Style="{StaticResource HudValue}" />
+                        </Grid>
+                        <CheckBox x:Name="ShowZonesCheck" Content="Afficher les zones lues sur l'image" IsChecked="True"
+                                  Click="ShowZonesCheck_Click" />
+
+                        <TextBlock Text="SESSION" Style="{StaticResource SectionTitle}" />
+                        <TextBlock x:Name="ElapsedText" Text="Durée : 00:00" />
+                        <TextBlock x:Name="RemainingText" Text="Restant : —" />
+                        <TextBlock x:Name="FpsText" Text="Images par seconde : —" />
+                        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="Images/s visées :" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <TextBox x:Name="TargetFpsBox" Text="5" Width="40" LostFocus="TargetFpsBox_LostFocus" />
+                        </StackPanel>
+
+                        <TextBlock Text="JEU" Style="{StaticResource SectionTitle}" />
+                        <TextBlock x:Name="GameWindowText" Text="Fenêtre du jeu : non cherchée" TextWrapping="Wrap" />
+
+                        <TextBlock Text="SÉCURITÉ" Style="{StaticResource SectionTitle}" />
+                        <CheckBox x:Name="EmergencyKeyCheck" Content="Touche d'arrêt d'urgence (Num 5)" IsChecked="True"
+                                  Click="SafetyCheck_Click" />
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="MaxDurationCheck" Content="Durée max (min) :" IsChecked="True"
+                                      Click="SafetyCheck_Click" VerticalAlignment="Center" />
+                            <TextBox x:Name="MaxDurationBox" Text="15" Width="40" Margin="6,0,0,0"
+                                     LostFocus="MaxDurationBox_LostFocus" />
+                        </StackPanel>
+                        <CheckBox x:Name="AnomalyCheck" Content="Arrêt sur anomalie (RAM du bot critique)" IsChecked="True"
+                                  Click="SafetyCheck_Click" />
+                        <CheckBox Content="Arrêt si la souris bouge (à partir de v0.4)" IsEnabled="False" />
+
+                        <TextBlock x:Name="VersionText" Text="Version" Foreground="#9AA0A6" Margin="0,10,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Dernier événement du journal (le journal complet est dans l'onglet Journal) -->
+                <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#141517" BorderBrush="#3C3F44" BorderThickness="1"
+                        Margin="0,6,0,0" Padding="8,4">
+                    <DockPanel>
+                        <TextBlock x:Name="AlertCounters" DockPanel.Dock="Right" Foreground="#9AA0A6" Margin="12,0,0,0" />
+                        <TextBlock x:Name="LastEventText" Text="—" FontFamily="Consolas" FontSize="11"
+                                   TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </TabItem>
+
+        <!-- ONGLET 2 : JOURNAL -->
+        <TabItem Header="Journal">
+            <DockPanel Margin="6">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <CheckBox x:Name="FilterErreur" Content="Erreurs" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#F28B82" />
+                    <CheckBox x:Name="FilterAlerte" Content="Alertes" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#FDD663" />
+                    <CheckBox x:Name="FilterInfo" Content="Infos" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" />
+                    <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="False" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
+                    <Button Content="Ouvrir le dossier des journaux" Click="OpenLogFolder_Click" />
+                    <TextBlock x:Name="LogFileText" VerticalAlignment="Center" Foreground="#9AA0A6" Margin="8,0,0,0" />
                 </StackPanel>
-                <TextBlock Text="Arrêt d'urgence : touche Num 5 (même quand le jeu est au premier plan)."
-                           TextWrapping="Wrap" Foreground="#F28B82" Margin="0,6,0,0" />
+                <ListBox x:Name="LogList" Background="#141517" BorderBrush="#3C3F44" FontFamily="Consolas" FontSize="12"
+                         VirtualizingPanel.IsVirtualizing="True">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" Foreground="{Binding Color}" TextWrapping="Wrap" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </TabItem>
 
-                <TextBlock Text="LECTURE DU HUD" Style="{StaticResource SectionTitle}" />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
-                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="Position" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="HudPosition" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="1" Text="Zone" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="HudZone" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="2" Text="Vie" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HudHealth" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="3" Text="Endurance" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="HudStamina" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="4" Text="Faim" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="HudHunger" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="5" Text="Cible" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="HudTarget" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="6" Text="Santé cible" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="HudTargetHealth" Text="—" Style="{StaticResource HudValue}" />
-                    <TextBlock Grid.Row="7" Text="Lecture" Style="{StaticResource HudLabel}" />
-                    <TextBlock Grid.Row="7" Grid.Column="1" x:Name="HudReadTime" Text="—" Style="{StaticResource HudValue}" />
-                </Grid>
-                <CheckBox x:Name="ShowZonesCheck" Content="Afficher les zones lues sur l'image" IsChecked="True"
-                          Click="ShowZonesCheck_Click" />
-
-                <TextBlock Text="SESSION" Style="{StaticResource SectionTitle}" />
-                <TextBlock x:Name="ElapsedText" Text="Durée : 00:00" />
-                <TextBlock x:Name="RemainingText" Text="Restant : —" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="FpsText" Text="Images par seconde : —" VerticalAlignment="Center" />
+        <!-- ONGLET 3 : SYSTÈME -->
+        <TabItem Header="Système">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10"
+                               Text="Consommation mesurée chaque seconde. Le bot ne fait que lire ces valeurs : il ne modifie ni le jeu ni Windows. Si sa RAM dépasse le seuil critique, la session s'arrête toute seule." />
+                    <WrapPanel>
+                        <Border Style="{StaticResource Card}" Width="320">
+                            <StackPanel>
+                                <TextBlock Text="LE BOT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <TextBlock x:Name="BotCpuText" Text="CPU : —" />
+                                <Canvas x:Name="BotCpuGraph" Height="50" Margin="0,4" Background="#1A1C1F" ClipToBounds="True" />
+                                <TextBlock x:Name="BotRamText" Text="RAM : —" />
+                                <Canvas x:Name="BotRamGraph" Height="50" Margin="0,4" Background="#1A1C1F" ClipToBounds="True" />
+                                <TextBlock x:Name="BotDetailsText" Text="—" Foreground="#9AA0A6" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Width="320">
+                            <StackPanel>
+                                <TextBlock Text="LE JEU (BitCraft)" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <TextBlock x:Name="GameCpuText" Text="CPU : —" />
+                                <TextBlock x:Name="GameRamText" Text="RAM : —" />
+                                <TextBlock Text="LE PC" Style="{StaticResource SectionTitle}" />
+                                <TextBlock x:Name="SystemCpuText" Text="CPU : —" />
+                                <TextBlock x:Name="SystemRamText" Text="RAM libre : —" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}" Width="320">
+                            <StackPanel>
+                                <TextBlock Text="SEUILS" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="70" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="RAM du bot : alerte (Mo)" VerticalAlignment="Center" />
+                                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="RamWarningBox" Margin="0,2" LostFocus="LimitBox_LostFocus" />
+                                    <TextBlock Grid.Row="1" Text="RAM du bot : arrêt (Mo)" VerticalAlignment="Center" />
+                                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="RamCriticalBox" Margin="0,2" LostFocus="LimitBox_LostFocus" />
+                                    <TextBlock Grid.Row="2" Text="CPU du bot : alerte (%)" VerticalAlignment="Center" />
+                                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="CpuWarningBox" Margin="0,2" LostFocus="LimitBox_LostFocus" />
+                                    <TextBlock Grid.Row="3" Text="RAM libre du PC : alerte (%)" VerticalAlignment="Center" />
+                                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="SystemRamWarningBox" Margin="0,2" LostFocus="LimitBox_LostFocus" />
+                                </Grid>
+                                <TextBlock x:Name="ResourceStateText" Text="État : normal" Margin="0,8,0,0" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                    <TextBlock Text="Images/s visées :" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <TextBox x:Name="TargetFpsBox" Text="5" Width="40" LostFocus="TargetFpsBox_LostFocus" />
-                </StackPanel>
-
-                <TextBlock Text="JEU" Style="{StaticResource SectionTitle}" />
-                <TextBlock x:Name="GameWindowText" Text="Fenêtre du jeu : non cherchée" TextWrapping="Wrap" />
-
-                <TextBlock Text="SÉCURITÉ" Style="{StaticResource SectionTitle}" />
-                <CheckBox x:Name="EmergencyKeyCheck" Content="Touche d'arrêt d'urgence (Num 5)" IsChecked="True"
-                          Click="SafetyCheck_Click" />
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox x:Name="MaxDurationCheck" Content="Durée max (min) :" IsChecked="True"
-                              Click="SafetyCheck_Click" VerticalAlignment="Center" />
-                    <TextBox x:Name="MaxDurationBox" Text="15" Width="40" Margin="6,0,0,0"
-                             LostFocus="MaxDurationBox_LostFocus" />
-                </StackPanel>
-                <CheckBox Content="Arrêt si la souris bouge (à partir de v0.4)" IsEnabled="False" />
-                <CheckBox Content="Arrêt sur anomalie (à partir de v0.4)" IsEnabled="False" />
-
-                <TextBlock Text="JOURNAL" Style="{StaticResource SectionTitle}" />
-                <Button Content="Ouvrir le dossier" HorizontalAlignment="Left" Click="OpenLogFolder_Click" />
-                <TextBlock x:Name="VersionText" Text="Version" Foreground="#9AA0A6" Margin="0,10,0,0"
-                           TextWrapping="Wrap" />
-            </StackPanel>
-        </ScrollViewer>
-
-        <GridSplitter Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Background="#2B2D31" />
-
-        <!-- Journal en direct -->
-        <ListBox x:Name="LogList" Grid.Row="2" Grid.ColumnSpan="2" Background="#141517" Foreground="#C8C8C8"
-                 BorderBrush="#3C3F44" FontFamily="Consolas" FontSize="11"
-                 VirtualizingPanel.IsVirtualizing="True" />
-    </Grid>
+            </ScrollViewer>
+        </TabItem>
+    </TabControl>
 </Window>

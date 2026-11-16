@@ -11,6 +11,9 @@ public static class KnownNames
         "Mature Oak Tree",
         "Young Oak Tree",
         "Young Beech Tree",
+        "Mature Beech Tree",
+        "Dead Tree",
+        "Bush",
         "Sticks",
         // Minerai et pierre (Mining)
         "Large Ferralith Vein",

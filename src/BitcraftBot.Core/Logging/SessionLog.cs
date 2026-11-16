@@ -3,8 +3,10 @@ using BitcraftBot.Core.Time;
 
 namespace BitcraftBot.Core.Logging;
 
+// Niveaux du journal, du plus détaillé au plus grave.
 public enum LogLevel
 {
+    Detail,
     Info,
     Alerte,
     Erreur,
@@ -16,8 +18,9 @@ public sealed record LogEntry(DateTime Time, LogLevel Level, string Category, st
     public override string ToString() =>
         $"{Time:yyyy-MM-dd HH:mm:ss.fff} [{LevelText(Level)}] [{Category}] {Message}";
 
-    private static string LevelText(LogLevel level) => level switch
+    public static string LevelText(LogLevel level) => level switch
     {
+        LogLevel.Detail => "DÉTAIL",
         LogLevel.Info => "INFO",
         LogLevel.Alerte => "ALERTE",
         LogLevel.Erreur => "ERREUR",
@@ -60,6 +63,8 @@ public sealed class SessionLog : IDisposable
         var plus = version.IndexOf('+');
         return plus >= 0 ? version[..plus] : version;
     }
+
+    public void Detail(string category, string message) => Write(LogLevel.Detail, category, message);
 
     public void Info(string category, string message) => Write(LogLevel.Info, category, message);
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using BitcraftBot.Core.Logging;
+using BitcraftBot.Core.Monitoring;
 using BitcraftBot.Core.Safety;
 using BitcraftBot.GameData;
 using BitcraftBot.Input.Keyboard;
@@ -18,12 +19,13 @@ using Frame = BitcraftBot.Perception.Capture.Frame;
 
 namespace BitcraftBot.App;
 
-// Fenêtre de supervision (D-005), version 0.2 :
+// Fenêtre de supervision (D-005), version 0.2 (onglets Supervision, Journal, Système) :
 // affiche le jeu en direct, lit le HUD (position, vie, endurance, faim, cible), gère la sécurité, écrit le journal.
 // Aucune action n'est envoyée au jeu dans cette version.
 public partial class MainWindow : Window
 {
-    private const int MaxLogLines = 500;
+    private const int GraphPoints = 120;
+    private static readonly TimeSpan ResourceDetailInterval = TimeSpan.FromSeconds(60);
     private static readonly TimeSpan HudInterval = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan LocateInterval = TimeSpan.FromSeconds(2);
     private static readonly TimeSpan UiInterval = TimeSpan.FromMilliseconds(250);
@@ -38,6 +40,17 @@ public partial class MainWindow : Window
     private readonly HudChangeLogger _hudLogger;
     private readonly HudReader? _hudReader;
     private GlobalKeyboardHook? _keyboardHook;
+
+    // Journal affiché et surveillance des ressources (onglet Système).
+    private readonly LogView _logView = new();
+    private readonly ResourceMonitor _resourceMonitor = new();
+    private readonly ResourceGuard _resourceGuard;
+    private readonly DispatcherTimer _resourceTimer;
+    private readonly List<double> _cpuHistory = [];
+    private readonly List<double> _ramHistory = [];
+    private ResourceSample? _lastResource;
+    private DateTime _lastResourceDetail = DateTime.MinValue;
+    private bool _resourceSampling;
 
     private CancellationTokenSource? _sessionCts;
     private WriteableBitmap? _bitmap;
@@ -68,6 +81,9 @@ public partial class MainWindow : Window
 
         _log = new SessionLog(AppContext.BaseDirectory, _version);
         _log.EntryWritten += entry => Dispatcher.BeginInvoke(() => AppendLogLine(entry));
+        LogList.ItemsSource = _logView.Visible;
+        LogFileText.Text = _log.FilePath;
+        _resourceGuard = new ResourceGuard(_settings.Limits);
         _hudLogger = new HudChangeLogger(_log);
 
         var ocr = OcrReader.TryCreate();
@@ -85,6 +101,11 @@ public partial class MainWindow : Window
         MaxDurationBox.Text = ((int)_safety.Options.MaxDuration.TotalMinutes).ToString();
         TargetFpsBox.Text = _settings.TargetFps.ToString();
         ShowZonesCheck.IsChecked = _settings.ShowZones;
+        AnomalyCheck.IsChecked = _settings.AnomalyStopEnabled;
+        ShowLimits();
+
+        _resourceTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1) };
+        _resourceTimer.Tick += async (_, _) => await OnResourceTickAsync();
 
         _uiTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = UiInterval };
         _uiTimer.Tick += (_, _) => OnUiTick();
@@ -98,6 +119,9 @@ public partial class MainWindow : Window
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
         _log.Info("Session", "Version 0.2 : affichage et lecture du HUD, aucune action sur le jeu.");
+        _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
+                             $"CPU du bot {_settings.Limits.BotCpuWarningPercent:0} %, RAM libre du PC {_settings.Limits.SystemRamAvailableWarningPercent:0} %.");
+        _resourceTimer.Start();
         _log.Info("Perception", _hudReader is null
             ? "Lecture de texte (OCR) indisponible : installer la langue anglaise dans Windows. Le HUD ne sera pas lu."
             : "Lecture de texte (OCR) prête, en anglais.");
@@ -172,7 +196,12 @@ public partial class MainWindow : Window
         // Réglages réellement appliqués à cette session (D-031).
         _log.Info("Session", $"Session démarrée. Réglages : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
                              $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}, " +
-                             $"{fps} images/s visées, lecture du HUD toutes les {HudInterval.TotalMilliseconds:0} ms.");
+                             $"{fps} images/s visées, lecture du HUD toutes les {HudInterval.TotalMilliseconds:0} ms, " +
+                             $"arrêt sur anomalie {(_settings.AnomalyStopEnabled ? "actif" : "désactivé")}.");
+        if (_lastResource is { } r)
+        {
+            _log.Info("Système", $"Au démarrage : {DescribeResources(r)}.");
+        }
     }
 
     // Boucle de capture : cadence fixe, compensée (un retard n'est pas cumulé d'une image à l'autre).
@@ -285,6 +314,10 @@ public partial class MainWindow : Window
             _log.Info("Session", $"Session arrêtée après {elapsed} : {description}.");
         }
         _log.Info("Capture", $"Bilan : {_measuredFps:0.0} images/s mesurées, capture moyenne {captureMs:0} ms par image.");
+        if (_lastResource is { } r)
+        {
+            _log.Info("Système", $"À l'arrêt : {DescribeResources(r)}.");
+        }
     }
 
     private void OnUiTick()
@@ -431,7 +464,8 @@ public partial class MainWindow : Window
     {
         ReadInputs();
         _log.Info("Config", $"Sécurité modifiée : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
-                            $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}.");
+                            $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}, " +
+                            $"arrêt sur anomalie {(_settings.AnomalyStopEnabled ? "actif" : "désactivé")}.");
     }
 
     private void MaxDurationBox_LostFocus(object sender, RoutedEventArgs e)
@@ -458,6 +492,7 @@ public partial class MainWindow : Window
     {
         _safety.Options.EmergencyKeyEnabled = EmergencyKeyCheck.IsChecked == true;
         _safety.Options.MaxDurationEnabled = MaxDurationCheck.IsChecked == true;
+        _settings.AnomalyStopEnabled = AnomalyCheck.IsChecked == true;
         if (int.TryParse(MaxDurationBox.Text, out var minutes) && minutes is >= 1 and <= 240)
         {
             _safety.Options.MaxDuration = TimeSpan.FromMinutes(minutes);
@@ -484,13 +519,166 @@ public partial class MainWindow : Window
 
     private void AppendLogLine(LogEntry entry)
     {
-        var text = $"{entry.Time:HH:mm:ss} [{entry.Category}] {entry.Message}";
-        LogList.Items.Add(text);
-        while (LogList.Items.Count > MaxLogLines)
+        var line = _logView.Add(entry);
+        if (_logView.Visible.Count > 0 && ReferenceEquals(_logView.Visible[^1], line))
         {
-            LogList.Items.RemoveAt(0);
+            LogList.ScrollIntoView(line);
         }
-        LogList.ScrollIntoView(text);
+        // Bandeau du bas de l'onglet Supervision : dernier événement (sauf les détails).
+        if (entry.Level != LogLevel.Detail)
+        {
+            LastEventText.Text = line.Text;
+            LastEventText.Foreground = line.Color;
+        }
+        AlertCounters.Text = $"Alertes : {_logView.AlertCount}   Erreurs : {_logView.ErrorCount}";
+    }
+
+    private void LogFilter_Click(object sender, RoutedEventArgs e)
+    {
+        _logView.SetVisible(LogLevel.Erreur, FilterErreur.IsChecked == true);
+        _logView.SetVisible(LogLevel.Alerte, FilterAlerte.IsChecked == true);
+        _logView.SetVisible(LogLevel.Info, FilterInfo.IsChecked == true);
+        _logView.SetVisible(LogLevel.Detail, FilterDetail.IsChecked == true);
+    }
+
+    // Mesure CPU/RAM chaque seconde, compare aux seuils, met à jour l'onglet Système.
+    private async Task OnResourceTickAsync()
+    {
+        if (_resourceSampling)
+        {
+            return;
+        }
+        _resourceSampling = true;
+        try
+        {
+            var sample = await Task.Run(_resourceMonitor.Sample);
+            _lastResource = sample;
+            foreach (var ev in _resourceGuard.Evaluate(sample))
+            {
+                switch (ev.Level)
+                {
+                    case ResourceLevel.Critique:
+                        _log.Erreur("Système", ev.Message);
+                        if (_safety.IsRunning && _settings.AnomalyStopEnabled)
+                        {
+                            _safety.RequestStop(StopReason.Anomalie);
+                        }
+                        break;
+                    case ResourceLevel.Alerte:
+                        _log.Alerte("Système", ev.Message);
+                        break;
+                    default:
+                        _log.Info("Système", ev.Message);
+                        break;
+                }
+            }
+            if (sample.At - _lastResourceDetail >= ResourceDetailInterval)
+            {
+                _log.Detail("Système", DescribeResources(sample));
+                _lastResourceDetail = sample.At;
+            }
+            ShowResources(sample);
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            _log.Erreur("Système", $"Mesure CPU/RAM impossible : {ex.Message}");
+        }
+        finally
+        {
+            _resourceSampling = false;
+        }
+    }
+
+    private void ShowResources(ResourceSample s)
+    {
+        BotCpuText.Text = $"CPU : {s.BotCpuPercent:0.0} % (tous cœurs confondus)";
+        BotRamText.Text = $"RAM : {s.BotRamMb:0} Mo   (alerte {_settings.Limits.BotRamWarningMb:0}, arrêt {_settings.Limits.BotRamCriticalMb:0})";
+        BotDetailsText.Text = $"Mémoire .NET : {s.BotManagedMb:0} Mo · fils : {s.BotThreads} · handles : {s.BotHandles}";
+        GameCpuText.Text = s.GameCpuPercent is { } gc ? $"CPU : {gc:0.0} %" : "CPU : jeu non lancé";
+        GameRamText.Text = s.GameRamMb is { } gr ? $"RAM : {gr:0} Mo" : "RAM : —";
+        SystemCpuText.Text = $"CPU : {s.SystemCpuPercent:0} %";
+        SystemRamText.Text = $"RAM libre : {s.SystemRamAvailableMb / 1024:0.0} Go sur {s.SystemRamTotalMb / 1024:0.0} Go ({s.SystemRamAvailablePercent:0} %)";
+        ResourceStateText.Text = _resourceGuard.BotRamLevel switch
+        {
+            ResourceLevel.Critique => "État : CRITIQUE (RAM du bot)",
+            ResourceLevel.Alerte => "État : alerte (RAM du bot)",
+            _ => "État : normal",
+        };
+        ResourceStateText.Foreground = _resourceGuard.BotRamLevel switch
+        {
+            ResourceLevel.Critique => Brushes.IndianRed,
+            ResourceLevel.Alerte => Brushes.Gold,
+            _ => Brushes.LightGreen,
+        };
+
+        Push(_cpuHistory, s.BotCpuPercent);
+        Push(_ramHistory, s.BotRamMb);
+        DrawGraph(BotCpuGraph, _cpuHistory, 100, null);
+        DrawGraph(BotRamGraph, _ramHistory, Math.Max(_settings.Limits.BotRamCriticalMb, _ramHistory.Max()) * 1.1,
+            _settings.Limits.BotRamWarningMb);
+    }
+
+    private static void Push(List<double> history, double value)
+    {
+        history.Add(value);
+        if (history.Count > GraphPoints)
+        {
+            history.RemoveAt(0);
+        }
+    }
+
+    // Petit graphique : courbe des 2 dernières minutes, et ligne du seuil d'alerte s'il y en a un.
+    private static void DrawGraph(Canvas canvas, List<double> values, double max, double? warning)
+    {
+        canvas.Children.Clear();
+        var width = canvas.ActualWidth;
+        var height = canvas.ActualHeight;
+        if (width <= 0 || height <= 0 || values.Count < 2 || max <= 0)
+        {
+            return;
+        }
+        if (warning is { } w)
+        {
+            var y = height - w / max * height;
+            canvas.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = Brushes.Gold, StrokeThickness = 1, StrokeDashArray = [4, 3] });
+        }
+        var line = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(61, 245, 138)), StrokeThickness = 1.5 };
+        for (var i = 0; i < values.Count; i++)
+        {
+            var x = width * i / (GraphPoints - 1);
+            var y = height - Math.Clamp(values[i] / max, 0, 1) * height;
+            line.Points.Add(new Point(x, y));
+        }
+        canvas.Children.Add(line);
+    }
+
+    private static string DescribeResources(ResourceSample s) =>
+        $"bot CPU {s.BotCpuPercent:0.0} %, RAM {s.BotRamMb:0} Mo ; " +
+        $"jeu {(s.GameRamMb is { } g ? $"CPU {s.GameCpuPercent ?? 0:0.0} %, RAM {g:0} Mo" : "non lancé")} ; " +
+        $"PC CPU {s.SystemCpuPercent:0} %, RAM libre {s.SystemRamAvailableMb / 1024:0.0} Go ({s.SystemRamAvailablePercent:0} %)";
+
+    private void ShowLimits()
+    {
+        var l = _settings.Limits;
+        RamWarningBox.Text = l.BotRamWarningMb.ToString("0");
+        RamCriticalBox.Text = l.BotRamCriticalMb.ToString("0");
+        CpuWarningBox.Text = l.BotCpuWarningPercent.ToString("0");
+        SystemRamWarningBox.Text = l.SystemRamAvailableWarningPercent.ToString("0");
+    }
+
+    private void LimitBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        var l = _settings.Limits;
+        var before = (l.BotRamWarningMb, l.BotRamCriticalMb, l.BotCpuWarningPercent, l.SystemRamAvailableWarningPercent);
+        if (double.TryParse(RamWarningBox.Text, out var warn) && warn is >= 50 and <= 16000) l.BotRamWarningMb = warn;
+        if (double.TryParse(RamCriticalBox.Text, out var crit) && crit > l.BotRamWarningMb && crit <= 32000) l.BotRamCriticalMb = crit;
+        if (double.TryParse(CpuWarningBox.Text, out var cpu) && cpu is >= 1 and <= 100) l.BotCpuWarningPercent = cpu;
+        if (double.TryParse(SystemRamWarningBox.Text, out var sys) && sys is >= 1 and <= 90) l.SystemRamAvailableWarningPercent = sys;
+        ShowLimits();
+        if (before != (l.BotRamWarningMb, l.BotRamCriticalMb, l.BotCpuWarningPercent, l.SystemRamAvailableWarningPercent))
+        {
+            _log.Info("Config", $"Seuils modifiés : RAM du bot {l.BotRamWarningMb:0}/{l.BotRamCriticalMb:0} Mo, CPU du bot {l.BotCpuWarningPercent:0} %, RAM libre du PC {l.SystemRamAvailableWarningPercent:0} %.");
+        }
     }
 
     private void SetStatus(string title, string detail, string color)
@@ -515,6 +703,11 @@ public partial class MainWindow : Window
         {
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
+        // Agrandie sur l'écran où elle se trouve (la position ci-dessus choisit l'écran).
+        if (_settings.StartMaximized)
+        {
+            SourceInitialized += (_, _) => WindowState = WindowState.Maximized;
+        }
     }
 
     // Évite de rouvrir la fenêtre hors de l'écran (par exemple si le 2e écran est débranché).
@@ -531,14 +724,18 @@ public partial class MainWindow : Window
             _safety.RequestStop(StopReason.Manuel);
         }
         _keyboardHook?.Dispose();
+        _resourceTimer.Stop();
 
-        if (WindowState == WindowState.Normal)
+        // Position « normale » de la fenêtre (même si elle est agrandie), pour retrouver le bon écran.
+        var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;
+        if (!bounds.IsEmpty)
         {
-            _settings.WindowLeft = Left;
-            _settings.WindowTop = Top;
-            _settings.WindowWidth = Width;
-            _settings.WindowHeight = Height;
+            _settings.WindowLeft = bounds.Left;
+            _settings.WindowTop = bounds.Top;
+            _settings.WindowWidth = bounds.Width;
+            _settings.WindowHeight = bounds.Height;
         }
+        _settings.StartMaximized = WindowState == WindowState.Maximized;
         _settings.EmergencyKeyEnabled = _safety.Options.EmergencyKeyEnabled;
         _settings.MaxDurationEnabled = _safety.Options.MaxDurationEnabled;
         _settings.MaxDurationMinutes = (int)_safety.Options.MaxDuration.TotalMinutes;

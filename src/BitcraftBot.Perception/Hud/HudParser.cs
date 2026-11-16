@@ -14,12 +14,12 @@ public static partial class HudParser
         {
             builder.Append(c switch
             {
-                'O' or 'o' or 'Q' or 'D' => '0',
+                // Seulement les confusions sans ambiguïté : Q peut être un 0 ou un 2, il est donc refusé.
+                'O' or 'o' => '0',
                 'l' or 'L' or 'I' or 'i' or '|' or '!' => '1',
                 'Z' or 'z' => '2',
                 'S' or 's' => '5',
                 'B' => '8',
-                'g' => '9',
                 _ => c,
             });
         }
@@ -132,7 +132,7 @@ public static partial class HudParser
     }
 
     // Lettre N, nombre, séparateur quelconque, lettre E, nombre. Les chiffres peuvent être mal lus.
-    [GeneratedRegex(@"N\s*((?:[0-9OoQDlLIi|SsZzBg] ?){3,6})[^0-9A-Za-z]{0,4}\s*[E£€]\s*((?:[0-9OoQDlLIi|SsZzBg] ?){3,6})", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"N\s*((?:[0-9OoQDlLIi|SsZzBg] ?){3,6})[^0-9A-Za-z]{0,4}\s*[E£€]\s*((?:[0-9OoQDlLIi|SsZzBg] ?){3,6})")]
     private static partial Regex CoordinatesRegex();
 
     [GeneratedRegex(@"([0-9OoQDlIi|SsZzB]{1,6})\s*[/\\|]\s*([0-9OoQDlIi|SsZzB]{1,6})")]
