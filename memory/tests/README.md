@@ -3,6 +3,7 @@
 | ID | Date | Type | Titre | Résultat |
 |---|---|---|---|---|
 | [T-20261116-01](T-20261116-01-v01-affichage.md) | 2026-11-16 | intégration | v0.1 : affichage du jeu et arrêt d'urgence | OK (Verr. Num désactivé non testé) |
+| [T-20261116-02](T-20261116-02-v02-lecture-hud.md) | 2026-11-16 | perception | v0.2 : lecture du HUD | Essais Claude OK ; à vérifier par Julien (dont de nuit) |
 
 ## Gabarit
 

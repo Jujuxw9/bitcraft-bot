@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.1.0** (2026-11-16). Le bot regarde le jeu mais n'agit pas encore dessus.
+> État : **v0.2.0** (2026-11-16). Le bot regarde le jeu et **lit le HUD**, mais n'agit pas encore dessus. Détails de la v0.2 : section 8.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -90,3 +90,41 @@ journaux/                         (à côté du .exe, jamais envoyé sur GitHub)
 - **À vérifier** : l'image capturée est-elle correcte (pas noire, pas figée) ? Test T-20261116-01.
 - **À vérifier** : moteur de lecture de texte (OCR) pour la v0.2 : Windows.Media.Ocr (intégré à Windows) ou Tesseract.
 - **À vérifier** : support DirectML / Windows ML en 2026 (seulement si un détecteur d'arbres devient nécessaire).
+
+## 8. v0.2 : lecture du HUD
+
+### Ce qui est lu, et comment
+
+| Élément | Où | Méthode |
+|---|---|---|
+| Position `N 8927, E 6707` | sous la minicarte | Texte (OCR) lu **deux fois** (agrandissements ×2 et ×4). Gardé seulement si les deux lectures sont identiques. |
+| Zone, région | sous la position | Texte (OCR) |
+| Vie, endurance `65/100` | texte dans les barres du bas | Texte (OCR), **contrôlé par la longueur de la barre** (écart max 15 %, sinon rejeté) |
+| Faim | fine ligne blanche à gauche du losange | Longueur de la ligne (estimation, pas de texte) |
+| Cible : nom, catégorie, santé | panneau crème en haut au centre | Panneau repéré par sa couleur, puis texte (OCR). Le nom est corrigé avec la liste des noms connus (GameData). |
+
+- **OCR** : moteur intégré à Windows, en anglais. Avant lecture, chaque zone est passée en noir sur blanc, agrandie avec lissage et entourée d'une marge. Réglages trouvés par essais sur une vraie capture.
+- Zones mesurées au pixel près sur une capture réelle en 1920×1080 (`HudLayout`). Si la fenêtre du jeu n'a pas cette taille, le HUD n'est pas lu.
+
+### Deux boucles indépendantes
+
+```
+Capture  : 5 images/s, cadence fixe et compensée ──► affichage + dernière image gardée
+Lecture  : 2 fois/s, sur la dernière image ─────────► colonne « LECTURE DU HUD » + journal
+```
+
+- La capture garde son rythme même si la lecture prend du temps.
+- Si l'interface est en retard, des images sont sautées à l'affichage (jamais d'accumulation).
+- Cadence réglable dans la fenêtre (« Images/s visées », de 1 à 15). Utile plus tard pour suivre un déplacement ou la minicarte.
+
+### Journal
+- Au démarrage : réglages réellement appliqués (corrige le défaut de la v0.1).
+- Seulement les **changements** : zone, région, vie qui baisse (ALERTE), endurance à 0 ou pleine, faim sous 50 % (ALERTE), cible qui apparaît, change ou disparaît, position illisible 10 fois de suite (ALERTE).
+- Un **résumé toutes les 30 s** : toutes les valeurs, temps de lecture, taux de lecture de la position, images/s.
+- À l'arrêt : bilan de cadence et temps de capture.
+
+### Mesures (2026-11-16, essai réel)
+Capture 18-19 ms par image, lecture complète du HUD 37-47 ms, position lue 100 % du temps sur 30 s, 5,0 images/s.
+
+### Tests automatiques
+60 tests, dont une lecture complète d'une **vraie capture du jeu** (`images/reference-ui/`) : position, zone, région, vie, endurance, faim et cible doivent toutes être justes.

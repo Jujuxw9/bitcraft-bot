@@ -228,3 +228,5 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_carte-monde-dezoom_001.png` | 2026-11-16 | Carte du monde très dézoomée : région entière | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_video-coupe-plusieurs-arbres_001.mp4` | 2026-11-16 | **Vidéo 1 min 30** : coupe de plusieurs arbres (Young Beech, Mature Oak, Young Oak) ; nombreux triangles rouges sur la minicarte ; message « inventaire plein » répété ; gains Rough Tree Bark, Tree Sap, Oak Seed | 1.0 |
 | `analyse/20261116_analyse_video-minage-ferralith_001.mp4` | 2026-11-16 | **Vidéo 41 s** : minage de « Large Ferralith Vein » (30 000 points) puis « Ferralith Vein » (3 000) | 1.0 |
+| `analyse/20261116_analyse_carte-repere-destination_001.png` | 2026-11-16 | Zoom carte du monde : repère de destination posé près d'une zone non découverte | 1.0 |
+| `analyse/20261116_analyse_video-trajet-banque-camera-w_001.mp4` | 2026-11-16 | **Vidéo 30 s** : trajet de la zone de minage (Ferralith Vein) jusqu'à la Banque de Snowrest, caméra recentrée avec W, interface Bank ouverte à l'arrivée | 1.0 |

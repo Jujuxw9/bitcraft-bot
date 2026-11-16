@@ -7,6 +7,7 @@
 | [03](2026-11-16-session-03-langue-exe-feuille-de-route.md) | 2026-11-16 | Claude Code | Langue, .exe validé, feuille de route |
 | [04](2026-11-16-session-04-analyse-captures.md) | 2026-11-16 | Claude Code | Analyse des lots 1 à 3 de captures |
 | [05](2026-11-16-session-05-v01.md) | 2026-11-16 | Claude Code | Réponses de Julien, v0.1 |
+| [06](2026-11-16-session-06-v02.md) | 2026-11-16 | Claude Code | v0.2 : lecture du HUD |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

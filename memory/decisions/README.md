@@ -35,6 +35,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-029](D-029-zone-sans-ennemis.md) | Zone de coupe : loin des ennemis, près du village | Validée | 2026-11-16 |
 | [D-030](D-030-banque-et-nourriture.md) | Procédure de dépôt à la Banque et repas | Validée | 2026-11-16 |
 | [D-031](D-031-fenetre-et-journaux.md) | Fenêtre du bot et journaux de session | Validée | 2026-11-16 |
+| [D-032](D-032-regles-repas.md) | Règles de repas | Validée | 2026-11-16 |
 
 ## Gabarit
 
