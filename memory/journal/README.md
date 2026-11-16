@@ -5,7 +5,8 @@
 | [01](2026-11-15-session-01-cadrage.md) | 2026-11-15 | Claude (chat) | Cadrage |
 | [02](2026-11-16-session-02-init-repo.md) | 2026-11-16 | Claude Code | Initialisation du repo |
 | [03](2026-11-16-session-03-langue-exe-feuille-de-route.md) | 2026-11-16 | Claude Code | Langue, .exe validé, feuille de route |
-| [04](2026-11-16-session-04-analyse-captures.md) | 2026-11-16 | Claude Code | Analyse du lot 1 de captures |
+| [04](2026-11-16-session-04-analyse-captures.md) | 2026-11-16 | Claude Code | Analyse des lots 1 à 3 de captures |
+| [05](2026-11-16-session-05-v01.md) | 2026-11-16 | Claude Code | Réponses de Julien, v0.1 |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

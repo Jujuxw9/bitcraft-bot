@@ -1,0 +1,21 @@
+# D-030 — Procédure de dépôt à la Banque et repas
+
+- **Statut** : Validée
+- **Date** : 2026-11-16
+- **Validée par** : Julien
+- **Liens** : D-016, D-024
+
+## Dépôt à la Banque (méthode de Julien)
+1. Survoler le bâtiment de la Banque jusqu'au **contour vert**.
+2. **Clic droit** : le personnage marche jusqu'à portée. L'interface de la Banque s'ouvre **toute seule**. Pas besoin d'entrer dans le bâtiment.
+3. Cliquer sur **Transfer** du côté **inventaire** (de l'inventaire vers la Banque).
+4. **Aucune fenêtre de carte ne doit être ouverte** pendant le transfert, sinon tout échoue.
+
+## Repas
+- Le bot **doit manger** quand la faim baisse.
+- Méthode : **un clic** sur un aliment placé dans la **barre d'action** en bas de l'écran.
+- **À définir** : seuil de faim (proposition : manger sous 40/100) et emplacement de l'aliment dans la barre.
+
+## Conséquences
+- Le bot doit fermer la carte avant chaque transfert.
+- Il faut toujours de la nourriture dans la barre d'action : le bot vérifie qu'il en reste.

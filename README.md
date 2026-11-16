@@ -6,9 +6,9 @@ Agent autonome pour BitCraft Online : perception écran, prise de décision et a
 
 ## État
 
-**v0.0.1 — squelette.** Aucune logique de bot. La solution compile, une fenêtre WPF vide s'ouvre.
+**v0.1.0** : la fenêtre du bot affiche le jeu en direct, avec arrêt d'urgence (touche `Num 5`), durée maximale de session et journaux. Le bot n'agit pas encore sur le jeu.
 
-Prochaine étape : captures du jeu, puis étude de la perception 3D (Q-001) et de la localisation (Q-002). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md).
+Prochaine étape : v0.2, lecture du HUD (position, endurance, vie, faim). Architecture : [memory/technique/architecture.md](memory/technique/architecture.md). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md).
 
 ## Principe
 

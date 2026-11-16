@@ -30,6 +30,11 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-024](D-024-commandes-du-bot.md) | Commandes utilisées par le bot | Validée | 2026-11-16 |
 | [D-025](D-025-jour-et-nuit.md) | Le bot fonctionne de jour comme de nuit | Validée | 2026-11-16 |
 | [D-026](D-026-captures-en-local.md) | Captures d'écran en local, pas dans Git | Validée | 2026-11-16 |
+| [D-027](D-027-ecorce-seulement.md) | MVP : écorce seulement, troncs au sol | Validée | 2026-11-16 |
+| [D-028](D-028-cycle-endurance.md) | Cycle d'endurance : attendre 100 % puis relancer | Validée | 2026-11-16 |
+| [D-029](D-029-zone-sans-ennemis.md) | Zone de coupe : loin des ennemis, près du village | Validée | 2026-11-16 |
+| [D-030](D-030-banque-et-nourriture.md) | Procédure de dépôt à la Banque et repas | Validée | 2026-11-16 |
+| [D-031](D-031-fenetre-et-journaux.md) | Fenêtre du bot et journaux de session | Validée | 2026-11-16 |
 
 ## Gabarit
 
