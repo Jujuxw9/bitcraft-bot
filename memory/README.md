@@ -33,10 +33,10 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-033
+- [README.md](decisions/README.md) — tableau D-001 à D-034
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-015
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-016
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -46,6 +46,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-15-cadrage-initial.md](echanges/2026-11-15-cadrage-initial.md) — session de cadrage n°1
 - [2026-11-15-prompt-init-repo.md](echanges/2026-11-15-prompt-init-repo.md) — prompt d'initialisation du repo (archive)
 - [2026-11-16-feuille-de-route.md](echanges/2026-11-16-feuille-de-route.md) — prochaines étapes, captures et infos demandées à Julien
+- [2026-11-16-demande-captures-lot5.md](echanges/2026-11-16-demande-captures-lot5.md) — lot 5 : captures et vidéos précises demandées
 
 ### technique/
 - [README.md](technique/README.md) — index

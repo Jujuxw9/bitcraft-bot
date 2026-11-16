@@ -17,3 +17,13 @@ Inventaire, Compendium, carte, Banque, Vault, Character, Quest Log, chariot, etc
 - Une fenêtre ouverte peut cacher une partie du HUD lu en v0.2 (ex. cible, coordonnées). Une lecture qui échoue soudain peut venir de là.
 - Rappel D-030 : aucune fenêtre de carte ouverte pendant le Transfer à la Banque.
 - Détails et stratégie : Q-015.
+
+## Barre d'action (infos de Julien, 2026-11-16)
+- En bas au centre : cases 1 à 0, puis `-` et `=`.
+- **Cadenas** à gauche des flèches : barre **verrouillée** (on ne peut pas déplacer ce qu'elle contient) ou déverrouillée.
+- **Plusieurs barres** : les flèches haut / bas à côté du cadenas font défiler **4 barres différentes** (raccourcis Pg. Préc / Pg. Suiv dans les réglages de touches).
+
+### Conséquences pour le bot
+- Garder la barre **verrouillée** : un clic raté ne doit pas déplacer un objet (ex. l'aliment).
+- Le bot doit savoir **quelle barre est affichée** avant de cliquer sur une case (repas en case 5, D-032). **À vérifier** : le numéro de la barre active est-il affiché ? Sinon, reconnaître l'icône de l'aliment dans la case.
+- Possibilité utile plus tard : une barre dédiée au bot (aliment, outils).

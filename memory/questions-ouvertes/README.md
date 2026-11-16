@@ -17,6 +17,7 @@
 | [Q-013](Q-013-ecorce-ou-troncs.md) | Quel « bois » ramener : écorce, troncs, ou les deux ? | Haute | Résolue → D-027 |
 | [Q-014](Q-014-ennemis-et-danger.md) | Ennemis et danger de mort | Haute | Ouverte |
 | [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Moyenne | Ouverte |
+| [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Ouverte (recommandation : modèles de chiffres) |
 
 ## Gabarit
 

@@ -13,6 +13,9 @@ Le bot mange (un clic sur l'aliment de la barre d'action) dans deux cas :
 ## Emplacement de l'aliment
 Choix laissé à Claude : **case 5** de la barre d'action, celle où Julien a déjà sa nourriture sur les captures. Le bot clique dessus à la souris (D-024). Il vérifie qu'il en reste (nombre affiché sur la case).
 
+## Précision (2026-11-16)
+Il existe **4 barres d'action** (flèches à côté du cadenas). « Case 5 » veut dire : case 5 de la barre où se trouve l'aliment. Le bot vérifie la barre affichée avant de cliquer (voir `technique/interface-du-jeu.md`).
+
 ## Informations utiles
 - La faim baisse de **1 par minute** (info-bulle « -1/1m »).
 - Le bonus de nourriture donne endurance +5/min et vie +3/min pendant environ 14 min (icône verte au-dessus des barres, avec la durée).
