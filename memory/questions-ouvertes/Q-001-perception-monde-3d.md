@@ -9,5 +9,6 @@ Comment détecter arbres, rochers, minerais, PNJ, bâtiments ?
 - Segmentation couleur.
 - Exploitation des info-bulles et surbrillances au survol de la souris.
 - Indicateurs d'interface (prompt d'interaction).
+- **Constat du 2026-11-16** ([analyse des captures](../technique/analyse-captures-2026-11-16.md)) : tout objet survolé reçoit un contour vert vif. Piste privilégiée : survol + détection du contour vert + lecture du nom, éventuellement guidé par un détecteur d'arbres. Difficulté : cycle jour/nuit.
 ## Ce qui bloque
-**Fondation de tout le projet** : à instruire avant tout code de récolte. Besoin de captures du jeu 1.0.
+**Fondation de tout le projet** : à instruire avant tout code de récolte. Captures du lot 2 (M1 à M3, M8) : arbre survolé de près, coupe en cours, fin de coupe.

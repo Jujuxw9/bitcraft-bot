@@ -11,6 +11,7 @@ La position absolue est lisible par OCR (D-018). Comment se déplacer et cartogr
 - Mémorisation des ressources et obstacles rencontrés (carte construite par le bot).
 - Points de passage enregistrés par Julien en complément.
 - Infos de Julien (2026-11-16) : la Banque peut être à 15 s comme à 2 min de marche. Le bot doit savoir **trouver** la Banque (carte ou vue), pas seulement y retourner.
-- Touches et mode de déplacement : voir Q-011.
+- Touches et mode de déplacement : voir Q-011 et D-024.
+- Constat du 2026-11-16 ([analyse des captures](../technique/analyse-captures-2026-11-16.md)) : option « Click to move on minimap » activée ; Banque à Snowrest vers `N 8937, E 6719`.
 ## Ce qui bloque
 Captures du HUD et de la carte nécessaires.

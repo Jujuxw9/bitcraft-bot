@@ -1,5 +1,5 @@
 # Q-011 — Touches de déplacement et de caméra
-- **Statut** : Ouverte
+- **Statut** : Ouverte (réponse proposée : D-024)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-16
 ## Question
@@ -17,5 +17,10 @@ Réponses de Julien (2026-11-16) :
 ## Pistes / options
 - Clic au sol : le bot clique sur un point de l'écran. Simple à envoyer, mais il faut viser un sol libre.
 - ZQSD/WASD : le bot maintient une touche. Plus prévisible, mais il faut gérer l'orientation de la caméra.
+## Réponse du 2026-11-16 ([analyse des captures](../technique/analyse-captures-2026-11-16.md))
+- Clavier physique : **AZERTY**.
+- ZQSD = rotation caméra, W = recentrer la caméra : pas d'incohérence, ce sont deux actions distinctes.
+- Déplacement au clavier : non assigné. Clic gauche = aller au curseur, clic droit = cibler + aller + interagir.
+- Proposition : D-024 (tout à la souris).
 ## Ce qui bloque
-Capture C10 (page des réglages de touches du jeu).
+Validation de D-024 par Julien.

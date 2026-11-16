@@ -11,6 +11,8 @@ Le bot doit savoir où il est.
 ## Décision
 La position est lue sur l'interface, sous la minicarte ronde en haut à gauche : coordonnées (ex. `N 8969, E 6739`), nom de zone (ex. « Safe Meadows », **À vérifier** : orthographe), région (ex. `R18`). L'heure du jeu est affichée au-dessus de la minicarte.
 
+**Correction du 2026-11-16** : l'horloge au-dessus de la minicarte affiche l'**heure du PC**, pas l'heure du jeu. Zone « SAFE MEADOWS » et région « KELDAN (R18) » confirmées sur capture.
+
 ## Alternatives écartées
 - Estimation de position par la vision 3D seule : imprécise.
 

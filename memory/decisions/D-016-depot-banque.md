@@ -9,7 +9,7 @@
 Le MVP doit déposer quand l'inventaire est plein.
 
 ## Décision
-Dépôt à la **Banque** (le plus gros bâtiment de la carte). **À vérifier** : nom exact en jeu, à confirmer par capture.
+Dépôt à la **Banque** (le plus gros bâtiment de la carte). Confirmé le 2026-11-16 : étiquette « Bank », interface « BANK », ville de **Snowrest** (vers `N 8937, E 6719`).
 
 ## Alternatives écartées
 - Coffre personnel : à étudier plus tard.
