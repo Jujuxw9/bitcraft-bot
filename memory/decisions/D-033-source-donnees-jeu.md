@@ -2,7 +2,7 @@
 
 - **Statut** : Proposée
 - **Date** : 2026-11-16
-- **Validée par** : — (en attente de Julien)
+- **Validée par** : — (Julien laisse la question en suspens le 2026-11-16, à reprendre plus tard)
 - **Liens** : Q-004, D-008
 
 ## Contexte

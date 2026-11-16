@@ -1,5 +1,5 @@
 # Q-017 — Mode test : mouvements aléatoires « humains » de la souris et de la caméra
-- **Statut** : Ouverte (idée de Julien, 2026-11-16)
+- **Statut** : Résolue → D-035
 - **Priorité** : Moyenne
 - **Créée le** : 2026-11-16
 

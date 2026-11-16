@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.2.1** (2026-11-16). Le bot regarde le jeu et **lit le HUD**, mais n'agit pas encore dessus. v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Limite connue : section 10.
+> État : **v0.2.2** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Limite connue : section 10. v0.2.2 (banc d'essai des mouvements) : section 11.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -152,3 +152,24 @@ Capture 18-19 ms par image, lecture complète du HUD 37-47 ms, position lue 100 
 
 L'OCR de Windows lit parfois le **2** de la police du HUD comme un « Q » (`E 6692` → `E 6 69 Q`). Depuis la v0.2.1, une lecture douteuse est **rejetée** (position « illisible ») au lieu d'être fausse.
 Solution prévue : **reconnaître les chiffres par comparaison avec des modèles** (la police du HUD ne change pas). C'est plus fiable et plus rapide que l'OCR pour des nombres. Image de test : `images/reference-ui/20261116_reference-ui_hud-cueillette-buisson_002.png`.
+
+## 11. v0.2.2 : banc d'essai des mouvements (D-035)
+
+Premier code qui **agit** sur le jeu, uniquement dans l'onglet **Tests**, **désactivé à chaque démarrage**.
+
+### Les « mains » (brique Input)
+| Élément | Rôle |
+|---|---|
+| `HumanMouse` | Fabrique un trajet humain : courbe (Bézier), durée selon la distance (loi de Fitts), vitesse en cloche, dépassement de la cible dans 30 % des cas puis correction, petits tremblements, pauses variables |
+| `HumanCamera` | Fabrique une suite d'appuis Z / Q / S / D (rotation) et W (recentrer) de durées variables |
+| `InputSender` | Envoie les mouvements à Windows (SendInput). Touches par position physique (AZERTY : Z = 0x11, Q = 0x1E, S = 0x1F, D = 0x20, W = 0x2C) |
+| `MovementTester` | Joue un test (souris ou caméra) avec les sécurités |
+
+### Sécurités, vérifiées avant **chaque** mouvement
+- Le jeu doit être **au premier plan** : sinon arrêt (jamais d'action dans une autre application).
+- Si le curseur n'est pas là où le bot l'a mis (écart > 25 px) : **Julien a bougé la souris**, donc arrêt.
+- **Num 5** : arrêt immédiat. Les touches simulées par le bot ne peuvent pas déclencher l'arrêt d'urgence.
+- Souris limitée au **centre de l'écran** (hors minicarte, panneau cible, chat, barres).
+- Clics gauche (étape 2) seulement si cochés, dans un rayon d'environ 220 px autour du personnage. **Jamais de clic droit.**
+- À la fin, quoi qu'il arrive, **bouton et touches relâchés**.
+- Durée de 5 à 120 s (30 par défaut). Démarrage après 3 s de compte à rebours.
