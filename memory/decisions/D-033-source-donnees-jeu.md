@@ -1,29 +1,33 @@
 # D-033 — Source des données du jeu : BitCraft_GameData
 
-- **Statut** : Proposée
-- **Date** : 2026-11-16
-- **Validée par** : — (Julien laisse la question en suspens le 2026-11-16, à reprendre plus tard)
-- **Liens** : Q-004, D-008
+- **Statut** : Validée
+- **Date** : 2026-11-16 (proposée), validée le 2026-11-16 (session 08)
+- **Validée par** : Julien : « si c'est à jour et qu'on peut s'y fier, oui. À Claude de bien l'intégrer. »
+- **Liens** : Q-004, D-008, D-034
 
 ## Contexte
-BitCraftPublic n'a que les schémas, pas les valeurs (Q-004). Julien a trouvé le dépôt **github.com/BitCraftToolBox/BitCraft_GameData**.
+BitCraftPublic n'a que les schémas, pas les valeurs (Q-004). Le dépôt **github.com/BitCraftToolBox/BitCraft_GameData** (branche `cereal/cs`) copie les tables de données statiques du jeu en JSON.
 
-## Constat (vérifié le 2026-11-16)
-- Copie des tables de données statiques (« desc tables ») du jeu : objets, ressources, recettes de récolte, etc. 112 fichiers JSON.
-- **Mise à jour automatique chaque jour** (dernière : 2026-11-15, donc après la sortie 1.0).
-- Branche conseillée : `cereal/cs` (JSON lisible). Exemple : `static/resource_desc.json` (2 Mo) donne nom, points de vie, tier, catégorie de chaque ressource.
-- Vérification : « Mature Oak Tree » = 12 000 points (comme à l'écran), « Young Oak Tree » = 3 000. La ressource lue « Tier 1 - Fiber Plant » 380/1100 est un **« Bush »** (1 100 points).
-- Données lues sans connexion au serveur : conforme aux règles (outil en lecture seule de données publiques).
-- **Pas de licence** sur ce dépôt : on ne recopie pas ces fichiers dans notre dépôt public.
+## Vérifications faites (2026-11-16)
+- **À jour** : un commit par jour, dernier le 2026-11-16 à 13:59 UTC (commit `00297fe`).
+- **Fiable** : valeurs conformes à l'écran : Mature Oak Tree 12 000 points, Young Oak Tree 3 000, Bush 1 100 ; coupe d'un chêne = hache tier 1, Forestry niveau 1, 1,6 s par coup (1,59 s affichées en jeu).
+- **Pas de licence** : on ne recopie pas ces fichiers dans notre dépôt public.
+- Lecture de données publiques sur GitHub : **aucune connexion au serveur du jeu** (règles respectées).
 
-## Décision proposée
-- Un script `tools/` télécharge les tables utiles dans `data/gamedata/` (**ignoré par Git**, jamais republié).
-- `BitcraftBot.GameData` lit ces fichiers : noms connus (correction OCR), points de vie, outils requis, temps de récolte.
-- En attendant, les noms manquants sont ajoutés à la main dans `KnownNames`.
+## Décision
+1. **Le bot télécharge lui-même** les 8 tables utiles (ressources, recettes de récolte, biomes, objets, cargaisons, nourriture, types d'outils, métiers) dans `donnees-jeu/`, **à côté du .exe**. Ce dossier est ignoré par Git : jamais republié.
+2. **Seulement si le dépôt a changé** (comparaison du commit). Sinon : rien à télécharger (40 ms).
+3. **Vérification avant usage** : fichiers lisibles, assez de ressources et d'objets, valeurs vues à l'écran retrouvées, biome « Safe Meadows » présent. Si une nouvelle version échoue : **l'ancienne est gardée**.
+4. **Contrôle permanent** : quand le bot lit une cible à l'écran, il compare sa santé max aux données. Désaccord = alerte dans le journal.
+5. Sans Internet : le bot garde la version déjà présente, ou sa petite liste de noms intégrée.
+6. Alerte si les données ont plus de 7 jours (risque de décalage après un patch).
 
 ## Alternatives écartées
-- Saisie manuelle depuis le jeu : long et incomplet.
+- Script séparé lancé à la main : on oublierait de le relancer après un patch.
+- Copier les fichiers dans le dépôt : pas de licence.
 - API Bitjita : données vivantes, plus complexes ; utile plus tard si besoin.
 
 ## Conséquences
-- Les données suivent les mises à jour du jeu (relancer le script après un patch).
+- Les noms de **878 ressources** corrigent les lectures du nom de la cible (avant : 19 noms saisis à la main).
+- Le bot peut exclure ce qui n'est pas un arbre ordinaire (ex. **Maker's Tree**, étiquette « Wonder Resource »).
+- Base pour la suite : endurance par coup, outils requis, nourriture (D-032).

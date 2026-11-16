@@ -1,5 +1,5 @@
 # Q-016 — Quel est le meilleur moyen de lire les coordonnées ?
-- **Statut** : Ouverte (recommandation de Claude ci-dessous)
+- **Statut** : Mise en œuvre en v0.3.0 (B + D, A en secours), à confirmer par le test T-20261116-04
 - **Priorité** : Haute
 - **Créée le** : 2026-11-16 (demande de Julien : « ouvrir un point de réflexion »)
 
@@ -27,3 +27,9 @@ Même principe possible plus tard pour les autres nombres du HUD (vie, endurance
 ## Ce qui bloque
 - Chiffres vus dans les captures : 0, 1, 2, 3, 4, 6, 7, 8, 9. **Le 5 manque** (pas vu de façon nette) → captures demandées (lot 5, C1).
 - Captures de **nuit** pour vérifier que le texte reste lisible.
+
+## Mise en œuvre (2026-11-16, session 08)
+- **B** : modèles des caractères 0-9, N, E appris sur 26 découpes étiquetées (`images/reference-ui/coordonnees/`, dont 1 de nuit). Contrôle croisé 26/26, lecture en direct 60/60, ~1 ms.
+- **D** : saut de position impossible refusé tant qu'une 2e lecture ne le confirme pas (téléportation).
+- **A** : l'OCR ne sert plus qu'en secours.
+- Le 5 manquant : fourni par le lot 5 (C1). Un seul exemple de 3 au départ ; un 2e ajouté depuis une capture du bot en direct.

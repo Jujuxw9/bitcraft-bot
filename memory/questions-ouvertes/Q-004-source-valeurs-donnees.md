@@ -1,5 +1,5 @@
 # Q-004 — Source des valeurs de données de jeu
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-033 (BitCraft_GameData, 2026-11-16)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-15
 ## Question

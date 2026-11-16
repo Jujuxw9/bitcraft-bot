@@ -9,6 +9,7 @@
 | [05](2026-11-16-session-05-v01.md) | 2026-11-16 | Claude Code | Réponses de Julien, v0.1 |
 | [06](2026-11-16-session-06-v02.md) | 2026-11-16 | Claude Code | v0.2 et v0.2.1 : lecture du HUD, onglets, CPU/RAM |
 | [07](2026-11-16-session-07-v022.md) | 2026-11-16 | Claude Code | v0.2.2 : banc d'essai des mouvements |
+| [08](2026-11-16-session-08-v030.md) | 2026-11-16 | Claude Code | v0.3.0 : coordonnées par modèles, données du jeu |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

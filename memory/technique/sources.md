@@ -32,3 +32,6 @@
 | bitcraftonline.com/news/spacetimedb-and-bitcraft | Article technique sur le serveur | Faible pour nous (pas de connexion au serveur) |
 | jeuxonline.info, actugaming.net | Articles de presse sur la sortie 1.0 | Faible |
 | spacetimedb.com/docs | Docs SpacetimeDB 2.0, SDK TypeScript/Rust/C#/C++ | Faible pour l'option A (pas de connexion directe au serveur) ; utile pour lire le code serveur |
+| api.steampowered.com/ISteamNews/GetNewsForApp (appid 3454650) | **API publique des actualités Steam** : texte complet des patch notes (la page web ne s'affiche pas sans navigateur) | **Haute** : lire chaque patch (utilisée le 2026-11-16) |
+| store.steampowered.com/news/app/3454650/view/655997268258717736 (lien de Julien, 2026-11-16) | Patch note « BitCraft Online 1.0 – A Fresh World » (13/11) | Haute : analysé dans `analyse-lot5-2026-11-16.md` ; rien de bloquant, Maker's Tree à exclure |
+| api.steamcmd.net/v1/info/3454650 | Numéro et date du dernier build du jeu | **Haute** : détecter une mise à jour sans note (ex. build 26707176 du 16/11 à 17:51) |

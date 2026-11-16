@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.2.2** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Limite connue : section 10. v0.2.2 (banc d'essai des mouvements) : section 11.
+> État : **v0.3.0** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -35,7 +35,7 @@ La sécurité peut couper la boucle à tout moment, quelle que soit l'étape en 
 | **Core** | Le « cerveau » : règles, sécurité, journal | Surveillance de sécurité (touche d'urgence, durée max), journal de session, horloge |
 | **Perception** | Les « yeux » | Recherche de la fenêtre du jeu, capture de l'écran |
 | **Input** | Les « mains » (et l'écoute du clavier) | Écoute de la touche Num 5 dans tout Windows |
-| **GameData** | La « mémoire du jeu » (objets, recettes) | Vide pour l'instant (Q-004) |
+| **GameData** | La « mémoire du jeu » (objets, recettes) | Vide en v0.1. Depuis la v0.3.0 : données BitCraft_GameData téléchargées et vérifiées (D-033, section 12) |
 
 Règle de dépendance : **App** utilise toutes les briques. **Core** ne dépend d'aucune brique d'écran ou de souris, ce qui permet de tester ses règles automatiquement, sans le jeu.
 
@@ -148,10 +148,10 @@ Capture 18-19 ms par image, lecture complète du HUD 37-47 ms, position lue 100 
 - **Mesures réelles** (2026-11-16) : bot 2 à 5 % de CPU, 175 Mo au lancement puis environ 300 Mo en session (images de 8 Mo capturées 5 fois par seconde). Jeu : environ 2,5 Go de RAM. PC : 32 Go, environ 14 Go libres.
 - **À améliorer** : réutiliser les mêmes zones mémoire pour les images capturées, pour stabiliser la RAM du bot.
 
-## 10. Limite connue de la lecture de la position
+## 10. Lecture de la position
 
-L'OCR de Windows lit parfois le **2** de la police du HUD comme un « Q » (`E 6692` → `E 6 69 Q`). Depuis la v0.2.1, une lecture douteuse est **rejetée** (position « illisible ») au lieu d'être fausse.
-Solution prévue : **reconnaître les chiffres par comparaison avec des modèles** (la police du HUD ne change pas). C'est plus fiable et plus rapide que l'OCR pour des nombres. Image de test : `images/reference-ui/20261116_reference-ui_hud-cueillette-buisson_002.png`.
+Jusqu'à la v0.2.2, l'OCR de Windows lisait souvent le **2** et le **0** comme un « Q » : position lue seulement 7 à 21 % du temps (test du 2026-11-16 à 18:10). Une lecture douteuse était rejetée, jamais fausse.
+**Résolu en v0.3.0** par la lecture par modèles de chiffres (section 12).
 
 ## 11. v0.2.2 : banc d'essai des mouvements (D-035)
 
@@ -173,3 +173,56 @@ Premier code qui **agit** sur le jeu, uniquement dans l'onglet **Tests**, **dés
 - Clics gauche (étape 2) seulement si cochés, dans un rayon d'environ 220 px autour du personnage. **Jamais de clic droit.**
 - À la fin, quoi qu'il arrive, **bouton et touches relâchés**.
 - Durée de 5 à 120 s (30 par défaut). Démarrage après 3 s de compte à rebours.
+
+## 12. v0.3.0 : coordonnées par modèles de chiffres et données du jeu
+
+### Lecture de la position par modèles (Q-016)
+Le texte des coordonnées est toujours **blanc, même police, même taille**. Au lieu de l'OCR (moteur généraliste), le bot compare chaque caractère à des **modèles** :
+
+```
+ zone sous la minicarte ──► taches blanches ──► regroupées ──► chaque caractère ──► « N8943,E6703 »
+ (290 × 34 px)              de la taille         en lignes       comparé aux 12        → (8943, 6703)
+                            d'une lettre         (même bas)      modèles 0-9, N, E
+```
+
+1. **Taches** : pixels très blancs reliés entre eux. Le décor blanc (cercle de la minicarte, icônes) est écarté par sa taille.
+2. **Lignes** : taches alignées sur le même bas ; un grand vide sépare deux textes.
+3. **Empreinte** : chaque caractère est ramené à une grille de 7 × 10 cases (encre moyenne) + sa largeur.
+4. **Comparaison** : modèle le plus proche ; si l'écart est trop grand, la lecture est **refusée** (jamais inventée).
+5. **Secours** : si la ligne n'est pas reconnue, l'ancienne lecture OCR (double lecture) prend le relais.
+6. **Garde-fou** : un saut de position impossible (ex. 2 000 unités en 0,5 s) est refusé, sauf s'il est confirmé à la lecture suivante (téléportation).
+
+| Mesure | Résultat |
+|---|---|
+| Exemples d'apprentissage | 26 découpes dans `images/reference-ui/coordonnees/` (nom du fichier = valeur attendue), jour et nuit |
+| Contrôle croisé | 26/26 (chaque image lue avec des modèles appris sans elle) |
+| En direct | 60/60, ~1 ms par lecture (l'OCR prenait ~10 ms) |
+
+Les modèles sont fabriqués par l'outil `tools/ModelesChiffres` à partir des exemples. Si un patch change la police : ajouter des captures, relancer l'outil.
+Le journal indique « position lue X % du temps (dont Y % par les modèles de chiffres) ».
+
+### Données du jeu (D-033)
+
+```
+ Lancement du bot
+   ├─ donnees-jeu/ présent ? → chargé et vérifié → noms des 878 ressources donnés au lecteur du HUD
+   └─ en arrière-plan : dernier commit de BitCraft_GameData (GitHub)
+         ├─ même commit → rien à faire
+         └─ nouveau → téléchargement dans un dossier temporaire → vérification
+                         ├─ OK → remplace l'ancienne version
+                         └─ KO → ancienne version gardée, alerte
+```
+
+| Élément | Rôle |
+|---|---|
+| `GameDataStore` (brique GameData) | Lit les 8 tables JSON : ressources (nom, tier, étiquette, santé), récolte (durée et endurance par coup, outil et niveau requis), biomes, objets, cargaisons, nourriture. Contrôles de vraisemblance |
+| `GameDataUpdater` (brique GameData) | Télécharge seulement si le dépôt a changé, toutes les tables du même commit, vérifie avant de remplacer |
+| `GameDataLoader` (App) | Orchestration au lancement et messages du journal (catégorie « Données ») |
+
+- Dossier `donnees-jeu/` **à côté du .exe**, ignoré par Git (pas de licence : jamais republié). ~7 Mo.
+- **Contrôle croisé écran / données** : à chaque nouvelle cible, la santé max lue est comparée aux données. Désaccord = alerte.
+- Sans Internet : version déjà présente, sinon liste de noms intégrée (19 noms).
+- Alerte si les données ont plus de 7 jours.
+
+### Autres changements v0.3.0
+- Changement de zone noté seulement s'il est lu **2 fois de suite** (évite « S A Pe Meadows »).

@@ -5,7 +5,7 @@
 | [Q-001](Q-001-perception-monde-3d.md) | Perception du monde 3D | Haute | Ouverte |
 | [Q-002](Q-002-cartographie-navigation.md) | Cartographie et navigation | Haute | Ouverte |
 | [Q-003](Q-003-interface-consignes-n3.md) | Interface de consignes N3 | Basse | Ouverte |
-| [Q-004](Q-004-source-valeurs-donnees.md) | Source des valeurs de données de jeu | Haute | Ouverte |
+| [Q-004](Q-004-source-valeurs-donnees.md) | Source des valeurs de données de jeu | Haute | Résolue → D-033 |
 | [Q-005](Q-005-langue-code.md) | Langue du code | Moyenne | Résolue → D-012 |
 | [Q-006](Q-006-premier-type-ressource.md) | Premier type de ressource testé | Haute | Résolue → D-021 |
 | [Q-007](Q-007-monde-joue.md) | Monde joué | Moyenne | Résolue → D-015 |
@@ -17,9 +17,10 @@
 | [Q-013](Q-013-ecorce-ou-troncs.md) | Quel « bois » ramener : écorce, troncs, ou les deux ? | Haute | Résolue → D-027 |
 | [Q-014](Q-014-ennemis-et-danger.md) | Ennemis et danger de mort | Haute | Ouverte |
 | [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Moyenne | Ouverte |
-| [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Ouverte (recommandation : modèles de chiffres) |
+| [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Mise en œuvre en v0.3.0 (modèles de chiffres), à confirmer par T-20261116-04 |
 | [Q-017](Q-017-mode-test-mouvements.md) | Mode test : mouvements « humains » souris et caméra | Moyenne | Résolue → D-035 |
 | [Q-018](Q-018-notifications-ecran.md) | Notifications à l'écran qui masquent le HUD | Moyenne | Ouverte (proposition : v0.3) |
+| [Q-019](Q-019-identifier-arbre-sans-cliquer.md) | Savoir si un arbre est vieux ou jeune avant de le couper | Haute | Ouverte (recommandation : contour + confirmation par le nom) |
 
 ## Gabarit
 

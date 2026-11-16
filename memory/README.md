@@ -36,7 +36,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [README.md](decisions/README.md) — tableau D-001 à D-035
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-018
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-019
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -55,6 +55,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [sources.md](technique/sources.md) — liens analysés
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
+- [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (vide)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à 04)

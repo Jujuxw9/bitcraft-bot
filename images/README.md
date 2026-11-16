@@ -232,3 +232,11 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_video-trajet-banque-camera-w_001.mp4` | 2026-11-16 | **Vidéo 30 s** : trajet de la zone de minage (Ferralith Vein) jusqu'à la Banque de Snowrest, caméra recentrée avec W, interface Bank ouverte à l'arrivée | 1.0 |
 | `reference-ui/20261116_reference-ui_hud-coupe-arbre_001.png` | 2026-11-16 | **Image de référence des tests** : écran complet 1920×1080 (capture exacte par le bot), coupe d'un Mature Oak Tree 893/12000, endurance 65/100, position N 8927, E 6707. Versionnée. | 1.0 |
 | `reference-ui/20261116_reference-ui_hud-cueillette-buisson_002.png` | 2026-11-16 | **Image de référence (cas difficile)** : position `N 8933, E 6692` où l'OCR lit le 2 comme « Q ». Servira à tester la lecture des chiffres par modèles. Versionnée. | 1.0 |
+| `analyse/20261116_analyse_coordonnees-chiffre5_001.png` à `_003` | 2026-11-16 | Lot 5 (C1) : coordonnées avec un 5 (N 8945 / 8948 / 8950). Découpes à la main, pas 1920×1080 exact | 1.0 |
+| `analyse/20261116_analyse_video-survol-arbres-camera-basse_001.mp4` | 2026-11-16 | **Vidéo 62 s** (V1) : caméra basse, survol d'arbres proches et lointains, contour vert, curseur hache | 1.0 |
+| `analyse/20261116_analyse_video-survol-elements-divers_001.mp4` | 2026-11-16 | **Vidéo 50 s** (V2) : vue de dessus, survol de rochers, plantes, arbres | 1.0 |
+| `analyse/20261116_analyse_video-coupe-jusqua-endurance-vide_001.mp4` | 2026-11-16 | **Vidéo 5 min 20** (V3) : coupe d'un Mature Oak Tree jusqu'à l'arrêt (4/100 d'endurance), panneau d'action en bas | 1.0 (build 26707176) |
+| `analyse/20261116_analyse_info-bulle-feu-proche_001.png` | 2026-11-16 | Info-bulle « Nearby Flame » (bonus du feu de camp) | 1.0 (build 26707176) |
+| `analyse/20261116_analyse_jauge-metier-zoom_001.png` | 2026-11-16 | Zoom : jauge verticale à gauche de la minicarte, hache et « 25 » | 1.0 (build 26707176) |
+| `analyse/20261116_analyse_coupe-panneau-action-bas_001.png` | 2026-11-16 | Coupe en cours, panneau d'action en bas (« Chop », 822/12000, 11 coups, 1,59 s), pas de panneau en haut | 1.0 (build 26707176) |
+| `reference-ui/coordonnees/*.png` | 2026-11-16 | **26 découpes** de la ligne des coordonnées (nom = valeur attendue), jour et nuit, dont 1 capture directe du bot. Servent à fabriquer et tester les modèles de chiffres. Versionnées | 1.0 |

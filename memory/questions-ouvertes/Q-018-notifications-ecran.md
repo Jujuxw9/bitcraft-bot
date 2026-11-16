@@ -15,6 +15,10 @@ Quand un métier monte de niveau (ou pour un succès), un **triangle bleu** desc
 - Bandeau « Entering / Leaving SNOWREST » (entrée et sortie de ville).
 - Gains d'objets à gauche, « +13 EXP » au-dessus du personnage.
 
+## Ajout (2026-11-16, session 08)
+- Patch 1.0 : les popups d'expérience sont plus lumineux et portent « EXP » (« 14 EXP » au-dessus du personnage). Hors des zones lues.
+- Nouveau panneau d'action en bas pendant la coupe (voir `technique/analyse-lot5-2026-11-16.md`).
+
 ## Proposition de Claude
 Une brique « **événements à l'écran** » qui :
 1. **reconnaît** chaque notification (couleur bleue du triangle, texte « LEVEL » lu par OCR, ou message connu) ;
