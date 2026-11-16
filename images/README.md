@@ -106,3 +106,19 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_snowrest-survol-batiment_004.png` | 2026-11-16 | Snowrest : bâtiments survolés, contour vert + nom | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_snowrest-survol-batiment_005.png` | 2026-11-16 | Snowrest : bâtiments survolés, contour vert + nom | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_snowrest-survol-batiment_006.png` | 2026-11-16 | Snowrest : bâtiments survolés, contour vert + nom | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_jour-riviere_001.png` | 2026-11-16 | Jour, bord de rivière, personnage arrêté | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_jour-survol-objet_001.png` | 2026-11-16 | Jour, bord de rivière, petit objet survolé (contour vert) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-silex_001.png` | 2026-11-16 | Récolte de « Flint Pile » (Mining) : panneau cible en haut, barre d'action en bas, gain « Knapped Flint » à gauche, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-silex_002.png` | 2026-11-16 | Récolte de « Flint Pile » (Mining) : panneau cible en haut, barre d'action en bas, gain « Knapped Flint » à gauche, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-lavande_001.png` | 2026-11-16 | Récolte de « Lavender » (Foraging, machette) : panneaux cible et action, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-lavande_002.png` | 2026-11-16 | Récolte de « Lavender » (Foraging, machette) : panneaux cible et action, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-fleur_001.png` | 2026-11-16 | Récolte de « Daisy » (Foraging) : panneaux cible et action, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-fleur_002.png` | 2026-11-16 | Récolte de « Daisy » (Foraging) : panneaux cible et action, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-fleur_003.png` | 2026-11-16 | Récolte de « Daisy » (Foraging) : panneaux cible et action, +EXP | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre_001.png` | 2026-11-16 | **Coupe de « Mature Oak Tree »** (Tier 1, Axe Tier 1, Forestry) : contour vert, santé 6746/12000, action « Chop » 1,59 s | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre_002.png` | 2026-11-16 | **Coupe de « Mature Oak Tree »** (Tier 1, Axe Tier 1, Forestry) : contour vert, santé 6746/12000, action « Chop » 1,59 s | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-arbre_003.png` | 2026-11-16 | **Coupe de « Mature Oak Tree »** (Tier 1, Axe Tier 1, Forestry) : contour vert, santé 6746/12000, action « Chop » 1,59 s | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-roche_001.png` | 2026-11-16 | Récolte de « Limestone Rock Formation » (pioche) à côté d'une souche d'arbre | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-roche-inventaire-plein_001.png` | 2026-11-16 | Message **« Some items couldn't fit in your inventory and were dropped on the ground »** (inventaire plein) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-roche_002.png` | 2026-11-16 | Récolte de « Limestone Rock Formation » (pioche) à côté d'une souche d'arbre | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-roche-inventaire-plein_002.png` | 2026-11-16 | Message **« Some items couldn't fit in your inventory and were dropped on the ground »** (inventaire plein) | 1.0 (build affiché : Early-Access-2-082daa0e) |

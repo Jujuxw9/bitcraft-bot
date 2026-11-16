@@ -82,3 +82,53 @@ Limite : balayer l'écran avec la souris est lent. Un détecteur d'arbres (YOLO)
 | M7 | **Carte du monde** ouverte (grande carte) | Q-002 |
 | M8 | Infos de l'arbre au survol long ou avec Alt (« Show Worldspace Tooltips ») | Identifier l'espèce d'arbre |
 | M9 | Réglages de touches : section « Window shortcuts » en entier (touche de la carte) | Ouvrir la carte |
+
+---
+
+# Lot 2 (16 captures, récoltes en cours)
+
+Fichiers `recolte-*`, `jour-riviere`, `jour-survol-objet` dans `images/analyse/`.
+
+## 8. Pendant une récolte, l'écran dit tout
+
+Deux panneaux apparaissent dès que la récolte commence :
+
+**Panneau cible (en haut au centre)** :
+- Nom de la ressource : `Mature Oak Tree`, catégorie `Tier 1 - Tree`.
+- Barre de santé de la ressource : `6746/12000` (texte lisible).
+- Conditions : `✓ Axe Tier 1`, `✓ Lv. 1 Forestry` (coche verte si remplie).
+
+**Panneau d'action (au-dessus de la barre d'action)** :
+- Nom + action : `Mature Oak Tree` / `Chop`.
+- Même barre de santé, une valeur `10` (puissance ?), une durée `1.59s` (temps d'un coup ?).
+
+Conséquence pour le bot : **l'OCR du panneau cible suffit à confirmer « je coupe bien un arbre »**. Si le panneau disparaît, la récolte est finie ou interrompue.
+
+## 9. Autres signaux visibles
+- **Gain d'objet** : bandeau à gauche de l'écran (`Knapped Flint 6`). Sert à compter ce qui est récolté.
+- **Gain d'expérience** : texte flottant `+12 EXP` au-dessus du personnage.
+- **Jauge verticale** à gauche de la minicarte : icône du métier en cours (pioche, fleur) + niveau (`13`). Probablement l'expérience du métier. **À vérifier**.
+- **Montée de niveau** : grand bandeau `MINING LEVEL 13` en haut.
+- **Endurance** : baisse pendant la récolte (100 → 82 sur les captures).
+- **Souche** : un arbre coupé laisse une souche.
+
+## 10. Inventaire plein : signal trouvé
+Message au centre de l'écran : **« Some items couldn't fit in your inventory and were dropped on the ground »**.
+- Attention : la récolte **continue** et les objets **tombent au sol**. Ce message doit déclencher immédiatement l'arrêt de la récolte puis le départ à la Banque.
+- Le bot surveillera aussi les cases vides de l'inventaire pour partir **avant** ce message.
+
+## 11. Durée de coupe d'un arbre (À vérifier)
+Sur deux captures à 10 s d'écart, la santé de l'arbre passe de 6746 à 6716. Soit environ 3 points/s pour 12 000 points. Si c'est exact, un arbre ne tombe jamais pendant une session de 15 min : l'inventaire sera plein bien avant. Le bot restera donc longtemps sur le même arbre, ce qui simplifie le MVP.
+
+## 12. État des captures demandées
+| # | État |
+|---|---|
+| M1 arbre survolé de près | ✔ (`recolte-arbre`) |
+| M2 coupe en cours | ✔ |
+| M3 après la coupe | Partiel : souche visible, pas de capture du bois dans l'inventaire |
+| M4 inventaire plein | Partiel : message ✔, inventaire plein ouvert ✘ |
+| M5 endurance basse | ✘ (minimum vu : 82/100) |
+| M6 message d'erreur | Partiel : message d'inventaire plein ✔ |
+| M7 carte du monde | ✘ |
+| M8 survol avec Alt | ✘ |
+| M9 raccourcis de fenêtres | ✘ |

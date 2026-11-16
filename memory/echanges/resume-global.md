@@ -4,9 +4,9 @@
 2. MVP : couper des arbres (bois, D-021), déposer à la Banque de Snowrest quand l'inventaire est plein, en boucle (D-002, D-016).
 3. Stack : C# / .NET 10, WPF, .exe unique (D-009, D-010). Dernier .exe validé dans `executable/` (D-020). Claude code tout (D-023).
 4. Langue : français partout, sauf les lignes de code (D-019). Sécurité : `Num 5`, 15 min (D-022).
-5. État : squelette .NET qui compile, aucune logique de bot. Lot 1 de captures analysé (80 images, session 04).
-6. Constat clé : tout objet survolé a un contour vert ; clic droit = aller + récolter. Base de la perception (Q-001).
+5. État : squelette .NET qui compile, aucune logique de bot. Lots 1 et 2 de captures analysés (96 images, session 04).
+6. Constats clés : contour vert au survol ; clic droit = aller + récolter ; panneau cible lisible (nom, santé) ; message « inventaire plein » repéré (Q-001).
 7. À valider par Julien : D-024 (tout à la souris, réglages du jeu inchangés).
-8. À fournir par Julien : lot 2 de captures M1 à M9 → [analyse des captures](../technique/analyse-captures-2026-11-16.md), section 7.
+8. Captures restantes (facultatives) : M3 à M9 → [analyse des captures](../technique/analyse-captures-2026-11-16.md), section 12.
 9. Prochaine version : v0.1 = capture du jeu affichée dans la fenêtre de supervision + arrêt d'urgence (aucune action sur le jeu).
 10. Plan des versions v0.1 → v0.6 (MVP) : dans la [feuille de route](2026-11-16-feuille-de-route.md).
