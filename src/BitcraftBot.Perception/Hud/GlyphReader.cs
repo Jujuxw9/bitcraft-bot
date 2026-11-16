@@ -56,8 +56,29 @@ public static partial class GlyphReader
         return null;
     }
 
+    // Lit un nombre entier (ex. niveau de métier « 25 ») avec les modèles des chiffres. Null si pas sûr.
+    public static int? ReadNumber(Frame frame, ScreenRect area, out string text)
+    {
+        text = string.Empty;
+        var digits = GlyphTemplates.Coordinates.Where(p => char.IsDigit(p.Key)).ToDictionary(p => p.Key, p => p.Value);
+        foreach (var line in FindLines(frame, area, minChars: 1))
+        {
+            if (line.Any(g => g.IsComma))
+            {
+                continue;
+            }
+            var lineText = Classify(line, digits);
+            if (lineText is not null && int.TryParse(lineText, out var value))
+            {
+                text = lineText;
+                return value;
+            }
+        }
+        return null;
+    }
+
     // Toutes les lignes de texte blanc de la zone, de haut en bas, chacune de gauche à droite.
-    public static List<List<Glyph>> FindLines(Frame frame, ScreenRect area)
+    public static List<List<Glyph>> FindLines(Frame frame, ScreenRect area, int minChars = 3)
     {
         var blobs = FindBlobs(frame, Clip(frame, area));
         var chars = blobs.Where(b => b.Height is >= MinCharHeight and <= MaxCharHeight && b.Width <= MaxCharWidth).ToList();
@@ -93,12 +114,12 @@ public static partial class GlyphReader
             {
                 if (run.Count > 0 && blob.X - run[^1].Right > MaxCharGap)
                 {
-                    AddRun(frame, run, top, bottom, result);
+                    AddRun(frame, run, top, bottom, minChars, result);
                     run = [];
                 }
                 run.Add(blob);
             }
-            AddRun(frame, run, top, bottom, result);
+            AddRun(frame, run, top, bottom, minChars, result);
         }
         return result;
     }
@@ -183,10 +204,10 @@ public static partial class GlyphReader
         public int Bottom => Y + Height - 1;
     }
 
-    private static void AddRun(Frame frame, List<Blob> run, int top, int bottom, List<List<Glyph>> result)
+    private static void AddRun(Frame frame, List<Blob> run, int top, int bottom, int minChars, List<List<Glyph>> result)
     {
-        // Une ligne utile a au moins 3 caractères (« N 0, E 0 » en a 6) et ne commence pas par une virgule.
-        if (run.Count(b => b.Height >= MinCharHeight) < 3)
+        // Coordonnées : au moins 3 caractères (« N 0, E 0 » en a 6). Un niveau de métier peut n'en avoir qu'un.
+        if (run.Count(b => b.Height >= MinCharHeight) < minChars)
         {
             return;
         }

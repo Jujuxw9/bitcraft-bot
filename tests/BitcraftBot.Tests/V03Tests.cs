@@ -120,3 +120,93 @@ public class PositionFilterTests
         Assert.Equal((8945, 6704), filter.Last);
     }
 }
+
+// v0.3.1 : jauge de métier à gauche de la minicarte (demande de Julien).
+public class ProfessionGaugeTests
+{
+    private static readonly string Folder = Path.Combine(HudReaderReferenceTests.FindRepoRoot(), "images", "reference-ui", "jauge-metier");
+
+    public static IEnumerable<object[]> Fixtures() =>
+        Directory.GetFiles(Folder, "*.png").Order().Select(f => new object[] { Path.GetFileName(f) });
+
+    // Nom du fichier : Metier_niveau_pourcentage_xxx.png (« absente » = pas de jauge). Découpe dont le coin est (1480, 0).
+    [Theory]
+    [MemberData(nameof(Fixtures))]
+    public async Task ReadsEveryLabeledCrop(string fileName)
+    {
+        var parts = fileName.Split('_');
+        var frame = await HudReaderReferenceTests.LoadFrameAsync(Path.Combine(Folder, fileName));
+
+        var gauge = ProfessionGaugeReader.Read(frame, (0, 0));
+
+        if (parts[0] == "absente")
+        {
+            Assert.Null(gauge);
+            return;
+        }
+        Assert.NotNull(gauge);
+        Assert.Equal(parts[0], gauge!.Profession);
+        Assert.Equal(int.Parse(parts[1]), gauge.Level);
+        Assert.InRange(gauge.Fill * 100, int.Parse(parts[2]) - 2, int.Parse(parts[2]) + 2);
+    }
+
+    // Capture complète 1920×1080 : la jauge est lue à sa place normale.
+    [Fact]
+    public async Task ReadsGaugeOnFullReferenceCapture()
+    {
+        var path = Path.Combine(HudReaderReferenceTests.FindRepoRoot(), "images", "reference-ui", "20261116_reference-ui_hud-coupe-arbre_001.png");
+        var frame = await HudReaderReferenceTests.LoadFrameAsync(path);
+        var gauge = ProfessionGaugeReader.Read(frame);
+        Assert.NotNull(gauge);
+        Assert.Equal("Forestry", gauge!.Profession);
+        Assert.Equal(23, gauge.Level);
+    }
+
+    // Jauge dessinée : cadre blanc, intérieur vert jusqu'à une hauteur donnée → pourcentage attendu.
+    [Theory]
+    [InlineData(0.0)]
+    [InlineData(0.25)]
+    [InlineData(0.6)]
+    [InlineData(1.0)]
+    public void MeasuresDrawnFill(double fill)
+    {
+        const int width = 140, height = 340;
+        var pixels = new byte[width * height * 4];
+        void Set(int x, int y, byte r, byte g, byte b)
+        {
+            var i = (y * width + x) * 4;
+            pixels[i] = b; pixels[i + 1] = g; pixels[i + 2] = r; pixels[i + 3] = 255;
+        }
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                Set(x, y, 26, 44, 38);
+            }
+        }
+        var top = (int)Math.Round(245 - fill * (245 - 22));
+        for (var y = 22; y <= 245; y++)
+        {
+            Set(54, y, 188, 189, 189);
+            Set(55, y, 188, 189, 189);
+            Set(70, y, 188, 189, 189);
+            Set(71, y, 188, 189, 189);
+            for (var x = 57; x <= 68; x++)
+            {
+                if (y >= top && fill > 0)
+                {
+                    Set(x, y, 17, 182, 74);
+                }
+            }
+        }
+        var frame = new Frame { Pixels = pixels, Width = width, Height = height, CapturedAt = DateTime.Now, Source = new ScreenRect(0, 0, width, height) };
+
+        var gauge = ProfessionGaugeReader.Read(frame, (0, 0));
+
+        Assert.NotNull(gauge);
+        Assert.InRange(gauge!.Fill, fill - 0.01, fill + 0.01);
+        // Pas d'icône ni de niveau dessinés : inconnus, sans invention.
+        Assert.Null(gauge.Profession);
+        Assert.Null(gauge.Level);
+    }
+}

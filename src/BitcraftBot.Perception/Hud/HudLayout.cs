@@ -52,5 +52,6 @@ public static class HudLayout
         ("Cible", TargetName),
         ("Catégorie", TargetCategory),
         ("Santé cible", TargetHealth),
+        ("Métier", ProfessionGaugeReader.ScreenArea),
     ];
 }

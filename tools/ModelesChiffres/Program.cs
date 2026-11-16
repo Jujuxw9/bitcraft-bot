@@ -97,6 +97,44 @@ code.AppendLine("}");
 var output = Path.Combine(root, "src", "BitcraftBot.Perception", "Hud", "GlyphTemplates.cs");
 File.WriteAllText(output, code.ToString(), new UTF8Encoding(true));
 Console.WriteLine($"Modèles écrits : {output} ({all.Count} caractères : {string.Concat(all.Keys.Order())}).");
+// 3. Icônes des métiers : découpes de images/reference-ui/jauge-metier (coin = (1480, 0) de l'écran),
+//    nom = Metier_niveau_pourcentage_xxx.png (ex. Forestry_25_95_capture-bot-direct_001.png).
+var iconSums = new Dictionary<string, (double[] Sum, int Count)>();
+foreach (var file in Directory.GetFiles(Path.Combine(root, "images", "reference-ui", "jauge-metier"), "*.png").Order())
+{
+    var parts = Path.GetFileNameWithoutExtension(file).Split('_');
+    var frame = await LoadFrameAsync(file);
+    var features = ProfessionGaugeReader.IconFeatures(frame, new ScreenRect(38, 252, 54, 42));
+    if (features is null)
+    {
+        Console.WriteLine($"ÉCARTÉE (icône non trouvée) : {Path.GetFileName(file)}");
+        continue;
+    }
+    var entry = iconSums.TryGetValue(parts[0], out var e) ? e : (new double[features.Length], 0);
+    for (var k = 0; k < features.Length; k++)
+    {
+        entry.Item1[k] += features[k];
+    }
+    iconSums[parts[0]] = (entry.Item1, entry.Item2 + 1);
+}
+var icons = new StringBuilder();
+icons.AppendLine("namespace BitcraftBot.Perception.Hud;");
+icons.AppendLine();
+icons.AppendLine("// Modèles des icônes de métier de la jauge, appris sur les découpes de images/reference-ui/jauge-metier.");
+icons.AppendLine($"// Fichier généré par tools/ModelesChiffres le {DateTime.Now:yyyy-MM-dd}. Ne pas modifier à la main.");
+icons.AppendLine("public static class ProfessionIconTemplates");
+icons.AppendLine("{");
+icons.AppendLine("    public static IReadOnlyDictionary<string, double[]> Icons { get; } = new Dictionary<string, double[]>");
+icons.AppendLine("    {");
+foreach (var (name, (sum, count)) in iconSums.OrderBy(p => p.Key))
+{
+    icons.AppendLine($"        [\"{name}\"] = [{string.Join(", ", sum.Select(v => (v / count).ToString("0.###", CultureInfo.InvariantCulture)))}],");
+}
+icons.AppendLine("    };");
+icons.AppendLine("}");
+File.WriteAllText(Path.Combine(root, "src", "BitcraftBot.Perception", "Hud", "ProfessionIconTemplates.cs"), icons.ToString(), new UTF8Encoding(true));
+Console.WriteLine($"Icônes de métier écrites : {string.Join(", ", iconSums.Select(p => $"{p.Key} ({p.Value.Count} images)"))}.");
+
 return errors == 0 ? 0 : 1;
 
 static Dictionary<char, double[]> Learn(IEnumerable<(string File, string Expected, List<Glyph> Glyphs)> samples)

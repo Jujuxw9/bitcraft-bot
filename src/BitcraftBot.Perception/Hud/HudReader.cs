@@ -46,6 +46,9 @@ public sealed record HudState
     public double? HungerRatio { get; init; }
     public TargetReading? Target { get; init; }
 
+    // Jauge de métier (null si absente : aucune action en cours).
+    public ProfessionGaugeReading? Profession { get; init; }
+
     // Zones dont la lecture a réussi (pour l'affichage en vert dans la fenêtre).
     public required IReadOnlySet<string> ZonesRead { get; init; }
 }
@@ -131,8 +134,12 @@ public sealed class HudReader(OcrReader ocrReader, IReadOnlyList<string>? knownT
             if (targetHealth is not null) zonesRead.Add("Santé cible");
         }
 
+        var profession = ProfessionGaugeReader.Read(frame);
+        if (profession is not null) zonesRead.Add("Métier");
+
         return new HudState
         {
+            Profession = profession,
             ReadAt = frame.CapturedAt,
             ReadDuration = watch.Elapsed,
             Position = position,

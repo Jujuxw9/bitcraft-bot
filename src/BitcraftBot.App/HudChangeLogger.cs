@@ -17,6 +17,8 @@ public sealed class HudChangeLogger(SessionLog log)
     private int _positionsByTemplates;
     private string? _zoneCandidate;
     private string? _confirmedZone;
+    private ProfessionGaugeReading? _lastGauge;
+    private int _gaugeMissing;
     private int _positionFailStreak;
     private double _totalReadMs;
     private readonly HashSet<string> _checkedTargets = [];
@@ -33,6 +35,8 @@ public sealed class HudChangeLogger(SessionLog log)
         _positionsByTemplates = 0;
         _zoneCandidate = null;
         _confirmedZone = null;
+        _lastGauge = null;
+        _gaugeMissing = 0;
         _positionFailStreak = 0;
         _totalReadMs = 0;
     }
@@ -134,6 +138,28 @@ public sealed class HudChangeLogger(SessionLog log)
             log.Alerte("Perception", $"Faim sous 50 % (≈{hunger * 100:0} %) : il faudra manger (D-032).");
         }
 
+        // Jauge de métier : début et fin d'action, montée de niveau.
+        // Fin d'action notée seulement après 4 lectures sans jauge (2 s) : une absence isolée n'est pas une fin.
+        if (now.Profession is { } gauge)
+        {
+            if (_lastGauge is null)
+            {
+                log.Info("Perception", $"Action en cours : {gauge}.");
+            }
+            else if (gauge.Level is { } level && _lastGauge.Level is { } levelBefore && level > levelBefore)
+            {
+                log.Info("Perception", $"Niveau gagné : {gauge.Profession ?? "métier"} passe niveau {level}.");
+            }
+            _lastGauge = gauge;
+            _gaugeMissing = 0;
+        }
+        else if (_lastGauge is not null && ++_gaugeMissing >= 4)
+        {
+            log.Info("Perception", $"Fin d'action (jauge de métier disparue, dernière valeur : {_lastGauge}).");
+            _lastGauge = null;
+            _gaugeMissing = 0;
+        }
+
         // Cible qui apparaît, change ou disparaît.
         var nameBefore = before.Target?.Name;
         var nameNow = now.Target?.Name;
@@ -194,6 +220,7 @@ public sealed class HudChangeLogger(SessionLog log)
         var region = hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "région ?";
         var hunger = hud.HungerRatio is { } h ? $"≈{h * 100:0} %" : "?";
         var target = hud.Target is null ? "aucune" : hud.Target.ToString();
-        return $"{position}, {hud.ZoneName ?? "zone ?"}, {region}, vie {hud.Health}, endurance {hud.Stamina}, faim {hunger}, cible {target}";
+        var gauge = hud.Profession is null ? "aucune action" : hud.Profession.ToString();
+        return $"{position}, {hud.ZoneName ?? "zone ?"}, {region}, vie {hud.Health}, endurance {hud.Stamina}, faim {hunger}, cible {target}, métier {gauge}";
     }
 }
