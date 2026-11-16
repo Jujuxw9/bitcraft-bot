@@ -16,6 +16,9 @@
 - Méthode : **un clic** sur un aliment placé dans la **barre d'action** en bas de l'écran.
 - **À définir** : seuil de faim (proposition : manger sous 40/100) et emplacement de l'aliment dans la barre.
 
+## Constat du 2026-11-16 (lot 4)
+Manger donne le bonus « Level 1 Food Regen » : endurance +5/min, vie +3/min, environ 14 min. Visible par une icône verte avec la durée au-dessus des barres.
+
 ## Conséquences
 - Le bot doit fermer la carte avant chaque transfert.
 - Il faut toujours de la nourriture dans la barre d'action : le bot vérifie qu'il en reste.

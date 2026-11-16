@@ -169,5 +169,42 @@ Exemple réel : Young Beech Tree à 905/3000, info-bulle **« Estimated time lef
 ## 17. Survol à distance
 Le contour vert apparaît aussi sur des **arbres éloignés** (série `survol-arbre-distance`). Le bot peut donc repérer un arbre loin à l'écran, puis faire un clic droit pour que le personnage y aille.
 
+## 18 bis. Voir aussi le lot 4 (fin de ce document)
+
 ## 18. Autres récoltes vues (pour plus tard, D-017)
 Strawberry Bush, Wild Grains, Wild Starbulb Plant, Mud Mound (argile), Sticks (bâtons, sans outil), Large Ferralith Vein (30 000 points, pioche), Briny Guppi (pêche, contour vert ou rouge sur le poisson). Toutes ont le même panneau cible et le même panneau d'action : **une seule méthode de lecture pour toutes les ressources**.
+
+---
+
+# Lot 4 (40 captures + 2 vidéos, 01:24 à 01:28)
+
+Fichiers `coupe-arbre-*`, `survol-tronc-*`, `chariot-*`, `minicarte-ennemi`, `carte-*`, `video-*` dans `images/analyse/`. Les vidéos ont été lues en extrayant une image toutes les 5 s.
+
+## 19. Grande carte du monde (Q-002)
+- Fond sombre = zone **non explorée**. Zone explorée en **hexagones** verts (cohérent avec la grille hexagonale du serveur).
+- Barre en bas : **`Keldan (R18) | (8918, 6700)`** = coordonnées du point **sous la souris**. Actions : **Set destination** (clic), Zoom (molette), Pan (glisser), F2 = grille d'empire.
+- Panneau « Map Options » : Buildings, Claims, Deployables, Placeables, Travelers activés ; Empires, Watchtowers, Wind désactivés.
+- Conséquence : pour aller à la Banque, le bot peut ouvrir la carte, placer la souris jusqu'à lire les bonnes coordonnées, puis cliquer « Set destination ». Méthode **précise**, sans deviner la distance. **À vérifier** : le personnage marche-t-il tout seul jusqu'à la destination ?
+- **Rappel D-030** : fermer la carte avant le Transfer à la Banque.
+- Touche d'ouverture de la carte : toujours inconnue (M9).
+
+## 20. Ennemis sur la minicarte (Q-014)
+- Triangle **rouge** = ennemi. Un ennemi est visible juste à l'est de la Banque (`minicarte-ennemi`).
+- Dans la vidéo de coupe, **5 à 7 triangles rouges** entourent le personnage (vers `N 8890, E 6759`) sans attaque visible. **À vérifier** avec Julien : ennemis passifs (animaux) ou agressifs ?
+
+## 21. Chariot (Cart)
+- Info-bulle : 1 conducteur, vitesse 15, **4 emplacements d'objets** (×100), **2 emplacements de cargaison** (×250).
+- Le personnage **tire** le chariot (`chariot-attele`). Fenêtre « ChatGPT Cart (I) » avec Sort / Transfer.
+- Pour plus tard (troncs, D-027).
+
+## 22. Bonus de nourriture
+- Icône verte au-dessus des barres + durée (« 14m ») : bonus **« Level 1 Food Regen »**, endurance **+5/min**, vie +3/min, pendant environ 14 min.
+- Avec ce bonus, l'endurance remonte à environ 20/min au lieu de 15 : manger raccourcit les pauses (D-028, D-030).
+
+## 23. Troncs au sol
+- Après plusieurs abattages, beaucoup de « Rough Wood Trunk » restent au sol. Survolés, ils ont un contour vert et une étiquette.
+- **Attention pour le bot** : un tronc au sol a un contour vert comme un arbre. Le bot doit **lire le nom** (panneau cible ou étiquette) avant de cliquer, pour ne pas viser un tronc.
+
+## 24. Ce que montrent les vidéos
+- **Coupe** : Julien enchaîne Young Beech, Mature Oak, Young Oak. Gains : Rough Tree Bark, **Tree Sap** (résine), Oak Seed. Le message « inventaire plein » s'affiche **plusieurs fois** pendant que la coupe continue : les objets tombent au sol. Le curseur de la souris est visible dans la vidéo.
+- **Minage** : Large Ferralith Vein (30 000 points) puis Ferralith Vein (3 000). Même panneau, même logique que les arbres.

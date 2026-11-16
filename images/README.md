@@ -15,6 +15,10 @@
 
 Les captures restent **sur le PC** (ignorées par Git). Seuls ce fichier et `reference-ui/` sont poussés. Penser à copier `images/` de temps en temps sur un disque externe.
 
+## Vidéos
+
+Même nommage, extension `.mp4` et sujet commençant par `video-` (ex. `20261116_analyse_video-coupe-plusieurs-arbres_001.mp4`). Format conseillé : MP4, 1920×1080, 30 i/s, 1 à 3 min, un sujet par vidéo.
+
 ## Nommage
 
 `AAAAMMJJ_categorie_sujet_NNN.png`
@@ -182,3 +186,45 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_survol-arbre-distance_005.png` | 2026-11-16 | **Arbres survolés de loin** : contour vert sur des arbres éloignés | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_recolte-jeune-arbre-temps-restant_001.png` | 2026-11-16 | Coupe « Young Beech Tree » 905/3000 : info-bulle **« Estimated time left: 2m 24s »** au survol du panneau d'action | 1.0 (build affiché : Early-Access-2-082daa0e) |
 | `analyse/20261116_analyse_recolte-jeune-arbre-niveau_001.png` | 2026-11-16 | Montée de niveau « Forestry Level 22 », gains « Rough Tree Bark 29 » et « Owl Feather » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_coupe-arbre-troncs-au-sol_001.png` | 2026-11-16 | Coupe de « Young Oak Tree » ; plusieurs **troncs laissés au sol** autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_coupe-arbre-troncs-au-sol_002.png` | 2026-11-16 | Coupe de « Young Oak Tree » ; plusieurs **troncs laissés au sol** autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-tronc-au-sol_001.png` | 2026-11-16 | Tronc au sol survolé : contour vert + étiquette « Rough Wood Trunk » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_coupe-arbre-troncs-au-sol_003.png` | 2026-11-16 | Coupe de « Young Oak Tree » ; plusieurs **troncs laissés au sol** autour | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-tronc-au-sol_002.png` | 2026-11-16 | Tronc au sol survolé : contour vert + étiquette « Rough Wood Trunk » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-tronc-au-sol_003.png` | 2026-11-16 | Tronc au sol survolé : contour vert + étiquette « Rough Wood Trunk » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_souche-et-troncs_001.png` | 2026-11-16 | Souche et troncs au sol après abattage | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_survol-arbre-proche_001.png` | 2026-11-16 | Arbre survolé de près (contour vert), panneau « Daisy » encore affiché | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_recolte-jeune-arbre_008.png` | 2026-11-16 | Coupe de « Young Oak Tree » 3000/3000, panneau d'action | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-bonus-nourriture_001.png` | 2026-11-16 | Zoom : bonus **« Level 1 Food Regen »** (endurance +5/min, vie +3/min), durée restante 13 min 54 s, icône « 14m » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_info-bulle-charrette_002.png` | 2026-11-16 | Zoom : info-bulle **Cart** (1 conducteur, vitesse 15, 4 emplacements d'objets ×100, 2 emplacements de cargaison ×250) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-monde_001.png` | 2026-11-16 | Chariot posé dans la prairie | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-zoom_001.png` | 2026-11-16 | Zoom sur le chariot et le personnage | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-zoom_002.png` | 2026-11-16 | Zoom sur le chariot et le personnage | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-zoom_003.png` | 2026-11-16 | Zoom sur le chariot et le personnage | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-survol_001.png` | 2026-11-16 | Chariot survolé : contour vert et étiquette « Cart » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-monde_002.png` | 2026-11-16 | Chariot posé dans la prairie | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-survol_002.png` | 2026-11-16 | Chariot survolé : contour vert et étiquette « Cart » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-attele_001.png` | 2026-11-16 | Personnage qui **tire le chariot** | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-attele_002.png` | 2026-11-16 | Personnage qui **tire le chariot** | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-attele_003.png` | 2026-11-16 | Personnage qui **tire le chariot** | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-attele_004.png` | 2026-11-16 | Personnage qui **tire le chariot** | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-interface_001.png` | 2026-11-16 | Inventaire + fenêtre **« ChatGPT Cart (I) »** ouverts | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-interface-zoom_001.png` | 2026-11-16 | Zoom : fenêtre du chariot (4 emplacements, 2 emplacements de cargaison 0/250, Sort / Transfer) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_chariot-interface_002.png` | 2026-11-16 | Inventaire + fenêtre **« ChatGPT Cart (I) »** ouverts | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_hud-menu-bas-droite_001.png` | 2026-11-16 | Zoom : icônes du menu en bas à droite | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_hud-menu-bas-gauche_001.png` | 2026-11-16 | Zoom : icônes en bas à gauche (chat, social, construction, commerce) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_minicarte-ennemi_001.png` | 2026-11-16 | Zoom minicarte : **triangle rouge (ennemi)** près de la Banque, coordonnées `N 8907, E 6724` | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_minicarte-ennemi_002.png` | 2026-11-16 | Zoom minicarte : **triangle rouge (ennemi)** près de la Banque, coordonnées `N 8907, E 6724` | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_jour-prairie-vue-dessus_001.png` | 2026-11-16 | Prairie vue de dessus, personnage seul | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_jour-prairie_008.png` | 2026-11-16 | Prairie, arbres et rochers, panneau cible « Young Oak Tree » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_jour-prairie_009.png` | 2026-11-16 | Prairie, arbres et rochers, panneau cible « Young Oak Tree » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-monde_001.png` | 2026-11-16 | **Carte du monde** ouverte : zone explorée en hexagones, icônes, panneau « Map Options » | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-monde-zoom_001.png` | 2026-11-16 | Carte du monde zoomée sur la zone de Snowrest | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-monde-zoom_002.png` | 2026-11-16 | Carte du monde zoomée sur la zone de Snowrest | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-monde-zoom_003.png` | 2026-11-16 | Carte du monde zoomée sur la zone de Snowrest | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-barre-coordonnees_001.png` | 2026-11-16 | Zoom : barre de la carte **« Keldan (R18) | (8918, 6700) »**, Set destination, Zoom, Pan, F2 Toggle Empire Grid | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-options_001.png` | 2026-11-16 | Zoom : Map Options (Buildings, Claims, Deployables, Empires, Placeables, Travelers, Watchtowers, Wind) | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-icones_001.png` | 2026-11-16 | Zoom : icônes de bâtiments sur la carte | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_carte-monde-dezoom_001.png` | 2026-11-16 | Carte du monde très dézoomée : région entière | 1.0 (build affiché : Early-Access-2-082daa0e) |
+| `analyse/20261116_analyse_video-coupe-plusieurs-arbres_001.mp4` | 2026-11-16 | **Vidéo 1 min 30** : coupe de plusieurs arbres (Young Beech, Mature Oak, Young Oak) ; nombreux triangles rouges sur la minicarte ; message « inventaire plein » répété ; gains Rough Tree Bark, Tree Sap, Oak Seed | 1.0 |
+| `analyse/20261116_analyse_video-minage-ferralith_001.mp4` | 2026-11-16 | **Vidéo 41 s** : minage de « Large Ferralith Vein » (30 000 points) puis « Ferralith Vein » (3 000) | 1.0 |
