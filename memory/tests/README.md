@@ -2,7 +2,7 @@
 
 | ID | Date | Type | Titre | Résultat |
 |---|---|---|---|---|
-| [T-20261116-01](T-20261116-01-v01-affichage.md) | 2026-11-16 | intégration | v0.1 : affichage du jeu et arrêt d'urgence | À faire |
+| [T-20261116-01](T-20261116-01-v01-affichage.md) | 2026-11-16 | intégration | v0.1 : affichage du jeu et arrêt d'urgence | Partiel (Num 5 OK) |
 
 ## Gabarit
 
