@@ -210,3 +210,54 @@ public class ProfessionGaugeTests
         Assert.Null(gauge.Level);
     }
 }
+
+// v0.3.2 : zone et région confirmées sur deux lectures ; images de diagnostic.
+public class ConfirmedTextTests
+{
+    [Fact]
+    public void IgnoresIsolatedMisread()
+    {
+        var region = new BitcraftBot.Core.Logging.ConfirmedText();
+        Assert.Null(region.Update("Keldan (R18)"));
+        Assert.Null(region.Update("Keldan (R10)")); // lecture ratée isolée (journal du 16/11 à 19:46)
+        Assert.Null(region.Update("Keldan (R18)"));
+        Assert.Null(region.Update(null));
+    }
+
+    [Fact]
+    public void ConfirmsRealChange()
+    {
+        var zone = new BitcraftBot.Core.Logging.ConfirmedText();
+        zone.Update("Safe Meadows");
+        Assert.Null(zone.Update("Calm Forest"));
+        Assert.Equal(("Safe Meadows", "Calm Forest"), zone.Update("Calm Forest"));
+        Assert.Null(zone.Update("Calm Forest"));
+    }
+}
+
+public class FrameSaverTests
+{
+    [Fact]
+    public async Task SavesReadablePng()
+    {
+        var path = Path.Combine(HudReaderReferenceTests.FindRepoRoot(), "images", "reference-ui", "20261116_reference-ui_hud-coupe-arbre_001.png");
+        var frame = await HudReaderReferenceTests.LoadFrameAsync(path);
+        var output = Path.Combine(Path.GetTempPath(), "bitcraftbot-tests", Guid.NewGuid().ToString("N"), "diagnostic.png");
+
+        await FrameSaver.SavePngAsync(frame, output);
+
+        // L'image relue donne la même lecture de la position.
+        var reloaded = await HudReaderReferenceTests.LoadFrameAsync(output);
+        Assert.Equal((8927, 6707), GlyphReader.ReadCoordinates(reloaded, HudLayout.CoordinatesSearch, out _));
+    }
+}
+
+public class CaptureKeyTests
+{
+    [Theory]
+    [InlineData(0x52, false, true)]  // Num 0
+    [InlineData(0x52, true, false)]  // Inser (touche étendue, même scancode)
+    [InlineData(0x4C, false, false)] // Num 5 = arrêt d'urgence, pas une capture
+    public void RecognizesOnlyNumpad0(int scanCode, bool extended, bool expected) =>
+        Assert.Equal(expected, BitcraftBot.Input.Keyboard.CaptureKey.IsCapture(scanCode, extended));
+}

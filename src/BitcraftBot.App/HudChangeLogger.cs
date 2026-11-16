@@ -15,8 +15,10 @@ public sealed class HudChangeLogger(SessionLog log)
     private int _reads;
     private int _positionsRead;
     private int _positionsByTemplates;
-    private string? _zoneCandidate;
-    private string? _confirmedZone;
+    private readonly ConfirmedText _zone = new();
+    private readonly ConfirmedText _region = new();
+    private int _staminaDropsWithoutGauge;
+    private DateTime _lastDiagnosticAt = DateTime.MinValue;
     private ProfessionGaugeReading? _lastGauge;
     private int _gaugeMissing;
     private int _positionFailStreak;
@@ -33,16 +35,20 @@ public sealed class HudChangeLogger(SessionLog log)
         _reads = 0;
         _positionsRead = 0;
         _positionsByTemplates = 0;
-        _zoneCandidate = null;
-        _confirmedZone = null;
+        _zone.Reset();
+        _region.Reset();
+        _staminaDropsWithoutGauge = 0;
+        _lastDiagnosticAt = DateTime.MinValue;
         _lastGauge = null;
         _gaugeMissing = 0;
         _positionFailStreak = 0;
         _totalReadMs = 0;
     }
 
-    public void OnHudRead(HudState hud, double captureFps)
+    // Renvoie une raison quand une image de diagnostic serait utile (situation anormale à comprendre), sinon null.
+    public string? OnHudRead(HudState hud, double captureFps)
     {
+        string? diagnostic = null;
         _reads++;
         _totalReadMs += hud.ReadDuration.TotalMilliseconds;
         if (hud.Position is not null)
@@ -57,6 +63,7 @@ public sealed class HudChangeLogger(SessionLog log)
         else if (++_positionFailStreak == 10)
         {
             log.Alerte("Perception", $"Position illisible 10 fois de suite (dernier texte lu : « {hud.RawPosition} »).");
+            diagnostic = "position illisible";
         }
 
         var previous = _previous;
@@ -79,38 +86,45 @@ public sealed class HudChangeLogger(SessionLog log)
             }
             _lastSummary = hud.ReadAt;
         }
+        // Endurance qui baisse sans jauge de métier pendant 3 s : action probable mais jauge non vue (cas du 16/11 à 19:47).
+        if (hud.Profession is null && previous?.Stamina.Value is { } stBefore && hud.Stamina.Value is { } stNow && stNow < stBefore)
+        {
+            _staminaDropsWithoutGauge++;
+        }
+        else if (hud.Profession is not null)
+        {
+            _staminaDropsWithoutGauge = 0;
+        }
+        if (_staminaDropsWithoutGauge >= 3)
+        {
+            log.Alerte("Perception", "L'endurance baisse mais la jauge de métier n'est pas vue.");
+            diagnostic ??= "endurance en baisse sans jauge de métier";
+            _staminaDropsWithoutGauge = 0;
+        }
+
         _previous = Merge(previous, hud);
+
+        // Au plus une image de diagnostic par minute.
+        if (diagnostic is not null && hud.ReadAt - _lastDiagnosticAt >= TimeSpan.FromMinutes(1))
+        {
+            _lastDiagnosticAt = hud.ReadAt;
+            return diagnostic;
+        }
+        return null;
     }
 
     private void LogChanges(HudState before, HudState now)
     {
-        // Changement de zone : noté seulement s'il est lu deux fois de suite (évite « S A Pe Meadows », lecture ratée isolée).
-        if (now.ZoneName is not null && _confirmedZone is null)
+        // Changements de zone et de région : notés seulement s'ils sont lus deux fois de suite
+        // (évite « S A Pe Meadows » ou « R10 » au lieu de « R18 », lectures ratées isolées).
+        if (_zone.Update(now.ZoneName) is { } zoneChange)
         {
-            _confirmedZone = now.ZoneName;
+            log.Info("Perception", $"Changement de zone : {zoneChange.Before} → {zoneChange.After}.");
         }
-        else if (now.ZoneName is not null && now.ZoneName != _confirmedZone)
+        var regionText = now.Region is { } r ? $"{r.Name} (R{r.Number})" : null;
+        if (_region.Update(regionText) is { } regionChange)
         {
-            if (_zoneCandidate == now.ZoneName)
-            {
-                log.Info("Perception", $"Changement de zone : {_confirmedZone} → {now.ZoneName}.");
-                _confirmedZone = now.ZoneName;
-                _zoneCandidate = null;
-            }
-            else
-            {
-                _zoneCandidate = now.ZoneName;
-            }
-        }
-        else
-        {
-            _zoneCandidate = null;
-        }
-
-        if (now.Region is not null && before.Region is not null && now.Region != before.Region)
-        {
-            log.Info("Perception", $"Changement de région : {before.Region.Value.Name} (R{before.Region.Value.Number}) → " +
-                                   $"{now.Region.Value.Name} (R{now.Region.Value.Number}).");
+            log.Info("Perception", $"Changement de région : {regionChange.Before} → {regionChange.After}.");
         }
 
         // Vie qui baisse : signe d'attaque (Q-014).

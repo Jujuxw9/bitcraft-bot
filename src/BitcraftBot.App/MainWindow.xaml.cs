@@ -42,6 +42,8 @@ public partial class MainWindow : Window
     private readonly HudChangeLogger _hudLogger;
     private readonly HudReader? _hudReader;
     private readonly GameDataLoader _gameData;
+    private const int MaxDiagnostics = 5;
+    private int _diagnosticsSaved;
     private GlobalKeyboardHook? _keyboardHook;
 
     // Journal affiché et surveillance des ressources (onglet Système).
@@ -134,7 +136,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.1 : affichage et lecture du HUD (coordonnées par modèles de chiffres, jauge de métier), aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.2 : affichage et lecture du HUD (coordonnées par modèles de chiffres, jauge de métier), capture du jeu avec Num 0, aucune action sur le jeu hors banc d'essai.");
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
                              $"CPU du bot {_settings.Limits.BotCpuWarningPercent:0} %, RAM libre du PC {_settings.Limits.SystemRamAvailableWarningPercent:0} %.");
@@ -147,7 +149,7 @@ public partial class MainWindow : Window
         {
             _keyboardHook = new GlobalKeyboardHook();
             _keyboardHook.KeyDown += OnGlobalKeyDown;
-            _log.Info("Sécurité", $"Écoute du clavier active (arrêt d'urgence : {EmergencyKey.DisplayName}).");
+            _log.Info("Sécurité", $"Écoute du clavier active (arrêt d'urgence : {EmergencyKey.DisplayName} ; capture du jeu : {CaptureKey.DisplayName}).");
         }
         catch (InvalidOperationException ex)
         {
@@ -157,6 +159,12 @@ public partial class MainWindow : Window
 
     private void OnGlobalKeyDown(int scanCode, bool isExtended, bool isInjected)
     {
+        // Num 0 : capture de l'écran du jeu seul (1920×1080 exact), même avec 2 écrans.
+        if (!isInjected && CaptureKey.IsCapture(scanCode, isExtended))
+        {
+            _ = Task.Run(SaveGameScreenshotAsync);
+            return;
+        }
         // Une touche simulée par un programme ne compte jamais comme arrêt d'urgence.
         if (isInjected || !EmergencyKey.IsEmergencyStop(scanCode, isExtended))
         {
@@ -185,6 +193,40 @@ public partial class MainWindow : Window
         });
     }
 
+    // Capture du jeu seul, sans compression, rangée dans images/analyse du dépôt (sinon dans « captures » à côté du .exe).
+    private async Task SaveGameScreenshotAsync()
+    {
+        try
+        {
+            var game = new GameWindowLocator().Find();
+            if (game is null)
+            {
+                _log.Alerte("Capture", $"Touche {CaptureKey.DisplayName} : fenêtre du jeu introuvable, pas de capture.");
+                return;
+            }
+            var frame = new ScreenCapturer().Capture(game.ClientArea);
+            var folder = FindAnalysisFolder() ?? System.IO.Path.Combine(AppContext.BaseDirectory, "captures");
+            var path = System.IO.Path.Combine(folder, $"{DateTime.Now:yyyyMMdd}_analyse_capture-bot_{DateTime.Now:HHmmss}.png");
+            await FrameSaver.SavePngAsync(frame, path);
+            _log.Info("Capture", $"Capture du jeu enregistrée ({frame.Width}×{frame.Height}) : {path}");
+        }
+        catch (Exception ex)
+        {
+            _log.Erreur("Capture", $"Capture impossible : {ex.Message}");
+        }
+    }
+
+    // Dossier images/analyse du dépôt, en remontant depuis le .exe (artifacts/vX.Y.Z/ ou executable/).
+    private static string? FindAnalysisFolder()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(System.IO.Path.Combine(dir.FullName, "BitcraftBot.sln")))
+        {
+            dir = dir.Parent;
+        }
+        return dir is null ? null : System.IO.Path.Combine(dir.FullName, "images", "analyse");
+    }
+
     private void StartButton_Click(object sender, RoutedEventArgs e) => StartSession();
 
     private void StopButton_Click(object sender, RoutedEventArgs e) => _safety.RequestStop(StopReason.Manuel);
@@ -195,6 +237,7 @@ public partial class MainWindow : Window
         _safety.Start();
         _hudLogger.Reset();
         _hudReader?.ResetPosition();
+        _diagnosticsSaved = 0;
         _consecutiveCaptureErrors = 0;
         _framesCounted = 0;
         _captureMsTotal = 0;
@@ -302,7 +345,15 @@ public partial class MainWindow : Window
                     {
                         break;
                     }
-                    _hudLogger.OnHudRead(hud, _measuredFps);
+                    var diagnostic = _hudLogger.OnHudRead(hud, _measuredFps);
+                    if (diagnostic is not null && _diagnosticsSaved < MaxDiagnostics)
+                    {
+                        _diagnosticsSaved++;
+                        // Image de diagnostic à côté du journal : pour comprendre un cas anormal (reste sur le PC, D-026).
+                        var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(_log.FilePath)!, $"diagnostic_{DateTime.Now:HH-mm-ss}.png");
+                        await FrameSaver.SavePngAsync(frame, path);
+                        _log.Info("Perception", $"Image de diagnostic enregistrée ({diagnostic}) : {path}");
+                    }
                     _ = Dispatcher.BeginInvoke(() => ShowHud(hud));
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
