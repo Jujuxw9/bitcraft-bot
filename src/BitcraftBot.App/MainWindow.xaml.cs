@@ -136,7 +136,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.3 : affichage et lecture du HUD (coordonnées par modèles de chiffres, jauge de métier), capture du jeu avec Num 0, aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.4 : affichage et lecture du HUD (coordonnées par modèles de chiffres, jauge de métier), capture du jeu avec Num 0, aucune action sur le jeu hors banc d'essai.");
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
                              $"CPU du bot {_settings.Limits.BotCpuWarningPercent:0} %, RAM libre du PC {_settings.Limits.SystemRamAvailableWarningPercent:0} %.");

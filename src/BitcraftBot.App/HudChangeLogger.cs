@@ -19,6 +19,10 @@ public sealed class HudChangeLogger(SessionLog log)
     private readonly ConfirmedText _region = new();
     private int _staminaDropsWithoutGauge;
     private int _hungerLowReads;
+    private readonly ConfirmedText _target = new();
+    private const string NoTarget = "(aucune)";
+    private DateTime _notificationUntil = DateTime.MinValue;
+    private static readonly TimeSpan NotificationDuration = TimeSpan.FromSeconds(8);
     private bool _hungerAlerted;
     private DateTime _lastDiagnosticAt = DateTime.MinValue;
     private ProfessionGaugeReading? _lastGauge;
@@ -43,6 +47,8 @@ public sealed class HudChangeLogger(SessionLog log)
         _lastDiagnosticAt = DateTime.MinValue;
         _hungerLowReads = 0;
         _hungerAlerted = false;
+        _target.Reset();
+        _notificationUntil = DateTime.MinValue;
         _lastGauge = null;
         _gaugeMissing = 0;
         _positionFailStreak = 0;
@@ -131,8 +137,35 @@ public sealed class HudChangeLogger(SessionLog log)
             log.Info("Perception", $"Changement de région : {regionChange.Before} → {regionChange.After}.");
         }
 
+        // Jauge de métier : début et fin d'action, montée de niveau.
+        // Fin d'action notée seulement après 4 lectures sans jauge (2 s) : une absence isolée n'est pas une fin.
+        if (now.Profession is { } gauge)
+        {
+            if (_lastGauge is null)
+            {
+                log.Info("Perception", $"Action en cours : {gauge}.");
+            }
+            else if (gauge.Level is { } level && _lastGauge.Level is { } levelBefore && level > levelBefore)
+            {
+                log.Info("Perception", $"Niveau gagné : {gauge.Profession ?? "métier"} passe niveau {level}. Notification à l'écran : vie, faim et cible ignorées 8 s (Q-018).");
+                _notificationUntil = now.ReadAt + NotificationDuration;
+            }
+            _lastGauge = gauge;
+            _gaugeMissing = 0;
+        }
+        else if (_lastGauge is not null && ++_gaugeMissing >= 4)
+        {
+            log.Info("Perception", $"Fin d'action (jauge de métier disparue, dernière valeur : {_lastGauge}).");
+            _lastGauge = null;
+            _gaugeMissing = 0;
+        }
+
+        // Pendant une notification de montée de niveau, le bandeau recouvre la cible, la vie et la faim
+        // (16/11 à 20:08 : faim lue à 0 %, cible « Lim MINING », santé 30/30000). Ces valeurs sont ignorées.
+        var masked = now.ReadAt < _notificationUntil;
+
         // Vie qui baisse : signe d'attaque (Q-014).
-        if (now.Health.Value is { } hp && before.Health.Value is { } hpBefore && hp < hpBefore)
+        if (!masked && now.Health.Value is { } hp && before.Health.Value is { } hpBefore && hp < hpBefore)
         {
             log.Alerte("Perception", $"Vie en baisse : {hpBefore} → {hp}.");
         }
@@ -152,7 +185,7 @@ public sealed class HudChangeLogger(SessionLog log)
 
         // Faim sous 50 % (D-032), seulement après 4 lectures basses de suite (2 s) :
         // une info-bulle ou une fenêtre peut cacher la ligne de faim (fausses alertes du 16/11 à 20:00).
-        if (now.HungerRatio is { } hunger)
+        if (!masked && now.HungerRatio is { } hunger)
         {
             if (hunger < 0.5)
             {
@@ -169,36 +202,12 @@ public sealed class HudChangeLogger(SessionLog log)
             }
         }
 
-        // Jauge de métier : début et fin d'action, montée de niveau.
-        // Fin d'action notée seulement après 4 lectures sans jauge (2 s) : une absence isolée n'est pas une fin.
-        if (now.Profession is { } gauge)
+        // Cible qui apparaît, change ou disparaît : notée seulement si lue 2 fois de suite, et pas pendant une notification.
+        if (!masked && _target.Update(now.Target?.Name ?? NoTarget) is { } targetChange)
         {
-            if (_lastGauge is null)
+            if (targetChange.After == NoTarget)
             {
-                log.Info("Perception", $"Action en cours : {gauge}.");
-            }
-            else if (gauge.Level is { } level && _lastGauge.Level is { } levelBefore && level > levelBefore)
-            {
-                log.Info("Perception", $"Niveau gagné : {gauge.Profession ?? "métier"} passe niveau {level}.");
-            }
-            _lastGauge = gauge;
-            _gaugeMissing = 0;
-        }
-        else if (_lastGauge is not null && ++_gaugeMissing >= 4)
-        {
-            log.Info("Perception", $"Fin d'action (jauge de métier disparue, dernière valeur : {_lastGauge}).");
-            _lastGauge = null;
-            _gaugeMissing = 0;
-        }
-
-        // Cible qui apparaît, change ou disparaît.
-        var nameBefore = before.Target?.Name;
-        var nameNow = now.Target?.Name;
-        if (nameNow != nameBefore)
-        {
-            if (nameNow is null)
-            {
-                log.Info("Perception", $"Plus de cible (avant : {nameBefore}).");
+                log.Info("Perception", $"Plus de cible (avant : {targetChange.Before}).");
             }
             else
             {
