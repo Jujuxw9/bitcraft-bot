@@ -189,7 +189,51 @@
             </DockPanel>
         </TabItem>
 
-        <!-- ONGLET 3 : SYSTÈME -->
+        <!-- ONGLET : TESTS DES MOUVEMENTS (D-035) -->
+        <TabItem Header="Tests">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
+                <StackPanel MaxWidth="760" HorizontalAlignment="Left">
+                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10"
+                               Text="Banc d'essai des mouvements « humains » (souris et caméra). Fonction de test, désactivée à chaque démarrage. Mettez-vous dans un endroit calme, sans ennemis. Au lancement, le jeu passe au premier plan après 3 secondes." />
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <CheckBox x:Name="TestsEnabledCheck" Content="Activer le banc d'essai" FontWeight="SemiBold"
+                                      Click="TestsEnabledCheck_Click" />
+                            <TextBlock TextWrapping="Wrap" Foreground="#F28B82" Margin="0,4,0,0"
+                                       Text="Arrêt immédiat : touche Num 5, ou bougez vous-même la souris, ou cliquez hors du jeu." />
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="Durée d'un test (secondes) :" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBox x:Name="TestDurationBox" Text="30" Width="45" />
+                            </StackPanel>
+                            <TextBlock Text="SOURIS" Style="{StaticResource SectionTitle}" />
+                            <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
+                                       Text="Trajets en courbe, vitesse qui accélère puis ralentit, petit dépassement de la cible, pauses variables. La souris reste au centre de l'écran (hors HUD, minicarte, chat, barre d'action)." />
+                            <CheckBox x:Name="AllowClicksCheck" Content="Étape 2 : autoriser les clics gauche (le personnage se déplace un peu)"
+                                      Margin="0,6,0,6" />
+                            <Button x:Name="TestMouseButton" Content="Lancer le test souris" HorizontalAlignment="Left"
+                                    IsEnabled="False" Click="TestMouseButton_Click" />
+                            <TextBlock Text="CAMÉRA" Style="{StaticResource SectionTitle}" />
+                            <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
+                                       Text="Rotations avec Z / Q / S / D, appuis et pauses de durée variable, W de temps en temps pour recentrer. Aucune autre touche." />
+                            <Button x:Name="TestCameraButton" Content="Lancer le test caméra" HorizontalAlignment="Left"
+                                    IsEnabled="False" Click="TestCameraButton_Click" Margin="0,6,0,0" />
+                            <Button x:Name="TestStopButton" Content="Arrêter le test" HorizontalAlignment="Left"
+                                    IsEnabled="False" Click="TestStopButton_Click" Margin="0,12,0,0" />
+                            <TextBlock x:Name="TestStatusText" Text="Banc d'essai désactivé." Margin="0,10,0,0"
+                                       FontWeight="SemiBold" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
+                               Text="Chaque geste est noté dans l'onglet Journal (cochez « Détails » pour tout voir)." />
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- ONGLET : SYSTÈME -->
         <TabItem Header="Système">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
                 <StackPanel>
