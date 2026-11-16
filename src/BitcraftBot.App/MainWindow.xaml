@@ -21,6 +21,15 @@
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Margin" Value="0,10,0,4" />
         </Style>
+        <Style x:Key="HudLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#9AA0A6" />
+            <Setter Property="Margin" Value="0,1,8,1" />
+        </Style>
+        <Style x:Key="HudValue" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E6E6E6" />
+            <Setter Property="Margin" Value="0,1" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="10,5" />
             <Setter Property="Margin" Value="0,0,6,0" />
@@ -36,13 +45,18 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="270" />
         </Grid.ColumnDefinitions>
 
-        <!-- Image du jeu en direct -->
+        <!-- Image du jeu en direct, avec les zones lues en surimpression -->
         <Border Grid.Row="0" Grid.Column="0" Background="Black" BorderBrush="#3C3F44" BorderThickness="1">
             <Grid>
-                <Image x:Name="GameImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="LowQuality" />
+                <Viewbox Stretch="Uniform">
+                    <Grid x:Name="FrameHost">
+                        <Image x:Name="GameImage" Stretch="Fill" RenderOptions.BitmapScalingMode="LowQuality" />
+                        <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False" />
+                    </Grid>
+                </Viewbox>
                 <TextBlock x:Name="NoImageText" Text="Pas d'image. Cliquez sur « Démarrer »."
                            HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9AA0A6" />
             </Grid>
@@ -65,10 +79,46 @@
                 <TextBlock Text="Arrêt d'urgence : touche Num 5 (même quand le jeu est au premier plan)."
                            TextWrapping="Wrap" Foreground="#F28B82" Margin="0,6,0,0" />
 
+                <TextBlock Text="LECTURE DU HUD" Style="{StaticResource SectionTitle}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Position" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="HudPosition" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="1" Text="Zone" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="HudZone" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="2" Text="Vie" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HudHealth" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="3" Text="Endurance" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="HudStamina" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="4" Text="Faim" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="HudHunger" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="5" Text="Cible" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="HudTarget" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="6" Text="Santé cible" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="HudTargetHealth" Text="—" Style="{StaticResource HudValue}" />
+                    <TextBlock Grid.Row="7" Text="Lecture" Style="{StaticResource HudLabel}" />
+                    <TextBlock Grid.Row="7" Grid.Column="1" x:Name="HudReadTime" Text="—" Style="{StaticResource HudValue}" />
+                </Grid>
+                <CheckBox x:Name="ShowZonesCheck" Content="Afficher les zones lues sur l'image" IsChecked="True"
+                          Click="ShowZonesCheck_Click" />
+
                 <TextBlock Text="SESSION" Style="{StaticResource SectionTitle}" />
                 <TextBlock x:Name="ElapsedText" Text="Durée : 00:00" />
                 <TextBlock x:Name="RemainingText" Text="Restant : —" />
-                <TextBlock x:Name="FpsText" Text="Images par seconde : —" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="FpsText" Text="Images par seconde : —" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                    <TextBlock Text="Images/s visées :" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <TextBox x:Name="TargetFpsBox" Text="5" Width="40" LostFocus="TargetFpsBox_LostFocus" />
+                </StackPanel>
 
                 <TextBlock Text="JEU" Style="{StaticResource SectionTitle}" />
                 <TextBlock x:Name="GameWindowText" Text="Fenêtre du jeu : non cherchée" TextWrapping="Wrap" />

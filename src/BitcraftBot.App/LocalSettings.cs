@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace BitcraftBot.App;
 
-// Réglages propres au PC (position de la fenêtre, sécurité), enregistrés dans config.local.json
+// Réglages propres au PC (position de la fenêtre, sécurité, affichage), enregistrés dans config.local.json
 // à côté du .exe. Ce fichier n'est jamais versionné (.gitignore).
 public sealed class LocalSettings
 {
@@ -18,6 +18,12 @@ public sealed class LocalSettings
     public bool EmergencyKeyEnabled { get; set; } = true;
     public bool MaxDurationEnabled { get; set; } = true;
     public int MaxDurationMinutes { get; set; } = 15;
+
+    // Cadence de capture visée (images par seconde). 5 par défaut ; on pourra monter si besoin.
+    public int TargetFps { get; set; } = 5;
+
+    // Affiche les zones lues sur l'image du jeu.
+    public bool ShowZones { get; set; } = true;
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 

@@ -2,24 +2,31 @@
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using BitcraftBot.Core.Logging;
 using BitcraftBot.Core.Safety;
+using BitcraftBot.GameData;
 using BitcraftBot.Input.Keyboard;
 using BitcraftBot.Perception.Capture;
+using BitcraftBot.Perception.Hud;
+using BitcraftBot.Perception.Ocr;
+using Frame = BitcraftBot.Perception.Capture.Frame;
 
 namespace BitcraftBot.App;
 
-// Fenêtre de supervision (D-005), version 0.1 :
-// affiche le jeu en direct, gère l'arrêt d'urgence et la durée max, écrit le journal.
+// Fenêtre de supervision (D-005), version 0.2 :
+// affiche le jeu en direct, lit le HUD (position, vie, endurance, faim, cible), gère la sécurité, écrit le journal.
 // Aucune action n'est envoyée au jeu dans cette version.
 public partial class MainWindow : Window
 {
     private const int MaxLogLines = 500;
-    private static readonly TimeSpan CaptureInterval = TimeSpan.FromMilliseconds(200);
+    private static readonly TimeSpan HudInterval = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan LocateInterval = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan UiInterval = TimeSpan.FromMilliseconds(250);
 
     private readonly string _version;
     private readonly LocalSettings _settings;
@@ -27,15 +34,24 @@ public partial class MainWindow : Window
     private readonly SafetyMonitor _safety;
     private readonly GameWindowLocator _locator = new();
     private readonly ScreenCapturer _capturer = new();
-    private readonly DispatcherTimer _timer;
+    private readonly DispatcherTimer _uiTimer;
+    private readonly HudChangeLogger _hudLogger;
+    private readonly HudReader? _hudReader;
     private GlobalKeyboardHook? _keyboardHook;
 
+    private CancellationTokenSource? _sessionCts;
     private WriteableBitmap? _bitmap;
+    private volatile Frame? _latestFrame;
+    private int _displayPending;
     private GameWindow? _gameWindow;
-    private DateTime _lastLocate = DateTime.MinValue;
     private string _lastLocateMessage = string.Empty;
-    private int _framesThisSecond;
+
+    // Mesures de cadence (mises à jour par le fil de capture, lues par l'interface).
+    private int _framesCounted;
     private DateTime _fpsWindowStart = DateTime.Now;
+    private double _measuredFps;
+    private double _captureMsTotal;
+    private int _captureMsCount;
     private int _consecutiveCaptureErrors;
 
     public MainWindow()
@@ -47,10 +63,15 @@ public partial class MainWindow : Window
         VersionText.Text = $"Version {_version}";
 
         _settings = LocalSettings.Load(LocalSettings.DefaultPath);
+        _settings.TargetFps = Math.Clamp(_settings.TargetFps, 1, 15);
         ApplyWindowSettings();
 
         _log = new SessionLog(AppContext.BaseDirectory, _version);
         _log.EntryWritten += entry => Dispatcher.BeginInvoke(() => AppendLogLine(entry));
+        _hudLogger = new HudChangeLogger(_log);
+
+        var ocr = OcrReader.TryCreate();
+        _hudReader = ocr is null ? null : new HudReader(ocr, KnownNames.Resources);
 
         _safety = new SafetyMonitor(new SafetyOptions
         {
@@ -62,9 +83,11 @@ public partial class MainWindow : Window
         EmergencyKeyCheck.IsChecked = _safety.Options.EmergencyKeyEnabled;
         MaxDurationCheck.IsChecked = _safety.Options.MaxDurationEnabled;
         MaxDurationBox.Text = ((int)_safety.Options.MaxDuration.TotalMinutes).ToString();
+        TargetFpsBox.Text = _settings.TargetFps.ToString();
+        ShowZonesCheck.IsChecked = _settings.ShowZones;
 
-        _timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = CaptureInterval };
-        _timer.Tick += (_, _) => OnTick();
+        _uiTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = UiInterval };
+        _uiTimer.Tick += (_, _) => OnUiTick();
 
         Loaded += OnLoaded;
         Closing += OnClosing;
@@ -74,9 +97,10 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Config", $"Sécurité : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
-                            $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}.");
-        _log.Info("Session", "Version 0.1 : affichage seul, aucune action sur le jeu.");
+        _log.Info("Session", "Version 0.2 : affichage et lecture du HUD, aucune action sur le jeu.");
+        _log.Info("Perception", _hudReader is null
+            ? "Lecture de texte (OCR) indisponible : installer la langue anglaise dans Windows. Le HUD ne sera pas lu."
+            : "Lecture de texte (OCR) prête, en anglais.");
 
         try
         {
@@ -99,20 +123,17 @@ public partial class MainWindow : Window
         }
         Dispatcher.BeginInvoke(() =>
         {
-            if (_safety.IsRunning)
+            if (!_safety.IsRunning)
             {
-                if (_safety.Options.EmergencyKeyEnabled)
-                {
-                    _safety.OnEmergencyKey();
-                }
-                else
-                {
-                    _log.Alerte("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée, mais l'arrêt d'urgence est désactivé.");
-                }
+                _log.Info("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée (aucune session en cours).");
+            }
+            else if (_safety.Options.EmergencyKeyEnabled)
+            {
+                _safety.OnEmergencyKey();
             }
             else
             {
-                _log.Info("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée (aucune session en cours).");
+                _log.Alerte("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée, mais l'arrêt d'urgence est désactivé.");
             }
         });
     }
@@ -123,27 +144,135 @@ public partial class MainWindow : Window
 
     private void StartSession()
     {
-        ReadSafetyInputs();
+        ReadInputs();
         _safety.Start();
-        _lastLocate = DateTime.MinValue;
+        _hudLogger.Reset();
         _consecutiveCaptureErrors = 0;
-        _framesThisSecond = 0;
+        _framesCounted = 0;
+        _captureMsTotal = 0;
+        _captureMsCount = 0;
         _fpsWindowStart = DateTime.Now;
-        _timer.Start();
+        _latestFrame = null;
+        _gameWindow = null;
+        _lastLocateMessage = string.Empty;
+
+        _sessionCts = new CancellationTokenSource();
+        var token = _sessionCts.Token;
+        var fps = _settings.TargetFps;
+        _ = Task.Run(() => CaptureLoopAsync(fps, token), token);
+        if (_hudReader is not null)
+        {
+            _ = Task.Run(() => HudLoopAsync(_hudReader, token), token);
+        }
+        _uiTimer.Start();
 
         StartButton.IsEnabled = false;
         StopButton.IsEnabled = true;
-        SetStatus("EN COURS", "Capture du jeu en direct. Aucune action envoyée au jeu.", "#1E4620");
-        _log.Info("Session", "Session démarrée.");
+        SetStatus("EN COURS", "Capture et lecture du HUD. Aucune action envoyée au jeu.", "#1E4620");
+        // Réglages réellement appliqués à cette session (D-031).
+        _log.Info("Session", $"Session démarrée. Réglages : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
+                             $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}, " +
+                             $"{fps} images/s visées, lecture du HUD toutes les {HudInterval.TotalMilliseconds:0} ms.");
+    }
+
+    // Boucle de capture : cadence fixe, compensée (un retard n'est pas cumulé d'une image à l'autre).
+    private async Task CaptureLoopAsync(int fps, CancellationToken token)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1.0 / fps));
+        var lastLocate = DateTime.MinValue;
+        try
+        {
+            do
+            {
+                var now = DateTime.Now;
+                if (_gameWindow is null || now - lastLocate >= LocateInterval)
+                {
+                    var found = _locator.Find();
+                    lastLocate = now;
+                    _ = Dispatcher.BeginInvoke(() => OnGameLocated(found));
+                    _gameWindow = found;
+                }
+                var area = _gameWindow?.ClientArea ?? GameWindowLocator.PrimaryScreen();
+                var watch = Stopwatch.StartNew();
+                try
+                {
+                    var frame = _capturer.Capture(area);
+                    _captureMsTotal += watch.Elapsed.TotalMilliseconds;
+                    _captureMsCount++;
+                    _latestFrame = frame;
+                    _framesCounted++;
+                    _consecutiveCaptureErrors = 0;
+                    // Une seule image en attente d'affichage : si l'interface est en retard, on saute des images.
+                    if (Interlocked.Exchange(ref _displayPending, 1) == 0)
+                    {
+                        _ = Dispatcher.BeginInvoke(DispatcherPriority.Render, () => ShowFrame(frame));
+                    }
+                }
+                catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
+                {
+                    var errors = ++_consecutiveCaptureErrors;
+                    if (errors == 1 || errors % 25 == 0)
+                    {
+                        _log.Erreur("Capture", $"Échec de capture ({errors} de suite) : {ex.Message}");
+                    }
+                }
+            }
+            while (await timer.WaitForNextTickAsync(token));
+        }
+        catch (OperationCanceledException)
+        {
+            // Fin normale de session.
+        }
+    }
+
+    // Boucle de lecture du HUD : 2 fois par seconde, sur la dernière image capturée.
+    private async Task HudLoopAsync(HudReader reader, CancellationToken token)
+    {
+        using var timer = new PeriodicTimer(HudInterval);
+        try
+        {
+            while (await timer.WaitForNextTickAsync(token))
+            {
+                var frame = _latestFrame;
+                if (frame is null)
+                {
+                    continue;
+                }
+                if (frame.Width != HudLayout.ReferenceWidth || frame.Height != HudLayout.ReferenceHeight)
+                {
+                    continue;
+                }
+                try
+                {
+                    var hud = await reader.ReadAsync(frame);
+                    if (token.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    _hudLogger.OnHudRead(hud, _measuredFps);
+                    _ = Dispatcher.BeginInvoke(() => ShowHud(hud));
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    _log.Erreur("Perception", $"Échec de lecture du HUD : {ex.Message}");
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Fin normale de session.
+        }
     }
 
     private void OnStopRequested(StopReason reason)
     {
-        _timer.Stop();
+        _sessionCts?.Cancel();
+        _uiTimer.Stop();
         StartButton.IsEnabled = true;
         StopButton.IsEnabled = false;
         var description = SafetyMonitor.Describe(reason);
         var elapsed = FormatDuration(_safety.LastSessionDuration);
+        var captureMs = _captureMsCount > 0 ? _captureMsTotal / _captureMsCount : 0;
 
         if (reason == StopReason.ToucheUrgence)
         {
@@ -155,46 +284,36 @@ public partial class MainWindow : Window
             SetStatus("ARRÊTÉ", $"Session terminée : {description}.", "#3C3F44");
             _log.Info("Session", $"Session arrêtée après {elapsed} : {description}.");
         }
+        _log.Info("Capture", $"Bilan : {_measuredFps:0.0} images/s mesurées, capture moyenne {captureMs:0} ms par image.");
     }
 
-    private void OnTick()
+    private void OnUiTick()
     {
         _safety.Tick();
         if (!_safety.IsRunning)
         {
             return;
         }
+        ElapsedText.Text = $"Durée : {FormatDuration(_safety.Elapsed)}";
+        RemainingText.Text = _safety.Remaining is { } remaining
+            ? $"Restant : {FormatDuration(remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining)}"
+            : "Restant : illimité";
 
         var now = DateTime.Now;
-        if (_gameWindow is null || now - _lastLocate >= LocateInterval)
+        var window = now - _fpsWindowStart;
+        // Mesure sur 5 s pour lisser les écarts d'une image.
+        if (window >= TimeSpan.FromSeconds(5))
         {
-            LocateGame();
-            _lastLocate = now;
+            _measuredFps = _framesCounted / window.TotalSeconds;
+            var captureMs = _captureMsCount > 0 ? _captureMsTotal / _captureMsCount : 0;
+            FpsText.Text = $"Images par seconde : {_measuredFps:0.0} (capture {captureMs:0} ms)";
+            _framesCounted = 0;
+            _fpsWindowStart = now;
         }
-
-        var area = _gameWindow?.ClientArea ?? GameWindowLocator.PrimaryScreen();
-        try
-        {
-            var frame = _capturer.Capture(area);
-            ShowFrame(frame);
-            _consecutiveCaptureErrors = 0;
-            _framesThisSecond++;
-        }
-        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
-        {
-            _consecutiveCaptureErrors++;
-            if (_consecutiveCaptureErrors == 1 || _consecutiveCaptureErrors % 25 == 0)
-            {
-                _log.Erreur("Capture", $"Échec de capture ({_consecutiveCaptureErrors} de suite) : {ex.Message}");
-            }
-        }
-
-        UpdateCounters(now);
     }
 
-    private void LocateGame()
+    private void OnGameLocated(GameWindow? found)
     {
-        var found = _locator.Find();
         string message;
         if (found is null)
         {
@@ -205,12 +324,11 @@ public partial class MainWindow : Window
         {
             message = $"Fenêtre du jeu trouvée : « {found.Title} » (processus {found.ProcessName}), zone {found.ClientArea}.";
             GameWindowText.Text = $"« {found.Title} »\n{found.ClientArea}";
-            if (found.ClientArea.Width != 1920 || found.ClientArea.Height != 1080)
+            if (found.ClientArea.Width != HudLayout.ReferenceWidth || found.ClientArea.Height != HudLayout.ReferenceHeight)
             {
-                message += " Attention : la taille attendue est 1920×1080 (D-006).";
+                message += " Attention : la taille attendue est 1920×1080 (D-006), le HUD ne sera pas lu.";
             }
         }
-        _gameWindow = found;
         if (message != _lastLocateMessage)
         {
             // On n'écrit dans le journal que quand la situation change.
@@ -228,41 +346,115 @@ public partial class MainWindow : Window
 
     private void ShowFrame(Frame frame)
     {
+        Interlocked.Exchange(ref _displayPending, 0);
+        if (!_safety.IsRunning)
+        {
+            return;
+        }
         if (_bitmap is null || _bitmap.PixelWidth != frame.Width || _bitmap.PixelHeight != frame.Height)
         {
             _bitmap = new WriteableBitmap(frame.Width, frame.Height, 96, 96, PixelFormats.Bgr32, null);
             GameImage.Source = _bitmap;
+            FrameHost.Width = frame.Width;
+            FrameHost.Height = frame.Height;
         }
         _bitmap.WritePixels(new Int32Rect(0, 0, frame.Width, frame.Height), frame.Pixels, frame.Stride, 0);
         NoImageText.Visibility = Visibility.Collapsed;
     }
 
-    private void UpdateCounters(DateTime now)
+    private void ShowHud(HudState hud)
     {
-        ElapsedText.Text = $"Durée : {FormatDuration(_safety.Elapsed)}";
-        RemainingText.Text = _safety.Remaining is { } remaining
-            ? $"Restant : {FormatDuration(remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining)}"
-            : "Restant : illimité";
-
-        var window = now - _fpsWindowStart;
-        if (window >= TimeSpan.FromSeconds(1))
+        if (!_safety.IsRunning)
         {
-            FpsText.Text = $"Images par seconde : {_framesThisSecond / window.TotalSeconds:0.0}";
-            _framesThisSecond = 0;
-            _fpsWindowStart = now;
+            return;
+        }
+        HudPosition.Text = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "illisible";
+        HudZone.Text = $"{hud.ZoneName ?? "?"}, {(hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "?")}";
+        HudHealth.Text = hud.Health.ToString();
+        HudStamina.Text = hud.Stamina.ToString();
+        HudHunger.Text = hud.HungerRatio is { } h ? $"≈{h * 100:0} % (ligne)" : "?";
+        if (hud.Target is null)
+        {
+            HudTarget.Text = "aucune";
+            HudTargetHealth.Text = "—";
+        }
+        else
+        {
+            HudTarget.Text = $"{hud.Target.Name ?? "?"} ({hud.Target.Category ?? "?"})";
+            HudTargetHealth.Text = hud.Target.Health is not null ? $"{hud.Target.Health}/{hud.Target.MaxHealth}" : "?";
+        }
+        HudReadTime.Text = $"{hud.ReadDuration.TotalMilliseconds:0} ms";
+        DrawZones(hud);
+    }
+
+    // Dessine les zones lues sur l'image : vert = lu, orange = pas lu.
+    private void DrawZones(HudState hud)
+    {
+        OverlayCanvas.Children.Clear();
+        if (ShowZonesCheck.IsChecked != true || _bitmap is null)
+        {
+            return;
+        }
+        foreach (var (name, rect) in HudLayout.AllZones)
+        {
+            var isTargetZone = name is "Cible" or "Catégorie" or "Santé cible";
+            if (isTargetZone && hud.Target is null)
+            {
+                continue;
+            }
+            var ok = hud.ZonesRead.Contains(name);
+            var color = ok ? Color.FromRgb(61, 245, 138) : Color.FromRgb(255, 165, 0);
+            // Trait épais : l'image est réduite environ 3 fois dans la fenêtre.
+            var box = new Rectangle
+            {
+                Width = rect.Width + 8,
+                Height = rect.Height + 8,
+                Stroke = new SolidColorBrush(color),
+                StrokeThickness = 5,
+            };
+            Canvas.SetLeft(box, rect.X - 4);
+            Canvas.SetTop(box, rect.Y - 4);
+            OverlayCanvas.Children.Add(box);
+        }
+    }
+
+    private void ShowZonesCheck_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.ShowZones = ShowZonesCheck.IsChecked == true;
+        if (!_settings.ShowZones)
+        {
+            OverlayCanvas.Children.Clear();
         }
     }
 
     private void SafetyCheck_Click(object sender, RoutedEventArgs e)
     {
-        ReadSafetyInputs();
+        ReadInputs();
         _log.Info("Config", $"Sécurité modifiée : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
                             $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}.");
     }
 
-    private void MaxDurationBox_LostFocus(object sender, RoutedEventArgs e) => ReadSafetyInputs();
+    private void MaxDurationBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        var before = _safety.Options.MaxDuration;
+        ReadInputs();
+        if (_safety.Options.MaxDuration != before)
+        {
+            _log.Info("Config", $"Durée max modifiée : {_safety.Options.MaxDuration.TotalMinutes:0} min.");
+        }
+    }
 
-    private void ReadSafetyInputs()
+    private void TargetFpsBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        var before = _settings.TargetFps;
+        ReadInputs();
+        if (_settings.TargetFps != before)
+        {
+            _log.Info("Config", $"Images/s visées : {_settings.TargetFps} (appliqué au prochain démarrage).");
+        }
+    }
+
+    private void ReadInputs()
     {
         _safety.Options.EmergencyKeyEnabled = EmergencyKeyCheck.IsChecked == true;
         _safety.Options.MaxDurationEnabled = MaxDurationCheck.IsChecked == true;
@@ -274,11 +466,19 @@ public partial class MainWindow : Window
         {
             MaxDurationBox.Text = ((int)_safety.Options.MaxDuration.TotalMinutes).ToString();
         }
+        if (int.TryParse(TargetFpsBox.Text, out var fps) && fps is >= 1 and <= 15)
+        {
+            _settings.TargetFps = fps;
+        }
+        else
+        {
+            TargetFpsBox.Text = _settings.TargetFps.ToString();
+        }
     }
 
     private void OpenLogFolder_Click(object sender, RoutedEventArgs e)
     {
-        var folder = Path.GetDirectoryName(_log.FilePath)!;
+        var folder = System.IO.Path.GetDirectoryName(_log.FilePath)!;
         Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true });
     }
 
