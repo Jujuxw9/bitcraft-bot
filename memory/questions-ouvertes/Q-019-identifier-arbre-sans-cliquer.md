@@ -1,5 +1,5 @@
 # Q-019 — Comment savoir si un arbre est vieux ou jeune avant de le couper ?
-- **Statut** : Ouverte (recommandation de Claude ci-dessous)
+- **Statut** : Résolue → D-036
 - **Priorité** : Haute (bloque la v0.3, D-034)
 - **Créée le** : 2026-11-16
 

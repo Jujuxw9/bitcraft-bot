@@ -39,6 +39,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-033](D-033-source-donnees-jeu.md) | Source des données du jeu : BitCraft_GameData | Validée | 2026-11-16 |
 | [D-034](D-034-arbres-vieux-d-abord.md) | v0.3 : les vieux arbres d'abord | Validée | 2026-11-16 |
 | [D-035](D-035-banc-essai-mouvements.md) | v0.2.2 : banc d'essai des mouvements humains | Validée | 2026-11-16 |
+| [D-036](D-036-choix-arbre-clic-droit.md) | Choisir un vieil arbre : viser le plus grand, cliquer, lire, annuler si besoin | Validée | 2026-11-16 |
 
 ## Gabarit
 

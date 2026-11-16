@@ -37,3 +37,16 @@
 - Si un échec apparaît : récupérer l'image et l'ajouter aux exemples, puis relancer `tools/ModelesChiffres`.
 
 **Ajout v0.3.1 (jauge de métier, essais de Claude de 19:13 à 19:20)** : 132 tests automatiques OK ; 4 exemples (Forestry 23 à 36 %, Forestry 25 à 95 % ×2, jauge absente) ; en direct « Forestry niv. 26, 24 % » vérifié à l'œil ; jauge absente quand Julien ne coupe pas. Position : une fois 10 lectures ratées sur 60 (cause inconnue, pas reproduite : 60/60 juste après).
+
+**Essai de Julien (v0.3.1, 2026-11-16 de 19:44 à 19:48, journal lu par Claude)** :
+| Mesure | Résultat |
+|---|---|
+| Position | **98 à 100 %** du temps, 100 % par les modèles de chiffres (avant : 7 à 21 %) |
+| Données du jeu | Chargées ; « Young Oak Tree » et « Mature Oak Tree » confirmés par les données |
+| Jauge de métier | « Action en cours : Forestry niv. 27, 19 % » → 30 %, fins d'action notées |
+| **Trou** | De 19:47:10 à 19:48:20, coupe en cours (endurance 100 → 80) mais **jauge non vue**. Cause inconnue, pas d'image. → v0.3.2 enregistre une image de diagnostic dans ce cas |
+| Région | Une lecture « R10 » isolée au lieu de « R18 » → v0.3.2 : région confirmée sur 2 lectures |
+| Lecture moyenne | 20 à 22 ms, 5 images/s, bot 0,5 à 1,7 % CPU, ~430 Mo |
+| **Nuit** | Vérifiée par Claude en direct à 19:49 : coordonnées 30/30 justes |
+
+**Résultat : OK**, sauf le trou de la jauge (à comprendre avec l'image de diagnostic).
