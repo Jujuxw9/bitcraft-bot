@@ -244,3 +244,4 @@ Une ligne par image ajoutée.
 | `analyse/20261116_analyse_barre-action-1_001.png` à `-4_001` | 2026-11-16 | Zoom sur la barre d'action 1 à 4 : point blanc à droite des flèches = barre active. Barres 2 à 4 vides | 1.0 |
 | `analyse/20261116_analyse_barre-action-1-endurance-vide_001.png` | 2026-11-16 | Endurance 0/100 : compétences 2 et 3 en rouge avec un éclair | 1.0 |
 | `analyse/20261116_analyse_inventaire-plein-chariot_001.png` | 2026-11-16 | Inventaire 25 cases occupées + chariot 144/250 (sans message) | 1.0 |
+| `analyse/20261116_analyse_capture-bot_195816.png` à `_200332` | 2026-11-16 | **57 captures Num 0** (exactes) : coupe et survol de nuit, info-bulle d'aliment, inventaire et chariot superposés, cueillette (Daisy), minage (Limestone). Détail : `memory/technique/interface-du-jeu.md` | 1.0 (build 26707176) |

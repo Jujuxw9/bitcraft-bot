@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.3.2** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14.
+> État : **v0.3.3** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14. v0.3.3 (jauge fiable) : section 15.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -259,3 +259,11 @@ Lecture : ~0,1 ms. Seule l'icône **Forestry** est connue pour l'instant.
 | **Touche Num 0** | Capture exacte du jeu seul (1920×1080, PNG sans perte) dans `images/analyse/` (dossier trouvé en remontant depuis le .exe ; sinon `captures/` à côté du .exe). Marche même sans session démarrée. Réponse au problème des 2 écrans. Une touche simulée par un programme est ignorée |
 | **Région confirmée** | Comme la zone : un changement n'est noté que s'il est lu 2 fois de suite (`ConfirmedText`, brique Core) |
 | **Images de diagnostic** | Enregistrées à côté du journal (au plus 5 par session, 1 par minute) quand : l'endurance baisse sans jauge de métier visible (cas inexpliqué du 16/11 à 19:47), ou la position est illisible 10 fois de suite. Servent à comprendre, restent sur le PC |
+
+## 15. v0.3.3 : jauge fiable de jour comme de nuit
+
+Problème vu grâce aux images de diagnostic de la v0.3.2 : l'intérieur vide de la jauge est **semi-transparent** (sombre le jour, bleu la nuit, clair devant le ciel). L'ancienne règle « intérieur sombre » ratait la jauge.
+- Nouvelle règle de présence : les **deux bords clairs** du cadre + au moins **2 des 3 traits** des quarts (y 78, 134, 190) qui traversent la barre.
+- Icônes connues : **Forestry** (hache), **Foraging** (baies), **Mining** (pioche). 12 exemples dans `images/reference-ui/jauge-metier/` (jour, nuit, ciel clair, info-bulle, absente).
+- Résultat sur les 57 captures de Julien : jauge lue à chaque action, aucune fausse jauge. En direct : Mining 40/40.
+- **Faim** : alerte seulement après 4 lectures basses de suite (une info-bulle cachait la ligne de faim).

@@ -50,3 +50,12 @@ Barre verticale à gauche de la minicarte, visible pendant une action : icône d
 
 ## Capture du jeu par le bot (v0.3.2)
 Julien a **2 écrans** : « Impr. écran » capture les deux. Le bot fournit donc la touche **Num 0** : capture exacte du jeu seul (1920×1080, sans perte), rangée dans `images/analyse/` sous le nom `AAAAMMJJ_analyse_capture-bot_HHMMSS.png`. **À vérifier** : Num 0 n'a pas d'effet dans le jeu.
+
+## Captures Num 0 du 2026-11-16 (19:58 à 20:03, 57 images)
+- **Num 0 fonctionne** : 57 captures exactes, aucun effet visible dans le jeu.
+- 19:58:16 à 19:59:30 : **coupe de nuit** d'un Mature Oak Tree (contour vert bien visible la nuit, panneaux lisibles).
+- 19:58:58 : **info-bulle d'un aliment** (survol de la case 5) : « Plain Roasted Fish, Tier 1 Basic Food… **Shift + E will eat the first item in your inventory** », Satiation 25, Level 1 Food Regen 15 min. Elle recouvre la barre d'action et la ligne de faim. **Raccourci Shift + E pour manger** : utile pour D-032 (**à vérifier** : « first item » = premier aliment de l'inventaire ?).
+- 19:59:36 à 19:59:56 : marche de nuit, **arbres survolés** (contours verts).
+- 20:00:08 à 20:00:28 : **inventaire et chariot superposés**, déplacés à plusieurs endroits (Q-015).
+- 20:00:45 à 20:01:11 : **cueillette** d'une Daisy (Foraging niv. 20, panneau bas « Gather »).
+- 20:01:12 à 20:03:32 : survol d'un **rocher** puis **minage** (Limestone Rock Formation, 30 000 points, Pickaxe Tier 1, Mining niv. 15, panneau bas « Mine »).
