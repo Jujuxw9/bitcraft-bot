@@ -14,7 +14,8 @@ Puis commit `chore: exe validé v0.1.0`.
 
 ## Version actuelle
 
-Aucune (la v0.0.1 est un squelette, pas un bot).
+**v0.1.0** : affichage du jeu en direct, arrêt d'urgence Num 5, durée max, journaux. N'agit pas sur le jeu.
 
 | Version | Date de validation | Test associé |
 |---|---|---|
+| v0.1.0 | 2026-11-16 | [T-20261116-01](../memory/tests/T-20261116-01-v01-affichage.md) |
