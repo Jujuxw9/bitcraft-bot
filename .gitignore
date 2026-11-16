@@ -511,3 +511,7 @@ models/large/
 
 # Anciennes versions du .exe : restent sur le PC, jamais poussées (D-020)
 executable/anciennes-versions/
+
+# Données du jeu téléchargées par le bot depuis BitCraft_GameData (D-033) : pas de licence, jamais republiées
+**/donnees-jeu/
+data/gamedata/*.json

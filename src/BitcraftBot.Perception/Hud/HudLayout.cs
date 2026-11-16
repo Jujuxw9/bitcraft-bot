@@ -11,6 +11,9 @@ public static class HudLayout
 
     // Sous la minicarte, en haut à droite (D-018).
     public static readonly ScreenRect Coordinates = new(1665, 298, 180, 26);
+    // Zone plus large pour la lecture par modèles : le texte est centré, sa largeur change avec le nombre de chiffres.
+    // S'arrête au-dessus du nom de la zone (y ≈ 334).
+    public static readonly ScreenRect CoordinatesSearch = new(1610, 294, 290, 34);
     public static readonly ScreenRect ZoneName = new(1650, 326, 210, 24);
     public static readonly ScreenRect Region = new(1665, 354, 180, 24);
 

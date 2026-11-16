@@ -23,6 +23,14 @@ public sealed record TargetReading(string? Name, string? Category, int? Health, 
         $"{Name ?? "?"} ({Category ?? "?"}) {(Health is not null ? $"{Health}/{MaxHealth}" : "?")}";
 }
 
+// Méthode qui a permis de lire la position.
+public enum PositionSource
+{
+    None,
+    Templates,
+    Ocr,
+}
+
 // Tout ce que la v0.2 lit sur l'écran.
 public sealed record HudState
 {
@@ -30,6 +38,7 @@ public sealed record HudState
     public required TimeSpan ReadDuration { get; init; }
     public (int North, int East)? Position { get; init; }
     public string RawPosition { get; init; } = string.Empty;
+    public PositionSource PositionSource { get; init; } = PositionSource.None;
     public string? ZoneName { get; init; }
     public (string Name, int Number)? Region { get; init; }
     public required GaugeReading Health { get; init; }
@@ -45,23 +54,47 @@ public sealed record HudState
 // knownTargetNames : noms de ressources connus, pour corriger les erreurs de lecture.
 public sealed class HudReader(OcrReader ocrReader, IReadOnlyList<string>? knownTargetNames = null)
 {
+    // Remplacée quand les données du jeu (D-033) sont chargées.
+    public IReadOnlyList<string>? KnownTargetNames { get; set; } = knownTargetNames;
+
     // Réglages trouvés par essais sur une vraie capture (2026-11-16).
     private const int HudTextThreshold = 220;
+
+    private readonly PositionFilter _positionFilter = new();
+
+    // À appeler au début de chaque session (le personnage a pu bouger entre deux sessions).
+    public void ResetPosition() => _positionFilter.Reset();
 
     public async Task<HudState> ReadAsync(Frame frame)
     {
         var watch = Stopwatch.StartNew();
         var zonesRead = new HashSet<string>();
 
-        // Position lue deux fois avec deux agrandissements différents :
-        // on ne la garde que si les deux lectures sont identiques (une erreur 8 → 6 serait grave).
-        var rawPosition = await ocrReader.ReadAsync(frame, HudLayout.Coordinates, TextStyle.BrightText, HudTextThreshold, scale: 2);
-        var rawPositionCheck = await ocrReader.ReadAsync(frame, HudLayout.Coordinates, TextStyle.BrightText, HudTextThreshold, scale: 4);
-        var position = HudParser.ParseCoordinates(rawPosition);
-        if (position is null || position != HudParser.ParseCoordinates(rawPositionCheck))
+        // Position : d'abord par les modèles de caractères (Q-016, fiable et < 1 ms),
+        // l'OCR ne sert qu'en secours si les modèles ne reconnaissent pas la ligne.
+        var position = GlyphReader.ReadCoordinates(frame, HudLayout.CoordinatesSearch, out var rawPosition);
+        var positionSource = PositionSource.Templates;
+        if (position is null)
         {
-            rawPosition = $"{rawPosition} | {rawPositionCheck}";
-            position = null;
+            positionSource = PositionSource.Ocr;
+            // OCR lu deux fois avec deux agrandissements différents :
+            // on ne garde la position que si les deux lectures sont identiques (une erreur 8 → 6 serait grave).
+            var ocrPosition = await ocrReader.ReadAsync(frame, HudLayout.Coordinates, TextStyle.BrightText, HudTextThreshold, scale: 2);
+            var ocrCheck = await ocrReader.ReadAsync(frame, HudLayout.Coordinates, TextStyle.BrightText, HudTextThreshold, scale: 4);
+            position = HudParser.ParseCoordinates(ocrPosition);
+            rawPosition = $"modèles « {rawPosition} » | OCR « {ocrPosition} » / « {ocrCheck} »";
+            if (position is null || position != HudParser.ParseCoordinates(ocrCheck))
+            {
+                position = null;
+                positionSource = PositionSource.None;
+            }
+        }
+        // Garde-fou : un saut impossible est refusé tant qu'il n'est pas confirmé.
+        position = _positionFilter.Accept(position, frame.CapturedAt, out var jumpRejected);
+        if (jumpRejected)
+        {
+            rawPosition = $"{rawPosition} (saut refusé, à confirmer)";
+            positionSource = PositionSource.None;
         }
         if (position is not null) zonesRead.Add("Position");
 
@@ -83,10 +116,10 @@ public sealed class HudReader(OcrReader ocrReader, IReadOnlyList<string>? knownT
         if (BarReader.IsTargetPanelVisible(frame))
         {
             var name = HudParser.CleanName(await ocrReader.ReadAsync(frame, HudLayout.TargetName, TextStyle.DarkText, 150), titleCase: false);
-            if (name is not null && knownTargetNames is not null)
+            if (name is not null && KnownTargetNames is { } knownNames)
             {
                 // Correction par le nom connu le plus proche ; sinon on garde le texte lu tel quel.
-                name = NameMatcher.BestMatch(name, knownTargetNames) ?? name;
+                name = NameMatcher.BestMatch(name, knownNames) ?? name;
             }
             var category = HudParser.CleanName(await ocrReader.ReadAsync(frame, HudLayout.TargetCategory, TextStyle.DarkText, 150), titleCase: false);
             category = category?.Replace('—', '-').Replace('–', '-');
@@ -104,6 +137,7 @@ public sealed class HudReader(OcrReader ocrReader, IReadOnlyList<string>? knownT
             ReadDuration = watch.Elapsed,
             Position = position,
             RawPosition = rawPosition,
+            PositionSource = positionSource,
             ZoneName = zone,
             Region = region,
             Health = health,

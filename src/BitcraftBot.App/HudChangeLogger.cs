@@ -1,4 +1,5 @@
 using BitcraftBot.Core.Logging;
+using BitcraftBot.GameData;
 using BitcraftBot.Perception.Hud;
 
 namespace BitcraftBot.App;
@@ -13,8 +14,15 @@ public sealed class HudChangeLogger(SessionLog log)
     private DateTime _lastSummary = DateTime.MinValue;
     private int _reads;
     private int _positionsRead;
+    private int _positionsByTemplates;
+    private string? _zoneCandidate;
+    private string? _confirmedZone;
     private int _positionFailStreak;
     private double _totalReadMs;
+    private readonly HashSet<string> _checkedTargets = [];
+
+    // Données du jeu (D-033), pour comparer ce qui est lu à l'écran avec ce que disent les fichiers.
+    public GameDataStore? GameData { get; set; }
 
     public void Reset()
     {
@@ -22,6 +30,9 @@ public sealed class HudChangeLogger(SessionLog log)
         _lastSummary = DateTime.MinValue;
         _reads = 0;
         _positionsRead = 0;
+        _positionsByTemplates = 0;
+        _zoneCandidate = null;
+        _confirmedZone = null;
         _positionFailStreak = 0;
         _totalReadMs = 0;
     }
@@ -33,6 +44,10 @@ public sealed class HudChangeLogger(SessionLog log)
         if (hud.Position is not null)
         {
             _positionsRead++;
+            if (hud.PositionSource == PositionSource.Templates)
+            {
+                _positionsByTemplates++;
+            }
             _positionFailStreak = 0;
         }
         else if (++_positionFailStreak == 10)
@@ -56,7 +71,7 @@ public sealed class HudChangeLogger(SessionLog log)
             {
                 var rate = 100.0 * _positionsRead / _reads;
                 log.Info("Perception", $"Résumé : {Describe(hud)}. Lecture moyenne {_totalReadMs / _reads:0} ms, " +
-                                       $"position lue {rate:0} % du temps, {captureFps:0.0} images/s.");
+                                       $"position lue {rate:0} % du temps (dont {100.0 * _positionsByTemplates / _reads:0} % par les modèles de chiffres), {captureFps:0.0} images/s.");
             }
             _lastSummary = hud.ReadAt;
         }
@@ -65,10 +80,29 @@ public sealed class HudChangeLogger(SessionLog log)
 
     private void LogChanges(HudState before, HudState now)
     {
-        if (now.ZoneName is not null && before.ZoneName is not null && now.ZoneName != before.ZoneName)
+        // Changement de zone : noté seulement s'il est lu deux fois de suite (évite « S A Pe Meadows », lecture ratée isolée).
+        if (now.ZoneName is not null && _confirmedZone is null)
         {
-            log.Info("Perception", $"Changement de zone : {before.ZoneName} → {now.ZoneName}.");
+            _confirmedZone = now.ZoneName;
         }
+        else if (now.ZoneName is not null && now.ZoneName != _confirmedZone)
+        {
+            if (_zoneCandidate == now.ZoneName)
+            {
+                log.Info("Perception", $"Changement de zone : {_confirmedZone} → {now.ZoneName}.");
+                _confirmedZone = now.ZoneName;
+                _zoneCandidate = null;
+            }
+            else
+            {
+                _zoneCandidate = now.ZoneName;
+            }
+        }
+        else
+        {
+            _zoneCandidate = null;
+        }
+
         if (now.Region is not null && before.Region is not null && now.Region != before.Region)
         {
             log.Info("Perception", $"Changement de région : {before.Region.Value.Name} (R{before.Region.Value.Number}) → " +
@@ -112,7 +146,32 @@ public sealed class HudChangeLogger(SessionLog log)
             else
             {
                 log.Info("Perception", $"Cible : {now.Target}.");
+                CheckAgainstGameData(now.Target!);
             }
+        }
+    }
+
+    // « Faire confiance mais vérifier » : la santé max lue à l'écran doit être celle des données du jeu.
+    private void CheckAgainstGameData(TargetReading target)
+    {
+        if (GameData is null || target.Name is null || target.MaxHealth is null || !_checkedTargets.Add(target.Name))
+        {
+            return;
+        }
+        var resource = GameData.FindResource(target.Name);
+        if (resource is null)
+        {
+            log.Alerte("Données", $"Cible « {target.Name} » absente des données du jeu.");
+        }
+        else if (resource.MaxHealth != target.MaxHealth)
+        {
+            log.Alerte("Données", $"Désaccord : « {target.Name} » a {target.MaxHealth} points à l'écran, {resource.MaxHealth} dans les données du jeu.");
+        }
+        else
+        {
+            var extraction = GameData.Extractions.GetValueOrDefault(resource.Id);
+            log.Info("Données", $"« {target.Name} » confirmé par les données du jeu : tier {resource.Tier}, {resource.MaxHealth} points" +
+                                  (extraction is null ? "." : $", outil type {extraction.ToolType} niveau {extraction.ToolLevel}, {extraction.StaminaPerAction:0.##} d'endurance par coup."));
         }
     }
 

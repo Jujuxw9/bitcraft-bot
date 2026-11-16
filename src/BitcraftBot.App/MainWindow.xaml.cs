@@ -41,6 +41,7 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _uiTimer;
     private readonly HudChangeLogger _hudLogger;
     private readonly HudReader? _hudReader;
+    private readonly GameDataLoader _gameData;
     private GlobalKeyboardHook? _keyboardHook;
 
     // Journal affiché et surveillance des ressources (onglet Système).
@@ -94,6 +95,15 @@ public partial class MainWindow : Window
 
         var ocr = OcrReader.TryCreate();
         _hudReader = ocr is null ? null : new HudReader(ocr, KnownNames.Resources);
+        _gameData = new GameDataLoader(_log);
+        _gameData.Loaded += store =>
+        {
+            if (_hudReader is not null)
+            {
+                _hudReader.KnownTargetNames = store.ResourceNames();
+            }
+            _hudLogger.GameData = store;
+        };
 
         _safety = new SafetyMonitor(new SafetyOptions
         {
@@ -124,7 +134,8 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.2 : affichage et lecture du HUD, aucune action sur le jeu.");
+        _log.Info("Session", "Version 0.3 : affichage et lecture du HUD (coordonnées par modèles de chiffres), aucune action sur le jeu hors banc d'essai.");
+        _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
                              $"CPU du bot {_settings.Limits.BotCpuWarningPercent:0} %, RAM libre du PC {_settings.Limits.SystemRamAvailableWarningPercent:0} %.");
         _resourceTimer.Start();
@@ -183,6 +194,7 @@ public partial class MainWindow : Window
         ReadInputs();
         _safety.Start();
         _hudLogger.Reset();
+        _hudReader?.ResetPosition();
         _consecutiveCaptureErrors = 0;
         _framesCounted = 0;
         _captureMsTotal = 0;
