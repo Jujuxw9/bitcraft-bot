@@ -19,6 +19,7 @@
 | [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Moyenne | Ouverte |
 | [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Ouverte (recommandation : modèles de chiffres) |
 | [Q-017](Q-017-mode-test-mouvements.md) | Mode test : mouvements « humains » souris et caméra | Moyenne | Ouverte (proposition : v0.2.2) |
+| [Q-018](Q-018-notifications-ecran.md) | Notifications à l'écran qui masquent le HUD | Moyenne | Ouverte (proposition : v0.3) |
 
 ## Gabarit
 

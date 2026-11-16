@@ -27,3 +27,8 @@ Inventaire, Compendium, carte, Banque, Vault, Character, Quest Log, chariot, etc
 - Garder la barre **verrouillée** : un clic raté ne doit pas déplacer un objet (ex. l'aliment).
 - Le bot doit savoir **quelle barre est affichée** avant de cliquer sur une case (repas en case 5, D-032). **À vérifier** : le numéro de la barre active est-il affiché ? Sinon, reconnaître l'icône de l'aliment dans la case.
 - Possibilité utile plus tard : une barre dédiée au bot (aliment, outils).
+
+## Notifications qui masquent le HUD (remarque de Julien, 2026-11-16)
+- **Montée de niveau / succès** : triangle bleu qui descend du centre du haut de l'écran (« FORESTRY / LEVEL 22 »). Il cache la **santé de la cible** pendant quelques secondes.
+- Autres : message d'inventaire plein (centre), « Carrying Cargo » (bas), « Entering / Leaving SNOWREST », gains d'objets (gauche).
+- Le bot doit les **reconnaître** et considérer les valeurs cachées comme « masquées », pas « illisibles ». Détails : Q-018.
