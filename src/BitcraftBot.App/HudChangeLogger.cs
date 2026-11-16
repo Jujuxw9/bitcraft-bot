@@ -18,6 +18,8 @@ public sealed class HudChangeLogger(SessionLog log)
     private readonly ConfirmedText _zone = new();
     private readonly ConfirmedText _region = new();
     private int _staminaDropsWithoutGauge;
+    private int _hungerLowReads;
+    private bool _hungerAlerted;
     private DateTime _lastDiagnosticAt = DateTime.MinValue;
     private ProfessionGaugeReading? _lastGauge;
     private int _gaugeMissing;
@@ -39,6 +41,8 @@ public sealed class HudChangeLogger(SessionLog log)
         _region.Reset();
         _staminaDropsWithoutGauge = 0;
         _lastDiagnosticAt = DateTime.MinValue;
+        _hungerLowReads = 0;
+        _hungerAlerted = false;
         _lastGauge = null;
         _gaugeMissing = 0;
         _positionFailStreak = 0;
@@ -146,10 +150,23 @@ public sealed class HudChangeLogger(SessionLog log)
             }
         }
 
-        // Faim sous 50 % (D-032).
-        if (now.HungerRatio is { } hunger && before.HungerRatio is { } hungerBefore && hunger < 0.5 && hungerBefore >= 0.5)
+        // Faim sous 50 % (D-032), seulement après 4 lectures basses de suite (2 s) :
+        // une info-bulle ou une fenêtre peut cacher la ligne de faim (fausses alertes du 16/11 à 20:00).
+        if (now.HungerRatio is { } hunger)
         {
-            log.Alerte("Perception", $"Faim sous 50 % (≈{hunger * 100:0} %) : il faudra manger (D-032).");
+            if (hunger < 0.5)
+            {
+                if (++_hungerLowReads == 4 && !_hungerAlerted)
+                {
+                    log.Alerte("Perception", $"Faim sous 50 % (≈{hunger * 100:0} %) : il faudra manger (D-032).");
+                    _hungerAlerted = true;
+                }
+            }
+            else
+            {
+                _hungerLowReads = 0;
+                _hungerAlerted = false;
+            }
         }
 
         // Jauge de métier : début et fin d'action, montée de niveau.

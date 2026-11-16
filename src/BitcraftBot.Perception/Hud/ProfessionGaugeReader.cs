@@ -50,15 +50,19 @@ public static class ProfessionGaugeReader
 
     public static ProfessionGaugeReading? Read(Frame frame) => Read(frame, ScreenOrigin);
 
-    // Visible si les deux bords blancs verticaux du cadre sont présents sur la plus grande partie de la hauteur.
+    // Traits blancs des quarts (75 %, 50 %, 25 %), à travers tout l'intérieur de la barre.
+    private static readonly int[] TickRows = [78, 134, 190];
+
+    // Visible si : les deux bords clairs du cadre sont présents sur la plus grande partie de la hauteur,
+    // et au moins 2 des 3 traits des quarts traversent la barre.
+    // L'intérieur vide est semi-transparent (sombre le jour, bleu la nuit, clair devant le ciel) : on ne s'y fie pas.
     public static bool IsVisible(Frame frame, (int X, int Y) origin)
     {
         if (origin.X + BarRight + 8 >= frame.Width || origin.Y + BarBottom >= frame.Height)
         {
             return false;
         }
-        int rows = 0, framed = 0, inside = 0;
-        var center = origin.X + (BarLeft + BarRight) / 2;
+        int rows = 0, framed = 0;
         for (var y = origin.Y + 40; y <= origin.Y + 230; y += 2)
         {
             rows++;
@@ -67,13 +71,31 @@ public static class ProfessionGaugeReader
             {
                 framed++;
             }
-            // Intérieur : vert (rempli), sombre (vide) ou trait blanc d'un quart.
-            if (IsGaugeGreen(frame, center, y) || IsDark(frame, center, y) || IsNeutralWhite(frame, center, y))
+        }
+        var ticks = TickRows.Count(t => HasTick(frame, origin, t));
+        return framed >= rows * 0.8 && ticks >= 2;
+    }
+
+    // Un trait : sur l'une des 3 lignes autour de la position prévue, 75 % de l'intérieur est blanc ou blanc-vert.
+    private static bool HasTick(Frame frame, (int X, int Y) origin, int row)
+    {
+        for (var y = origin.Y + row - 1; y <= origin.Y + row + 1; y++)
+        {
+            int white = 0, total = 0;
+            for (var x = origin.X + BarLeft + 1; x <= origin.X + BarRight - 1; x++)
             {
-                inside++;
+                total++;
+                if (IsNeutralWhite(frame, x, y))
+                {
+                    white++;
+                }
+            }
+            if (white * 4 >= total * 3)
+            {
+                return true;
             }
         }
-        return framed >= rows * 0.8 && inside >= rows * 0.95;
+        return false;
     }
 
     // Remplissage : ligne la plus haute où l'intérieur de la barre est vert.
@@ -174,13 +196,6 @@ public static class ProfessionGaugeReader
         var i = (y * frame.Width + x) * 4;
         int b = frame.Pixels[i], g = frame.Pixels[i + 1], r = frame.Pixels[i + 2];
         return Math.Min(r, Math.Min(g, b)) >= 150 && Math.Max(r, Math.Max(g, b)) - Math.Min(r, Math.Min(g, b)) <= 40;
-    }
-
-    // Intérieur vide de la jauge : très sombre (≈ 27, 35, 35).
-    private static bool IsDark(Frame frame, int x, int y)
-    {
-        var i = (y * frame.Width + x) * 4;
-        return Math.Max(frame.Pixels[i + 2], Math.Max(frame.Pixels[i + 1], frame.Pixels[i])) < 70;
     }
 
     private static ScreenRect Offset(ScreenRect r, (int X, int Y) origin) => new(r.X + origin.X, r.Y + origin.Y, r.Width, r.Height);

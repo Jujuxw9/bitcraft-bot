@@ -193,7 +193,12 @@ public class ProfessionGaugeTests
             Set(71, y, 188, 189, 189);
             for (var x = 57; x <= 68; x++)
             {
-                if (y >= top && fill > 0)
+                if (y is 78 or 134 or 190)
+                {
+                    // Trait blanc d'un quart (blanc-vert sur la partie remplie, comme dans le jeu).
+                    Set(x, y, 188, 222, 193);
+                }
+                else if (y >= top && fill > 0)
                 {
                     Set(x, y, 17, 182, 74);
                 }
