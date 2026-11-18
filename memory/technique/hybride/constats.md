@@ -44,7 +44,7 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 - Position exacte sans OCR. Arbres connus avec leur type et leur âge **sans cliquer** (règle Q-019 / D-036 simplifiée). Ennemis connus même hors écran. Inventaire plein connu sans lire l'écran.
 
 ## Vérifié le 2026-11-18 (session 10)
-- Modules **1.0** sur l'hôte `bitcraft-early-access.spacetimedb.com` : global = `bitcraft-live-global`, régions = `bitcraft-live-N`. **R18 → `bitcraft-live-18`** (le schéma répond). Les anciens `bitcraft-global`, `bitcraft-1`… existent encore (accès anticipé, non utilisés).
+- (Corrigé plus bas : les modules 1.0 sont `idc-N` et `idc-global`.) Modules `bitcraft-live-*` trouvés en premier sur l'hôte `bitcraft-early-access.spacetimedb.com`.
 - Schéma de `bitcraft-live-18` lisible sans jeton : 542 tables. Toutes les tables utilisées en H1 sont publiques, avec clé primaire.
 - Liaison WebSocket avec un faux jeton : **refus 401**. Adresse, protocole et lecture du jeton par le serveur : OK.
 - Global : `user_region_state` (identité → région) existe. Non utilisé : le bot ne se connecte qu'à la région (une seule liaison, moins de risque).
@@ -57,3 +57,14 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 - Code serveur : à l'ouverture, une région refuse le compte si (1) il n'est pas « authentifié » depuis moins de **24 h**, ou (2) le compte n'a pas de `user_state` dans **cette** région. Le module global, lui, exige une authentification de moins d'**1 h**, mais pas de personnage. L'« authentification » est posée par le service de connexion de BitCraft (reducer `authenticate`, appelé par un compte administrateur).
 - L'API SQL par HTTP est bloquée (403) : seule la liaison WebSocket est possible.
 - Réponse en v0.3.6 : découverte par le module global (compte connu ? région du personnage ? adresse du module ?) quand le jeu est fermé, puis lecture de la bonne région ; message clair si la région refuse.
+
+## Cause trouvée (2026-11-18, essai v0.3.6) : mauvais noms de modules
+- Essai v0.3.6 : le module `bitcraft-live-global` **et** la région `bitcraft-live-18` ferment la liaison, même 10 s après un nouveau code, jeu lancé ou non.
+- Le monde **1.0** utilise les modules **`idc-N`** (régions) et **`idc-global`**, sur le même hôte. Schéma `idc-18` : 809 Ko, propriétaire différent de `bitcraft-live-*`. Régions vues : 7, 8, 9, 12, 13, 14, 17, 18, 19 (un carré de 3 × 3). **R18 → `idc-18`**.
+- `bitcraft-live-*` = ancien monde, où le personnage de Julien n'existe pas : d'où les refus.
+- Toutes les tables et colonnes utilisées existent dans `idc-18` et `idc-global` (test sur le vrai schéma : OK).
+- Corrigé en **v0.3.7**.
+
+## Relais Bitjita (piste, non utilisée)
+- `relay.bitjita.com` : relais SpacetimeDB en **lecture seule**, protocole v1, modules `idc-N` et `idc-global`, identités propres au relais (**aucun jeton BitCraft**). Exploitant, règles d'usage et limites : non indiqués.
+- Avantage : aucune liaison avec le compte de Julien, donc **aucun risque de déconnexion** du personnage. Inconvénients : service tiers, disponibilité non garantie.

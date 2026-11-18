@@ -15,8 +15,9 @@ public static class ServerEndpoints
     // Nom générique : aucune donnée personnelle dans l'en-tête.
     public const string UserAgent = "BitcraftBot-lecture";
 
-    // Module d'une région : « R18 » dans le jeu → « bitcraft-live-18 ».
-    public static string RegionModule(int region) => $"bitcraft-live-{region}";
+    // Module d'une région du monde 1.0 : « R18 » dans le jeu → « idc-18 » (vérifié le 2026-11-18 ;
+    // les modules « bitcraft-live-N » sont un ancien monde, où le personnage n'existe pas).
+    public static string RegionModule(int region) => $"idc-{region}";
 
     public static Uri SubscribeUri(string host, string module) => new($"wss://{host}/v1/database/{module}/subscribe");
 

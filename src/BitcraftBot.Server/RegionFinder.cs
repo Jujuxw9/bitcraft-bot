@@ -8,7 +8,7 @@ namespace BitcraftBot.Server;
 // fermer une liaison globale pendant que le jeu tourne pourrait déconnecter le personnage (constats H1).
 public static class RegionFinder
 {
-    public const string GlobalModule = "bitcraft-live-global";
+    public const string GlobalModule = "idc-global";
 
     public static IReadOnlyList<string> Queries(string hexIdentity) =>
     [

@@ -320,3 +320,7 @@ Comparaison écran / serveur : toutes les 15 s, le journal note les deux positio
 ## 19. v0.3.6 — découverte de la région du personnage (2026-11-18)
 
 Avant de lire la région, si le jeu est fermé, le bot ouvre une liaison courte avec le module **global** (`bitcraft-live-global`) et demande : le compte a-t-il un personnage ? dans quelle région ? à quelle adresse ? Puis il ferme cette liaison et lit la bonne région. Si le jeu tourne, il saute cette étape (risque de déconnexion) et lit la région saisie. Si une région ferme la liaison avant le moindre message, le bot l'explique (personnage absent ou connexion du compte trop ancienne).
+
+## 20. v0.3.7 — modules du monde 1.0 (2026-11-18)
+
+Les régions du monde 1.0 s'appellent `idc-N` (R18 → `idc-18`) et le module global `idc-global`. Les versions 0.3.5 et 0.3.6 visaient `bitcraft-live-*`, un ancien monde : le serveur refusait le compte. Seuls ces deux noms changent.

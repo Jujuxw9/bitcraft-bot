@@ -273,9 +273,9 @@ public class H1ServerTests
     [Fact]
     public void Module_de_la_region()
     {
-        Assert.Equal("bitcraft-live-18", ServerEndpoints.RegionModule(18));
-        Assert.Equal("wss://bitcraft-early-access.spacetimedb.com/v1/database/bitcraft-live-18/subscribe",
-            ServerEndpoints.SubscribeUri(ServerEndpoints.Host, "bitcraft-live-18").ToString());
+        Assert.Equal("idc-18", ServerEndpoints.RegionModule(18));
+        Assert.Equal("wss://bitcraft-early-access.spacetimedb.com/v1/database/idc-18/subscribe",
+            ServerEndpoints.SubscribeUri(ServerEndpoints.Host, "idc-18").ToString());
     }
 }
 
@@ -362,16 +362,16 @@ public class H1RegionFinderTests
         var cache = Cache(
             ("user_state", [$$"""{"identity":{"__identity__":"0x{{Id}}"},"entity_id":77,"can_sign_in":true}"""]),
             ("user_region_state", [$$"""{"identity":{"__identity__":"0x{{Id}}"},"region_id":12}"""]),
-            ("region_connection_info", ["""{"id":12,"host":"https://autre-hote.spacetimedb.com:443","module":"bitcraft-live-12"}""", """{"id":18,"host":"x","module":"bitcraft-live-18"}"""]),
-            ("world_region_name_state", ["""{"id":12,"player_facing_name":"Ashveil","module_name_prefix":"bitcraft-live"}"""]));
+            ("region_connection_info", ["""{"id":12,"host":"https://autre-hote.spacetimedb.com:443","module":"idc-12"}""", """{"id":18,"host":"x","module":"idc-18"}"""]),
+            ("world_region_name_state", ["""{"id":12,"player_facing_name":"Ashveil","module_name_prefix":"idc"}"""]));
         var d = RegionFinder.Read(cache, Id);
         Assert.True(d.Success);
         Assert.Equal(77UL, d.EntityId);
         Assert.Equal(12, d.RegionId);
         Assert.Equal("Ashveil", d.RegionName);
         Assert.Equal("autre-hote.spacetimedb.com", d.Host);
-        Assert.Equal("bitcraft-live-12", d.Module);
-        Assert.Contains("bitcraft-live-12", RegionFinder.Describe(d));
+        Assert.Equal("idc-12", d.Module);
+        Assert.Contains("idc-12", RegionFinder.Describe(d));
     }
 
     [Fact]
@@ -391,7 +391,7 @@ public class H1RegionFinderTests
             ("user_region_state", [$$"""{"identity":"0x{{Id}}","region_id":18}"""]));
         var d = RegionFinder.Read(cache, Id);
         Assert.True(d.Success);
-        Assert.Equal("bitcraft-live-18", d.Module);
+        Assert.Equal("idc-18", d.Module);
         Assert.Equal(ServerEndpoints.Host, d.Host);
     }
 
@@ -405,6 +405,6 @@ public class H1RegionFinderTests
     public void Requetes_de_decouverte_en_lecture_seule()
     {
         Assert.All(RegionFinder.Queries("abcd"), q => Assert.StartsWith("SELECT ", q));
-        Assert.Equal("bitcraft-live-global", RegionFinder.GlobalModule);
+        Assert.Equal("idc-global", RegionFinder.GlobalModule);
     }
 }

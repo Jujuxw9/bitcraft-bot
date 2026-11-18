@@ -8,6 +8,7 @@
 | [T-20261116-04](T-20261116-04-v030-coordonnees-donnees.md) | 2026-11-16 | perception | v0.3.1 : coordonnées par modèles, données du jeu, jauge de métier | OK (position 98-100 %, nuit OK) ; un trou de la jauge à comprendre |
 | [T-20261118-01](T-20261118-01-h1-lecture-serveur.md) | 2026-11-18 | unitaire + intégration | H1 : lecture du serveur (essais de Claude, sans jeton) | OK ; essai réel à faire par Julien |
 | T-20261118-02 (dans `echanges/2026-11-18-essai-h1.md`) | 2026-11-18 | session réelle | Essai H1 de Julien (v0.3.5) | KO : jeton OK, région 18 refuse la liaison → v0.3.6 |
+| T-20261118-03 | 2026-11-18 | session réelle | Essai H1 de Julien (v0.3.6) | KO : modules `bitcraft-live-*` = ancien monde → v0.3.7 (`idc-*`) |
 
 ## Gabarit
 
