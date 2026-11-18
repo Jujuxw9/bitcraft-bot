@@ -225,7 +225,7 @@
                                 </StackPanel>
                                 <Border Background="#3A2E12" CornerRadius="4" Padding="8" Margin="0,8,0,8">
                                     <TextBlock TextWrapping="Wrap" Foreground="#FDD663"
-                                               Text="Ordre à respecter : 1) jeu fermé, 2) connecter le bot ici, 3) lancer le jeu. Si le jeu est déjà lancé, le bot devient la connexion « principale » du compte : sa fermeture peut déconnecter votre personnage." />
+                                               Text="Ordre à respecter : 1) jeu fermé, 2) connecter le bot ici, 3) lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter : il éjecterait le jeu (« Logged in elsewhere »). Une fois le jeu lancé, déconnecter le bot ne touche pas le jeu." />
                                 </Border>
                                 <TextBlock x:Name="ServerGameRunningText" Text="Jeu : —" TextWrapping="Wrap" />
                                 <StackPanel Orientation="Horizontal" Margin="0,8,0,0">

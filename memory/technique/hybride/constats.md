@@ -65,6 +65,16 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 - Toutes les tables et colonnes utilisées existent dans `idc-18` et `idc-global` (test sur le vrai schéma : OK).
 - Corrigé en **v0.3.7**.
 
+## Essais réels v0.3.7 et v0.3.8 (2026-11-18, Julien) : la lecture marche
+- Découverte par `idc-global` : OK (compte connu, région 18 « Keldan », `region_connection_info` donne l'hôte **`bitcraft-release.spacetimedb.com`**). `bitcraft-early-access` accepte aussi `idc-18`.
+- Lecture de `idc-18` : OK. Personnage (entité 648518346637266951), vie, endurance, faim, `signed_in_player_state` (passe à 1 quand le jeu se connecte). Environ **700 ressources** dans un carré de 80 petites cases (jointure acceptée).
+- Changements reçus en direct : ≈ 1 message par seconde (faim qui baisse), plus les déplacements.
+- **Ordre bot → jeu, puis déconnexion du bot : le jeu reste connecté** (vérifié 2 fois).
+- **Bot connecté alors que le jeu est ouvert : le jeu est éjecté** aussitôt (« Logged in elsewhere », capture de Julien). Le client du jeu se ferme lui-même quand une connexion plus récente du compte apparaît. Pas besoin d'attendre la déconnexion du bot.
+- Correctif v0.3.9 : connexion **refusée** si le jeu est lancé (aucune dérogation) ; plus de question à la déconnexion.
+- Coordonnées : **E ≈ x ÷ 3, N ≈ z ÷ 3**, à 1 près (x, z = position serveur en petites cases). Ex. : x 20115,5 / z 26707,7 → écran E 6704, N 8902. Arrondi exact : à préciser en H2 (le journal note l'écart toutes les 15 s depuis la v0.3.9).
+- À vérifier : le « Mature Oak Tree » que Julien coupait n'est pas dans les 50 ressources les plus proches de l'instantané (seul un « Young Beech Tree » à 8,5 cases). Position d'un arbre = une case de référence ? À regarder en H2.
+
 ## Relais Bitjita (piste, non utilisée)
 - `relay.bitjita.com` : relais SpacetimeDB en **lecture seule**, protocole v1, modules `idc-N` et `idc-global`, identités propres au relais (**aucun jeton BitCraft**). Exploitant, règles d'usage et limites : non indiqués.
 - Avantage : aucune liaison avec le compte de Julien, donc **aucun risque de déconnexion** du personnage. Inconvénients : service tiers, disponibilité non garantie.

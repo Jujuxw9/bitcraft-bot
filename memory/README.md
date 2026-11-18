@@ -62,4 +62,4 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261118-01)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261118-04)

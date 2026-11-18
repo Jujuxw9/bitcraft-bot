@@ -176,21 +176,20 @@ public partial class MainWindow
             return;
         }
         _settings.ServerRegion = region;
-        var gameRunning = IsGameRunning();
-        if (gameRunning)
+        // Vérifié le 2026-11-18 (essai v0.3.8) : se connecter avec le jeu ouvert éjecte le jeu
+        // (« Logged in elsewhere »). Aucune dérogation possible.
+        if (IsGameRunning())
         {
-            var answer = MessageBox.Show(this,
-                "Le jeu est déjà lancé.\n\nSi vous connectez le bot maintenant, il devient la connexion « principale » du compte : " +
-                "quand le bot se déconnectera, votre personnage risque d'être déconnecté du jeu.\n\n" +
-                "Conseillé : fermer le jeu, connecter le bot, puis relancer le jeu.\n\nSe connecter quand même ?",
-                "Jeu déjà lancé", MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No);
-            if (answer != MessageBoxResult.Yes)
-            {
-                _log.Info("Serveur", "Connexion annulée : le jeu était déjà lancé.");
-                return;
-            }
+            _log.Alerte("Serveur", "Connexion refusée : le jeu est lancé (le jeu serait éjecté).");
+            ServerStateText.Text = "Le jeu est lancé : connexion impossible. Quittez le jeu, connectez le bot, puis relancez le jeu.";
+            ServerStateText.Foreground = System.Windows.Media.Brushes.Gold;
+            MessageBox.Show(this,
+                "Le jeu est lancé.\n\nSi le bot se connecte maintenant, le jeu affiche « Logged in elsewhere » et vous éjecte.\n\n" +
+                "Ordre à suivre : quittez le jeu, cliquez « Se connecter » ici, puis relancez le jeu.",
+                "Jeu lancé", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
         }
-        _log.Info("Serveur", $"Connexion en lecture seule à la région R{region} (jeu {(gameRunning ? "déjà lancé : ordre non respecté, accepté par Julien" : "fermé : ordre respecté")}).");
+        _log.Info("Serveur", $"Connexion en lecture seule à la région R{region} (jeu fermé : ordre respecté).");
 
         if (_serverReader is not null)
         {
@@ -201,8 +200,8 @@ public partial class MainWindow
         _serverReader.StateChanged += () => Dispatcher.BeginInvoke(ShowServerState);
         ServerConnectButton.IsEnabled = false;
         ServerDisconnectButton.IsEnabled = true;
-        // Découverte par le module global seulement si le jeu est fermé (sinon risque de déconnexion du personnage).
-        await _serverReader.ConnectAsync(token, region, discover: !gameRunning, CancellationToken.None);
+        // Le jeu est fermé ici : la découverte par le module global est sans risque.
+        await _serverReader.ConnectAsync(token, region, discover: true, CancellationToken.None);
         ShowServerState();
     }
 
@@ -212,12 +211,7 @@ public partial class MainWindow
         {
             return;
         }
-        if (IsGameRunning() && MessageBox.Show(this,
-                "Le jeu est lancé. Si le bot a été connecté APRÈS le jeu, sa déconnexion peut déconnecter votre personnage.\n\nSe déconnecter maintenant ?",
-                "Déconnexion", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
-        {
-            return;
-        }
+        // Le bot se connecte toujours avant le jeu : sa déconnexion ne touche pas le jeu (vérifié le 2026-11-18).
         await _serverReader.DisconnectAsync("demandé par Julien");
         ShowServerState();
     }
@@ -284,7 +278,8 @@ public partial class MainWindow
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)
         {
             _lastPositionCompare = DateTime.Now;
-            _log.Info("Serveur", $"Comparaison des positions : serveur {sp} ; écran N {hud.North}, E {hud.East}.");
+            // Constat des essais du 2026-11-18 : E ≈ x ÷ 3 et N ≈ z ÷ 3, à 1 près.
+            _log.Info("Serveur", $"Comparaison des positions : serveur {sp} (÷3 : E {sp.X / 3:0.0}, N {sp.Z / 3:0.0}) ; écran N {hud.North}, E {hud.East} ; écart E {hud.East - sp.X / 3:+0.0;-0.0;0}, N {hud.North - sp.Z / 3:+0.0;-0.0;0}.");
         }
     }
 
