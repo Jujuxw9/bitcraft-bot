@@ -276,3 +276,11 @@ Journal v0.3.2 du 16/11 à 20:08 : pendant le bandeau de montée de niveau (Mini
 - Vérifié en rejouant la séquence du 16/11 : niveau noté, aucune fausse alerte.
 
 Rappel : si une fenêtre (inventaire…) recouvre la jauge, elle n'est pas lue. C'est normal (cas de 20:02:56). Le bot fermera ses fenêtres avant d'agir (Q-015).
+
+## 17. Voie hybride (D-039, 2026-11-17) : nouvelle brique Server
+
+- Sixième brique : **Server** (`src/BitcraftBot.Server`). Rôle : lire en direct l'état du jeu sur le serveur officiel, **en lecture seule**, avec le jeton de Julien.
+- Elle remplacera peu à peu la **Perception** comme source principale (position, arbres, vie, endurance, faim). La Perception reste pour la sécurité et le contrôle croisé.
+- La brique n'envoie **aucune action** au serveur. Les actions restent dans **Input** (souris, clavier).
+- Le jeton est chiffré avec la protection de Windows (lié à la session de Julien), jamais écrit dans le journal ni dans Git.
+- État : brique créée vide (compile). Contenu au livrable **H1**. Plan détaillé : `memory/technique/hybride/`.

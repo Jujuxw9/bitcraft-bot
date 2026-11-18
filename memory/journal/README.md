@@ -10,6 +10,7 @@
 | [06](2026-11-16-session-06-v02.md) | 2026-11-16 | Claude Code | v0.2 et v0.2.1 : lecture du HUD, onglets, CPU/RAM |
 | [07](2026-11-16-session-07-v022.md) | 2026-11-16 | Claude Code | v0.2.2 : banc d'essai des mouvements |
 | [08](2026-11-16-session-08-v030.md) | 2026-11-16 | Claude Code | v0.3.0 : coordonnées par modèles, données du jeu |
+| [09](2026-11-17-session-09-voie-reseau.md) | 2026-11-17 | Claude Code | Voie réseau → voie hybride (D-039), brique Server |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

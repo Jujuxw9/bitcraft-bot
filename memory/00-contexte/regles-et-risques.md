@@ -16,6 +16,6 @@
 - Pas de modification du client.
 - Pas de lecture mémoire du processus.
 - Pas d'injection.
-- Pas de connexion directe au serveur officiel par un client tiers.
+- Pas d'action envoyée au serveur officiel par un client tiers. La connexion en lecture seule avec le jeton de Julien est permise (D-039).
 
 Lien : [D-001](../decisions/D-001-orientation-a.md).

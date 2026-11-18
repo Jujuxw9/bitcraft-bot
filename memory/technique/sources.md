@@ -35,3 +35,8 @@
 | api.steampowered.com/ISteamNews/GetNewsForApp (appid 3454650) | **API publique des actualités Steam** : texte complet des patch notes (la page web ne s'affiche pas sans navigateur) | **Haute** : lire chaque patch (utilisée le 2026-11-16) |
 | store.steampowered.com/news/app/3454650/view/655997268258717736 (lien de Julien, 2026-11-16) | Patch note « BitCraft Online 1.0 – A Fresh World » (13/11) | Haute : analysé dans `analyse-lot5-2026-11-16.md` ; rien de bloquant, Maker's Tree à exclure |
 | api.steamcmd.net/v1/info/3454650 | Numéro et date du dernier build du jeu | **Haute** : détecter une mise à jour sans note (ex. build 26707176 du 16/11 à 17:51) |
+| github.com/clockworklabs/BitCraftPublic (renvoyé par Julien, 2026-11-17) | Code serveur 1.0. Le README dit que le client **n'est pas publié** | Déjà analysé (`analyse-bitcraftpublic.md`) ; base de Q-021 |
+| spacetimedb.com/docs (renvoyé par Julien, 2026-11-17) | Fonctionnement : WebSocket chiffré, abonnement aux tables, appels de reducers | Moyenne : comprendre le jeu ; Q-021 |
+| clockworklabs.helpshift.com (FAQ « developer program ») | Règles officielles des outils tiers : lecture avec son propre jeton permise, outils de bot interdits | **Haute** pour Q-021 |
+| bitcraftonline.com/news/bitcraft-online-verified-developer-program | Programme « Verified developer » (rouvert le 2026-03-31). Page en erreur 404 le 2026-11-17 ; le texte est dans la FAQ | Faible |
+| github.com/raffiandev/bitcraft-stdb (licence MIT, juillet 2025) | Lecteur WebSocket dérivé de Bitjita : obtention du jeton par code e-mail, hôte, modules, abonnement JSON | **Très haute** pour H1 (`technique/hybride/constats.md`). Ancien : à revérifier en 1.0 |
