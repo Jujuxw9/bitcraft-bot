@@ -1,6 +1,6 @@
 # Analyse de BitCraftPublic
 
-Résultat de l'analyse du clone du 2026-11-15 (dernier commit : 2026-11-13, « release 1.0 »). Dépôt : https://github.com/clockworklabs/BitCraftPublic
+Résultat de l'analyse du clone du 2026-11-15 (dernier commit : 2026-11-13, « release 1.0 »). Dépôt : https://github.com/clockworklabs/BitCraftPublic Copie complète dans le dépôt : [references/BitCraftPublic/](../../references/README.md) ; vérifié le 2026-11-18 : pas de nouveau commit.
 
 ## Contenu
 

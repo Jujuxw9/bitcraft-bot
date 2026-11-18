@@ -33,7 +33,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-039
+- [README.md](decisions/README.md) — tableau D-001 à D-040
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-021
@@ -56,6 +56,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.3.10
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)

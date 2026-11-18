@@ -11,13 +11,13 @@
 | [Q-007](Q-007-monde-joue.md) | Monde joué | Moyenne | Résolue → D-015 |
 | [Q-008](Q-008-deconnexion-cadence.md) | Déconnexion automatique et cadence | Moyenne | Ouverte |
 | [Q-009](Q-009-langue-messages-commit.md) | Langue des messages de commit | Basse | Résolue → D-019 |
-| [Q-010](Q-010-poids-exe-historique-git.md) | Poids des .exe dans l'historique Git | Basse | Ouverte |
+| [Q-010](Q-010-poids-exe-historique-git.md) | Poids des .exe dans l'historique Git | Basse | Résolue → D-040 |
 | [Q-011](Q-011-touches-deplacement-camera.md) | Touches de déplacement et de caméra | Haute | Résolue → D-024 |
 | [Q-012](Q-012-purge-captures-historique.md) | Effacer les captures déjà poussées de l'historique Git ? | Basse | Résolue (non) |
 | [Q-013](Q-013-ecorce-ou-troncs.md) | Quel « bois » ramener : écorce, troncs, ou les deux ? | Haute | Résolue → D-027 |
 | [Q-014](Q-014-ennemis-et-danger.md) | Ennemis et danger de mort | Haute | Ouverte |
 | [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Moyenne | Ouverte (barre active : point blanc, vu le 16/11) |
-| [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Mise en œuvre en v0.3.0 (modèles de chiffres), à confirmer par T-20261116-04 |
+| [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Résolue (modèles de chiffres, T-20261116-04 OK) |
 | [Q-017](Q-017-mode-test-mouvements.md) | Mode test : mouvements « humains » souris et caméra | Moyenne | Résolue → D-035 |
 | [Q-018](Q-018-notifications-ecran.md) | Notifications à l'écran qui masquent le HUD | Moyenne | En partie traitée (montée de niveau, v0.3.4) |
 | [Q-019](Q-019-identifier-arbre-sans-cliquer.md) | Savoir si un arbre est vieux ou jeune avant de le couper | Haute | Résolue → D-036 |

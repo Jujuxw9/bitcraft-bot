@@ -1,5 +1,5 @@
 # Q-010 — Poids des .exe dans l'historique Git
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-040 (2026-11-18)
 - **Priorité** : Basse
 - **Créée le** : 2026-11-16
 ## Question

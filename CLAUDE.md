@@ -20,7 +20,19 @@
 - **Tester en interne chaque livrable** avant de le donner : tests automatiques + essai réel sur le PC.
 - **Poser une question au moindre doute** sur une fonction ou un livrable, plutôt que supposer.
 - **Rappeler à la fin de chaque message les questions encore sans réponse.**
-- Liens envoyés par Julien : les évaluer et les ranger dans `memory/technique/sources.md`.
+- Liens envoyés par Julien : les évaluer et les ranger dans `memory/technique/sources.md`. Tout lien utilisé va aussi dans `memory/technique/liens-utilises.md`.
+
+## Versions et fichiers (D-040)
+
+- Nouvelle version : changer `<Version>` dans `Directory.Build.props` et le message de version (`MainWindow.xaml.cs`), puis lancer `tools/publier-version.ps1`. La dernière version est toujours dans `artifacts/release/`, les anciennes dans `artifacts/old/vX.Y.Z/`.
+- Julien lance toujours `artifacts\release\BitcraftBot.exe`. Ses journaux sont dans `artifacts/release/journaux/vX.Y.Z/AAAA-MM-JJ/`.
+- `references/BitCraftPublic/` : copie du code serveur officiel. Vérifier de temps en temps s'il a changé (voir `references/README.md`).
+
+## Voie hybride (D-039)
+
+- Le bot lit le serveur officiel en lecture seule, avec le jeton de Julien. Le jeton ne doit jamais apparaître dans un journal, dans Git ni dans une réponse.
+- Le bot se connecte **avant** le jeu, jamais après : sinon le jeu est éjecté (« Logged in elsewhere »). Pas de reconnexion automatique.
+- L'e-mail de Julien reste privé : Julien le tape lui-même dans le bot.
 
 ## En fin de session
 

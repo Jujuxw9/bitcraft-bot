@@ -1,5 +1,5 @@
 # Q-018 — Notifications à l'écran qui masquent le HUD
-- **Statut** : Ouverte (remarque de Julien, 2026-11-16)
+- **Statut** : En partie traitée (montée de niveau, v0.3.4)
 - **Priorité** : Moyenne
 - **Créée le** : 2026-11-16
 

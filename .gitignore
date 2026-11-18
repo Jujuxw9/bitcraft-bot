@@ -485,12 +485,14 @@ $RECYCLE.BIN/
 # Règles spécifiques au projet bitcraft-bot
 # ----------------------------------------------------------------
 
-# Configuration locale (chemins, réglages perso) : jamais versionnée
-config.local.json
+# Versions fabriquées : artifacts/release (dernière version) et artifacts/old (anciennes),
+# sur le PC seulement (D-040). Déjà ignoré plus haut par « artifacts/ ».
+
+# Configuration locale (réglages du PC, e-mail du compte) : jamais versionnée
 **/config.local.json
 
 # Captures d'écran : restent sur le PC (D-026).
-# Versionnés : l'index images/README.md, les .gitkeep et images/reference-ui/.
+# Versionnés : les index images/README.md et HISTORIQUE.md, les .gitkeep et images/reference-ui/.
 images/**
 !images/**/
 !images/README.md
@@ -498,20 +500,16 @@ images/**
 !images/**/.gitkeep
 !images/reference-ui/**
 
-# Modèles ONNX : Git ne sait pas filtrer par taille.
-# Convention : tout modèle > 50 Mo va dans models/large/
-
-# Journaux de session du bot (D-031) : restent sur le PC
-**/journaux/ (ignoré).
-# Les modèles < 50 Mo restent dans models/ et sont versionnés.
+# Modèles ONNX (voie B, vision) : Git ne sait pas filtrer par taille.
+# Les modèles < 50 Mo restent dans models/ ; ceux de plus de 50 Mo vont dans models/large/.
 models/large/
 
 # Journaux de session du bot (D-031) : restent sur le PC
 **/journaux/
 
-# Anciennes versions du .exe : restent sur le PC, jamais poussées (D-020)
-executable/anciennes-versions/
-
 # Données du jeu téléchargées par le bot depuis BitCraft_GameData (D-033) : pas de licence, jamais republiées
 **/donnees-jeu/
-data/gamedata/*.json
+
+# Copie du code serveur officiel (Apache 2.0) : versionnée telle quelle,
+# malgré les règles .NET ci-dessus (ex. « packages/ »).
+!references/**

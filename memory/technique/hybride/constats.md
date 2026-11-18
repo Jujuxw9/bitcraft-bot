@@ -11,9 +11,9 @@
 
 ## Connexion (source : dépôt communautaire `raffiandev/bitcraft-stdb`, juillet 2025, dérivé de Bitjita)
 - Jeton : `POST https://api.bitcraftonline.com/authentication/request-access-code?email=…` → code reçu par e-mail → `POST …/authenticate?email=…&accessCode=…` → jeton (format JWT, utilisé en `Authorization: Bearer …`).
-- Hôte : `bitcraft-early-access.spacetimedb.com` (le nom résout toujours le 2026-11-17). **À vérifier pour la 1.0.**
-- Modules : un module global, puis un module par région. La table `region_connection_info` (id, host, module) donne l'hôte et le nom du module de région. Noms vus en 2025 : `bitcraft-global`, `bitcraft-3`. **À vérifier pour la 1.0.**
-- Protocole : WebSocket `wss://{hôte}/v1/database/{module}/subscribe`, sous-protocole JSON `v1.json.spacetimedb`, abonnement par requêtes SQL (`SELECT * FROM table WHERE …`). Puis réception des changements en direct. **À vérifier avec SpacetimeDB 2.0.**
+- Hôte : `bitcraft-early-access.spacetimedb.com`. **Vérifié en 1.0** ; le module global indique aussi `bitcraft-release.spacetimedb.com` pour les régions (les deux marchent).
+- Modules : un module global, puis un module par région. La table `region_connection_info` (id, host, module) donne l'hôte et le nom du module de région. Noms 2025 : `bitcraft-global`, `bitcraft-3`. **En 1.0 : `idc-global` et `idc-N`** (voir plus bas).
+- Protocole : WebSocket `wss://{hôte}/v1/database/{module}/subscribe`, sous-protocole JSON `v1.json.spacetimedb`, abonnement par requêtes SQL (`SELECT * FROM table WHERE …`). Puis réception des changements en direct. **Vérifié en réel le 2026-11-18.**
 - Schéma : `GET https://{hôte}/v1/database/{module}/schema?version=9`.
 - Le dépôt prévient : « si vous êtes connecté au jeu, ces commandes peuvent vous déconnecter ».
 
@@ -21,11 +21,11 @@
 - À chaque connexion, le serveur note la **dernière connexion** du compte comme connexion active.
 - À la déconnexion : si c'est la connexion active → le joueur est **déconnecté du jeu** (sign_out). Si c'est une ancienne connexion → rien.
 - Conséquence : si le bot se connecte **après** le jeu, puis se ferme, le personnage risque d'être déconnecté.
-- Parade à tester : **lancer la lecture serveur avant le jeu**. Le jeu devient la connexion active ; la fermeture du bot ne fait rien. **À vérifier en réel.**
+- Parade : **lancer la lecture serveur avant le jeu**. Le jeu devient la connexion active ; la fermeture du bot ne fait rien. **Vérifié en réel** (essais v0.3.7, v0.3.8, v0.3.9). Bot connecté après le jeu = jeu éjecté (voir plus bas).
 - Chaque connexion est enregistrée côté serveur : la lecture est visible (elle est permise par la FAQ).
 
 ## Région
-- Le monde est carré, découpé en régions (nombre carré : 4, 9, 16…). La taille exacte en 1.0 : **à vérifier** (sera lue à la connexion).
+- Le monde est carré, découpé en régions. En 1.0 (`world_region_state`, lu le 2026-11-18) : **25 régions (5 × 5)**, chaque région = 80 × 80 chunks ; R18 commence au chunk x 160, z 240. Seules 9 régions (7-9, 12-14, 17-19) ont un module visible.
 - Une région est un grand morceau de carte : largement assez pour farmer autour de Snowrest.
 
 ## Tables utiles (code serveur 1.0, toutes publiques)
@@ -38,7 +38,7 @@
 | Métiers | `experience_state` |
 | Équipement | `equipment_state` |
 | Joueur | `player_state`, `signed_in_player_state` |
-Inventaire, position des ressources : noms exacts **à vérifier** dans le schéma réel.
+Position des ressources : `location_state` (jointure sur `entity_id`), **vérifié** en v0.3.7. Inventaire : nom de table **à vérifier** dans le schéma réel.
 
 ## Gain attendu par rapport à la vision
 - Position exacte sans OCR. Arbres connus avec leur type et leur âge **sans cliquer** (règle Q-019 / D-036 simplifiée). Ennemis connus même hors écran. Inventaire plein connu sans lire l'écran.
@@ -48,7 +48,7 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 - Schéma de `bitcraft-live-18` lisible sans jeton : 542 tables. Toutes les tables utilisées en H1 sont publiques, avec clé primaire.
 - Liaison WebSocket avec un faux jeton : **refus 401**. Adresse, protocole et lecture du jeton par le serveur : OK.
 - Global : `user_region_state` (identité → région) existe. Non utilisé : le bot ne se connecte qu'à la région (une seule liaison, moins de risque).
-- Positions (code serveur) : `mobile_entity_state.location_x/z` = petites cases × 1000 ; `location_state.x/z` = petites cases. Une grande case (terrain) = 3 petites cases. Lien avec les coordonnées N / E de l'écran : **à vérifier** (le bot note les deux toutes les 15 s).
+- Positions (code serveur) : `mobile_entity_state.location_x/z` = petites cases × 1000 ; `location_state.x/z` = petites cases. Une grande case (terrain) = 3 petites cases. Lien avec les coordonnées N / E de l'écran : trouvé, voir « Essais réels » plus bas.
 - SQL des abonnements (doc SpacetimeDB) : jointure de 2 tables permise si les deux colonnes sont indexées (`entity_id` l'est) ; identité en `0x…`.
 
 ## Premier essai réel de Julien (2026-11-18, v0.3.5)
@@ -72,8 +72,8 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 - **Ordre bot → jeu, puis déconnexion du bot : le jeu reste connecté** (vérifié 2 fois).
 - **Bot connecté alors que le jeu est ouvert : le jeu est éjecté** aussitôt (« Logged in elsewhere », capture de Julien). Le client du jeu se ferme lui-même quand une connexion plus récente du compte apparaît. Pas besoin d'attendre la déconnexion du bot.
 - Correctif v0.3.9 : connexion **refusée** si le jeu est lancé (aucune dérogation) ; plus de question à la déconnexion.
-- Coordonnées : **E ≈ x ÷ 3, N ≈ z ÷ 3**, à 1 près (x, z = position serveur en petites cases). Ex. : x 20115,5 / z 26707,7 → écran E 6704, N 8902. Arrondi exact : à préciser en H2 (le journal note l'écart toutes les 15 s depuis la v0.3.9).
-- À vérifier : le « Mature Oak Tree » que Julien coupait n'est pas dans les 50 ressources les plus proches de l'instantané (seul un « Young Beech Tree » à 8,5 cases). Position d'un arbre = une case de référence ? À regarder en H2.
+- Coordonnées : **E = arrondi(x ÷ 3), N = arrondi(z ÷ 3)** (x, z = position serveur en petites cases). Vérifié à l'arrêt en v0.3.9 : écarts de 0,3 à 0,4, toujours vers l'arrondi. En marche, écart jusqu'à 1 (décalage de temps entre l'écran et le serveur).
+- Arbres : les instantanés v0.3.9 listent bien des « Young Oak Tree », « Young Beech Tree » et « Mature Oak Tree » (8,6 et 10,2 cases). L'instantané ne garde que les 50 ressources les plus proches, fleurs comprises : un arbre peut donc manquer dans le fichier mais pas dans le bot. **À vérifier** : l'arbre que coupe Julien correspond-il à une ligne de la liste (position, nom) ?
 
 ## Relais Bitjita (piste, non utilisée)
 - `relay.bitjita.com` : relais SpacetimeDB en **lecture seule**, protocole v1, modules `idc-N` et `idc-global`, identités propres au relais (**aucun jeton BitCraft**). Exploitant, règles d'usage et limites : non indiqués.

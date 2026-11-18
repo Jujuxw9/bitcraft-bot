@@ -25,8 +25,6 @@ public sealed class LocalSettings
     // Affiche les zones lues sur l'image du jeu.
     public bool ShowZones { get; set; } = true;
 
-    // Fenêtre agrandie au démarrage, sur l'écran où elle était (demande de Julien).
-    public bool StartMaximized { get; set; } = true;
 
     // Arrêt sur anomalie (RAM du bot critique).
     public bool AnomalyStopEnabled { get; set; } = true;

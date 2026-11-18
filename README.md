@@ -1,64 +1,74 @@
 # bitcraft-bot
 
-Agent autonome pour BitCraft Online : perception écran, prise de décision et automatisation du farm de ressources, sous supervision humaine. Projet d'apprentissage.
+Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décision et automatisation du farm de ressources, sous supervision humaine. Projet d'apprentissage.
 
 > ⚠️ Les Community Guidelines de BitCraft interdisent toute automatisation. Projet expérimental, risque de sanction accepté par le porteur. Détail : [memory/00-contexte/regles-et-risques.md](memory/00-contexte/regles-et-risques.md).
 
 ## État
 
-**v0.3.4** : la fenêtre du bot affiche le jeu en direct, **lit le HUD** (position par modèles de chiffres, zone, vie, endurance, faim, cible, jauge de métier), télécharge et vérifie les **données du jeu** (BitCraft_GameData, jamais republiées), surveille sa consommation CPU/RAM, et propose un **banc d'essai des mouvements** souris / caméra (désactivé par défaut). Capture du jeu avec `Num 0`. Arrêt d'urgence `Num 5`, durée maximale, journaux. Dernière version validée : v0.1.0 (`executable/`).
+**v0.3.10** :
+- Voie hybride (D-039) : l'onglet **« Serveur (H1) »** lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré). Il affiche la position, la vie, l'endurance, la faim et les ressources proches. Vérifié en réel.
+- Lecture de l'écran (HUD) : position, zone, vie, endurance, faim, cible, jauge de métier.
+- Données du jeu (BitCraft_GameData, jamais republiées), surveillance CPU/RAM, banc d'essai des mouvements (désactivé par défaut).
+- Sécurité : arrêt d'urgence `Num 5`, durée maximale, journaux. Capture du jeu avec `Num 0`.
 
-Prochaine étape : v0.4, viser et couper un vieil arbre (D-036). Architecture : [memory/technique/architecture.md](memory/technique/architecture.md). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md).
+Règle : connecter le bot **avant** de lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter, sinon le jeu serait éjecté.
+
+Prochaine étape : H2, carte des arbres autour du joueur, puis H3 (aller à un arbre). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
 
 ## Principe
 
-Un `.exe` Windows lancé à côté du jeu. Sa fenêtre de supervision est sur le 2ᵉ écran. Le bot lit l'écran du jeu et pilote clavier/souris. L'humain supervise et peut tout arrêter (touche d'urgence, mouvement de souris, anomalie, durée max).
+Un `.exe` Windows lancé à côté du jeu, avec sa fenêtre sur le 2ᵉ écran :
+- le bot **lit** l'état du jeu sur le serveur, et l'écran en contrôle ;
+- il **agit** uniquement au clavier et à la souris, sur le vrai jeu.
+
+L'humain supervise et peut tout arrêter (touche d'urgence, mouvement de souris, anomalie, durée max).
 
 Stack : C# / .NET 10, WPF.
 
-## Démarrage rapide
+## Lancer le bot
+
+Dernière version : `artifacts\release\BitcraftBot.exe`. Les anciennes versions sont dans `artifacts\old\vX.Y.Z\` (D-040, sur le PC seulement).
+
+## Pour les développeurs
 
 Prérequis : Windows, [SDK .NET 10](https://dotnet.microsoft.com/download).
 
-```bash
+```powershell
 dotnet build
 ```
 
-```bash
+```powershell
 dotnet test
 ```
 
-```bash
-dotnet run --project src/BitcraftBot.App
+Fabriquer une version (lit `Directory.Build.props`, range l'ancienne dans `old`) :
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/publier-version.ps1
 ```
 
-Publication d'un `.exe` unique autonome :
-
-```bash
-dotnet publish src/BitcraftBot.App -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
-```
-
-Les versions publiées (tag `vX.Y.Z`) sont construites par `.github/workflows/release.yml` et disponibles dans les GitHub Releases.
+Les versions marquées d'un tag `vX.Y.Z` sont aussi construites par `.github/workflows/release.yml` (GitHub Releases).
 
 ## Organisation
 
 | Dossier | Contenu |
 |---|---|
 | [memory/](memory/README.md) | Mémoire du projet : contexte, décisions, questions ouvertes, journal |
-| `src/` | Code C# (App, Core, Perception, Input, GameData) |
+| `src/` | Code C# : App, Core, Perception, Input, GameData, Server |
 | `tests/` | Tests xUnit |
-| [images/](images/README.md) | Captures d'écran (référence UI, entraînement, analyse, tests) |
-| [data/](data/README.md) | Données de jeu (schémas BitCraftPublic, valeurs) |
-| [models/](models/README.md) | Modèles de vision `.onnx` |
+| [images/](images/README.md) | Captures d'écran (référence UI, entraînement, analyse) |
+| [models/](models/README.md) | Modèles de vision `.onnx` (voie B, en pause) |
 | [tools/](tools/README.md) | Scripts utilitaires |
-| [executable/](executable/README.md) | Dernier .exe validé (les anciens restent sur le PC) |
+| [references/](references/README.md) | Copie du code serveur officiel BitCraftPublic (Apache 2.0) |
+| `artifacts/` | Versions fabriquées : `release/` et `old/` (sur le PC, ignoré par Git) |
 
 ## Notes
 
-- Modèles `.onnx` de plus de 50 Mo : à placer dans `models/large/` (ignoré par Git). Git ne sait pas ignorer selon la taille.
-- `config.local.json` est ignoré par Git (réglages locaux).
+- `config.local.json` (réglages du PC), les journaux et les captures restent sur le PC (ignorés par Git).
+- Le jeton du compte est chiffré par Windows, hors du dépôt, et n'apparaît jamais dans les journaux.
 - Agents IA : lire [CLAUDE.md](CLAUDE.md) avant toute action.
 
 ## Licence
 
-MIT — voir [LICENSE](LICENSE).
+MIT — voir [LICENSE](LICENSE). Le dossier `references/BitCraftPublic/` garde sa propre licence (Apache 2.0).

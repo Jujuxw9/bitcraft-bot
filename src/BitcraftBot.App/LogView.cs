@@ -17,7 +17,8 @@ public sealed class LogView
     private static readonly Brush DetailBrush = Frozen(Color.FromRgb(140, 145, 150));
 
     private readonly List<LogLine> _all = [];
-    private readonly HashSet<LogLevel> _visible = [LogLevel.Erreur, LogLevel.Alerte, LogLevel.Info];
+    // Tous les niveaux cochés par défaut, détails compris (demande de Julien, 2026-11-18).
+    private readonly HashSet<LogLevel> _visible = [LogLevel.Erreur, LogLevel.Alerte, LogLevel.Info, LogLevel.Detail];
 
     public ObservableCollection<LogLine> Visible { get; } = [];
 

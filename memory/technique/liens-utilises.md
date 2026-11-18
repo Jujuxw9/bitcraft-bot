@@ -13,7 +13,7 @@ Liens consultés par Claude pour récupérer des données, comprendre le jeu ou 
 ## Code du serveur et SpacetimeDB
 | Lien | Pourquoi |
 |---|---|
-| https://github.com/clockworklabs/BitCraftPublic | Code serveur 1.0 : tables, connexion (« la connexion la plus récente gagne »), authentification (24 h région, 1 h global), coordonnées |
+| https://github.com/clockworklabs/BitCraftPublic | Copie dans `references/BitCraftPublic/` (commit 85c972d, 2026-11-13). Code serveur 1.0 : tables, connexion (« la connexion la plus récente gagne »), authentification (24 h région, 1 h global), coordonnées |
 | https://github.com/clockworklabs (liste des dépôts) | Vérifier que le client du jeu n'est **pas** public |
 | https://spacetimedb.com/docs/ | Fonctionnement de SpacetimeDB (abonnements, reducers) |
 | https://spacetimedb.com/docs/core-concepts/authentication/ | Jetons et identités SpacetimeDB |

@@ -1,5 +1,5 @@
 # Q-016 — Quel est le meilleur moyen de lire les coordonnées ?
-- **Statut** : Mise en œuvre en v0.3.0 (B + D, A en secours), à confirmer par le test T-20261116-04
+- **Statut** : Résolue (modèles de chiffres, validés par T-20261116-04 : position lue 98-100 %)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-16 (demande de Julien : « ouvrir un point de réflexion »)
 

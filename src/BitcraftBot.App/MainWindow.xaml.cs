@@ -91,6 +91,7 @@ public partial class MainWindow : Window
         _log = new SessionLog(AppContext.BaseDirectory, _version);
         _log.EntryWritten += entry => Dispatcher.BeginInvoke(() => AppendLogLine(entry));
         LogList.ItemsSource = _logView.Visible;
+        LogList.IsVisibleChanged += (_, _) => ScrollLogToEnd();
         LogFileText.Text = _log.FilePath;
         _resourceGuard = new ResourceGuard(_settings.Limits);
         _hudLogger = new HudChangeLogger(_log);
@@ -136,7 +137,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.9 (H1, connexion refusée si le jeu est lancé) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel, avec recherche de la région du personnage. Aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.10 (fenêtre toujours agrandie, journal complet qui reste en bas, H1 lecture serveur) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel, avec recherche de la région du personnage. Aucune action sur le jeu hors banc d'essai.");
         InitServerTab();
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
@@ -217,7 +218,7 @@ public partial class MainWindow : Window
         }
     }
 
-    // Dossier images/analyse du dépôt, en remontant depuis le .exe (artifacts/vX.Y.Z/ ou executable/).
+    // Dossier images/analyse du dépôt, en remontant depuis le .exe (artifacts/release/ ou artifacts/old/vX.Y.Z/).
     private static string? FindAnalysisFolder()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
@@ -599,7 +600,7 @@ public partial class MainWindow : Window
         var line = _logView.Add(entry);
         if (_logView.Visible.Count > 0 && ReferenceEquals(_logView.Visible[^1], line))
         {
-            LogList.ScrollIntoView(line);
+            ScrollLogToEnd();
         }
         // Bandeau du bas de l'onglet Supervision : dernier événement (sauf les détails).
         if (entry.Level != LogLevel.Detail)
@@ -616,7 +617,29 @@ public partial class MainWindow : Window
         _logView.SetVisible(LogLevel.Alerte, FilterAlerte.IsChecked == true);
         _logView.SetVisible(LogLevel.Info, FilterInfo.IsChecked == true);
         _logView.SetVisible(LogLevel.Detail, FilterDetail.IsChecked == true);
+        ScrollLogToEnd();
     }
+
+    // Le journal montre toujours la dernière ligne (en bas) : à chaque ajout, après un filtre,
+    // et à l'ouverture de l'onglet (ScrollIntoView ne fait rien tant que la liste est cachée).
+    private void ScrollLogToEnd()
+    {
+        if (_logScrollPending)
+        {
+            return;
+        }
+        _logScrollPending = true;
+        Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, () =>
+        {
+            _logScrollPending = false;
+            if (LogList.Items.Count > 0 && LogList.IsVisible)
+            {
+                LogList.ScrollIntoView(LogList.Items[^1]);
+            }
+        });
+    }
+
+    private bool _logScrollPending;
 
     // Mesure CPU/RAM chaque seconde, compare aux seuils, met à jour l'onglet Système.
     private async Task OnResourceTickAsync()
@@ -882,11 +905,9 @@ public partial class MainWindow : Window
         {
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
         }
-        // Agrandie sur l'écran où elle se trouve (la position ci-dessus choisit l'écran).
-        if (_settings.StartMaximized)
-        {
-            SourceInitialized += (_, _) => WindowState = WindowState.Maximized;
-        }
+        // Toujours agrandie (demande de Julien, 2026-11-18), sur l'écran où elle se trouvait
+        // (la position ci-dessus choisit l'écran).
+        SourceInitialized += (_, _) => WindowState = WindowState.Maximized;
     }
 
     // Évite de rouvrir la fenêtre hors de l'écran (par exemple si le 2e écran est débranché).
@@ -916,7 +937,6 @@ public partial class MainWindow : Window
             _settings.WindowWidth = bounds.Width;
             _settings.WindowHeight = bounds.Height;
         }
-        _settings.StartMaximized = WindowState == WindowState.Maximized;
         _settings.EmergencyKeyEnabled = _safety.Options.EmergencyKeyEnabled;
         _settings.MaxDurationEnabled = _safety.Options.MaxDurationEnabled;
         _settings.MaxDurationMinutes = (int)_safety.Options.MaxDuration.TotalMinutes;

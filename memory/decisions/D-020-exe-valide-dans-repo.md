@@ -1,6 +1,6 @@
 # D-020 — Le .exe validé est versionné dans le repo
 
-- **Statut** : Validée
+- **Statut** : Remplacée par D-040 (2026-11-18)
 - **Date** : 2026-11-16
 - **Validée par** : Julien
 - **Liens** : D-010, Q-010

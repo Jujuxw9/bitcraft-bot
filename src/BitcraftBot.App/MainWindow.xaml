@@ -174,7 +174,7 @@
                     <CheckBox x:Name="FilterErreur" Content="Erreurs" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#F28B82" />
                     <CheckBox x:Name="FilterAlerte" Content="Alertes" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#FDD663" />
                     <CheckBox x:Name="FilterInfo" Content="Infos" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" />
-                    <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="False" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
+                    <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="True" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
                     <Button Content="Ouvrir le dossier des journaux" Click="OpenLogFolder_Click" />
                     <TextBlock x:Name="LogFileText" VerticalAlignment="Center" Foreground="#9AA0A6" Margin="8,0,0,0" />
                 </StackPanel>

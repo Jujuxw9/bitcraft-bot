@@ -5,7 +5,7 @@
 
 ## Décisions de l'échange
 - D-019 : français partout, sauf les lignes de code (remplace D-012, résout Q-009).
-- D-020 : le dernier `.exe` validé est versionné dans `executable/`, les anciens vont dans `executable/anciennes-versions/` (non poussé).
+- D-020 (remplacée par D-040 le 2026-11-18) : les versions sont maintenant dans `artifacts/release` (dernière) et `artifacts/old` (anciennes), sur le PC.
 
 ## Étape 1 — Réponses rapides de Julien
 

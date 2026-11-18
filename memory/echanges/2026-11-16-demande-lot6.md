@@ -3,7 +3,7 @@
 Reste du lot 5, mis à jour. **Nouveau : les captures se font avec le bot** (v0.3.2), car « Impr. écran » prend les 2 écrans.
 
 ## Comment capturer
-1. Lancer `artifacts/v0.3.4/BitcraftBot.exe` (pas besoin de cliquer sur Démarrer).
+1. Lancer `artifacts/release/BitcraftBot.exe` (dernière version, D-040) (pas besoin de cliquer sur Démarrer).
 2. Dans le jeu, appuyer sur **Num 0** (pavé numérique) : le bot enregistre l'écran du jeu seul, en 1920×1080 exact, dans `images/analyse/`. Une ligne « Capture du jeu enregistrée » apparaît dans le journal du bot.
 3. Rien d'autre à faire : les noms sont automatiques. Dis-moi juste « lot 6 déposé » et ce que montre chaque capture, dans l'ordre (ex. « 1 : hêtre survolé, 2 : … »).
 
