@@ -48,7 +48,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-16-feuille-de-route.md](echanges/2026-11-16-feuille-de-route.md) — prochaines étapes, captures et infos demandées à Julien
 - [2026-11-16-demande-captures-lot5.md](echanges/2026-11-16-demande-captures-lot5.md) — lot 5 : captures et vidéos précises demandées
 - [2026-11-16-demande-lot6.md](echanges/2026-11-16-demande-lot6.md) — lot 6 : reste du lot 5, captures avec Num 0
-- [2026-11-18-essai-h1.md](echanges/2026-11-18-essai-h1.md) — essai H1 à faire par Julien (jeton, lecture, test de déconnexion)
+- [2026-11-18-essai-h1.md](echanges/2026-11-18-essai-h1.md) — essai H1 (fait : lecture OK, ordre bot → jeu)
+- [2026-11-18-essai-h2.md](echanges/2026-11-18-essai-h2.md) — essai H2 à faire par Julien (v0.3.11 : carte des arbres)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -56,11 +57,11 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.3.10
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.3.11 (H2)
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261118-04)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261118-05)

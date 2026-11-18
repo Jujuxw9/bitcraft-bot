@@ -16,7 +16,6 @@ public partial class MainWindow
 {
     private static readonly TimeSpan ServerUiInterval = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan PositionCompareInterval = TimeSpan.FromSeconds(15);
-    private const int MaxResourcesShown = 40;
 
     private readonly TokenStore _tokenStore = new(TokenStore.DefaultPath);
     private DispatcherTimer? _serverTimer;
@@ -32,7 +31,8 @@ public partial class MainWindow
         ServerRegionBox.Text = _settings.ServerRegion.ToString();
         _gameData.Loaded += store => Dispatcher.BeginInvoke(() =>
             _resourceLabels = store.Resources.GroupBy(r => r.Id)
-                .ToDictionary(g => g.Key, g => new ResourceLabel(g.First().Name, g.First().Tier, g.First().Tag)));
+                .ToDictionary(g => g.Key, g => new ResourceLabel(g.First().Name, g.First().Tier, g.First().Tag, g.First().MaxHealth)));
+        InitResourceMap();
         _serverTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = ServerUiInterval };
         _serverTimer.Tick += (_, _) => OnServerTick();
         _serverTimer.Start();
@@ -46,6 +46,8 @@ public partial class MainWindow
         {
             _lastHudPosition = p;
         }
+        _lastHudTarget = hud.Target;
+        _lastHudTargetAt = DateTime.Now;
     }
 
     private void ShowTokenStatus()
@@ -255,24 +257,14 @@ public partial class MainWindow
         SrvRegion.Text = s.RegionIndex is { } ri ? $"{s.RegionName ?? "?"} (index {ri})"
             : reader.Discovery is { Success: true } dr ? $"{dr.RegionName ?? "?"} (région {dr.RegionId}, {dr.Module})"
             : reader.Discovery is { Error: { } de } ? $"inconnue ({de})" : "—";
-        SrvPosition.Text = s.Position is { } p ? $"{p}  (÷3 : x {p.X / 3:0.0}, z {p.Z / 3:0.0})" : "—";
-        SrvDestination.Text = s.Destination is { } d ? $"{d}{(s.Walking == true ? " — en marche" : "")}" : "—";
+        SrvPosition.Text = s.Position is { } p ? $"{p.ScreenText}  (serveur : {p})" : "—";
+        SrvDestination.Text = s.Destination is { } d ? $"{d.ScreenText}{(s.Walking == true ? " — en marche" : "")}" : "—";
         SrvHealth.Text = s.Health is { } h ? $"{h:0.#}" : "—";
         SrvStamina.Text = s.Stamina is { } st ? $"{st:0.#}" : "—";
         SrvSatiation.Text = s.Satiation is { } sa ? $"{sa:0.#}" : "—";
         SrvUpdated.Text = reader.LastUpdate is { } at ? $"{at:HH:mm:ss}" : "—";
 
-        var treesOnly = TreesOnlyCheck.IsChecked == true;
-        var shown = s.Resources.Where(r => !treesOnly || string.Equals(r.Tag, "Tree", StringComparison.OrdinalIgnoreCase)).ToList();
-        SrvResourceCount.Text = $"{shown.Count} affichées sur {s.Resources.Count} ressources lues (rayon {ServerReader.ResourceRadius} cases).";
-        SrvResourceList.ItemsSource = shown.Take(MaxResourcesShown).Select(r => new
-        {
-            r.Name,
-            Tag = r.Tag ?? "?",
-            Tier = r.Tier?.ToString() ?? "?",
-            Distance = $"{r.Distance:0.0}",
-            Position = r.Position.ToString(),
-        }).ToList();
+        ShowResources(reader, s);
 
         // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)

@@ -10,7 +10,7 @@ namespace BitcraftBot.Tests;
 public class H1ServerTests
 {
     // Petit schéma au format réel de SpacetimeDB (mêmes champs, peu de tables).
-    private const string SchemaJson = """
+    internal const string SchemaJson = """
     {
       "typespace": { "types": [
         { "Product": { "elements": [
@@ -40,34 +40,38 @@ public class H1ServerTests
         { "Product": { "elements": [
           { "name": { "some": "entity_id" }, "algebraic_type": { "U64": [] } },
           { "name": { "some": "last_stamina_decrease_timestamp" }, "algebraic_type": { "Product": { "elements": [] } } },
-          { "name": { "some": "stamina" }, "algebraic_type": { "F32": [] } } ] } }
+          { "name": { "some": "stamina" }, "algebraic_type": { "F32": [] } } ] } },
+        { "Product": { "elements": [
+          { "name": { "some": "entity_id" }, "algebraic_type": { "U64": [] } },
+          { "name": { "some": "health" }, "algebraic_type": { "I32": [] } } ] } }
       ] },
       "tables": [
         { "name": "user_state", "product_type_ref": 0, "primary_key": [1], "table_access": { "Public": [] } },
         { "name": "mobile_entity_state", "product_type_ref": 1, "primary_key": [0], "table_access": { "Public": [] } },
         { "name": "location_state", "product_type_ref": 2, "primary_key": [0], "table_access": { "Public": [] } },
         { "name": "resource_state", "product_type_ref": 3, "primary_key": [0], "table_access": { "Public": [] } },
-        { "name": "stamina_state", "product_type_ref": 4, "primary_key": [0], "table_access": { "Private": [] } }
+        { "name": "stamina_state", "product_type_ref": 4, "primary_key": [0], "table_access": { "Private": [] } },
+        { "name": "resource_health_state", "product_type_ref": 5, "primary_key": [0], "table_access": { "Public": [] } }
       ]
     }
     """;
 
-    private const string Identity = "c200aaaabbbbccccddddeeeeffff00001111222233334444555566667777b435";
+    internal const string Identity = "c200aaaabbbbccccddddeeeeffff00001111222233334444555566667777b435";
 
-    private static string Rows(params string[] rows) => "[" + string.Join(",", rows.Select(r => System.Text.Json.JsonSerializer.Serialize(r))) + "]";
+    internal static string Rows(params string[] rows) => "[" + string.Join(",", rows.Select(r => System.Text.Json.JsonSerializer.Serialize(r))) + "]";
 
-    private static string Table(string name, string inserts, string deletes = "[]") =>
+    internal static string Table(string name, string inserts, string deletes = "[]") =>
         $$"""{ "table_id": 1, "table_name": "{{name}}", "num_rows": 1, "updates": [ { "deletes": {{deletes}}, "inserts": {{inserts}} } ] }""";
 
-    private static string Initial(params string[] tables) =>
+    internal static string Initial(params string[] tables) =>
         $$"""{ "InitialSubscription": { "database_update": { "tables": [ {{string.Join(",", tables)}} ] }, "request_id": 2, "total_host_execution_duration": { "__time_duration_micros__": 10 } } }""";
 
     private static Schema LoadSchema() => Schema.Parse(SchemaJson);
 
-    private static ResourceLabel? Describe(int id) => id switch
+    internal static ResourceLabel? Describe(int id) => id switch
     {
-        10 => new ResourceLabel("Mature Beech Tree", 1, "Tree"),
-        11 => new ResourceLabel("Young Beech Tree", 1, "Tree"),
+        10 => new ResourceLabel("Mature Beech Tree", 1, "Tree", 12000),
+        11 => new ResourceLabel("Young Beech Tree", 1, "Tree", 3000),
         _ => null,
     };
 
@@ -75,7 +79,7 @@ public class H1ServerTests
     public void Schema_donne_les_colonnes_la_cle_et_la_visibilite()
     {
         var schema = LoadSchema();
-        Assert.Equal(5, schema.TableCount);
+        Assert.Equal(6, schema.TableCount);
         var mobile = schema.Find("mobile_entity_state")!;
         Assert.Equal("location_x", mobile.Columns[3]);
         Assert.Equal([0], mobile.PrimaryKey);
@@ -303,6 +307,7 @@ public class H1RealSchemaTests
             ["signed_in_player_state"] = ["entity_id"],
             ["location_state"] = ["entity_id", "x", "z"],
             ["resource_state"] = ["entity_id", "resource_id"],
+            ["resource_health_state"] = ["entity_id", "health"],
             ["world_region_state"] = ["region_index"],
             ["world_region_name_state"] = ["id", "player_facing_name"],
         };

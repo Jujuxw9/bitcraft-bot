@@ -6,7 +6,7 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 
 ## État
 
-**v0.3.10** :
+**v0.3.11** :
 - Voie hybride (D-039) : l'onglet **« Serveur (H1) »** lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré). Il affiche la position, la vie, l'endurance, la faim et les ressources proches. Vérifié en réel.
 - Lecture de l'écran (HUD) : position, zone, vie, endurance, faim, cible, jauge de métier.
 - Données du jeu (BitCraft_GameData, jamais republiées), surveillance CPU/RAM, banc d'essai des mouvements (désactivé par défaut).
@@ -14,7 +14,9 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 
 Règle : connecter le bot **avant** de lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter, sinon le jeu serait éjecté.
 
-Prochaine étape : H2, carte des arbres autour du joueur, puis H3 (aller à un arbre). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
+- H2 (v0.3.11) : **carte des arbres** autour du joueur, avec leur âge, leur santé, leur distance et leur direction.
+
+Prochaine étape : vérifier H2 en jeu, puis H3 (aller au meilleur arbre). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
 
 ## Principe
 

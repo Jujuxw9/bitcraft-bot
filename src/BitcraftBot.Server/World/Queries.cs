@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -27,21 +27,27 @@ public static class Queries
         };
         if (area is { } a)
         {
-            list.AddRange(Resources(a));
+            list.AddRange(Resources(a, withHealth));
         }
         return list;
     }
 
-    // Ressources (arbres, rochers, buissons…) dans un carré autour du personnage : leur position et leur type.
-    public static IReadOnlyList<string> Resources(Area a)
+    // Ressources (arbres, rochers, buissons…) dans un carré autour du personnage : leur position, leur type
+    // et, si demandé, leur santé actuelle (resource_health_state, une ligne par ressource dès son apparition).
+    public static IReadOnlyList<string> Resources(Area a, bool withHealth = true)
     {
         var where = string.Create(CultureInfo.InvariantCulture,
             $"l.x >= {a.MinX} AND l.x <= {a.MaxX} AND l.z >= {a.MinZ} AND l.z <= {a.MaxZ}");
-        return
-        [
+        var list = new List<string>
+        {
             $"SELECT l.* FROM location_state l JOIN resource_state r ON l.entity_id = r.entity_id WHERE {where}",
             $"SELECT r.* FROM resource_state r JOIN location_state l ON r.entity_id = l.entity_id WHERE {where}",
-        ];
+        };
+        if (withHealth)
+        {
+            list.Add($"SELECT h.* FROM resource_health_state h JOIN location_state l ON h.entity_id = l.entity_id WHERE {where}");
+        }
+        return list;
     }
 }
 

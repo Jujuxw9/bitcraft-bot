@@ -26,6 +26,26 @@ public sealed record PlayerSnapshot
 
 public readonly record struct ServerPosition(double X, double Z)
 {
+    // Coordonnées affichées par le jeu (HUD) : E = arrondi(x ÷ 3), N = arrondi(z ÷ 3).
+    // Vérifié en réel le 2026-11-18 (essais v0.3.7 à v0.3.9, écart de 0,3 à 0,4 à l'arrêt).
+    public double ScreenEast => X / 3.0;
+
+    public double ScreenNorth => Z / 3.0;
+
+    public int RoundedEast => (int)Math.Round(ScreenEast, MidpointRounding.AwayFromZero);
+
+    public int RoundedNorth => (int)Math.Round(ScreenNorth, MidpointRounding.AwayFromZero);
+
+    // Distance dans les unités de l'écran (celles des coordonnées N et E du HUD).
+    public double ScreenDistanceTo(ServerPosition other)
+    {
+        var de = ScreenEast - other.ScreenEast;
+        var dn = ScreenNorth - other.ScreenNorth;
+        return Math.Sqrt(de * de + dn * dn);
+    }
+
+    public string ScreenText => $"N {RoundedNorth}, E {RoundedEast}";
+
     // Distance approchée en cases : les rangées d'hexagones sont espacées de √3/2.
     public double DistanceTo(ServerPosition other)
     {
@@ -37,10 +57,26 @@ public readonly record struct ServerPosition(double X, double Z)
     public override string ToString() => $"x {X:0.0}, z {Z:0.0}";
 }
 
-public sealed record NearbyResource(ulong EntityId, int ResourceId, string Name, int? Tier, string? Tag, ServerPosition Position, double Distance);
+// Distance : en petites cases du serveur. ScreenDistance : en unités de l'écran (N, E).
+// Health : santé actuelle lue sur le serveur (table resource_health_state) ; MaxHealth : données du jeu.
+public sealed record NearbyResource(ulong EntityId, int ResourceId, string Name, int? Tier, string? Tag, ServerPosition Position, double Distance)
+{
+    public int? Health { get; init; }
+
+    public int? MaxHealth { get; init; }
+
+    public double ScreenDistance { get; init; }
+
+    // Direction vue du personnage (N, NE, E, SE, S, SO, O, NO).
+    public string Direction { get; init; } = "";
+
+    public bool IsTree => string.Equals(Tag, "Tree", StringComparison.OrdinalIgnoreCase);
+
+    public string Age => ResourceNames.Age(Name);
+}
 
 // Description d'une ressource d'après les données du jeu (BitCraft_GameData).
-public sealed record ResourceLabel(string Name, int? Tier, string? Tag);
+public sealed record ResourceLabel(string Name, int? Tier, string? Tag, int? MaxHealth = null);
 
 public static class SnapshotBuilder
 {
@@ -92,6 +128,14 @@ public static class SnapshotBuilder
                 locations[e] = new ServerPosition(x, z);
             }
         }
+        var health = new Dictionary<ulong, int>();
+        foreach (var row in cache.Rows("resource_health_state"))
+        {
+            if (row.U64("entity_id") is { } e && row.I32("health") is { } h)
+            {
+                health[e] = h;
+            }
+        }
         var result = new List<NearbyResource>();
         foreach (var row in cache.Rows("resource_state"))
         {
@@ -100,7 +144,13 @@ public static class SnapshotBuilder
                 continue;
             }
             var label = describe(rid);
-            result.Add(new NearbyResource(e, rid, label?.Name ?? $"ressource n° {rid}", label?.Tier, label?.Tag, at, at.DistanceTo(from)));
+            result.Add(new NearbyResource(e, rid, label?.Name ?? $"ressource n° {rid}", label?.Tier, label?.Tag, at, at.DistanceTo(from))
+            {
+                Health = health.TryGetValue(e, out var h) ? h : null,
+                MaxHealth = label?.MaxHealth,
+                ScreenDistance = at.ScreenDistanceTo(from),
+                Direction = ResourceNames.Direction(at.ScreenEast - from.ScreenEast, at.ScreenNorth - from.ScreenNorth),
+            });
         }
         result.Sort((a, b) => a.Distance.CompareTo(b.Distance));
         return result;

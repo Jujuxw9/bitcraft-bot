@@ -29,6 +29,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private Area? _area;
     private string? _targetModule;
     private bool _resourcesRefused;
+    private bool _healthRefused;
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
     private long _messages;
@@ -48,6 +49,13 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
     public event Action? StateChanged;
 
+    // Zone des ressources lues (centre = position du personnage au moment de la demande) et heure de la demande.
+    public Area? ResourceArea => _area;
+
+    public DateTime? ResourceAreaUpdated { get; private set; }
+
+    public bool HealthRefused => _healthRefused;
+
     // Résultat de la dernière découverte par le module global (null si elle n'a pas été faite).
     public RegionDiscovery? Discovery { get; private set; }
 
@@ -62,6 +70,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _entityId = null;
         _area = null;
         _resourcesRefused = false;
+        _healthRefused = false;
+        ResourceAreaUpdated = null;
         Interlocked.Exchange(ref _messages, 0);
         Interlocked.Exchange(ref _transactions, 0);
         var tokenInfo = TokenInfo.TryRead(token);
@@ -191,7 +201,14 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
             case SubscriptionErrorEvent error:
                 log.Erreur(Category, $"Abonnement refusé par le serveur : {error.Error}");
-                if (_area is not null && !_resourcesRefused)
+                if (_area is { } refusedArea && !_healthRefused && _entityId is { } he)
+                {
+                    // D'abord sans la santé des ressources (requête ajoutée en v0.3.11), en gardant les ressources.
+                    _healthRefused = true;
+                    log.Alerte(Category, "Nouvel essai sans la santé des ressources.");
+                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false), "ressources sans la santé");
+                }
+                else if (_area is not null && !_resourcesRefused)
                 {
                     // Les requêtes des ressources (avec jointure) sont les plus fragiles : on continue sans elles.
                     _resourcesRefused = true;
@@ -251,8 +268,13 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         {
             return;
         }
+        var previous = _area;
         _area = Area.Around(p.X, p.Z, ResourceRadius);
-        Subscribe(Queries.FollowPlayer(_identity, entity, _area), $"ressources autour de {p}");
+        ResourceAreaUpdated = DateTime.Now;
+        var why = previous is { } old
+            ? $"ressources autour de {p.ScreenText} : le personnage s'est éloigné de {new ServerPosition(old.CenterX, old.CenterZ).ScreenDistanceTo(p):0.0} cases écran du centre de l'ancienne zone"
+            : $"ressources autour de {p.ScreenText}";
+        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused), why);
     }
 
     private void Subscribe(IReadOnlyList<string> queries, string why)

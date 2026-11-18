@@ -72,3 +72,14 @@ Pour déboguer la connexion sans être devant le PC, le journal (catégorie « S
 - Fenêtre **toujours agrandie** au démarrage, sur l'écran où elle était.
 - Onglet Journal : les 4 niveaux (erreurs, alertes, infos, détails) cochés par défaut ; la liste reste **collée à la dernière ligne** (à chaque ajout, après un filtre, à l'ouverture de l'onglet).
 - Versions rangées par `tools/publier-version.ps1` dans `artifacts/release` (dernière) et `artifacts/old` (D-040).
+
+## 24. v0.3.11 — H2 : carte des arbres (2026-11-18)
+
+- **Coordonnées** : chaque position du serveur est traduite en coordonnées du jeu, E = arrondi(x ÷ 3), N = arrondi(z ÷ 3). Les distances sont données dans ces mêmes unités (« cases du jeu »).
+- **Santé des arbres** : nouvelle demande de lecture `resource_health_state` (une ligne par ressource, créée à son apparition). Si le serveur la refuse, le bot réessaie sans la santé, puis sans les ressources.
+- **Carte** (onglet Serveur, carte 4) : nord en haut, est à droite, vous au centre, cercles à 5 et 10 cases. Arbres mûrs en vert foncé, jeunes en vert clair, morts en brun, entamés entourés d'orange. Repères : meilleur arbre (jaune), cible à l'écran (rose), sélection (blanc). Un clic sur un point le sélectionne dans le tableau.
+- **Tableau** : repère (★ meilleur, ◎ cible), nom, âge (jeune, mûr, mort, planté…), santé actuelle / max (%), distance, direction (N, NE… SO, O, NO), position N / E, palier. Mis à jour sur place : la sélection et le défilement restent.
+- **Meilleur arbre** : l'arbre mûr le plus proche, jamais le Maker's Tree (D-036). C'est celui que H3 visera.
+- **Cible à l'écran** : la cible lue sur le HUD (nom + santé) est retrouvée parmi les arbres du serveur ; même santé = sûr, même nom seulement = probable. Écrit dans le journal à chaque changement. Sert à vérifier H2 en jeu.
+- **Zone lue** : centre, rayon (≈ 13 cases), heure de la dernière relecture ; le journal explique chaque relecture (distance parcourue).
+- Tests : 200 OK (23 nouveaux : coordonnées réelles, direction, âge, santé, requêtes). Table de santé présente et publique dans le vrai schéma de `idc-18`.
