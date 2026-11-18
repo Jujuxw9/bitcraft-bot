@@ -19,7 +19,7 @@ public sealed class ResourceRow : INotifyPropertyChanged
         Name = r.Name;
         Age = r.Age;
         Tier = r.Tier?.ToString() ?? "?";
-        Kind = r.IsTree ? "Arbre" : r.Tag ?? "?";
+        Kind = r.Family;
         Position = r.Position.ScreenText;
         Refresh(r, "");
     }

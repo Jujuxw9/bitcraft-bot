@@ -83,3 +83,11 @@ Pour déboguer la connexion sans être devant le PC, le journal (catégorie « S
 - **Cible à l'écran** : la cible lue sur le HUD (nom + santé) est retrouvée parmi les arbres du serveur ; même santé = sûr, même nom seulement = probable. Écrit dans le journal à chaque changement. Sert à vérifier H2 en jeu.
 - **Zone lue** : centre, rayon (≈ 13 cases), heure de la dernière relecture ; le journal explique chaque relecture (distance parcourue).
 - Tests : 200 OK (23 nouveaux : coordonnées réelles, direction, âge, santé, requêtes). Table de santé présente et publique dans le vrai schéma de `idc-18`.
+
+## 25. v0.3.12 — onglet Carte, familles, cible stable (2026-11-18)
+
+- Demandes de Julien après l'essai v0.3.11 : un onglet à part pour la carte, des cases à cocher par type de ressource.
+- **Onglet « Serveur (H1) »** : compte, connexion, personnage, instantané. **Onglet « Carte (H2) »** : bandeau (votre position ±1, vie, endurance, satiété, région), cases par famille, carte agrandie (560 px), tableau avec la colonne « Famille ».
+- **Familles** : les ~80 catégories du jeu regroupées en 12 familles (arbres, rochers et pierre, minerais, fleurs, plantes à fibres, baies et fruits, champignons, céréales et légumes, sable / argile / terre, pêche, obstacles, autres). Chaque case montre le nombre lu ; chaque famille a sa couleur, la même sur la carte. Boutons « Tout » et « Arbres seulement ».
+- **Cible à l'écran** : ressources du même nom à moins de 8 cases seulement ; le serveur peut avoir jusqu'à 3 % d'avance sur l'écran ; « sûr » seulement si une seule ressource colle ; sinon on garde la précédente. Le journal note chaque changement de cible ou de certitude.
+- Tests : 219 OK (19 nouveaux : familles, cas réels de la cible).

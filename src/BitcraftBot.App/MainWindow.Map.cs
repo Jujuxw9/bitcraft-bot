@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 using BitcraftBot.Perception.Hud;
 using BitcraftBot.Server;
@@ -6,16 +7,20 @@ using BitcraftBot.Server.World;
 
 namespace BitcraftBot.App;
 
-// Onglet « Serveur » : carte des arbres et tableau des ressources proches (H2).
+// Onglet « Carte (H2) » : carte, filtres par famille et tableau des ressources proches.
 public partial class MainWindow
 {
-    private const int MaxRowsShown = 60;
+    private const int MaxRowsShown = 80;
 
     private readonly ObservableCollection<ResourceRow> _resourceRows = [];
+    private readonly Dictionary<string, CheckBox> _familyChecks = [];
+    private readonly HashSet<string> _shownFamilies = [ResourceFamilies.Trees];
+    private readonly ScreenTargetMatcher _targetMatcher = new();
     private TargetReading? _lastHudTarget;
     private DateTime _lastHudTargetAt;
     private ulong? _selectedResource;
     private ulong? _loggedScreenTarget;
+    private bool _loggedScreenTargetSure;
     private ulong? _loggedBest;
     private bool _updatingRows;
 
@@ -32,7 +37,39 @@ public partial class MainWindow
                 SrvResourceList.ScrollIntoView(row);
             }
         };
-        TreesOnlyCheck.Click += (_, _) => _resourceRows.Clear();
+        // Une case par famille, dans l'ordre, avec sa couleur. Le nombre lu s'ajoute à la connexion.
+        foreach (var family in ResourceFamilies.All)
+        {
+            var check = new CheckBox
+            {
+                Content = family,
+                IsChecked = _shownFamilies.Contains(family),
+                Foreground = FamilyColors.Of(family),
+                Margin = new Thickness(0, 2, 16, 2),
+                Tag = family,
+            };
+            check.Click += (_, _) => SetFamily(family, check.IsChecked == true);
+            _familyChecks[family] = check;
+            FamilyChecks.Children.Add(check);
+        }
+    }
+
+    private void SetFamily(string family, bool shown)
+    {
+        if (shown) _shownFamilies.Add(family);
+        else _shownFamilies.Remove(family);
+        _familyChecks[family].IsChecked = shown;
+        _resourceRows.Clear();
+    }
+
+    private void FamilyAll_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var family in ResourceFamilies.All) SetFamily(family, true);
+    }
+
+    private void FamilyTrees_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var family in ResourceFamilies.All) SetFamily(family, family == ResourceFamilies.Trees);
     }
 
     private void SrvResourceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -45,51 +82,45 @@ public partial class MainWindow
 
     private void ShowResources(ServerReader reader, PlayerSnapshot s)
     {
-        var treesOnly = TreesOnlyCheck.IsChecked == true;
-        var shown = s.Resources.Where(r => !treesOnly || r.IsTree).ToList();
-        var trees = s.Resources.Count(r => r.IsTree);
-        SrvResourceCount.Text = $"{trees} arbres ({s.Resources.Count(ResourceNames.IsHarvestTarget)} mûrs) parmi {s.Resources.Count} ressources lues.";
+        MapPlayerText.Text = s.Position is { } me
+            ? $"Vous : {me.ScreenText} (±1){(s.Walking == true ? ", en marche" : "")} — vie {s.Health:0}, endurance {s.Stamina:0}, satiété {s.Satiation:0} — {s.RegionName ?? "région ?"}"
+            : "En attente de la position du personnage…";
+
+        // Nombre de ressources lues par famille, sur chaque case.
+        var counts = s.Resources.GroupBy(r => r.Family).ToDictionary(g => g.Key, g => g.Count());
+        foreach (var (family, check) in _familyChecks)
+        {
+            check.Content = $"{family} ({counts.GetValueOrDefault(family)})";
+        }
+
+        bool Shown(NearbyResource r) => _shownFamilies.Contains(r.Family);
+        var shown = s.Resources.Where(Shown).ToList();
+        SrvResourceCount.Text = $"{shown.Count} affichées sur {s.Resources.Count} ressources lues ; {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs.";
 
         var best = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
-        var screenTarget = FindScreenTarget(s.Resources, out var sure);
+        var target = CurrentHudTarget();
+        var match = _targetMatcher.Match(target?.Name, target?.Health, s.Resources);
 
         SrvBestTree.Text = best is null ? "aucun arbre mûr dans la zone lue" : Describe(best);
-        SrvScreenTarget.Text = _lastHudTarget is not { Name: { } targetName } target
+        SrvScreenTarget.Text = target is not { Name: { } targetName }
             ? "aucune cible lue à l'écran"
-            : screenTarget is null
-                ? $"« {targetName} » {ResourceRow.FormatHealth(target.Health, target.MaxHealth)} : introuvable dans la zone lue"
-                : $"{Describe(screenTarget)}{(sure ? " (même santé : c'est bien lui)" : " (même nom, santé différente : probable)")}";
+            : match is null
+                ? $"« {targetName} » {ResourceRow.FormatHealth(target.Health, target.MaxHealth)} : introuvable à moins de {ScreenTargetMatcher.MaxDistance:0} cases"
+                : $"{Describe(match.Resource)}{(match.Sure ? " — c'est bien elle (même santé)" : " — probable (même nom)")}";
+        // La zone est relue quand le personnage s'éloigne de la moitié du rayon (20 petites cases ≈ 7 cases du jeu).
         SrvArea.Text = reader.ResourceArea is { } a && reader.ResourceAreaUpdated is { } at
-            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez de {ServerReader.ResourceRadius / 6} cases)"
-              + (reader.HealthRefused ? " — santé des arbres refusée par le serveur" : "")
+            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d'environ 7 cases)"
+              + (reader.HealthRefused ? " — santé refusée par le serveur" : "")
             : "—";
 
-        UpdateRows(shown.Take(MaxRowsShown).ToList(), best?.EntityId, screenTarget?.EntityId);
-        SrvMap.Update(s.Position, s.Walking == true ? s.Destination : null, s.Resources, treesOnly, best?.EntityId, screenTarget?.EntityId, _selectedResource);
-        LogMatches(best, screenTarget, sure);
+        UpdateRows(shown.Take(MaxRowsShown).ToList(), best?.EntityId, match?.Resource.EntityId);
+        SrvMap.Update(s.Position, s.Walking == true ? s.Destination : null, s.Resources, Shown, best?.EntityId, match?.Resource.EntityId, _selectedResource);
+        LogMatches(best, match, target);
     }
 
-    // Arbre ciblé dans le jeu (lu à l'écran) : même nom et même santé ; sinon, même nom, le plus proche.
-    private NearbyResource? FindScreenTarget(IReadOnlyList<NearbyResource> resources, out bool sure)
-    {
-        sure = false;
-        if (DateTime.Now - _lastHudTargetAt > TimeSpan.FromSeconds(5))
-        {
-            _lastHudTarget = null; // lecture de l'écran arrêtée : plus de cible
-        }
-        if (_lastHudTarget is not { Name: { } name } target)
-        {
-            return null;
-        }
-        var sameName = resources.Where(r => string.Equals(r.Name, name, StringComparison.OrdinalIgnoreCase)).ToList();
-        var exact = sameName.FirstOrDefault(r => r.Health is not null && r.Health == target.Health);
-        if (exact is not null)
-        {
-            sure = true;
-            return exact;
-        }
-        return sameName.FirstOrDefault(r => r.ScreenDistance <= 4);
-    }
+    // Cible lue sur l'écran, oubliée si la lecture de l'écran s'est arrêtée.
+    private TargetReading? CurrentHudTarget() =>
+        DateTime.Now - _lastHudTargetAt > TimeSpan.FromSeconds(5) ? null : _lastHudTarget;
 
     private static string Describe(NearbyResource r) =>
         $"{r.Name}, {r.Position.ScreenText}, à {r.ScreenDistance:0.0} cases ({r.Direction}), santé {ResourceRow.FormatHealth(r.Health, r.MaxHealth)}";
@@ -127,15 +158,17 @@ public partial class MainWindow
         }
     }
 
-    // Journal : quand la cible à l'écran ou le meilleur arbre change (pour vérifier H2 après coup).
-    private void LogMatches(NearbyResource? best, NearbyResource? screenTarget, bool sure)
+    // Journal : quand la cible à l'écran change (ou devient sûre), et quand le meilleur arbre change.
+    private void LogMatches(NearbyResource? best, ScreenTargetMatch? match, TargetReading? target)
     {
-        if (screenTarget?.EntityId != _loggedScreenTarget && screenTarget is not null && _lastHudTarget is { } t)
+        if (match is not null && target is not null
+            && (match.Resource.EntityId != _loggedScreenTarget || match.Sure != _loggedScreenTargetSure))
         {
-            _log.Info("Serveur", $"Cible à l'écran « {t.Name} » {ResourceRow.FormatHealth(t.Health, t.MaxHealth)} = arbre du serveur {Describe(screenTarget)} " +
-                                 $"({(sure ? "même santé : sûr" : "même nom seulement : probable")}).");
+            _log.Info("Serveur", $"Cible à l'écran « {target.Name} » {ResourceRow.FormatHealth(target.Health, target.MaxHealth)} = {Describe(match.Resource)} " +
+                                 $"({(match.Sure ? "sûr : seule ressource proche avec cette santé" : "probable : même nom")}).");
         }
-        _loggedScreenTarget = screenTarget?.EntityId;
+        _loggedScreenTarget = match?.Resource.EntityId;
+        _loggedScreenTargetSure = match?.Sure ?? false;
         if (best?.EntityId != _loggedBest && best is not null)
         {
             _log.Detail("Serveur", $"Meilleur arbre : {Describe(best)}.");

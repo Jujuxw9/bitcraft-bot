@@ -73,6 +73,8 @@ public sealed record NearbyResource(ulong EntityId, int ResourceId, string Name,
     public bool IsTree => string.Equals(Tag, "Tree", StringComparison.OrdinalIgnoreCase);
 
     public string Age => ResourceNames.Age(Name);
+
+    public string Family => ResourceFamilies.Of(Tag);
 }
 
 // Description d'une ressource d'après les données du jeu (BitCraft_GameData).

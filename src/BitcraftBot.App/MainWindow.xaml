@@ -276,72 +276,87 @@
                         </Border>
                     </WrapPanel>
 
-                    <!-- 4. Carte des arbres (H2) -->
-                    <Border Style="{StaticResource Card}" HorizontalAlignment="Left">
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- Onglet Carte (H2) : carte et tableau des ressources lues sur le serveur -->
+        <TabItem Header="Carte (H2)">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
+                <StackPanel>
+                    <!-- Bandeau : personnage et filtres -->
+                    <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="4. CARTE DES ARBRES (H2)" Style="{StaticResource SectionTitle}" Margin="0,0,16,0" />
-                                <CheckBox x:Name="TreesOnlyCheck" Content="Arbres seulement" IsChecked="True" VerticalAlignment="Center" />
-                                <TextBlock x:Name="SrvResourceCount" Text="" Foreground="#9AA0A6" VerticalAlignment="Center" Margin="16,0,0,0" />
+                            <TextBlock x:Name="MapPlayerText" Text="Pas connecté : connectez-vous dans l'onglet « Serveur (H1) »." FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,4">
+                                <TextBlock Text="AFFICHER" Style="{StaticResource SectionTitle}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <Button Content="Tout" Click="FamilyAll_Click" Padding="8,1" Margin="0,0,6,0" />
+                                <Button Content="Arbres seulement" Click="FamilyTrees_Click" Padding="8,1" Margin="0,0,16,0" />
+                                <TextBlock x:Name="SrvResourceCount" Text="" Foreground="#9AA0A6" VerticalAlignment="Center" />
                             </StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <!-- Carte + légende -->
-                                <StackPanel Grid.Column="0" Margin="0,0,12,0">
-                                    <local:ResourceMap x:Name="SrvMap" Width="460" Height="460" Cursor="Hand" />
-                                    <WrapPanel Margin="0,6,0,0" MaxWidth="460">
-                                        <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#8AB4F8" /> vous</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#34A853" FontSize="16" /> arbre mûr</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#A8DAB5" /> jeune</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#8D6E63" /> mort</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="○" Foreground="#FB8C00" /> entamé</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="◯" Foreground="#FDD663" /> meilleur arbre</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="◯" Foreground="#F28BF5" /> cible à l'écran</TextBlock>
-                                        <TextBlock Margin="0,0,12,2"><Run Text="◯" Foreground="White" /> sélection</TextBlock>
-                                    </WrapPanel>
-                                    <TextBlock Text="Nord en haut, est à droite. Cercles : 5 et 10 cases (unités des coordonnées N / E du jeu). Cliquez un point pour le retrouver dans le tableau."
-                                               Foreground="#9AA0A6" TextWrapping="Wrap" MaxWidth="460" Margin="0,4,0,0" />
-                                </StackPanel>
-                                <!-- Résumé + tableau -->
-                                <StackPanel Grid.Column="1" MinWidth="560">
-                                    <Grid Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition /><RowDefinition /><RowDefinition />
-                                        </Grid.RowDefinitions>
-                                        <TextBlock Grid.Row="0" Text="Meilleur arbre" Style="{StaticResource HudLabel}" Foreground="#FDD663" />
-                                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource HudValue}" TextWrapping="Wrap" />
-                                        <TextBlock Grid.Row="1" Text="Cible à l'écran" Style="{StaticResource HudLabel}" Foreground="#F28BF5" />
-                                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource HudValue}" TextWrapping="Wrap" />
-                                        <TextBlock Grid.Row="2" Text="Zone lue" Style="{StaticResource HudLabel}" />
-                                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource HudValue}" TextWrapping="Wrap" />
-                                    </Grid>
-                                    <ListView x:Name="SrvResourceList" Height="400" Background="#141517" Foreground="#E6E6E6" BorderBrush="#3C3F44"
-                                              SelectionChanged="SrvResourceList_SelectionChanged">
-                                        <ListView.View>
-                                            <GridView>
-                                                <GridViewColumn Header="" Width="34" DisplayMemberBinding="{Binding Mark}" />
-                                                <GridViewColumn Header="Nom" Width="190" DisplayMemberBinding="{Binding Name}" />
-                                                <GridViewColumn Header="Âge" Width="70" DisplayMemberBinding="{Binding Age}" />
-                                                <GridViewColumn Header="Santé" Width="150" DisplayMemberBinding="{Binding Health}" />
-                                                <GridViewColumn Header="Distance" Width="70" DisplayMemberBinding="{Binding Distance}" />
-                                                <GridViewColumn Header="Direction" Width="70" DisplayMemberBinding="{Binding Direction}" />
-                                                <GridViewColumn Header="Position" Width="130" DisplayMemberBinding="{Binding Position}" />
-                                                <GridViewColumn Header="Palier" Width="50" DisplayMemberBinding="{Binding Tier}" />
-                                            </GridView>
-                                        </ListView.View>
-                                    </ListView>
-                                    <TextBlock Text="Distance en cases du jeu (mêmes unités que N / E). « Meilleur arbre » : l'arbre mûr le plus proche, celui que le bot visera en H3. « Cible à l'écran » : l'arbre que vous ciblez dans le jeu, retrouvé par son nom et sa santé (il faut lancer « Démarrer » dans Supervision pour lire l'écran)."
-                                               Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,4,0,0" MaxWidth="760" HorizontalAlignment="Left" />
-                                </StackPanel>
-                            </Grid>
+                            <WrapPanel x:Name="FamilyChecks" />
                         </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" HorizontalAlignment="Left">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <!-- Carte + légende -->
+                            <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                                <local:ResourceMap x:Name="SrvMap" Width="560" Height="560" Cursor="Hand" />
+                                <WrapPanel Margin="0,6,0,0" MaxWidth="560">
+                                    <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#8AB4F8" /> vous</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#34A853" FontSize="16" /> arbre mûr</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#A8DAB5" /> jeune</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="●" Foreground="#8D6E63" /> mort</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="○" Foreground="#FB8C00" /> entamé</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="◯" Foreground="#FDD663" /> meilleur arbre</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="◯" Foreground="#F28BF5" /> cible à l'écran</TextBlock>
+                                    <TextBlock Margin="0,0,12,2"><Run Text="◯" Foreground="White" /> sélection</TextBlock>
+                                </WrapPanel>
+                                <TextBlock Text="Autres ressources : la couleur de leur case à cocher. Nord en haut, est à droite. Cercles : 5 et 10 cases du jeu. Cliquez un point pour le retrouver dans le tableau."
+                                           Foreground="#9AA0A6" TextWrapping="Wrap" MaxWidth="560" Margin="0,4,0,0" />
+                            </StackPanel>
+                            <!-- Résumé + tableau -->
+                            <StackPanel Grid.Column="1" MinWidth="640">
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition /><RowDefinition /><RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Meilleur arbre" Style="{StaticResource HudLabel}" Foreground="#FDD663" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource HudValue}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Row="1" Text="Cible à l'écran" Style="{StaticResource HudLabel}" Foreground="#F28BF5" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource HudValue}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Row="2" Text="Zone lue" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource HudValue}" TextWrapping="Wrap" />
+                                </Grid>
+                                <ListView x:Name="SrvResourceList" Height="480" Background="#141517" Foreground="#E6E6E6" BorderBrush="#3C3F44"
+                                          SelectionChanged="SrvResourceList_SelectionChanged">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="" Width="34" DisplayMemberBinding="{Binding Mark}" />
+                                            <GridViewColumn Header="Nom" Width="190" DisplayMemberBinding="{Binding Name}" />
+                                            <GridViewColumn Header="Famille" Width="130" DisplayMemberBinding="{Binding Kind}" />
+                                            <GridViewColumn Header="Âge" Width="70" DisplayMemberBinding="{Binding Age}" />
+                                            <GridViewColumn Header="Santé" Width="150" DisplayMemberBinding="{Binding Health}" />
+                                            <GridViewColumn Header="Distance" Width="65" DisplayMemberBinding="{Binding Distance}" />
+                                            <GridViewColumn Header="Direction" Width="65" DisplayMemberBinding="{Binding Direction}" />
+                                            <GridViewColumn Header="Position (±1)" Width="120" DisplayMemberBinding="{Binding Position}" />
+                                            <GridViewColumn Header="Palier" Width="45" DisplayMemberBinding="{Binding Tier}" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <TextBlock Text="Distance en cases du jeu (mêmes unités que N / E). Position : à 1 case près (le serveur arrondit un peu la position quand on s'arrête). « Meilleur arbre » : l'arbre mûr le plus proche, celui que le bot visera en H3. « Cible à l'écran » : la ressource que vous ciblez dans le jeu, retrouvée par son nom et sa santé (il faut lancer « Démarrer » dans Supervision pour lire l'écran)."
+                                           Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,4,0,0" MaxWidth="900" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </Grid>
                     </Border>
                 </StackPanel>
             </ScrollViewer>

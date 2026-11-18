@@ -72,7 +72,7 @@ Position des ressources : `location_state` (jointure sur `entity_id`), **vérifi
 - **Ordre bot → jeu, puis déconnexion du bot : le jeu reste connecté** (vérifié 2 fois).
 - **Bot connecté alors que le jeu est ouvert : le jeu est éjecté** aussitôt (« Logged in elsewhere », capture de Julien). Le client du jeu se ferme lui-même quand une connexion plus récente du compte apparaît. Pas besoin d'attendre la déconnexion du bot.
 - Correctif v0.3.9 : connexion **refusée** si le jeu est lancé (aucune dérogation) ; plus de question à la déconnexion.
-- Coordonnées : **E = arrondi(x ÷ 3), N = arrondi(z ÷ 3)** (x, z = position serveur en petites cases). Vérifié à l'arrêt en v0.3.9 : écarts de 0,3 à 0,4, toujours vers l'arrondi. En marche, écart jusqu'à 1 (décalage de temps entre l'écran et le serveur).
+- Coordonnées : **E ≈ arrondi(x ÷ 3), N ≈ arrondi(z ÷ 3), à ±1 case**. Essai v0.3.11 : à l'arrêt, la position serveur est parfois arrondie (x 20099,0 pour trois positions écran différentes : E 6699, 6700). La formule hexagonale exacte du serveur (petite case → grande case, `references/…/coordinates/`) ne fait pas mieux. Le ±1 est donc affiché tel quel. Pour H3, on se déplace en coordonnées serveur : le ±1 de l'écran ne gêne pas.
 - Arbres : les instantanés v0.3.9 listent bien des « Young Oak Tree », « Young Beech Tree » et « Mature Oak Tree » (8,6 et 10,2 cases). L'instantané ne garde que les 50 ressources les plus proches, fleurs comprises : un arbre peut donc manquer dans le fichier mais pas dans le bot. **À vérifier** : l'arbre que coupe Julien correspond-il à une ligne de la liste (position, nom) ?
 
 ## Relais Bitjita (piste, non utilisée)

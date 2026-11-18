@@ -23,7 +23,6 @@ public sealed class ResourceMap : FrameworkElement
     private static readonly Brush YoungBrush = Frozen(Color.FromRgb(168, 218, 181));
     private static readonly Brush DeadBrush = Frozen(Color.FromRgb(141, 110, 99));
     private static readonly Brush OtherTreeBrush = Frozen(Color.FromRgb(129, 201, 149));
-    private static readonly Brush OtherBrush = Frozen(Color.FromRgb(95, 99, 104));
     private static readonly Pen DamagedPen = FrozenPen(Color.FromRgb(251, 140, 0), 2);
     private static readonly Pen BestPen = FrozenPen(Color.FromRgb(253, 214, 99), 2.5);
     private static readonly Pen ScreenTargetPen = FrozenPen(Color.FromRgb(242, 139, 245), 2.5);
@@ -33,7 +32,7 @@ public sealed class ResourceMap : FrameworkElement
     private ServerPosition? _player;
     private ServerPosition? _destination;
     private IReadOnlyList<NearbyResource> _resources = [];
-    private bool _treesOnly = true;
+    private Func<NearbyResource, bool> _shown = r => r.IsTree;
     private ulong? _best;
     private ulong? _screenTarget;
     private ulong? _selected;
@@ -42,12 +41,12 @@ public sealed class ResourceMap : FrameworkElement
     public event Action<ulong?>? ResourceClicked;
 
     public void Update(ServerPosition? player, ServerPosition? destination, IReadOnlyList<NearbyResource> resources,
-        bool treesOnly, ulong? best, ulong? screenTarget, ulong? selected)
+        Func<NearbyResource, bool> shown, ulong? best, ulong? screenTarget, ulong? selected)
     {
         _player = player;
         _destination = destination;
         _resources = resources;
-        _treesOnly = treesOnly;
+        _shown = shown;
         _best = best;
         _screenTarget = screenTarget;
         _selected = selected;
@@ -94,12 +93,12 @@ public sealed class ResourceMap : FrameworkElement
         // Ressources : les autres d'abord (dessous), puis les arbres, puis les repères de choix.
         foreach (var r in _resources)
         {
-            if (!r.IsTree && !_treesOnly && Visible(r))
+            if (!r.IsTree && _shown(r) && Visible(r))
             {
-                dc.DrawEllipse(OtherBrush, null, ToPoint(r.Position, player), 2.5, 2.5);
+                dc.DrawEllipse(FamilyColors.Of(r.Family), null, ToPoint(r.Position, player), 3.5, 3.5);
             }
         }
-        foreach (var r in _resources.Where(r => r.IsTree && Visible(r)))
+        foreach (var r in _resources.Where(r => r.IsTree && _shown(r) && Visible(r)))
         {
             var p = ToPoint(r.Position, player);
             var (brush, radius) = r.Age switch
@@ -138,7 +137,7 @@ public sealed class ResourceMap : FrameworkElement
         }
         var click = e.GetPosition(this);
         var nearest = _resources
-            .Where(r => (r.IsTree || !_treesOnly) && Visible(r))
+            .Where(r => _shown(r) && Visible(r))
             .Select(r => (r, d: (ToPoint(r.Position, player) - click).Length))
             .Where(x => x.d <= 14)
             .OrderBy(x => x.d)
