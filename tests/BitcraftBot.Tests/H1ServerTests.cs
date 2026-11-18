@@ -338,3 +338,73 @@ public class H1LiveTests
         Assert.Contains("401", ex.Message);
     }
 }
+
+// v0.3.6 : découverte de la région du personnage par le module global.
+public class H1RegionFinderTests
+{
+    private const string Id = "c200aaaabbbbccccddddeeeeffff00001111222233334444555566667777cc03";
+
+    private static Row R(string json) => Row.Parse(json, null);
+
+    private static TableCache Cache(params (string Table, string[] Rows)[] tables)
+    {
+        var cache = new TableCache();
+        foreach (var (table, rows) in tables)
+        {
+            cache.Apply(new TableChange(table, rows.Select(R).ToList(), []));
+        }
+        return cache;
+    }
+
+    [Fact]
+    public void Region_du_personnage_trouvee()
+    {
+        var cache = Cache(
+            ("user_state", [$$"""{"identity":{"__identity__":"0x{{Id}}"},"entity_id":77,"can_sign_in":true}"""]),
+            ("user_region_state", [$$"""{"identity":{"__identity__":"0x{{Id}}"},"region_id":12}"""]),
+            ("region_connection_info", ["""{"id":12,"host":"https://autre-hote.spacetimedb.com:443","module":"bitcraft-live-12"}""", """{"id":18,"host":"x","module":"bitcraft-live-18"}"""]),
+            ("world_region_name_state", ["""{"id":12,"player_facing_name":"Ashveil","module_name_prefix":"bitcraft-live"}"""]));
+        var d = RegionFinder.Read(cache, Id);
+        Assert.True(d.Success);
+        Assert.Equal(77UL, d.EntityId);
+        Assert.Equal(12, d.RegionId);
+        Assert.Equal("Ashveil", d.RegionName);
+        Assert.Equal("autre-hote.spacetimedb.com", d.Host);
+        Assert.Equal("bitcraft-live-12", d.Module);
+        Assert.Contains("bitcraft-live-12", RegionFinder.Describe(d));
+    }
+
+    [Fact]
+    public void Compte_inconnu()
+    {
+        var d = RegionFinder.Read(Cache(("user_state", [])), Id);
+        Assert.False(d.Success);
+        Assert.False(d.AccountKnown);
+        Assert.Contains("aucun personnage", d.Error);
+    }
+
+    [Fact]
+    public void Region_sans_adresse_prend_le_nom_par_defaut()
+    {
+        var cache = Cache(
+            ("user_state", [$$"""{"identity":"0x{{Id}}","entity_id":5}"""]),
+            ("user_region_state", [$$"""{"identity":"0x{{Id}}","region_id":18}"""]));
+        var d = RegionFinder.Read(cache, Id);
+        Assert.True(d.Success);
+        Assert.Equal("bitcraft-live-18", d.Module);
+        Assert.Equal(ServerEndpoints.Host, d.Host);
+    }
+
+    [Theory]
+    [InlineData("bitcraft-early-access.spacetimedb.com", "bitcraft-early-access.spacetimedb.com")]
+    [InlineData("https://h.example.com:443", "h.example.com")]
+    [InlineData("", null)]
+    public void Hote_nettoye(string input, string? expected) => Assert.Equal(expected, RegionFinder.HostOnly(input));
+
+    [Fact]
+    public void Requetes_de_decouverte_en_lecture_seule()
+    {
+        Assert.All(RegionFinder.Queries("abcd"), q => Assert.StartsWith("SELECT ", q));
+        Assert.Equal("bitcraft-live-global", RegionFinder.GlobalModule);
+    }
+}

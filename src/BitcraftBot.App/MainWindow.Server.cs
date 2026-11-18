@@ -201,7 +201,8 @@ public partial class MainWindow
         _serverReader.StateChanged += () => Dispatcher.BeginInvoke(ShowServerState);
         ServerConnectButton.IsEnabled = false;
         ServerDisconnectButton.IsEnabled = true;
-        await _serverReader.ConnectAsync(token, region, CancellationToken.None);
+        // Découverte par le module global seulement si le jeu est fermé (sinon risque de déconnexion du personnage).
+        await _serverReader.ConnectAsync(token, region, discover: !gameRunning, CancellationToken.None);
         ShowServerState();
     }
 
@@ -257,7 +258,9 @@ public partial class MainWindow
         SrvCharacter.Text = s.EntityId is { } id
             ? $"entité {id}, {(s.SignedIn == true ? "connecté dans le jeu" : "pas connecté dans le jeu")}"
             : "—";
-        SrvRegion.Text = s.RegionIndex is { } ri ? $"{s.RegionName ?? "?"} (index {ri})" : "—";
+        SrvRegion.Text = s.RegionIndex is { } ri ? $"{s.RegionName ?? "?"} (index {ri})"
+            : reader.Discovery is { Success: true } dr ? $"{dr.RegionName ?? "?"} (région {dr.RegionId}, {dr.Module})"
+            : reader.Discovery is { Error: { } de } ? $"inconnue ({de})" : "—";
         SrvPosition.Text = s.Position is { } p ? $"{p}  (÷3 : x {p.X / 3:0.0}, z {p.Z / 3:0.0})" : "—";
         SrvDestination.Text = s.Destination is { } d ? $"{d}{(s.Walking == true ? " — en marche" : "")}" : "—";
         SrvHealth.Text = s.Health is { } h ? $"{h:0.#}" : "—";

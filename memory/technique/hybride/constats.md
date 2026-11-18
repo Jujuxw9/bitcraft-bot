@@ -50,3 +50,10 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 - Global : `user_region_state` (identité → région) existe. Non utilisé : le bot ne se connecte qu'à la région (une seule liaison, moins de risque).
 - Positions (code serveur) : `mobile_entity_state.location_x/z` = petites cases × 1000 ; `location_state.x/z` = petites cases. Une grande case (terrain) = 3 petites cases. Lien avec les coordonnées N / E de l'écran : **à vérifier** (le bot note les deux toutes les 15 s).
 - SQL des abonnements (doc SpacetimeDB) : jointure de 2 tables permise si les deux colonnes sont indexées (`entity_id` l'est) ; identité en `0x…`.
+
+## Premier essai réel de Julien (2026-11-18, v0.3.5)
+- Code e-mail et jeton : **OK** (compte c200…cc03).
+- Liaison avec `bitcraft-live-18` : acceptée (pas de 401), puis **fermée aussitôt par le serveur**, aucun message reçu.
+- Code serveur : à l'ouverture, une région refuse le compte si (1) il n'est pas « authentifié » depuis moins de **24 h**, ou (2) le compte n'a pas de `user_state` dans **cette** région. Le module global, lui, exige une authentification de moins d'**1 h**, mais pas de personnage. L'« authentification » est posée par le service de connexion de BitCraft (reducer `authenticate`, appelé par un compte administrateur).
+- L'API SQL par HTTP est bloquée (403) : seule la liaison WebSocket est possible.
+- Réponse en v0.3.6 : découverte par le module global (compte connu ? région du personnage ? adresse du module ?) quand le jeu est fermé, puis lecture de la bonne région ; message clair si la région refuse.

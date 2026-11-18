@@ -27,6 +27,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private string? _identity;
     private ulong? _entityId;
     private Area? _area;
+    private string? _targetModule;
     private bool _resourcesRefused;
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
@@ -47,7 +48,11 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
     public event Action? StateChanged;
 
-    public async Task ConnectAsync(string token, int region, CancellationToken cancel)
+    // Résultat de la dernière découverte par le module global (null si elle n'a pas été faite).
+    public RegionDiscovery? Discovery { get; private set; }
+
+    // discover = true seulement si le jeu est fermé (voir RegionFinder).
+    public async Task ConnectAsync(string token, int region, bool discover, CancellationToken cancel)
     {
         if (_connection is not null)
         {
@@ -57,15 +62,40 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _entityId = null;
         _area = null;
         _resourcesRefused = false;
+        Interlocked.Exchange(ref _messages, 0);
+        Interlocked.Exchange(ref _transactions, 0);
         _identity = Row.Normalize(TokenInfo.TryRead(token)?.HexIdentity);
+        var host = ServerEndpoints.Host;
         var module = ServerEndpoints.RegionModule(region);
         try
         {
+            Discovery = null;
+            if (discover)
+            {
+                SetState(ReaderState.Connexion, "Recherche du personnage (module global)…");
+                Discovery = await RegionFinder.FindAsync(token, _identity, TimeSpan.FromSeconds(15), cancel);
+                if (Discovery.Success)
+                {
+                    log.Info(Category, $"Découverte : {RegionFinder.Describe(Discovery)}.");
+                    host = Discovery.Host!;
+                    module = Discovery.Module!;
+                    if (Discovery.RegionId != region)
+                    {
+                        log.Alerte(Category, $"La région du personnage ({Discovery.RegionId}) n'est pas celle demandée (R{region}) : lecture de la région du personnage.");
+                    }
+                }
+                else
+                {
+                    log.Alerte(Category, $"Découverte : {Discovery.Error}. Essai direct de la région R{region}.");
+                }
+            }
+            _targetModule = module;
+
             SetState(ReaderState.Connexion, $"Lecture du schéma de {module}…");
             using (var http = new HttpClient { Timeout = TimeSpan.FromSeconds(30) })
             {
                 http.DefaultRequestHeaders.UserAgent.ParseAdd(ServerEndpoints.UserAgent);
-                var json = await http.GetStringAsync(ServerEndpoints.SchemaUri(ServerEndpoints.Host, module), cancel);
+                var json = await http.GetStringAsync(ServerEndpoints.SchemaUri(host, module), cancel);
                 _schema = Schema.Parse(json);
             }
             log.Info(Category, $"Schéma de {module} lu : {_schema.TableCount} tables.");
@@ -75,8 +105,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             connection.MessageReceived += OnMessage;
             connection.Closed += OnClosed;
             _connection = connection;
-            await connection.ConnectAsync(ServerEndpoints.SubscribeUri(ServerEndpoints.Host, module), token, cancel);
-            log.Info(Category, $"Liaison ouverte avec {module} (lecture seule). Identité du compte : {TokenInfo.ShortIdentity(_identity)}.");
+            await connection.ConnectAsync(ServerEndpoints.SubscribeUri(host, module), token, cancel);
+            log.Info(Category, $"Liaison ouverte avec {module} sur {host} (lecture seule). Identité du compte : {TokenInfo.ShortIdentity(_identity)}.");
             SetState(ReaderState.Connexion, "Liaison ouverte, attente de l'identité…");
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -247,6 +277,19 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private void OnClosed(string reason)
     {
         _connection = null;
+        if (MessageCount == 0)
+        {
+            // Fermée avant le moindre message : le serveur a refusé le compte à l'ouverture (code serveur :
+            // personnage absent de cette région, ou compte pas authentifié depuis moins de 24 h).
+            var hint = Discovery is { Success: false, AccountKnown: false } d && d.Error is not null
+                ? $" Découverte : {d.Error}."
+                : "";
+            var detail = $"La région {_targetModule} a refusé la liaison dès l'ouverture. Causes possibles : personnage pas dans cette région, " +
+                         $"ou connexion du compte trop ancienne (redemander un code juste avant).{hint}";
+            log.Erreur(Category, detail + $" (détail technique : {reason})");
+            SetState(ReaderState.Erreur, detail);
+            return;
+        }
         log.Alerte(Category, $"Liaison terminée : {reason}. Pas de reconnexion automatique (voir l'onglet Serveur).");
         SetState(ReaderState.Perdu, $"Liaison terminée : {reason}.");
     }

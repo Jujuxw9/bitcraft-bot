@@ -136,7 +136,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.5 (H1) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel. Aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.6 (H1) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel, avec recherche de la région du personnage. Aucune action sur le jeu hors banc d'essai.");
         InitServerTab();
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
