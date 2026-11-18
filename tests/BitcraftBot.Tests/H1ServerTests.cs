@@ -408,3 +408,44 @@ public class H1RegionFinderTests
         Assert.Equal("idc-global", RegionFinder.GlobalModule);
     }
 }
+
+// v0.3.8 : journaux détaillés de la liaison, sans jamais le jeton.
+public class H1LogTests
+{
+    [Fact]
+    public void Resume_de_message_masque_le_jeton()
+    {
+        var json = """{ "IdentityToken": { "identity": { "__identity__": "0xc200ff" }, "token": "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIxIn0.c2lnbmF0dXJl" } }""";
+        var text = ServerMessages.Summarize(1, json, withExcerpt: true);
+        Assert.Contains("Message n° 1 : IdentityToken", text);
+        Assert.Contains("[jeton masqué]", text);
+        Assert.DoesNotContain("c2lnbmF0dXJl", text);
+        Assert.Equal($"Message n° 7 : IdentityToken, {json.Length} caractères.", ServerMessages.Summarize(7, json, withExcerpt: false));
+    }
+
+    [Fact]
+    public void Resume_long_tronque_et_json_illisible()
+    {
+        var text = ServerMessages.Summarize(2, "{\"InitialSubscription\":\"" + new string('a', 2000) + "\"}", withExcerpt: true);
+        Assert.EndsWith("…", text);
+        Assert.Contains("JSON illisible", ServerMessages.Summarize(3, "pas du json", withExcerpt: false));
+    }
+
+    [Fact]
+    public async Task Refus_de_poignee_de_main_journalise_le_code_HTTP()
+    {
+        if (Environment.GetEnvironmentVariable("BITCRAFT_LIVE") != "1")
+        {
+            return;
+        }
+        var lines = new List<string>();
+        await using var connection = new SpacetimeConnection();
+        connection.Diagnostic += lines.Add;
+        await Assert.ThrowsAsync<System.Net.WebSockets.WebSocketException>(() => connection.ConnectAsync(
+            ServerEndpoints.SubscribeUri(ServerEndpoints.Host, ServerEndpoints.RegionModule(18)),
+            "eyJhbGciOiJFUzI1NiJ9.eyJmYXV4IjoiamV0b24ifQ.ZmF1eA", CancellationToken.None));
+        Assert.Contains(lines, l => l.Contains("HTTP 401", StringComparison.Ordinal));
+        Assert.DoesNotContain(lines, l => l.Contains("ZmF1eA", StringComparison.Ordinal));
+        File.WriteAllLines(Path.Combine(Path.GetTempPath(), "bitcraftbot-diag-test.txt"), lines);
+    }
+}

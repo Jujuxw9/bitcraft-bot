@@ -324,3 +324,13 @@ Avant de lire la région, si le jeu est fermé, le bot ouvre une liaison courte 
 ## 20. v0.3.7 — modules du monde 1.0 (2026-11-18)
 
 Les régions du monde 1.0 s'appellent `idc-N` (R18 → `idc-18`) et le module global `idc-global`. Les versions 0.3.5 et 0.3.6 visaient `bitcraft-live-*`, un ancien monde : le serveur refusait le compte. Seuls ces deux noms changent.
+
+## 21. v0.3.8 — journaux de liaison détaillés (2026-11-18)
+
+Pour déboguer la connexion sans être devant le PC, le journal (catégorie « Serveur ») note maintenant :
+- le jeton **sans le secret** : compte, date d'émission, âge, fin de validité ;
+- chaque liaison (`[liaison idc-global]`, `[liaison idc-18]`) : adresse, durée de la poignée de main, code HTTP, sous-protocole accepté, en-têtes du serveur (sans ceux qui contiennent un jeton) ;
+- en cas de refus : code HTTP, code d'erreur, cause ;
+- les 5 premiers messages reçus : type, taille, extrait (jeton masqué) ; les suivants : type et taille (niveau « Détails ») ;
+- chaque abonnement : numéro, raison, requêtes SQL ;
+- la fin de liaison : durée, nombre de messages, octets reçus, statut de fermeture.

@@ -64,7 +64,9 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _resourcesRefused = false;
         Interlocked.Exchange(ref _messages, 0);
         Interlocked.Exchange(ref _transactions, 0);
-        _identity = Row.Normalize(TokenInfo.TryRead(token)?.HexIdentity);
+        var tokenInfo = TokenInfo.TryRead(token);
+        _identity = Row.Normalize(tokenInfo?.HexIdentity);
+        log.Info(Category, DescribeToken(tokenInfo));
         var host = ServerEndpoints.Host;
         var module = ServerEndpoints.RegionModule(region);
         try
@@ -73,7 +75,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             if (discover)
             {
                 SetState(ReaderState.Connexion, "Recherche du personnage (module global)…");
-                Discovery = await RegionFinder.FindAsync(token, _identity, TimeSpan.FromSeconds(15), cancel);
+                Discovery = await RegionFinder.FindAsync(token, _identity, TimeSpan.FromSeconds(15), m => log.Info(Category, $"[liaison {RegionFinder.GlobalModule}] {m}"), cancel);
                 if (Discovery.Success)
                 {
                     log.Info(Category, $"Découverte : {RegionFinder.Describe(Discovery)}.");
@@ -104,6 +106,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             var connection = new SpacetimeConnection();
             connection.MessageReceived += OnMessage;
             connection.Closed += OnClosed;
+            connection.Diagnostic += m => log.Info(Category, $"[liaison {module}] {m}");
             _connection = connection;
             await connection.ConnectAsync(ServerEndpoints.SubscribeUri(host, module), token, cancel);
             log.Info(Category, $"Liaison ouverte avec {module} sur {host} (lecture seule). Identité du compte : {TokenInfo.ShortIdentity(_identity)}.");
@@ -140,7 +143,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
     private void OnMessage(string json)
     {
-        Interlocked.Increment(ref _messages);
+        var count = Interlocked.Increment(ref _messages);
+        LogRawMessage(count, json);
         ServerEvent message;
         try
         {
@@ -260,7 +264,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         }
         _lastSubscribe = DateTime.Now;
         var id = ++_requestId;
-        log.Detail(Category, $"Abonnement n° {id} ({why}) : {string.Join(" ; ", queries)}");
+        log.Info(Category, $"Abonnement n° {id} ({why}) : {string.Join(" ; ", queries)}");
         _ = Task.Run(async () =>
         {
             try
@@ -292,6 +296,31 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         }
         log.Alerte(Category, $"Liaison terminée : {reason}. Pas de reconnexion automatique (voir l'onglet Serveur).");
         SetState(ReaderState.Perdu, $"Liaison terminée : {reason}.");
+    }
+
+    // Les 5 premiers messages d'une liaison sont notés avec un extrait (jeton masqué) ; ensuite, type et taille en « Détails ».
+    private void LogRawMessage(long index, string json)
+    {
+        if (index <= 5)
+        {
+            log.Info(Category, ServerMessages.Summarize(index, json, withExcerpt: true));
+        }
+        else
+        {
+            log.Detail(Category, ServerMessages.Summarize(index, json, withExcerpt: false));
+        }
+    }
+
+    // Ce que dit le jeton (sans le secret) : compte, date d'émission, âge, fin de validité.
+    private static string DescribeToken(TokenInfo? info)
+    {
+        if (info is null)
+        {
+            return "Jeton illisible (format inattendu) : l'identité du compte sera demandée au serveur.";
+        }
+        var issued = info.IssuedAt is { } i ? $"émis le {i.ToLocalTime():dd/MM HH:mm:ss} (il y a {(DateTimeOffset.Now - i).TotalMinutes:0} min)" : "date d'émission inconnue";
+        var expires = info.ExpiresAt is { } e ? $"valable jusqu'au {e.ToLocalTime():dd/MM/yyyy HH:mm}" : "sans date de fin";
+        return $"Jeton : compte {TokenInfo.ShortIdentity(info.HexIdentity)}, {issued}, {expires}.";
     }
 
     private string DescribeCounts() =>

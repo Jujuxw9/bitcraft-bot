@@ -112,6 +112,39 @@ public static class ServerMessages
         }
     }
 
+    // Résumé d'un message pour le journal : type, taille, et pour les premiers messages un extrait.
+    // Tout ce qui ressemble à un jeton (JWT) est masqué.
+    public static string Summarize(long index, string json, bool withExcerpt)
+    {
+        var type = "?";
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.ValueKind == JsonValueKind.Object)
+            {
+                type = doc.RootElement.EnumerateObject().FirstOrDefault().Name ?? "?";
+            }
+        }
+        catch (JsonException)
+        {
+            type = "JSON illisible";
+        }
+        var text = $"Message n° {index} : {type}, {json.Length} caractères";
+        if (!withExcerpt)
+        {
+            return text + ".";
+        }
+        var excerpt = Redact(json);
+        if (excerpt.Length > 700)
+        {
+            excerpt = excerpt[..700] + "…";
+        }
+        return $"{text}. Extrait : {excerpt}";
+    }
+
+    public static string Redact(string text) =>
+        System.Text.RegularExpressions.Regex.Replace(text, @"eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+", "[jeton masqué]");
+
     // Message d'abonnement (ancien format « Subscribe » : chaque envoi remplace les abonnements précédents).
     public static string Subscribe(IEnumerable<string> queries, uint requestId) =>
         JsonSerializer.Serialize(new { Subscribe = new { query_strings = queries.ToArray(), request_id = requestId } });

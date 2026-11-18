@@ -18,7 +18,7 @@ public static class RegionFinder
         "SELECT * FROM world_region_name_state",
     ];
 
-    public static async Task<RegionDiscovery> FindAsync(string token, string? hexIdentity, TimeSpan timeout, CancellationToken cancel)
+    public static async Task<RegionDiscovery> FindAsync(string token, string? hexIdentity, TimeSpan timeout, Action<string>? diagnostic, CancellationToken cancel)
     {
         Schema schema;
         using (var http = new System.Net.Http.HttpClient { Timeout = TimeSpan.FromSeconds(30) })
@@ -31,9 +31,14 @@ public static class RegionFinder
         var identity = Row.Normalize(hexIdentity);
         var messages = 0;
         await using var connection = new SpacetimeConnection();
+        if (diagnostic is not null)
+        {
+            connection.Diagnostic += diagnostic;
+        }
         connection.MessageReceived += json =>
         {
-            Interlocked.Increment(ref messages);
+            var n = Interlocked.Increment(ref messages);
+            diagnostic?.Invoke(ServerMessages.Summarize(n, json, withExcerpt: true));
             try
             {
                 switch (ServerMessages.Parse(json, schema))

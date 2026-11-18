@@ -40,3 +40,5 @@
 | clockworklabs.helpshift.com (FAQ « developer program ») | Règles officielles des outils tiers : lecture avec son propre jeton permise, outils de bot interdits | **Haute** pour Q-021 |
 | bitcraftonline.com/news/bitcraft-online-verified-developer-program | Programme « Verified developer » (rouvert le 2026-03-31). Page en erreur 404 le 2026-11-17 ; le texte est dans la FAQ | Faible |
 | github.com/raffiandev/bitcraft-stdb (licence MIT, juillet 2025) | Lecteur WebSocket dérivé de Bitjita : obtention du jeton par code e-mail, hôte, modules, abonnement JSON | **Très haute** pour H1 (`technique/hybride/constats.md`). Ancien : à revérifier en 1.0 |
+| relay.bitjita.com | Relais SpacetimeDB en lecture seule, sans jeton ; modules `idc-N` et `idc-global` | Haute : a donné les vrais noms de modules ; solution de secours sans risque de déconnexion |
+| bitjita.com et bitjita.com/docs/api (envoyés par Julien, 2026-11-18) | Site communautaire et API publique (joueurs, inventaires, régions, ressources) | Moyenne : recherche de joueur, contrôles ; pas de position en direct documentée |
