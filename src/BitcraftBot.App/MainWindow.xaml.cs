@@ -136,7 +136,8 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.4 : affichage et lecture du HUD (coordonnées par modèles de chiffres, jauge de métier), capture du jeu avec Num 0, aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.5 (H1) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel. Aucune action sur le jeu hors banc d'essai.");
+        InitServerTab();
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
                              $"CPU du bot {_settings.Limits.BotCpuWarningPercent:0} %, RAM libre du PC {_settings.Limits.SystemRamAvailableWarningPercent:0} %.");
@@ -476,6 +477,7 @@ public partial class MainWindow : Window
         {
             return;
         }
+        RememberHudPosition(hud);
         HudPosition.Text = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "illisible";
         HudZone.Text = $"{hud.ZoneName ?? "?"}, {(hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "?")}";
         HudHealth.Text = hud.Health.ToString();
@@ -903,6 +905,7 @@ public partial class MainWindow : Window
         _testCts?.Cancel();
         _keyboardHook?.Dispose();
         _resourceTimer.Stop();
+        CloseServerReader();
 
         // Position « normale » de la fenêtre (même si elle est agrandie), pour retrouver le bon écran.
         var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;

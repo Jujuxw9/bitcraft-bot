@@ -5,6 +5,7 @@
     <ProjectReference Include="..\BitcraftBot.Perception\BitcraftBot.Perception.csproj" />
     <ProjectReference Include="..\BitcraftBot.Input\BitcraftBot.Input.csproj" />
     <ProjectReference Include="..\BitcraftBot.GameData\BitcraftBot.GameData.csproj" />
+    <ProjectReference Include="..\BitcraftBot.Server\BitcraftBot.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>

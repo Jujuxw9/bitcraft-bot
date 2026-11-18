@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\src\BitcraftBot.Perception\BitcraftBot.Perception.csproj" />
     <ProjectReference Include="..\..\src\BitcraftBot.Input\BitcraftBot.Input.csproj" />
     <ProjectReference Include="..\..\src\BitcraftBot.GameData\BitcraftBot.GameData.csproj" />
+    <ProjectReference Include="..\..\src\BitcraftBot.Server\BitcraftBot.Server.csproj" />
   </ItemGroup>
 
 </Project>

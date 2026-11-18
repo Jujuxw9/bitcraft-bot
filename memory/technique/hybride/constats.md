@@ -42,3 +42,11 @@ Inventaire, position des ressources : noms exacts **à vérifier** dans le sché
 
 ## Gain attendu par rapport à la vision
 - Position exacte sans OCR. Arbres connus avec leur type et leur âge **sans cliquer** (règle Q-019 / D-036 simplifiée). Ennemis connus même hors écran. Inventaire plein connu sans lire l'écran.
+
+## Vérifié le 2026-11-18 (session 10)
+- Modules **1.0** sur l'hôte `bitcraft-early-access.spacetimedb.com` : global = `bitcraft-live-global`, régions = `bitcraft-live-N`. **R18 → `bitcraft-live-18`** (le schéma répond). Les anciens `bitcraft-global`, `bitcraft-1`… existent encore (accès anticipé, non utilisés).
+- Schéma de `bitcraft-live-18` lisible sans jeton : 542 tables. Toutes les tables utilisées en H1 sont publiques, avec clé primaire.
+- Liaison WebSocket avec un faux jeton : **refus 401**. Adresse, protocole et lecture du jeton par le serveur : OK.
+- Global : `user_region_state` (identité → région) existe. Non utilisé : le bot ne se connecte qu'à la région (une seule liaison, moins de risque).
+- Positions (code serveur) : `mobile_entity_state.location_x/z` = petites cases × 1000 ; `location_state.x/z` = petites cases. Une grande case (terrain) = 3 petites cases. Lien avec les coordonnées N / E de l'écran : **à vérifier** (le bot note les deux toutes les 15 s).
+- SQL des abonnements (doc SpacetimeDB) : jointure de 2 tables permise si les deux colonnes sont indexées (`entity_id` l'est) ; identité en `0x…`.

@@ -283,4 +283,36 @@ Rappel : si une fenêtre (inventaire…) recouvre la jauge, elle n'est pas lue. 
 - Elle remplacera peu à peu la **Perception** comme source principale (position, arbres, vie, endurance, faim). La Perception reste pour la sécurité et le contrôle croisé.
 - La brique n'envoie **aucune action** au serveur. Les actions restent dans **Input** (souris, clavier).
 - Le jeton est chiffré avec la protection de Windows (lié à la session de Julien), jamais écrit dans le journal ni dans Git.
-- État : brique créée vide (compile). Contenu au livrable **H1**. Plan détaillé : `memory/technique/hybride/`.
+- État : **v0.3.5 (H1)**, voir section 18.
+
+## 18. v0.3.5 — H1 : lecture du serveur (2026-11-18)
+
+Nouvel onglet **« Serveur (H1) »**. Le bot lit le serveur officiel en direct, sans rien envoyer d'autre que des demandes de lecture.
+
+```
+  Julien : e-mail ──► service de connexion BitCraft ──► code par e-mail ──► jeton
+                                                                             │ chiffré par Windows
+                                                                             ▼  (%LOCALAPPDATA%\BitcraftBot\jeton.bin)
+  Brique Server :  schéma public ─► liaison chiffrée avec bitcraft-live-18 ─► « qui suis-je ? »
+                   ─► abonnement 1 : mon personnage (numéro d'entité)
+                   ─► abonnement 2 : position, vie, endurance, faim, connecté ou non,
+                                     + ressources dans un carré de 80 × 80 cases autour de moi
+                   ─► le serveur envoie ensuite chaque changement ; copie locale à jour
+```
+
+| Élément | Rôle |
+|---|---|
+| Connexion au compte | Demande un code pour l'e-mail, échange le code contre le jeton. Le jeton n'est jamais dans le journal. |
+| Coffre du jeton | Chiffrement Windows lié au compte de Julien. Bouton « Oublier le jeton ». |
+| Liaison | WebSocket chiffré, protocole JSON de SpacetimeDB. **Ne sait pas** envoyer d'action (un test automatique le vérifie). |
+| Schéma | Donne le nom de chaque colonne : les lignes arrivent en simples listes de valeurs. |
+| Copie locale | Tables reçues, mises à jour à chaque changement (suppression puis ajout). |
+| Instantané | Résumé du personnage + arbres triés par distance, noms et paliers tirés de BitCraft_GameData. |
+
+Règles de sécurité de la liaison :
+- **Ordre** : se connecter avant de lancer le jeu. Si le jeu tourne déjà, le bot demande confirmation (risque de déconnexion du personnage à la fermeture du bot).
+- **Pas de reconnexion automatique** si la liaison tombe : elle ferait du bot la connexion principale.
+- Le carré des ressources est redemandé quand le personnage s'est éloigné de 20 cases (au plus une fois toutes les 5 s).
+- Si le serveur refuse la requête des ressources, le bot continue sans elles (journal : « Abonnement refusé »).
+
+Comparaison écran / serveur : toutes les 15 s, le journal note les deux positions (pour trouver la conversion en H2).

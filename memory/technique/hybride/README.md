@@ -26,7 +26,7 @@ Principe (D-039) : le bot **lit** l'état du jeu sur le serveur, **agit** au cla
 
 | Livrable | Contenu | État |
 |---|---|---|
-| **H1 — Lecture serveur** | Onglet « Serveur » : connexion par code reçu par e-mail, jeton chiffré, trouver la région, afficher en direct position, vie, endurance, faim, arbres proches (type, âge, distance). Aucune action. | À faire (prochain) |
+| **H1 — Lecture serveur** | Onglet « Serveur » : connexion par code reçu par e-mail, jeton chiffré, trouver la région, afficher en direct position, vie, endurance, faim, arbres proches (type, âge, distance). Aucune action. | **v0.3.5 livrée** (2026-11-18), essai réel à faire (`echanges/2026-11-18-essai-h1.md`) |
 | H2 — Contrôle croisé | Comparer position serveur et position lue à l'écran ; carte des arbres autour du joueur | Plus tard |
 | H3 — Aller à un arbre | Choisir le meilleur arbre (données serveur), y aller à la souris, suivre la position serveur | Plus tard |
 | H4 — Boucle bois → Banque | MVP (D-002) en hybride | Plus tard |

@@ -6,6 +6,7 @@
 | [T-20261116-02](T-20261116-02-v02-lecture-hud.md) | 2026-11-16 | perception | v0.2 : lecture du HUD | Essais Claude OK ; à vérifier par Julien (dont de nuit) |
 | [T-20261116-03](T-20261116-03-v022-mouvements.md) | 2026-11-16 | session en jeu | v0.2.2 : mouvements souris et caméra | OK : gestes naturels ; destinations à rendre utiles (D-037) |
 | [T-20261116-04](T-20261116-04-v030-coordonnees-donnees.md) | 2026-11-16 | perception | v0.3.1 : coordonnées par modèles, données du jeu, jauge de métier | OK (position 98-100 %, nuit OK) ; un trou de la jauge à comprendre |
+| [T-20261118-01](T-20261118-01-h1-lecture-serveur.md) | 2026-11-18 | unitaire + intégration | H1 : lecture du serveur (essais de Claude, sans jeton) | OK ; essai réel à faire par Julien |
 
 ## Gabarit
 

@@ -48,6 +48,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-16-feuille-de-route.md](echanges/2026-11-16-feuille-de-route.md) — prochaines étapes, captures et infos demandées à Julien
 - [2026-11-16-demande-captures-lot5.md](echanges/2026-11-16-demande-captures-lot5.md) — lot 5 : captures et vidéos précises demandées
 - [2026-11-16-demande-lot6.md](echanges/2026-11-16-demande-lot6.md) — lot 6 : reste du lot 5, captures avec Num 0
+- [2026-11-18-essai-h1.md](echanges/2026-11-18-essai-h1.md) — essai H1 à faire par Julien (jeton, lecture, test de déconnexion)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -60,4 +61,4 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à 04)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261118-01)

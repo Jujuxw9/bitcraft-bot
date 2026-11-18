@@ -189,6 +189,117 @@
             </DockPanel>
         </TabItem>
 
+        <!-- ONGLET : SERVEUR (voie hybride, livrable H1, D-039) -->
+        <TabItem Header="Serveur (H1)">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10" MaxWidth="1100" HorizontalAlignment="Left"
+                               Text="Lecture en direct du serveur officiel, en lecture seule, avec le jeton de votre compte. Le bot ne fait que lire : aucune action n'est envoyée au serveur. Le jeton est chiffré par Windows sur ce PC, et n'apparaît jamais dans le journal." />
+                    <WrapPanel>
+                        <!-- 1. Compte -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="1. COMPTE BITCRAFT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <TextBlock Text="Adresse e-mail liée au compte BitCraft :" />
+                                <TextBox x:Name="ServerEmailBox" Margin="0,2,0,6" />
+                                <Button x:Name="RequestCodeButton" Content="Recevoir le code par e-mail" HorizontalAlignment="Left"
+                                        Click="RequestCodeButton_Click" />
+                                <TextBlock Text="Code reçu :" Margin="0,8,0,0" />
+                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                    <TextBox x:Name="ServerCodeBox" Width="140" Margin="0,0,6,0" />
+                                    <Button x:Name="ValidateCodeButton" Content="Valider le code" Click="ValidateCodeButton_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="TokenStatusText" Text="Aucun jeton enregistré." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <Button x:Name="ForgetTokenButton" Content="Oublier le jeton" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                        Click="ForgetTokenButton_Click" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 2. Connexion -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="2. CONNEXION (LECTURE SEULE)" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Région : R" VerticalAlignment="Center" />
+                                    <TextBox x:Name="ServerRegionBox" Text="18" Width="40" Margin="2,0,0,0" />
+                                </StackPanel>
+                                <Border Background="#3A2E12" CornerRadius="4" Padding="8" Margin="0,8,0,8">
+                                    <TextBlock TextWrapping="Wrap" Foreground="#FDD663"
+                                               Text="Ordre à respecter : 1) jeu fermé, 2) connecter le bot ici, 3) lancer le jeu. Si le jeu est déjà lancé, le bot devient la connexion « principale » du compte : sa fermeture peut déconnecter votre personnage." />
+                                </Border>
+                                <TextBlock x:Name="ServerGameRunningText" Text="Jeu : —" TextWrapping="Wrap" />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button x:Name="ServerConnectButton" Content="Se connecter" Click="ServerConnectButton_Click" />
+                                    <Button x:Name="ServerDisconnectButton" Content="Se déconnecter" IsEnabled="False" Click="ServerDisconnectButton_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="ServerStateText" Text="Pas connecté." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <TextBlock x:Name="ServerTrafficText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 3. En direct -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="3. PERSONNAGE EN DIRECT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="Personnage" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SrvCharacter" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="1" Text="Région" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvRegion" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="2" Text="Position serveur" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvPosition" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="3" Text="Destination" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SrvDestination" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="4" Text="Position écran" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="SrvHudPosition" Text="— (lancer « Démarrer » dans Supervision)" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="5" Text="Vie" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="SrvHealth" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="6" Text="Endurance" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="SrvStamina" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="7" Text="Faim (satiété)" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="7" Grid.Column="1" x:Name="SrvSatiation" Text="—" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="8" Text="Mise à jour" Style="{StaticResource HudLabel}" />
+                                    <TextBlock Grid.Row="8" Grid.Column="1" x:Name="SrvUpdated" Text="—" Style="{StaticResource HudValue}" />
+                                </Grid>
+                                <Button x:Name="ServerSnapshotButton" Content="Enregistrer un instantané (diagnostic)" HorizontalAlignment="Left"
+                                        Margin="0,8,0,0" IsEnabled="False" Click="ServerSnapshotButton_Click" />
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+
+                    <!-- 4. Ressources proches -->
+                    <Border Style="{StaticResource Card}" MaxWidth="1100" HorizontalAlignment="Left">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="4. RESSOURCES PROCHES" Style="{StaticResource SectionTitle}" Margin="0,0,16,0" />
+                                <CheckBox x:Name="TreesOnlyCheck" Content="Arbres seulement" IsChecked="True" VerticalAlignment="Center" />
+                                <TextBlock x:Name="SrvResourceCount" Text="" Foreground="#9AA0A6" VerticalAlignment="Center" Margin="16,0,0,0" />
+                            </StackPanel>
+                            <ListView x:Name="SrvResourceList" Height="260" Background="#141517" Foreground="#E6E6E6" BorderBrush="#3C3F44">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Nom" Width="260" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Catégorie" Width="130" DisplayMemberBinding="{Binding Tag}" />
+                                        <GridViewColumn Header="Palier" Width="60" DisplayMemberBinding="{Binding Tier}" />
+                                        <GridViewColumn Header="Distance (cases)" Width="110" DisplayMemberBinding="{Binding Distance}" />
+                                        <GridViewColumn Header="Position serveur" Width="170" DisplayMemberBinding="{Binding Position}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </TabItem>
+
         <!-- ONGLET : TESTS DES MOUVEMENTS (D-035) -->
         <TabItem Header="Tests">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
