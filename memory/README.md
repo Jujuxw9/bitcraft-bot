@@ -55,6 +55,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v0316.md](echanges/2026-11-19-essai-v0316.md) — essai v0.3.16 (onglets regroupés, bonus actifs)
 - [2026-11-19-essai-v0317.md](echanges/2026-11-19-essai-v0317.md) — essai v0.3.17 (fait : formats et % du métier vérifiés)
 - [2026-11-19-essai-v0318.md](echanges/2026-11-19-essai-v0318.md) — essai v0.3.18 à faire (thème, repas auto actif, Num 5, fermeture)
+- [2026-11-19-passation-session-14.md](echanges/2026-11-19-passation-session-14.md) — **passation** : demandes de Julien pour la session suivante
 
 ### technique/
 - [README.md](technique/README.md) — index
