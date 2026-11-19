@@ -11,10 +11,10 @@ public sealed record LogLine(LogEntry Entry, string Text, Brush Color);
 public sealed class LogView
 {
     private const int MaxLines = 3000;
-    private static readonly Brush ErreurBrush = Frozen(Color.FromRgb(242, 139, 130));
-    private static readonly Brush AlerteBrush = Frozen(Color.FromRgb(253, 214, 99));
-    private static readonly Brush InfoBrush = Frozen(Color.FromRgb(200, 200, 200));
-    private static readonly Brush DetailBrush = Frozen(Color.FromRgb(140, 145, 150));
+    private static readonly Brush ErreurBrush = Frozen(Color.FromRgb(226, 87, 76));
+    private static readonly Brush AlerteBrush = Frozen(Color.FromRgb(229, 194, 31));
+    private static readonly Brush InfoBrush = Frozen(Color.FromRgb(233, 223, 196));
+    private static readonly Brush DetailBrush = Frozen(Color.FromRgb(147, 168, 191));
 
     private readonly List<LogLine> _all = [];
     // Tous les niveaux cochés par défaut, détails compris (demande de Julien, 2026-11-18).

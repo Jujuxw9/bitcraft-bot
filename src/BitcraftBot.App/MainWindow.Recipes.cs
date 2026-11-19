@@ -19,10 +19,10 @@ public partial class MainWindow
     private bool _recipesLoading;
     private DispatcherTimer? _recipeSearchTimer;
 
-    private static readonly Brush TitleBrush = Frozen(232, 234, 237);
-    private static readonly Brush DimBrush = Frozen(154, 160, 166);
-    private static readonly Brush AccentBrush = Frozen(138, 180, 248);
-    private static readonly Brush CardBrush = Frozen(37, 39, 43);
+    private static readonly Brush TitleBrush = Frozen(233, 223, 196);
+    private static readonly Brush DimBrush = Frozen(147, 168, 191);
+    private static readonly Brush AccentBrush = Frozen(210, 182, 93);
+    private static readonly Brush CardBrush = Frozen(16, 35, 58);
 
     // Chargé en tâche de fond après les données du jeu (≈ 12 Mo de recettes).
     private void LoadRecipesInBackground()
@@ -41,7 +41,7 @@ public partial class MainWindow
                 {
                     _recipes = book;
                     _log.Info("Données", $"Recettes chargées : {book.Entries.Count} objets et cargaisons, {book.Recipes.Count} recettes (fabrication et récolte).");
-                    RecipeSearchInfo.Text = $"{book.Entries.Count} objets connus.";
+                    RecipeSearchInfo.Text = $"{book.Entries.Count} objets";
                     RunRecipeSearch();
                 });
             }

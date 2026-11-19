@@ -157,3 +157,16 @@ Demandes de Julien : tableau de bord dans l'onglet Bot ; lire la jauge de métie
 - Num 0 : une seule capture par seconde (touche maintenue = deux fichiers identiques à l'essai v0.3.16).
 - Le journal écrit un **extrait brut** de chaque nouvelle table au premier abonnement : format réel **à vérifier** au prochain essai.
 - Tests : 254 OK. Tableau de bord vérifié à l'écran (sans connexion : le jeu était ouvert).
+
+## 31. v0.3.18 — contrôleur d'actions commun, thème BitCraft, déconnexion garantie (2026-11-19)
+
+Demandes de Julien : supprimer la case Num 5 ; Sécurité dans Paramètres ; repas auto actif de base, alerte sans nourriture ; beaucoup moins de texte ; nouveau thème aux couleurs de BitCraft, adaptatif ; raccourci bureau ; toujours se déconnecter avant de fermer ; contrôleur d'actions commun.
+
+- **Contrôleur d'actions** (D-045) : `src/BitcraftBot.Input/Actions/ActionController.cs`. `PressAsync` (touche ou combinaison) et `ClickAsync` (trajet humain puis clic), `WhyNot()` (raison d'attendre), `Halt` / `Resume`. Le repas automatique l'utilise (`EatAsync`). `InputSender` implémente `IInputDevice` (un faux dans les tests).
+- **Num 5** toujours actif ; il bloque le contrôleur tout de suite (depuis le fil du clavier, sans attendre l'interface). Reprise : « Démarrer » ou recocher le repas auto.
+- **Repas auto** : remis à « actif » à chaque démarrage ; alerte « Aucune nourriture dans le sac » (une fois, puis info quand il y en a de nouveau).
+- **Fermeture** : la fenêtre annule sa première fermeture, se déconnecte du serveur en **attendant la fin** (8 s au plus), puis se ferme. Arrêt de Windows : déconnexion directe (4 s au plus). Avant, l'attente était bloquante et limitée à 4 s (elle marchait déjà : « Liaison fermée (fermeture du bot) » dans le journal v0.3.17).
+- **Interface** (D-046) : `Themes/BitCraft.xaml` ; fenêtre réécrite (`MainWindow.xaml`), textes raccourcis dans le code ; mise en page adaptative (`MainWindow.Layout.cs`). Retirés : lignes de lecture écran redondantes (zone, vie, endurance, faim : le tableau de bord les montre, l'écran en secours sans serveur), niveaux de tous les métiers, énergie de téléportation, temps de jeu, nombre de messages, chemin du journal.
+- **Raccourci bureau** : `tools/creer-raccourci-bureau.ps1` crée « BitCraft Bot » → `tools/lancer-bot.ps1`, qui lance le `BitcraftBot-vX.Y.Z.exe` de numéro le plus haut dans `artifacts/release`.
+- Vérifié : 264 tests ; rendu de la fenêtre **hors écran** à 1920, 1200 et 800 px de large (Julien jouait : aucune fenêtre ouverte). Deux défauts trouvés et corrigés au rendu : clés « Muted » et « Card » en double dans le thème (la fenêtre ne s'ouvrait pas), chevauchement en largeur étroite.
+- **À vérifier en réel** (Julien) : déconnexion à la fermeture, repas auto actif au démarrage, alerte sans nourriture, aspect sur son écran.

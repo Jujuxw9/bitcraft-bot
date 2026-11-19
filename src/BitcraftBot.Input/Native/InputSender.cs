@@ -4,7 +4,7 @@ namespace BitcraftBot.Input.Native;
 
 // Envoie de vrais mouvements de souris et appuis de touches à Windows (SendInput).
 // Les touches sont envoyées par position physique (scancode) : indépendant de AZERTY / QWERTY.
-public sealed class InputSender
+public sealed class InputSender : BitcraftBot.Input.Actions.IInputDevice
 {
     private const uint INPUT_MOUSE = 0;
     private const uint INPUT_KEYBOARD = 1;

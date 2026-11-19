@@ -26,7 +26,7 @@ public partial class MainWindow
         _inventoryShownAt = DateTime.Now;
         if (reader.InventoryRefused)
         {
-            InventorySummary.Text = "Le serveur a refusé la lecture du sac et des banques (voir le journal).";
+            InventorySummary.Text = "Lecture refusée (journal).";
             return;
         }
         var inventories = reader.Inventories();

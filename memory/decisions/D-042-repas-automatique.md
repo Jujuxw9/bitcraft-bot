@@ -17,7 +17,9 @@ Entre deux aliments : attendre que le serveur confirme (faim en hausse ou bonus 
 - Données du jeu : `food_desc` (faim rendue par aliment), `buff_desc` et `buff_type_desc` (les 11 niveaux de « Food Regen »).
 
 ## Sécurités
-- **Désactivé par défaut** : case « Manger automatiquement » dans Paramètres.
+- ~~Désactivé par défaut~~ → **actif à chaque démarrage** depuis la v0.3.18 (demande de Julien : « manger automatiquement doit être activé de base »). La case « Manger (Maj + E) » est dans l'onglet Bot ; décochée ou coupée par Num 5, elle le reste jusqu'à la fermeture du bot.
+- **Pas de nourriture dans le sac** : alerte dans le journal (une fois), et « Pas de nourriture » dans les alertes du tableau de bord (v0.3.18).
+- Depuis la v0.3.18, Maj + E passe par le contrôleur d'actions commun (D-045).
 - Seulement si BitCraft est la fenêtre active et visible, le personnage connecté dans le jeu, et si Julien n'a pas tapé au clavier depuis 3 s (chat).
 - Si le premier aliment du sac est une potion, un thé ou un élixir, le bot ne mange pas et le signale.
 - Au plus 8 aliments en 10 min. Deux échecs de suite (rien ne change) : pause de 5 min.

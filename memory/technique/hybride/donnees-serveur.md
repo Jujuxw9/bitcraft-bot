@@ -24,7 +24,9 @@ Toutes ces tables sont **publiques** (vérifié sur le vrai schéma de `idc-18`)
 | Temps de jeu | `player_state` | v0.3.17 | |
 | Énergie de téléportation | `teleportation_energy_state` | v0.3.17 | |
 
-Format réel des nouvelles tables v0.3.17 : **à vérifier** au prochain essai (le journal écrit un extrait brut de chaque table au premier abonnement).
+Format réel des nouvelles tables v0.3.17 : **vérifié** à l'essai du 2026-11-19 (extraits bruts du journal) : `experience_state.experience_stacks` = liste de `[id du métier, expérience]` ; `player_action_state` (start_time et duration en ms, `action_type` et `layer` en énumérations `[index, {}]`) ; `extract_outcome_state` (`last_timestamp` en microsecondes Unix, `damage`, `is_crit`) ; `player_state.time_played` en secondes ; `teleportation_energy_state.energy` (100.0).
+
+**% du métier comparé à la jauge du jeu** : Forestry 101 712 XP → niv. 29, 87,5 % (jeu : 29, 87 %) ; Mining 41 600 XP → niv. 22, 24,9 % (jeu : 22, 26 % après quelques coups). **Concordant.**
 
 ## 2. Disponible, pas encore lu (à étudier selon les besoins)
 

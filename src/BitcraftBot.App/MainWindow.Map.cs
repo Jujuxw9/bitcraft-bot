@@ -95,7 +95,7 @@ public partial class MainWindow
 
         bool Shown(NearbyResource r) => _shownFamilies.Contains(r.Family);
         var shown = s.Resources.Where(Shown).ToList();
-        SrvResourceCount.Text = $"{shown.Count} affichées sur {s.Resources.Count} ressources lues ; {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs.";
+        SrvResourceCount.Text = $"{shown.Count} / {s.Resources.Count} ressources · {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs";
 
         var best = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
         var target = CurrentHudTarget();

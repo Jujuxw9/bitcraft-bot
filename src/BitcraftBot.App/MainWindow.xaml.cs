@@ -92,7 +92,6 @@ public partial class MainWindow : Window
         _log.EntryWritten += entry => Dispatcher.BeginInvoke(() => AppendLogLine(entry));
         LogList.ItemsSource = _logView.Visible;
         LogList.IsVisibleChanged += (_, _) => ScrollLogToEnd();
-        LogFileText.Text = _log.FilePath;
         _resourceGuard = new ResourceGuard(_settings.Limits);
         _hudLogger = new HudChangeLogger(_log);
 
@@ -108,14 +107,16 @@ public partial class MainWindow : Window
             _hudLogger.GameData = store;
         };
 
+        // Num 5 toujours actif (v0.3.18, demande de Julien : plus de case pour le couper).
         _safety = new SafetyMonitor(new SafetyOptions
         {
-            EmergencyKeyEnabled = _settings.EmergencyKeyEnabled,
+            EmergencyKeyEnabled = true,
             MaxDurationEnabled = _settings.MaxDurationEnabled,
             MaxDuration = TimeSpan.FromMinutes(Math.Clamp(_settings.MaxDurationMinutes, 1, 240)),
         });
         _safety.StopRequested += OnStopRequested;
-        EmergencyKeyCheck.IsChecked = _safety.Options.EmergencyKeyEnabled;
+        _actions = CreateActionController();
+        MouseStopCheck.IsChecked = _settings.StopOnMouseMove;
         MaxDurationCheck.IsChecked = _safety.Options.MaxDurationEnabled;
         MaxDurationBox.Text = ((int)_safety.Options.MaxDuration.TotalMinutes).ToString();
         TargetFpsBox.Text = _settings.TargetFps.ToString();
@@ -137,10 +138,11 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.17 : tableau de bord dans l’onglet Bot (vie, endurance, faim, bonus, action en cours, métier et sa progression lus sur le serveur, ressource frappée, sac, meilleur arbre). Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E si le repas automatique est coché.");
+        _log.Info("Session", "Version 0.3.18 : nouveau thème BitCraft, moins de texte, contrôleur d'actions commun (toutes les touches et clics passent par les mêmes sécurités), repas automatique actif au démarrage, Num 5 toujours actif, déconnexion garantie à la fermeture. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
         InitServerTab();
         InitOverlay();
         InitMeals();
+        InitLayout();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
@@ -200,6 +202,8 @@ public partial class MainWindow : Window
             _log.Detail("Sécurité", $"Touche {EmergencyKey.DisplayName} ignorée : BitCraft n'est pas la fenêtre active.");
             return;
         }
+        // Tout de suite (sans attendre l'interface) : l'action en cours est interrompue, touches relâchées.
+        _actions.Halt($"touche {EmergencyKey.DisplayName}");
         Dispatcher.BeginInvoke(() =>
         {
             StopMealsForEmergency();
@@ -207,13 +211,9 @@ public partial class MainWindow : Window
             {
                 _log.Info("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée (aucune session en cours).");
             }
-            else if (_safety.Options.EmergencyKeyEnabled)
-            {
-                _safety.OnEmergencyKey();
-            }
             else
             {
-                _log.Alerte("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée, mais l'arrêt d'urgence est désactivé.");
+                _safety.OnEmergencyKey();
             }
         });
     }
@@ -285,9 +285,10 @@ public partial class MainWindow : Window
 
         StartButton.IsEnabled = false;
         StopButton.IsEnabled = true;
-        SetStatus("EN COURS", "Capture et lecture du HUD. Aucune action envoyée au jeu.", "#1E4620");
+        _actions.Resume("« Démarrer »");
+        SetStatus("EN COURS", "Lecture de l'écran", "#1B4D33");
         // Réglages réellement appliqués à cette session (D-031).
-        _log.Info("Session", $"Session démarrée. Réglages : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
+        _log.Info("Session", $"Session démarrée. Réglages : touche d'urgence toujours active, arrêt si la souris bouge {(_actions.Options.StopOnMouseMove ? "actif" : "désactivé")}, " +
                              $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}, " +
                              $"{fps} images/s visées, lecture du HUD toutes les {HudInterval.TotalMilliseconds:0} ms, " +
                              $"arrêt sur anomalie {(_settings.AnomalyStopEnabled ? "actif" : "désactivé")}.");
@@ -420,12 +421,12 @@ public partial class MainWindow : Window
 
         if (reason == StopReason.ToucheUrgence)
         {
-            SetStatus("ARRÊT D'URGENCE", $"Tout est arrêté ({description}).", "#8B1A1A");
+            SetStatus("ARRÊT D'URGENCE", description, "#6E1F1F");
             _log.Alerte("Sécurité", $"Session arrêtée après {elapsed} : {description}.");
         }
         else
         {
-            SetStatus("ARRÊTÉ", $"Session terminée : {description}.", "#3C3F44");
+            SetStatus("ARRÊTÉ", description, "#1F2F45");
             _log.Info("Session", $"Session arrêtée après {elapsed} : {description}.");
         }
         _log.Info("Capture", $"Bilan : {_measuredFps:0.0} images/s mesurées, capture moyenne {captureMs:0} ms par image.");
@@ -442,10 +443,9 @@ public partial class MainWindow : Window
         {
             return;
         }
-        ElapsedText.Text = $"Durée : {FormatDuration(_safety.Elapsed)}";
-        RemainingText.Text = _safety.Remaining is { } remaining
-            ? $"Restant : {FormatDuration(remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining)}"
-            : "Restant : illimité";
+        ElapsedText.Text = _safety.Remaining is { } remaining
+            ? $"{FormatDuration(_safety.Elapsed)} (reste {FormatDuration(remaining < TimeSpan.Zero ? TimeSpan.Zero : remaining)})"
+            : FormatDuration(_safety.Elapsed);
 
         var now = DateTime.Now;
         var window = now - _fpsWindowStart;
@@ -454,7 +454,7 @@ public partial class MainWindow : Window
         {
             _measuredFps = _framesCounted / window.TotalSeconds;
             var captureMs = _captureMsCount > 0 ? _captureMsTotal / _captureMsCount : 0;
-            FpsText.Text = $"Images par seconde : {_measuredFps:0.0} (capture {captureMs:0} ms)";
+            FpsText.Text = $"{_measuredFps:0.0} (capture {captureMs:0} ms)";
             _framesCounted = 0;
             _fpsWindowStart = now;
         }
@@ -466,12 +466,12 @@ public partial class MainWindow : Window
         if (found is null)
         {
             message = "Jeu introuvable : capture de l'écran principal à la place.";
-            GameWindowText.Text = "Fenêtre du jeu : introuvable (capture de l'écran principal).";
+            GameWindowText.Text = "○ Jeu introuvable";
         }
         else
         {
             message = $"Fenêtre du jeu trouvée : « {found.Title} » (processus {found.ProcessName}), zone {found.ClientArea}.";
-            GameWindowText.Text = $"« {found.Title} »\n{found.ClientArea}";
+            GameWindowText.Text = $"● Jeu {found.ClientArea.Width}×{found.ClientArea.Height}";
             if (found.ClientArea.Width != HudLayout.ReferenceWidth || found.ClientArea.Height != HudLayout.ReferenceHeight)
             {
                 message += " Attention : la taille attendue est 1920×1080 (D-006), le HUD ne sera pas lu.";
@@ -518,12 +518,11 @@ public partial class MainWindow : Window
         }
         RememberHudPosition(hud);
         HudPosition.Text = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "illisible";
-        HudZone.Text = $"{hud.ZoneName ?? "?"}, {(hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "?")}";
-        // Vie, endurance, faim : le serveur d'abord (valeurs exactes), l'écran seulement sans serveur (v0.3.16).
-        var server = _serverReader?.State == Server.ReaderState.Connecte ? _lastSnapshot : null;
-        HudHealth.Text = server?.Health is { } sh ? $"{sh:0} (serveur)" : hud.Health + " (écran)";
-        HudStamina.Text = server?.Stamina is { } ss ? $"{ss:0} (serveur)" : hud.Stamina + " (écran)";
-        HudHunger.Text = server?.Satiation is { } sf ? $"{sf:0} / {server.MaxSatiation ?? 100:0} (serveur)" : hud.HungerRatio is { } h ? $"≈{h * 100:0} % (écran)" : "?";
+        // Vie, endurance, faim : le serveur d'abord (D-044) ; sans serveur, le tableau de bord prend l'écran.
+        if (_serverReader?.State != Server.ReaderState.Connecte)
+        {
+            ShowScreenVitals(hud);
+        }
         if (hud.Target is null)
         {
             HudTarget.Text = "aucune";
@@ -534,7 +533,6 @@ public partial class MainWindow : Window
             HudTarget.Text = $"{hud.Target.Name ?? "?"} ({hud.Target.Category ?? "?"})";
             HudTargetHealth.Text = hud.Target.Health is not null ? $"{hud.Target.Health}/{hud.Target.MaxHealth}" : "?";
         }
-        HudReadTime.Text = $"{hud.ReadDuration.TotalMilliseconds:0} ms";
         DrawZones(hud);
     }
 
@@ -581,7 +579,7 @@ public partial class MainWindow : Window
     private void SafetyCheck_Click(object sender, RoutedEventArgs e)
     {
         ReadInputs();
-        _log.Info("Config", $"Sécurité modifiée : touche d'urgence {(_safety.Options.EmergencyKeyEnabled ? "active" : "désactivée")}, " +
+        _log.Info("Config", $"Sécurité modifiée : arrêt si la souris bouge {(_actions.Options.StopOnMouseMove ? "actif" : "désactivé")}, " +
                             $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}, " +
                             $"arrêt sur anomalie {(_settings.AnomalyStopEnabled ? "actif" : "désactivé")}.");
     }
@@ -608,7 +606,8 @@ public partial class MainWindow : Window
 
     private void ReadInputs()
     {
-        _safety.Options.EmergencyKeyEnabled = EmergencyKeyCheck.IsChecked == true;
+        _settings.StopOnMouseMove = MouseStopCheck.IsChecked == true;
+        _actions.Options.StopOnMouseMove = _settings.StopOnMouseMove;
         _safety.Options.MaxDurationEnabled = MaxDurationCheck.IsChecked == true;
         _settings.AnomalyStopEnabled = AnomalyCheck.IsChecked == true;
         if (int.TryParse(MaxDurationBox.Text, out var minutes) && minutes is >= 1 and <= 240)
@@ -731,24 +730,21 @@ public partial class MainWindow : Window
 
     private void ShowResources(ResourceSample s)
     {
-        BotCpuText.Text = $"CPU : {s.BotCpuPercent:0.0} % (tous cœurs confondus)";
-        BotRamText.Text = $"RAM : {s.BotRamMb:0} Mo   (alerte {_settings.Limits.BotRamWarningMb:0}, arrêt {_settings.Limits.BotRamCriticalMb:0})";
-        BotDetailsText.Text = $"Mémoire .NET : {s.BotManagedMb:0} Mo · fils : {s.BotThreads} · handles : {s.BotHandles}";
-        GameCpuText.Text = s.GameCpuPercent is { } gc ? $"CPU : {gc:0.0} %" : "CPU : jeu non lancé";
-        GameRamText.Text = s.GameRamMb is { } gr ? $"RAM : {gr:0} Mo" : "RAM : —";
-        SystemCpuText.Text = $"CPU : {s.SystemCpuPercent:0} %";
-        SystemRamText.Text = $"RAM libre : {s.SystemRamAvailableMb / 1024:0.0} Go sur {s.SystemRamTotalMb / 1024:0.0} Go ({s.SystemRamAvailablePercent:0} %)";
+        BotCpuText.Text = $"Bot : CPU {s.BotCpuPercent:0.0} %";
+        BotRamText.Text = $"Bot : RAM {s.BotRamMb:0} Mo";
+        GameCpuText.Text = s.GameRamMb is { } gr ? $"Jeu : CPU {s.GameCpuPercent ?? 0:0} %, RAM {gr / 1024:0.0} Go" : "Jeu : fermé";
+        SystemCpuText.Text = $"PC : CPU {s.SystemCpuPercent:0} %, RAM libre {s.SystemRamAvailableMb / 1024:0.0} Go ({s.SystemRamAvailablePercent:0} %)";
         ResourceStateText.Text = _resourceGuard.BotRamLevel switch
         {
-            ResourceLevel.Critique => "État : CRITIQUE (RAM du bot)",
-            ResourceLevel.Alerte => "État : alerte (RAM du bot)",
-            _ => "État : normal",
+            ResourceLevel.Critique => "CRITIQUE (RAM du bot)",
+            ResourceLevel.Alerte => "Alerte (RAM du bot)",
+            _ => "Normal",
         };
         ResourceStateText.Foreground = _resourceGuard.BotRamLevel switch
         {
-            ResourceLevel.Critique => Brushes.IndianRed,
-            ResourceLevel.Alerte => Brushes.Gold,
-            _ => Brushes.LightGreen,
+            ResourceLevel.Critique => Theme("Bad"),
+            ResourceLevel.Alerte => Theme("Warn"),
+            _ => Theme("Good"),
         };
 
         Push(_cpuHistory, s.BotCpuPercent);
@@ -780,9 +776,9 @@ public partial class MainWindow : Window
         if (warning is { } w)
         {
             var y = height - w / max * height;
-            canvas.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = Brushes.Gold, StrokeThickness = 1, StrokeDashArray = [4, 3] });
+            canvas.Children.Add(new Line { X1 = 0, X2 = width, Y1 = y, Y2 = y, Stroke = new SolidColorBrush(Color.FromRgb(210, 182, 93)), StrokeThickness = 1, StrokeDashArray = [4, 3] });
         }
-        var line = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(61, 245, 138)), StrokeThickness = 1.5 };
+        var line = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(79, 209, 197)), StrokeThickness = 1.5 };
         for (var i = 0; i < values.Count; i++)
         {
             var x = width * i / (GraphPoints - 1);
@@ -855,15 +851,32 @@ public partial class MainWindow : Window
         && left < SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - 100
         && top < SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - 100;
 
-    private void OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+    // Fermeture (demande de Julien, v0.3.18) : le bot se déconnecte TOUJOURS du serveur avant de fermer la fenêtre.
+    // 1er passage : on annule la fermeture, on se déconnecte (en attendant la fin), puis on referme.
+    private async void OnClosing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
-        if (_safety.IsRunning)
+        if (!_closeReady)
         {
-            _safety.RequestStop(StopReason.Manuel);
+            e.Cancel = true;
+            if (_closeStarted)
+            {
+                return;
+            }
+            _closeStarted = true;
+            IsEnabled = false;
+            Title += " — déconnexion…";
+            if (_safety.IsRunning)
+            {
+                _safety.RequestStop(StopReason.Manuel);
+            }
+            _actions.Halt("fermeture du bot");
+            await CloseServerReaderAsync();
+            _closeReady = true;
+            _ = Dispatcher.BeginInvoke(Close);
+            return;
         }
         _keyboardHook?.Dispose();
         _resourceTimer.Stop();
-        CloseServerReader();
         CloseOverlay();
 
         // Position « normale » de la fenêtre (même si elle est agrandie), pour retrouver le bon écran.
@@ -875,7 +888,6 @@ public partial class MainWindow : Window
             _settings.WindowWidth = bounds.Width;
             _settings.WindowHeight = bounds.Height;
         }
-        _settings.EmergencyKeyEnabled = _safety.Options.EmergencyKeyEnabled;
         _settings.MaxDurationEnabled = _safety.Options.MaxDurationEnabled;
         _settings.MaxDurationMinutes = (int)_safety.Options.MaxDuration.TotalMinutes;
         _settings.Save(LocalSettings.DefaultPath);

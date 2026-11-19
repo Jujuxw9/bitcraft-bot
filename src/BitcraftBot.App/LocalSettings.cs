@@ -15,7 +15,6 @@ public sealed class LocalSettings
     public double WindowWidth { get; set; } = 960;
     public double WindowHeight { get; set; } = 540;
 
-    public bool EmergencyKeyEnabled { get; set; } = true;
     public bool MaxDurationEnabled { get; set; } = true;
     public int MaxDurationMinutes { get; set; } = 15;
 
@@ -39,8 +38,11 @@ public sealed class LocalSettings
     // Overlay sur l'écran du jeu (onglet Paramètres).
     public bool OverlayEnabled { get; set; } = true;
 
-    // Repas automatique (D-042, onglet Paramètres). Désactivé par défaut : c'est le bot qui appuie sur Maj+E.
-    public bool AutoEatEnabled { get; set; }
+    // Repas automatique (D-042). Remis à « actif » à chaque démarrage (v0.3.18) : la valeur enregistrée ne sert pas au démarrage.
+    public bool AutoEatEnabled { get; set; } = true;
+
+    // Arrêt d'urgence si la souris bouge pendant un geste du bot (contrôleur d'actions, v0.3.18).
+    public bool StopOnMouseMove { get; set; } = true;
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 

@@ -1,3 +1,5 @@
+> v0.3.18 : la case « Touche d'arrêt d'urgence » est supprimée, Num 5 est **toujours actif** (toujours seulement quand BitCraft est la fenêtre active). Voir D-045.
+
 # D-041 — Num 5 n'agit que si BitCraft est la fenêtre active
 
 - **Statut** : Validée

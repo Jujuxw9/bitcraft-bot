@@ -33,7 +33,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-041
+- [README.md](decisions/README.md) — tableau D-001 à D-046
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-022
@@ -53,7 +53,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v0314.md](echanges/2026-11-19-essai-v0314.md) — essai v0.3.14 à faire (overlay, Num 5, sac et banques, recettes)
 - [2026-11-19-essai-v0315.md](echanges/2026-11-19-essai-v0315.md) — essai v0.3.15 à faire (repas automatique, images des recettes)
 - [2026-11-19-essai-v0316.md](echanges/2026-11-19-essai-v0316.md) — essai v0.3.16 (onglets regroupés, bonus actifs)
-- [2026-11-19-essai-v0317.md](echanges/2026-11-19-essai-v0317.md) — essai v0.3.17 à faire (tableau de bord, métier lu sur le serveur)
+- [2026-11-19-essai-v0317.md](echanges/2026-11-19-essai-v0317.md) — essai v0.3.17 (fait : formats et % du métier vérifiés)
+- [2026-11-19-essai-v0318.md](echanges/2026-11-19-essai-v0318.md) — essai v0.3.18 à faire (thème, repas auto actif, Num 5, fermeture)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -61,11 +62,11 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.3.14 (onglets, overlay, banques, recettes)
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.3.18
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-02)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-03)

@@ -58,17 +58,17 @@ public partial class MainWindow
         var token = _tokenStore.Load();
         if (token is null)
         {
-            TokenStatusText.Text = "Aucun jeton enregistré. Étapes : e-mail → « Recevoir le code » → code → « Valider ».";
-            TokenStatusText.Foreground = System.Windows.Media.Brushes.Gold;
+            TokenStatusText.Text = "Pas de jeton : e-mail → code → Valider.";
+            TokenStatusText.Foreground = Theme("Warn");
             ForgetTokenButton.IsEnabled = false;
             return;
         }
         var info = TokenInfo.TryRead(token);
         var expires = info?.ExpiresAt is { } exp ? $", valable jusqu'au {exp.ToLocalTime():dd/MM/yyyy HH:mm}" : ", sans date de fin";
-        TokenStatusText.Text = $"Jeton enregistré (chiffré). Compte {TokenInfo.ShortIdentity(info?.HexIdentity)}{expires}.";
+        TokenStatusText.Text = $"Jeton enregistré ({TokenInfo.ShortIdentity(info?.HexIdentity)}).";
         TokenStatusText.Foreground = info?.ExpiresAt is { } e && e < DateTimeOffset.Now
-            ? System.Windows.Media.Brushes.IndianRed
-            : System.Windows.Media.Brushes.LightGreen;
+            ? Theme("Bad")
+            : Theme("Good");
         ForgetTokenButton.IsEnabled = true;
     }
 
@@ -77,7 +77,7 @@ public partial class MainWindow
         var email = ServerEmailBox.Text.Trim();
         if (!email.Contains('@') || _authBusy)
         {
-            TokenStatusText.Text = "Entrez l'adresse e-mail liée à votre compte BitCraft.";
+            TokenStatusText.Text = "E-mail manquant.";
             return;
         }
         _settings.ServerEmail = email;
@@ -86,7 +86,7 @@ public partial class MainWindow
             var result = await new AuthClient(http).RequestCodeAsync(email, CancellationToken.None);
             if (result.Success)
             {
-                TokenStatusText.Text = "Code demandé. Regardez vos e-mails (et les indésirables), puis entrez le code.";
+                TokenStatusText.Text = "Code envoyé : regardez vos e-mails.";
                 _log.Info("Serveur", "Code de connexion demandé au service de BitCraft.");
             }
             else
@@ -103,7 +103,7 @@ public partial class MainWindow
         var code = ServerCodeBox.Text.Trim();
         if (code.Length == 0 || !email.Contains('@') || _authBusy)
         {
-            TokenStatusText.Text = "Entrez l'adresse e-mail et le code reçu.";
+            TokenStatusText.Text = "E-mail ou code manquant.";
             return;
         }
         await RunAuthAsync(async http =>
@@ -172,12 +172,12 @@ public partial class MainWindow
         var token = _tokenStore.Load();
         if (token is null)
         {
-            ServerStateText.Text = "Pas de jeton : faites d'abord l'étape 1.";
+            ServerStateText.Text = "Pas de jeton (carte Compte).";
             return;
         }
         if (!int.TryParse(ServerRegionBox.Text, out var region) || region is < 1 or > 100)
         {
-            ServerStateText.Text = "Numéro de région invalide (exemple : 18 pour R18).";
+            ServerStateText.Text = "Région invalide (ex. 18).";
             return;
         }
         _settings.ServerRegion = region;
@@ -186,8 +186,8 @@ public partial class MainWindow
         if (IsGameRunning())
         {
             _log.Alerte("Serveur", "Connexion refusée : le jeu est lancé (le jeu serait éjecté).");
-            ServerStateText.Text = "Le jeu est lancé : connexion impossible. Quittez le jeu, connectez le bot, puis relancez le jeu.";
-            ServerStateText.Foreground = System.Windows.Media.Brushes.Gold;
+            ServerStateText.Text = "Jeu lancé : quittez-le avant de connecter.";
+            ServerStateText.Foreground = Theme("Warn");
             MessageBox.Show(this,
                 "Le jeu est lancé.\n\nSi le bot se connecte maintenant, le jeu affiche « Logged in elsewhere » et vous éjecte.\n\n" +
                 "Ordre à suivre : quittez le jeu, cliquez « Se connecter » ici, puis relancez le jeu.",
@@ -228,10 +228,10 @@ public partial class MainWindow
         ServerStateText.Text = reader?.StateDetail ?? "Pas connecté.";
         ServerStateText.Foreground = state switch
         {
-            ReaderState.Connecte => System.Windows.Media.Brushes.LightGreen,
-            ReaderState.Connexion => System.Windows.Media.Brushes.Gold,
-            ReaderState.Perdu or ReaderState.Erreur => System.Windows.Media.Brushes.IndianRed,
-            _ => System.Windows.Media.Brushes.White,
+            ReaderState.Connecte => Theme("Good"),
+            ReaderState.Connexion => Theme("Warn"),
+            ReaderState.Perdu or ReaderState.Erreur => Theme("Bad"),
+            _ => Theme("Text"),
         };
         var active = state is ReaderState.Connexion or ReaderState.Connecte;
         ServerConnectButton.IsEnabled = !active;
@@ -247,14 +247,12 @@ public partial class MainWindow
     {
         UpdateOverlay();
         ServerGameRunningText.Text = IsGameRunning() ? "Jeu : lancé." : "Jeu : fermé.";
-        SrvHudPosition.Text = _lastHudPosition is { } hp ? $"N {hp.North}, E {hp.East}" : "— (lancer « Démarrer » dans l’onglet Bot)";
         var reader = _serverReader;
         if (reader is null || reader.State == ReaderState.Deconnecte)
         {
             UpdateDashboard(null, null);
             return;
         }
-        ServerTrafficText.Text = $"Messages reçus : {reader.MessageCount} (dont {reader.TransactionCount} changements).";
         var s = reader.Snapshot();
         _lastSnapshot = s;
         SrvCharacter.Text = s.EntityId is { } id
@@ -315,8 +313,35 @@ public partial class MainWindow
         }
     }
 
-    // À la fermeture du bot : fermeture propre de la liaison, sans bloquer l'interface.
-    private void CloseServerReader()
+    private static readonly TimeSpan CloseDisconnectTimeout = TimeSpan.FromSeconds(8);
+
+    // À la fermeture du bot : déconnexion propre du serveur, en attendant qu'elle soit finie (v0.3.18).
+    private async Task CloseServerReaderAsync()
+    {
+        var reader = TakeReaderForClose();
+        if (reader is null)
+        {
+            return;
+        }
+        _log.Info("Serveur", "Fermeture du bot : déconnexion du serveur d'abord.");
+        var disconnect = reader.DisconnectAsync("fermeture du bot");
+        if (await Task.WhenAny(disconnect, Task.Delay(CloseDisconnectTimeout)) != disconnect)
+        {
+            _log.Alerte("Serveur", $"Déconnexion pas confirmée après {CloseDisconnectTimeout.TotalSeconds:0} s : la liaison est abandonnée (le serveur la coupe de lui-même).");
+        }
+    }
+
+    // Windows s'arrête ou ferme la session : pas le temps d'attendre l'interface, déconnexion directe.
+    private void CloseServerReaderNow()
+    {
+        var reader = TakeReaderForClose();
+        if (reader is not null)
+        {
+            Task.Run(() => reader.DisconnectAsync("arrêt de Windows")).Wait(TimeSpan.FromSeconds(4));
+        }
+    }
+
+    private ServerReader? TakeReaderForClose()
     {
         _serverTimer?.Stop();
         _settings.ServerEmail = ServerEmailBox.Text.Trim();
@@ -326,9 +351,6 @@ public partial class MainWindow
         }
         var reader = _serverReader;
         _serverReader = null;
-        if (reader is not null)
-        {
-            Task.Run(() => reader.DisposeAsync().AsTask()).Wait(TimeSpan.FromSeconds(4));
-        }
+        return reader;
     }
 }

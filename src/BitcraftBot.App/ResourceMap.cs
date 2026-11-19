@@ -13,18 +13,18 @@ public sealed class ResourceMap : FrameworkElement
     // Rayon montré, en unités de l'écran (N, E). Les ressources sont lues sur environ 13 unités.
     public const double RadiusUnits = 14;
 
-    private static readonly Brush Background = Frozen(Color.FromRgb(20, 21, 23));
-    private static readonly Pen RingPen = FrozenPen(Color.FromRgb(60, 63, 68), 1);
-    private static readonly Pen AxisPen = FrozenPen(Color.FromRgb(45, 47, 51), 1);
-    private static readonly Brush TextBrush = Frozen(Color.FromRgb(154, 160, 166));
-    private static readonly Brush PlayerBrush = Frozen(Color.FromRgb(138, 180, 248));
+    private static readonly Brush Background = Frozen(Color.FromRgb(10, 21, 36));
+    private static readonly Pen RingPen = FrozenPen(Color.FromRgb(43, 76, 112), 1);
+    private static readonly Pen AxisPen = FrozenPen(Color.FromRgb(26, 51, 80), 1);
+    private static readonly Brush TextBrush = Frozen(Color.FromRgb(147, 168, 191));
+    private static readonly Brush PlayerBrush = Frozen(Color.FromRgb(95, 168, 224));
     private static readonly Pen DestinationPen = FrozenPen(Color.FromRgb(138, 180, 248), 1.5, dashed: true);
     private static readonly Brush MatureBrush = Frozen(Color.FromRgb(52, 168, 83));
     private static readonly Brush YoungBrush = Frozen(Color.FromRgb(168, 218, 181));
     private static readonly Brush DeadBrush = Frozen(Color.FromRgb(141, 110, 99));
     private static readonly Brush OtherTreeBrush = Frozen(Color.FromRgb(129, 201, 149));
     private static readonly Pen DamagedPen = FrozenPen(Color.FromRgb(251, 140, 0), 2);
-    private static readonly Pen BestPen = FrozenPen(Color.FromRgb(253, 214, 99), 2.5);
+    private static readonly Pen BestPen = FrozenPen(Color.FromRgb(210, 182, 93), 2.5);
     private static readonly Pen ScreenTargetPen = FrozenPen(Color.FromRgb(242, 139, 245), 2.5);
     private static readonly Pen SelectedPen = FrozenPen(Colors.White, 2);
     private static readonly Typeface Font = new("Segoe UI");

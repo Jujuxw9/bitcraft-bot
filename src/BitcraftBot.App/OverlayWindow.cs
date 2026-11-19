@@ -38,11 +38,11 @@ public sealed class OverlayWindow : Window
         SizeToContent = SizeToContent.WidthAndHeight;
         Title = "BitCraft Bot — overlay";
         _keys.Text = "Num 0 : capture   ·   Num 5 : arrêt (jeu actif)";
-        _keys.Foreground = new SolidColorBrush(Color.FromRgb(200, 200, 200));
+        _keys.Foreground = new SolidColorBrush(Color.FromRgb(147, 168, 191));
         Content = new Border
         {
-            Background = new SolidColorBrush(Color.FromArgb(170, 20, 21, 23)),
-            BorderBrush = new SolidColorBrush(Color.FromArgb(200, 60, 63, 68)),
+            Background = new SolidColorBrush(Color.FromArgb(200, 11, 24, 40)),
+            BorderBrush = new SolidColorBrush(Color.FromArgb(220, 210, 182, 93)),
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(4),
             Padding = new Thickness(8, 5, 8, 5),
@@ -87,7 +87,7 @@ public sealed class OverlayWindow : Window
     }
 
     private static TextBlock Line(double size, FontWeight weight) =>
-        new() { FontSize = size, FontWeight = weight, FontFamily = new FontFamily("Segoe UI"), Foreground = Brushes.White };
+        new() { FontSize = size, FontWeight = weight, FontFamily = new FontFamily("Segoe UI"), Foreground = new SolidColorBrush(Color.FromRgb(233, 223, 196)) };
 
     [DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hWnd, int index);

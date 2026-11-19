@@ -22,7 +22,7 @@ public partial class MainWindow
         _buffsShownAt = DateTime.Now;
         if (s.Buffs is null)
         {
-            BuffSummary.Text = "Bonus pas encore lus (ou refusés par le serveur).";
+            BuffSummary.Text = "Pas encore lus.";
             return;
         }
         var now = DateTimeOffset.UtcNow;

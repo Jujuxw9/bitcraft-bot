@@ -13,6 +13,7 @@
 | T-20261118-05 (tests `H2MapTests`) | 2026-11-18 | unitaire | H2 (v0.3.11) : coordonnées N / E sur valeurs réelles, direction, âge, santé, requêtes de lecture | OK (200 tests) ; essai réel : `echanges/2026-11-18-essai-h2.md` |
 | [T-20261118-06](T-20261118-06-v0311-essai-reel-h2.md) | 2026-11-18 | session réelle | Essai H2 de Julien (v0.3.11) | OK : carte, santé, zone, journal ; défauts : cible instable → v0.3.12 |
 | [T-20261119-01](T-20261119-01-v0312-essai-long.md) | 2026-11-19 | session réelle (42 min) | Essai long v0.3.12 | OK : liaison, mémoire stable, familles, cible ; défauts : Num 0 / Num 5 hors jeu, lecture d'une fenêtre devant le jeu → v0.3.13 |
+| T-20261119-03 (tests `V0318Tests` + rendu hors écran) | 2026-11-19 | unitaire + rendu | v0.3.18 : contrôleur d'actions (10 cas), fenêtre rendue à 1920 / 1200 / 800 px | OK (264 tests) ; 2 défauts trouvés au rendu et corrigés ; essai réel : `echanges/2026-11-19-essai-v0318.md` |
 | T-20261119-02 (tests `V0314Tests`) | 2026-11-19 | unitaire + vraies données | v0.3.14 : poches (3 formats), requêtes d'inventaire, livre des recettes (données de test et vraies données) | OK (229 tests) ; essai réel : `echanges/2026-11-19-essai-v0314.md` |
 
 ## Gabarit

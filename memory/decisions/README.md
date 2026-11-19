@@ -48,6 +48,8 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-042](D-042-repas-automatique.md) | Repas automatique avec Maj + E (faim < 30 %, plus de bonus) | Validée | 2026-11-19 |
 | [D-043](D-043-onglets-par-usage.md) | Onglets regroupés par usage (Bot, Personnage, Carte, Recettes, Paramètres) | Validée | 2026-11-19 |
 | [D-044](D-044-serveur-avant-ecran.md) | Le serveur d'abord, l'écran en contrôle (cible, jauge) | Validée | 2026-11-19 |
+| [D-045](D-045-controleur-actions.md) | Contrôleur d'actions commun : mêmes sécurités pour toutes les touches et clics ; Num 5 toujours actif | Validée | 2026-11-19 |
+| [D-046](D-046-interface-bitcraft.md) | Interface aux couleurs de BitCraft, peu de texte, adaptative | Validée | 2026-11-19 |
 
 ## Gabarit
 

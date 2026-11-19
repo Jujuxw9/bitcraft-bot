@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
 using BitcraftBot.GameData;
-using BitcraftBot.Perception.Capture;
+using BitcraftBot.Input.Actions;
 using BitcraftBot.Server;
 using BitcraftBot.Server.World;
 
@@ -9,16 +9,13 @@ namespace BitcraftBot.App;
 
 // Repas automatique (D-042, demande de Julien du 2026-11-19) : Maj + E quand la faim passe sous 30 %
 // ou quand le bonus de nourriture est fini. Un aliment à la fois, avec une pause, vérifié sur le serveur.
-// Sécurités : option cochée, BitCraft fenêtre active et visible, personnage connecté dans le jeu,
-// Julien ne tape pas au clavier, au plus 8 aliments en 10 minutes, Num 5 coupe tout.
+// Sécurités : personnage connecté dans le jeu, au plus 8 aliments en 10 minutes, et celles du contrôleur d'actions
+// (BitCraft actif et visible, Julien ne tape pas, Num 5 coupe tout). Actif à chaque démarrage (v0.3.18).
 public partial class MainWindow
 {
-    private const ushort ShiftScanCode = 0x2A;
-    private const ushort EScanCode = 0x12;
     private const int MaxMealsPer10Min = 8;
     private static readonly TimeSpan MealConfirmTimeout = TimeSpan.FromSeconds(20);
     private static readonly TimeSpan MealFailurePause = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan KeyboardQuietTime = TimeSpan.FromSeconds(3);
 
     private readonly Random _mealRandom = new();
     private readonly Queue<DateTime> _mealTimes = new();
@@ -30,6 +27,7 @@ public partial class MainWindow
     private int _mealFailures;
     private PendingMeal? _pendingMeal;
     private string _mealLastLogged = "";
+    private bool? _hadFood;
     private DateTime _lastPhysicalKey = DateTime.MinValue;
     private Brush _mealOverlayBrush = OffBrush;
 
@@ -39,7 +37,8 @@ public partial class MainWindow
 
     private void InitMeals()
     {
-        AutoEatCheck.IsChecked = _settings.AutoEatEnabled;
+        // Actif à chaque démarrage (demande de Julien, v0.3.18). Num 5 ou la case le coupent jusqu'à la fermeture.
+        SetAutoEat(true, "au démarrage du bot");
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadFoodsInBackground);
     }
 
@@ -83,7 +82,12 @@ public partial class MainWindow
         _mealFailures = 0;
         _mealPausedUntil = DateTime.MinValue;
         _mealLastLogged = "";
+        _hadFood = null;
         _log.Info("Repas", enabled ? $"Repas automatique activé ({why})." : $"Repas automatique désactivé ({why}).");
+        if (enabled && _actions.IsHalted)
+        {
+            _actions.Resume("repas automatique réactivé");
+        }
         AutoEatStatusText.Text = enabled ? "Activé." : "Désactivé.";
         UpdateOverlay();
     }
@@ -108,10 +112,11 @@ public partial class MainWindow
             ? $"{sa:0.#} / {max:0}{(s.MaxSatiation is null ? " (max supposé)" : "")} · bonus de nourriture : {RegenText(regen)}"
             : "—";
         AutoEatFoodText.Text = sac is null || foods is null
-            ? "Sac pas encore lu : le premier aliment est inconnu."
-            : blocker is not null ? $"Attention : « {blocker.Name} » passe avant la nourriture dans le sac."
-            : next is not null ? $"Prochain aliment (premier du sac) : « {next.Name} », rend {next.Hunger:0} de faim{(next.GivesFoodRegen ? " et donne le bonus" : "")} ({Count(sac, next.ItemId)} dans le sac)."
-            : "Aucun aliment dans le sac.";
+            ? "Sac pas encore lu."
+            : blocker is not null ? $"« {blocker.Name} » passe avant la nourriture."
+            : next is not null ? $"Prochain : {next.Name} (+{next.Hunger:0}) × {Count(sac, next.ItemId)}"
+            : "Aucune nourriture dans le sac.";
+        WarnIfNoFood(sac is not null && foods is not null ? next is not null || blocker is not null : null);
 
         if (!_settings.AutoEatEnabled)
         {
@@ -183,12 +188,8 @@ public partial class MainWindow
         }
 
         // 3. Conditions de sécurité avant d'appuyer sur une touche.
-        var game = _gameWindow ?? new GameWindowLocator().Find();
-        string? wait = game is null ? "jeu introuvable"
-            : !_inputSender.IsForeground(game.Handle) ? "BitCraft n'est pas la fenêtre active"
-            : !GameVisibility.IsUncovered(game) ? "le jeu est caché par une autre fenêtre"
-            : now - _lastPhysicalKey < KeyboardQuietTime ? "vous tapez au clavier"
-            : null;
+        // Sécurités communes à toutes les actions (contrôleur d'actions, v0.3.18).
+        var wait = _actions.WhyNot();
         while (_mealTimes.Count > 0 && now - _mealTimes.Peek() > TimeSpan.FromMinutes(10))
         {
             _mealTimes.Dequeue();
@@ -205,47 +206,36 @@ public partial class MainWindow
         _mealSeries = decision.ContinuesSeries;
         _mealTimes.Enqueue(now);
         ShowMealState("en train de manger…", WaitBrush);
-        _ = PressShiftEAsync(game!.Handle);
+        _ = EatAsync();
     }
 
-    // Maj + E avec des durées d'appui humaines. Les touches sont toujours relâchées, même en cas d'erreur.
-    private async Task PressShiftEAsync(IntPtr gameHandle)
+    // Maj + E par le contrôleur d'actions : mêmes sécurités que toute autre action, touches toujours relâchées.
+    private async Task EatAsync()
     {
-        var shiftDown = false;
-        var eDown = false;
-        try
+        var result = await _actions.PressAsync("Repas automatique", GameKeys.Shift, GameKeys.E);
+        if (!result.Done)
         {
-            if (!_inputSender.IsForeground(gameHandle))
-            {
-                _log.Info("Repas", "Maj + E annulé : BitCraft n'est plus la fenêtre active.");
-                _pendingMeal = null;
-                return;
-            }
-            _inputSender.KeyDown(ShiftScanCode);
-            shiftDown = true;
-            await Task.Delay(40 + _mealRandom.Next(60));
-            _inputSender.KeyDown(EScanCode);
-            eDown = true;
-            await Task.Delay(60 + _mealRandom.Next(80));
-        }
-        catch (Exception ex)
-        {
-            _log.Erreur("Repas", $"Envoi de Maj + E impossible : {ex.Message}");
+            _log.Info("Repas", $"Maj + E pas envoyé : {result.Detail}.");
             _pendingMeal = null;
         }
-        finally
+    }
+
+    // Pas de nourriture dans le sac : signalé dans le journal (alerte), une fois, puis quand il y en a de nouveau.
+    private void WarnIfNoFood(bool? hasFood)
+    {
+        if (!_settings.AutoEatEnabled || hasFood is null || hasFood == _hadFood)
         {
-            try
-            {
-                if (eDown) _inputSender.KeyUp(EScanCode);
-                await Task.Delay(30 + _mealRandom.Next(40));
-                if (shiftDown) _inputSender.KeyUp(ShiftScanCode);
-            }
-            catch (Exception ex)
-            {
-                _log.Erreur("Repas", $"Relâchement des touches impossible : {ex.Message}");
-            }
+            return;
         }
+        if (hasFood == false)
+        {
+            _log.Alerte("Repas", "Aucune nourriture dans le sac : le repas automatique ne pourra pas manger.");
+        }
+        else if (_hadFood == false)
+        {
+            _log.Info("Repas", "Nourriture de nouveau dans le sac.");
+        }
+        _hadFood = hasFood;
     }
 
     // Num 5 : le repas automatique s'arrête (il faut recocher la case).

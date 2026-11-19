@@ -35,7 +35,7 @@ La sécurité peut couper la boucle à tout moment, quelle que soit l'étape en 
 | **App** | La fenêtre que voit Julien (WPF) | 5 onglets (D-043) : Bot (tableau de bord, image du jeu, repas automatique, sécurité), Personnage, Carte, Recettes, Paramètres (avec le journal) |
 | **Core** | Le « cerveau » : règles, sécurité, journal | Surveillance de sécurité (touche d'urgence, durée max), journal de session, horloge |
 | **Perception** | Les « yeux » | Recherche de la fenêtre du jeu, capture de l'écran |
-| **Input** | Les « mains » (et l'écoute du clavier) | Écoute de Num 5 et Num 0, envoi de touches (Maj + E), mouvements humains de souris et de caméra (gardés pour H3) |
+| **Input** | Les « mains » (et l'écoute du clavier) | Écoute de Num 5 et Num 0 ; **contrôleur d'actions commun** (D-045) : toute touche ou tout clic passe par lui, avec les mêmes sécurités ; mouvements humains de souris et de caméra (pour H3) |
 | **GameData** | La « mémoire du jeu » (objets, recettes) | Vide en v0.1. Depuis la v0.3.0 : données BitCraft_GameData téléchargées et vérifiées (D-033, section 12) |
 | **Server** | La lecture du serveur officiel (depuis la v0.3.5, D-039) | Lecture seule avec le jeton de Julien : voir [hybride/architecture-serveur.md](hybride/architecture-serveur.md) |
 

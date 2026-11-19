@@ -14,6 +14,7 @@
 | [10](2026-11-18-session-10-h1.md) | 2026-11-18 | Claude Code | H1 : lecture du serveur, v0.3.5 → v0.3.8 (modules idc, journaux détaillés) |
 | [11](2026-11-19-session-11-essai-long.md) | 2026-11-19 | Claude Code | Essai long (42 min), v0.3.13 et v0.3.14 (overlay, banques, recettes, Paramètres) |
 | [12](2026-11-19-session-12-repas.md) | 2026-11-19 | Claude Code | v0.3.15 : repas automatique (Maj + E), images des objets, raccourcis du jeu |
+| [13](2026-11-19-session-13-actions-theme.md) | 2026-11-19 | Claude Code | v0.3.18 : contrôleur d'actions commun, thème BitCraft, déconnexion garantie, raccourci bureau |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 
