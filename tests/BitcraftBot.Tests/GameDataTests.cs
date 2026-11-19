@@ -33,6 +33,8 @@ public class GameDataTests
             ["skill_desc"] = "[{\"id\":2,\"name\":\"Forestry\"}]",
             ["crafting_recipe_desc"] = "[]",
             ["building_type_desc"] = "[]",
+            ["buff_desc"] = "[]",
+            ["buff_type_desc"] = "[]",
         };
     }
 

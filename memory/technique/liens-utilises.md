@@ -49,3 +49,6 @@ Liens consultés par Claude pour récupérer des données, comprendre le jeu ou 
 | https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=3454650 | Texte complet des patch notes |
 | https://api.steamcmd.net/v1/info/3454650 | Numéro et date du dernier build |
 | https://steamcommunity.com/app/3454650/discussions/0/685240979008140619/ | Discussion Steam sur le code d'accès |
+| https://github.com/BitCraftToolBox/cereal | Code de cereal.brico.app : adresse du CDN des images (`src/lib/constants.ts`) |
+| https://cdn.brico.app/sprites/ | Images des objets (webp), utilisées par l'onglet Recettes (v0.3.15) |
+| https://raw.githubusercontent.com/BitCraftToolBox/BitCraft_GameData/cereal/cs/static/buff_desc.json | Bonus du jeu (« Food Regen » pour le repas automatique) |

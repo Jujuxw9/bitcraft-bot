@@ -3,7 +3,8 @@ using System.Text.Json;
 namespace BitcraftBot.GameData;
 
 // Un objet ou une cargaison du jeu (item_desc / cargo_desc).
-public sealed record GameEntry(int Id, bool IsCargo, string Name, string Description, int Tier, string Tag, string Rarity)
+// Icon : chemin de l'image du jeu (icon_asset_name), ex. « Items/CookedBerries ».
+public sealed record GameEntry(int Id, bool IsCargo, string Name, string Description, int Tier, string Tag, string Rarity, string Icon = "")
 {
     public string Key => (IsCargo ? "C" : "I") + Id;
 }
@@ -107,7 +108,7 @@ public sealed class RecipeBook
         var entries = new Dictionary<string, GameEntry>();
         foreach (var e in Read(folder, "item_desc"))
         {
-            var entry = new GameEntry(Int(e, "id"), false, Str(e, "name"), Str(e, "description"), Int(e, "tier"), Str(e, "tag"), Str(e, "rarity"));
+            var entry = new GameEntry(Int(e, "id"), false, Str(e, "name"), Str(e, "description"), Int(e, "tier"), Str(e, "tag"), Str(e, "rarity"), Str(e, "icon_asset_name"));
             if (entry.Name.Length > 0)
             {
                 entries.TryAdd(entry.Key, entry);
@@ -115,7 +116,7 @@ public sealed class RecipeBook
         }
         foreach (var e in Read(folder, "cargo_desc"))
         {
-            var entry = new GameEntry(Int(e, "id"), true, Str(e, "name"), Str(e, "description"), Int(e, "tier"), Str(e, "tag"), Str(e, "rarity"));
+            var entry = new GameEntry(Int(e, "id"), true, Str(e, "name"), Str(e, "description"), Int(e, "tier"), Str(e, "tag"), Str(e, "rarity"), Str(e, "icon_asset_name"));
             if (entry.Name.Length > 0)
             {
                 entries.TryAdd(entry.Key, entry);

@@ -1,6 +1,6 @@
 # D-032 — Règles de repas
 
-- **Statut** : Validée
+- **Statut** : Remplacée par D-042 (2026-11-19)
 - **Date** : 2026-11-16
 - **Validée par** : Julien
 - **Liens** : D-030, D-028

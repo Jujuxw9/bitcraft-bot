@@ -31,6 +31,9 @@ public sealed class GameDataStore
         // Onglet Recettes (v0.3.14) : recettes d'artisanat et types d'ateliers.
         "crafting_recipe_desc",
         "building_type_desc",
+        // Repas automatique (v0.3.15) : bonus des aliments (« Food Regen »).
+        "buff_desc",
+        "buff_type_desc",
     ];
 
     public required IReadOnlyList<ResourceInfo> Resources { get; init; }

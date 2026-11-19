@@ -39,6 +39,9 @@ public sealed class LocalSettings
     // Overlay sur l'écran du jeu (onglet Paramètres).
     public bool OverlayEnabled { get; set; } = true;
 
+    // Repas automatique (D-042, onglet Paramètres). Désactivé par défaut : c'est le bot qui appuie sur Maj+E.
+    public bool AutoEatEnabled { get; set; }
+
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     public static string DefaultPath => Path.Combine(AppContext.BaseDirectory, FileName);

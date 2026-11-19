@@ -15,6 +15,7 @@ public partial class MainWindow
     private const int MaxUsesShown = 25;
 
     private RecipeBook? _recipes;
+    private readonly ItemIcons _icons = new();
     private bool _recipesLoading;
     private DispatcherTimer? _recipeSearchTimer;
 
@@ -87,7 +88,7 @@ public partial class MainWindow
         var found = _recipes.Search(RecipeSearchBox.Text);
         RecipeResults.ItemsSource = found.Select(e => new ListBoxItem
         {
-            Content = $"{e.Name}   (palier {e.Tier}{(e.IsCargo ? ", cargaison" : "")})",
+            Content = WithIcon(e.Key, 24, $"{e.Name}   (palier {e.Tier}{(e.IsCargo ? ", cargaison" : "")})"),
             Tag = e.Key,
         }).ToList();
         RecipeSearchInfo.Text = RecipeSearchBox.Text.Trim().Length == 0
@@ -126,7 +127,13 @@ public partial class MainWindow
         }
         var panel = RecipeDetails.Children;
         panel.Clear();
-        panel.Add(MakeText(entry.Name, 22, FontWeights.Bold, TitleBrush));
+        var title = new StackPanel { Orientation = Orientation.Horizontal };
+        title.Children.Add(IconImage(entry.Key, 64, hover: false));
+        var name = MakeText(entry.Name, 22, FontWeights.Bold, TitleBrush);
+        name.VerticalAlignment = VerticalAlignment.Center;
+        name.Margin = new Thickness(10, 0, 0, 0);
+        title.Children.Add(name);
+        panel.Add(title);
         panel.Add(MakeText($"{(entry.IsCargo ? "Cargaison" : "Objet")} · palier {entry.Tier} · catégorie « {entry.Tag} » · rareté {entry.Rarity}", 13, FontWeights.Normal, DimBrush));
         if (entry.Description.Length > 0)
         {
@@ -213,7 +220,10 @@ public partial class MainWindow
             var a = amounts[i];
             if (i > 0) target.Inlines.Add(new Run(", "));
             target.Inlines.Add(new Run($"{a.Quantity} × "));
+            target.Inlines.Add(new InlineUIContainer(IconImage(a.Key, 18)) { BaselineAlignment = BaselineAlignment.Center });
             var link = new Hyperlink(new Run(book.NameOf(a.Key))) { Foreground = a.Key == highlight ? Frozen(129, 201, 149) : AccentBrush };
+            link.ToolTip = BigIcon(a.Key, book.NameOf(a.Key));
+            ToolTipService.SetInitialShowDelay(link, 150);
             var key = a.Key;
             link.Click += (_, _) => OpenEntry(key);
             target.Inlines.Add(link);
@@ -226,6 +236,55 @@ public partial class MainWindow
                 target.Inlines.Add(new Run($" (poids {a.Probability:0.##})"));
             }
         }
+    }
+
+    // Image d'un objet (vide le temps du téléchargement, ou si l'image n'existe pas).
+    // hover : une grande image apparaît quand la souris passe dessus.
+    private Image IconImage(string key, double size, bool hover = true)
+    {
+        var image = new Image { Width = size, Height = size, Margin = new Thickness(0, 0, 4, 0), VerticalAlignment = VerticalAlignment.Center };
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+        if (_recipes?.Entries.TryGetValue(key, out var entry) == true && entry.Icon.Length > 0)
+        {
+            _ = SetIconAsync(image, entry.Icon);
+            if (hover)
+            {
+                image.ToolTip = BigIcon(key, entry.Name);
+                ToolTipService.SetInitialShowDelay(image, 150);
+            }
+        }
+        return image;
+    }
+
+    private async Task SetIconAsync(Image image, string icon)
+    {
+        var source = await _icons.GetAsync(icon);
+        if (source is not null)
+        {
+            image.Source = source;
+        }
+    }
+
+    // Info-bulle : grande image et nom de l'objet.
+    private ToolTip BigIcon(string key, string name)
+    {
+        var content = new StackPanel();
+        var image = new Image { Width = 96, Height = 96, HorizontalAlignment = HorizontalAlignment.Center };
+        if (_recipes?.Entries.TryGetValue(key, out var entry) == true && entry.Icon.Length > 0)
+        {
+            _ = SetIconAsync(image, entry.Icon);
+        }
+        content.Children.Add(image);
+        content.Children.Add(new TextBlock { Text = name, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 4, 0, 0) });
+        return new ToolTip { Content = content };
+    }
+
+    private StackPanel WithIcon(string key, double size, string text)
+    {
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        row.Children.Add(IconImage(key, size, hover: false));
+        row.Children.Add(new TextBlock { Text = text, VerticalAlignment = VerticalAlignment.Center });
+        return row;
     }
 
     private static string Duration(double seconds) =>

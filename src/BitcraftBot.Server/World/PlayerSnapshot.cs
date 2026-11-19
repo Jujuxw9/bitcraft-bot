@@ -17,6 +17,11 @@ public sealed record PlayerSnapshot
     public double? Stamina { get; init; }
     public double? Satiation { get; init; }
 
+    // Faim maximale (character_stats_state) et bonus actifs (active_buff_state). null si non lus.
+    public double? MaxSatiation { get; init; }
+
+    public IReadOnlyList<ActiveBuffInfo>? Buffs { get; init; }
+
     public string? RegionName { get; init; }
     public int? RegionIndex { get; init; }
 
@@ -112,6 +117,8 @@ public static class SnapshotBuilder
             Health = Of("health_state")?.F64("health"),
             Stamina = Of("stamina_state")?.F64("stamina"),
             Satiation = Of("satiation_state")?.F64("satiation"),
+            MaxSatiation = PlayerBuffs.MaxSatiation(cache, entity.Value),
+            Buffs = PlayerBuffs.Of(cache, entity.Value),
             RegionIndex = regionIndex,
             RegionName = regionName?.Get("player_facing_name")?.ToString(),
             Resources = position is { } p ? NearbyResources(cache, p, describe) : [],

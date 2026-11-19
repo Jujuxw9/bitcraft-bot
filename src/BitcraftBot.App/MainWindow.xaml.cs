@@ -138,9 +138,10 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.14 : onglets Personnage (sac et banques), Carte, Recettes et Paramètres ; overlay sur l'écran du jeu ; Num 5 seulement quand BitCraft est actif. Lecture seule du serveur officiel. Aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.15 : repas automatique (Maj + E, désactivé par défaut), images des objets dans Recettes, onglet Journal avant Paramètres. Lecture seule du serveur officiel. Seules actions sur le jeu : Maj + E si le repas automatique est coché, et le banc d'essai.");
         InitServerTab();
         InitOverlay();
+        InitMeals();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
@@ -164,6 +165,10 @@ public partial class MainWindow : Window
 
     private void OnGlobalKeyDown(int scanCode, bool isExtended, bool isInjected)
     {
+        if (!isInjected)
+        {
+            Dispatcher.BeginInvoke(NotePhysicalKey);
+        }
         // Num 0 : capture de l'écran du jeu seul (1920×1080 exact), même avec 2 écrans.
         if (!isInjected && CaptureKey.IsCapture(scanCode, isExtended))
         {
@@ -192,6 +197,7 @@ public partial class MainWindow : Window
         }
         Dispatcher.BeginInvoke(() =>
         {
+            StopMealsForEmergency();
             // Un test de mouvements en cours s'arrête toujours avec Num 5.
             if (_testCts is { IsCancellationRequested: false } test)
             {

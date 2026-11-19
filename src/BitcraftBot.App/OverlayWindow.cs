@@ -21,6 +21,7 @@ public sealed class OverlayWindow : Window
 
     private readonly TextBlock _server = Line(14, FontWeights.SemiBold);
     private readonly TextBlock _screen = Line(13, FontWeights.Normal);
+    private readonly TextBlock _meal = Line(13, FontWeights.Normal);
     private readonly TextBlock _keys = Line(12, FontWeights.Normal);
 
     public OverlayWindow()
@@ -45,7 +46,7 @@ public sealed class OverlayWindow : Window
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(4),
             Padding = new Thickness(8, 5, 8, 5),
-            Child = new StackPanel { Children = { _server, _screen, _keys } },
+            Child = new StackPanel { Children = { _server, _screen, _meal, _keys } },
         };
     }
 
@@ -65,6 +66,14 @@ public sealed class OverlayWindow : Window
         _server.Foreground = serverColor;
         _screen.Text = screen;
         _screen.Foreground = screenColor;
+    }
+
+    // Ligne du repas automatique (cachée s'il est désactivé).
+    public void ShowMeal(string? text, Brush color)
+    {
+        _meal.Visibility = text is null ? Visibility.Collapsed : Visibility.Visible;
+        _meal.Text = text ?? "";
+        _meal.Foreground = color;
     }
 
     // Place le cadre en haut à gauche de la zone du jeu (coordonnées écran en pixels).

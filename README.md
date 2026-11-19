@@ -6,7 +6,7 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 
 ## État
 
-**v0.3.14** :
+**v0.3.15** :
 - Voie hybride (D-039) : le bot lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré). Il affiche la position, la vie, l'endurance, la faim et les ressources proches. Vérifié en réel.
 - Lecture de l'écran (HUD) : position, zone, vie, endurance, faim, cible, jauge de métier.
 - Données du jeu (BitCraft_GameData, jamais republiées), surveillance CPU/RAM, banc d'essai des mouvements (désactivé par défaut).
@@ -14,6 +14,8 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 - Onglets « Personnage » (sac et banques), « Recettes » (comment obtenir chaque objet), « Paramètres » (connexion, overlay, système).
 - Overlay sur l'écran du jeu : état du bot et rappel des touches.
 - Sécurité : arrêt d'urgence `Num 5` (seulement quand BitCraft est actif, D-041), durée maximale, journaux. Capture du jeu avec `Num 0`.
+- Repas automatique (Maj + E) quand la faim passe sous 30 % ou que le bonus de nourriture est fini (D-042, à cocher dans Paramètres).
+- Images des objets dans l'onglet Recettes.
 
 Règle : connecter le bot **avant** de lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter, sinon le jeu serait éjecté.
 
@@ -31,7 +33,7 @@ Stack : C# / .NET 10, WPF.
 
 ## Lancer le bot
 
-Dernière version : `artifacts\release\BitcraftBot.exe`. Les anciennes versions sont dans `artifacts\old\vX.Y.Z\` (D-040, sur le PC seulement).
+Dernière version : `artifacts\release\BitcraftBot-vX.Y.Z.exe` (le nom porte la version). Les anciennes versions sont dans `artifacts\old\vX.Y.Z\` (D-040, sur le PC seulement).
 
 ## Pour les développeurs
 

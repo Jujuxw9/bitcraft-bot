@@ -1,7 +1,7 @@
 ﻿# Fabrique le .exe de la version en cours et le range (D-040).
-#   artifacts/release/ : toujours la dernière version (BitcraftBot.exe, config.local.json,
+#   artifacts/release/ : toujours la dernière version (BitcraftBot-vX.Y.Z.exe, config.local.json,
 #                        donnees-jeu/, journaux/ de toutes les versions, rangés par version).
-#   artifacts/old/vX.Y.Z/BitcraftBot.exe : les versions précédentes.
+#   artifacts/old/vX.Y.Z/ : les versions précédentes.
 # La version est lue dans Directory.Build.props.
 # Usage : powershell -ExecutionPolicy Bypass -File tools/publier-version.ps1
 
@@ -26,20 +26,20 @@ $newExe = Join-Path $build 'BitcraftBot.exe'
 $sizeMb = (Get-Item $newExe).Length / 1MB
 if ($sizeMb -gt 100) { Write-Warning ("Le .exe fait {0:N1} Mo : trop gros pour une Release GitHub (100 Mo)." -f $sizeMb) }
 
-# L'ancienne version de release/ part dans old/vX.Y.Z/.
+# Les anciennes versions de release/ partent dans old/vX.Y.Z/ (BitcraftBot.exe d'avant la v0.3.15, ou BitcraftBot-vX.Y.Z.exe).
 New-Item -ItemType Directory -Force $release, $old | Out-Null
-$currentExe = Join-Path $release 'BitcraftBot.exe'
-if (Test-Path $currentExe) {
-    $current = (Get-Item $currentExe).VersionInfo.ProductVersion -replace '\+.*$', ''
+$targetName = "BitcraftBot-v$version.exe"
+foreach ($exe in Get-ChildItem $release -Filter 'BitcraftBot*.exe') {
+    if ($exe.Name -eq $targetName) { continue }
+    $current = $exe.VersionInfo.ProductVersion -replace '\+.*$', ''
     if (-not $current) { $current = 'inconnue' }
-    if ($current -ne $version) {
-        $dest = Join-Path $old "v$current"
-        New-Item -ItemType Directory -Force $dest | Out-Null
-        Move-Item $currentExe (Join-Path $dest 'BitcraftBot.exe') -Force
-        Write-Host "Ancienne version v$current rangée dans $dest"
-    }
+    $dest = Join-Path $old "v$current"
+    New-Item -ItemType Directory -Force $dest | Out-Null
+    Move-Item $exe.FullName (Join-Path $dest $exe.Name) -Force
+    Write-Host "Ancienne version v$current rangée dans $dest"
 }
 
+$currentExe = Join-Path $release $targetName
 Copy-Item $newExe $currentExe -Force
 Remove-Item -Recurse -Force $build
-Write-Host ("OK : v{0} dans {1} ({2:N1} Mo)." -f $version, $release, $sizeMb)
+Write-Host ("OK : {0} dans {1} ({2:N1} Mo)." -f $targetName, $release, $sizeMb)

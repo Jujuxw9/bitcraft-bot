@@ -167,29 +167,6 @@
             </Grid>
         </TabItem>
 
-        <!-- ONGLET 2 : JOURNAL -->
-        <TabItem Header="Journal">
-            <DockPanel Margin="6">
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                    <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,10,0" />
-                    <CheckBox x:Name="FilterErreur" Content="Erreurs" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#F28B82" />
-                    <CheckBox x:Name="FilterAlerte" Content="Alertes" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#FDD663" />
-                    <CheckBox x:Name="FilterInfo" Content="Infos" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" />
-                    <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="True" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
-                    <Button Content="Ouvrir le dossier des journaux" Click="OpenLogFolder_Click" />
-                    <TextBlock x:Name="LogFileText" VerticalAlignment="Center" Foreground="#9AA0A6" Margin="8,0,0,0" />
-                </StackPanel>
-                <ListBox x:Name="LogList" Background="#141517" BorderBrush="#3C3F44" FontFamily="Consolas" FontSize="12"
-                         VirtualizingPanel.IsVirtualizing="True">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}" Foreground="{Binding Color}" TextWrapping="Wrap" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
-        </TabItem>
-
         <!-- ONGLET : PERSONNAGE (lecture du serveur, H1, D-039) -->
         <TabItem Header="Personnage">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
@@ -426,6 +403,29 @@
             </ScrollViewer>
         </TabItem>
 
+        <!-- ONGLET : JOURNAL (avant Paramètres, demande de Julien du 2026-11-19) -->
+        <TabItem Header="Journal">
+            <DockPanel Margin="6">
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <CheckBox x:Name="FilterErreur" Content="Erreurs" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#F28B82" />
+                    <CheckBox x:Name="FilterAlerte" Content="Alertes" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#FDD663" />
+                    <CheckBox x:Name="FilterInfo" Content="Infos" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" />
+                    <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="True" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
+                    <Button Content="Ouvrir le dossier des journaux" Click="OpenLogFolder_Click" />
+                    <TextBlock x:Name="LogFileText" VerticalAlignment="Center" Foreground="#9AA0A6" Margin="8,0,0,0" />
+                </StackPanel>
+                <ListBox x:Name="LogList" Background="#141517" BorderBrush="#3C3F44" FontFamily="Consolas" FontSize="12"
+                         VirtualizingPanel.IsVirtualizing="True">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" Foreground="{Binding Color}" TextWrapping="Wrap" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </TabItem>
+
         <!-- ONGLET : PARAMÈTRES (connexion au serveur, affichage, système) -->
         <TabItem Header="Paramètres">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
@@ -482,6 +482,18 @@
                                 <CheckBox x:Name="OverlayCheck" Content="Afficher l'overlay (état du bot et touches)" IsChecked="True" Click="OverlayCheck_Click" />
                                 <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,6,0,0"
                                            Text="Petit cadre en haut à gauche de l'écran du jeu : bot connecté ou non, lecture de l'écran, rappel des touches Num 0 (capture) et Num 5 (arrêt). Il laisse passer les clics et n'apparaît pas dans les captures du bot." />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Repas automatique (D-042) -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="4. REPAS AUTOMATIQUE" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <CheckBox x:Name="AutoEatCheck" Content="Manger automatiquement (Maj + E)" Click="AutoEatCheck_Click" />
+                                <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,6,0,0"
+                                           Text="Le bot appuie sur Maj + E (mange le premier aliment du sac) : si la faim passe sous 30 %, ou s'il n'y a plus de bonus de nourriture. Un aliment à la fois, avec une pause, sans dépasser le manque. Seulement si BitCraft est la fenêtre active et que vous ne tapez pas au clavier. Num 5 le coupe." />
+                                <TextBlock x:Name="AutoEatStatusText" Text="Désactivé." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <TextBlock x:Name="AutoEatFoodText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
                     </WrapPanel>

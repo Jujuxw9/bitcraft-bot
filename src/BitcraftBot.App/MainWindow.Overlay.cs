@@ -61,6 +61,7 @@ public partial class MainWindow
             ? (_gameVisible ? ("● Lecture de l'écran en cours", OnBrush) : ("◌ Lecture de l'écran en pause (jeu caché)", WaitBrush))
             : ("○ Lecture de l'écran arrêtée", OffBrush);
         _overlay.Show(server, serverColor, screen, screenColor);
+        _overlay.ShowMeal(_settings.AutoEatEnabled ? MealOverlayText : null, _mealOverlayBrush);
         if (!_overlay.IsVisible)
         {
             _overlay.Show();

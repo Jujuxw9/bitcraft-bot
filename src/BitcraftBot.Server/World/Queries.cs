@@ -31,6 +31,9 @@ public static class Queries
             list.Add($"SELECT * FROM inventory_state WHERE owner_entity_id = {e}");
             list.Add($"SELECT * FROM inventory_state WHERE player_owner_entity_id = {e}");
             list.Add("SELECT * FROM bank_state");
+            // Repas automatique (v0.3.15) : bonus actifs (bonus de nourriture) et faim maximale.
+            list.Add($"SELECT * FROM active_buff_state WHERE entity_id = {e}");
+            list.Add($"SELECT * FROM character_stats_state WHERE entity_id = {e}");
         }
         if (area is { } a)
         {

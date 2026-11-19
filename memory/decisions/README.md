@@ -35,7 +35,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-029](D-029-zone-sans-ennemis.md) | Zone de coupe : loin des ennemis, près du village | Validée | 2026-11-16 |
 | [D-030](D-030-banque-et-nourriture.md) | Procédure de dépôt à la Banque et repas | Validée | 2026-11-16 |
 | [D-031](D-031-fenetre-et-journaux.md) | Fenêtre du bot et journaux de session | Validée | 2026-11-16 |
-| [D-032](D-032-regles-repas.md) | Règles de repas | Validée | 2026-11-16 |
+| [D-032](D-032-regles-repas.md) | Règles de repas | Remplacée par D-042 | 2026-11-16 |
 | [D-033](D-033-source-donnees-jeu.md) | Source des données du jeu : BitCraft_GameData | Validée | 2026-11-16 |
 | [D-034](D-034-arbres-vieux-d-abord.md) | v0.3 : les vieux arbres d'abord | Validée | 2026-11-16 |
 | [D-035](D-035-banc-essai-mouvements.md) | v0.2.2 : banc d'essai des mouvements humains | Validée | 2026-11-16 |
@@ -45,6 +45,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-039](D-039-voie-hybride.md) | Voie hybride prioritaire : lire le serveur, agir au clavier et à la souris | Validée | 2026-11-17 |
 | [D-040](D-040-dossiers-release-old.md) | Versions rangées dans artifacts/release (dernière) et artifacts/old | Validée | 2026-11-18 |
 | [D-041](D-041-num5-jeu-actif.md) | Num 5 n'agit que si BitCraft est la fenêtre active | Validée | 2026-11-19 |
+| [D-042](D-042-repas-automatique.md) | Repas automatique avec Maj + E (faim < 30 %, plus de bonus) | Validée | 2026-11-19 |
 
 ## Gabarit
 

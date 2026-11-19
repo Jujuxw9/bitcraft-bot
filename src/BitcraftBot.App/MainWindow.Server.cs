@@ -267,6 +267,7 @@ public partial class MainWindow
 
         ShowResources(reader, s);
         ShowInventories(reader, s);
+        RunMeals(reader, s);
 
         // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)
