@@ -192,4 +192,4 @@ Demandes de Julien (passation session 14) : supprimer Num 5 ; plus d'information
   - une seule recherche de la fenêtre du jeu (overlay, contrôleur, Num 0) ;
   - messages bruts du serveur : 1 sur 200 en « Détails » (avant : tous, chacun relu une 2e fois).
 - Vérifié : 262 tests (nouveaux : `V0319Tests`, 9 cas) ; rendu **hors écran** des 5 onglets à 1920 et 800 px et de l'overlay (Julien jouait : aucune fenêtre ouverte).
-- **Pas vérifié** : mesure CPU / RAM avant / après, journal des tâches en réel (il faut la connexion au serveur, donc le jeu fermé avant). .exe **pas fabriqué** (pas de Release demandée ; la fabrication locale a été bloquée par le contrôle automatique).
+- **Pas vérifié** : mesure CPU / RAM avant / après, journal des tâches en réel (il faut la connexion au serveur, donc le jeu fermé avant). .exe fabriqué en local (`artifacts/release/BitcraftBot-v0.3.19.exe`), sans Release GitHub.

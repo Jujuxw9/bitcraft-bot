@@ -1,6 +1,6 @@
 # D-047 — Plus de touche d'arrêt d'urgence (Num 5 supprimée)
 
-- **Statut** : Validée (demande de Julien) — remplaçants à confirmer par Julien
+- **Statut** : Validée (remplaçants confirmés par Julien le 2026-11-19 : « OUI »)
 - **Date** : 2026-11-19
 - **Validée par** : Julien (« Num5 supprime la fonction associée à la touche »)
 - **Liens** : remplace D-041 ; modifie D-022 et D-045 ; D-004
@@ -28,4 +28,4 @@ Julien demande de supprimer la fonction de la touche.
 
 ## Conséquences
 - Le contrôleur d'actions garde son blocage (`Halt`), utilisé par la souris bougée et la fermeture.
-- Avant H3 (déplacements), reposer la question d'un arrêt au clavier : la souris bougée suffit-elle ?
+- Julien confirme (2026-11-19) que le bouton « Arrêter », la souris bougée et la pause quand il tape suffisent : pas d'autre touche d'arrêt, y compris pour H3.

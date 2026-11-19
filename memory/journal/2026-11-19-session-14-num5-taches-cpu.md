@@ -12,8 +12,8 @@ Demandes de la passation (`echanges/2026-11-19-passation-session-14.md`), dans l
 - Détail : `technique/hybride/architecture-serveur.md`, section 32. Essai : `echanges/2026-11-19-essai-v0319.md`.
 
 ## Écarts notés
-- **Num 5** était la sécurité principale (D-004, D-022). Supprimée comme demandé ; remplaçants listés dans D-047, à confirmer par Julien.
-- **.exe pas fabriqué** : « pas de Release » ; la fabrication locale (`publier-version.ps1`) a aussi été bloquée par le contrôle automatique. Julien ne peut pas encore essayer la v0.3.19.
+- **Num 5** était la sécurité principale (D-004, D-022). Supprimée comme demandé ; remplaçants (bouton, souris, pause clavier) **confirmés par Julien**.
+- **.exe** : d'abord pas fabriqué (malentendu sur « pas de Release »). Précision de Julien : toujours fabriquer le .exe en local dans `artifacts/release`, mais **pas de Release GitHub**. Fabriqué ensuite.
 - **Pas d'essai réel** : Julien jouait (BitCraft au premier plan), et le journal des tâches demande la connexion au serveur (jeu fermé avant). Mesure CPU avant / après pas faite.
 - « Coups » = nombre d'actions distinctes du serveur (`start_time`). À vérifier en réel contre le jeu.
 - Fabrication : le nom de la recette n'est pas écrit (les données chargées ne relient pas `recipe_id` à un nom) ; les objets gagnés et utilisés le montrent.
@@ -23,5 +23,5 @@ Demandes de la passation (`echanges/2026-11-19-passation-session-14.md`), dans l
 - D-047 (plus de touche d'arrêt d'urgence).
 
 ## Prochaines étapes
-- Fabriquer le .exe v0.3.19 (accord de Julien), essai `echanges/2026-11-19-essai-v0319.md`.
-- H3 (aller au meilleur arbre) : reposer la question d'un arrêt au clavier avant que le bot bouge la souris.
+- Essai de Julien : `echanges/2026-11-19-essai-v0319.md`.
+- H3 (aller au meilleur arbre).
