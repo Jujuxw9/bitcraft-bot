@@ -25,12 +25,10 @@ public static class HudLayout
     // Points où le fond crème du panneau cible est visible quand le panneau est affiché.
     public static readonly (int X, int Y)[] TargetPanelProbes = [(720, 40), (1100, 90), (1240, 90)];
 
-    // Zones affichées en surimpression dans la fenêtre de supervision.
+    // Zones affichées en surimpression dans la fenêtre de supervision (v0.3.20 : la cible seulement ;
+    // position, zone et région restent mesurées ici pour les tests et un éventuel retour).
     public static IReadOnlyList<(string Name, ScreenRect Rect)> AllZones { get; } =
     [
-        ("Position", Coordinates),
-        ("Zone", ZoneName),
-        ("Région", Region),
         ("Cible", TargetName),
         ("Catégorie", TargetCategory),
         ("Santé cible", TargetHealth),

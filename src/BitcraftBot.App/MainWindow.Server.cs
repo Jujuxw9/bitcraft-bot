@@ -15,7 +15,6 @@ namespace BitcraftBot.App;
 public partial class MainWindow
 {
     private static readonly TimeSpan ServerUiInterval = TimeSpan.FromMilliseconds(500);
-    private static readonly TimeSpan PositionCompareInterval = TimeSpan.FromSeconds(15);
 
     private readonly TokenStore _tokenStore = new(TokenStore.DefaultPath);
     private DispatcherTimer? _serverTimer;
@@ -24,8 +23,6 @@ public partial class MainWindow
     // Dernière lecture du serveur (toutes les 500 ms), pour les autres onglets.
     private PlayerSnapshot? _lastSnapshot;
     private Dictionary<int, ResourceLabel> _resourceLabels = [];
-    private (int North, int East)? _lastHudPosition;
-    private DateTime _lastPositionCompare = DateTime.MinValue;
     private bool _authBusy;
 
     private void InitServerTab()
@@ -42,13 +39,9 @@ public partial class MainWindow
         ShowTokenStatus();
     }
 
-    // Appelé à chaque lecture du HUD : sert à comparer la position de l'écran avec celle du serveur.
-    private void RememberHudPosition(HudState hud)
+    // Appelé à chaque lecture de l'écran : la cible sélectionnée, rapprochée des ressources du serveur (onglet Carte).
+    private void RememberHudTarget(HudState hud)
     {
-        if (hud.Position is { } p)
-        {
-            _lastHudPosition = p;
-        }
         _lastHudTarget = hud.Target;
         _lastHudTargetAt = DateTime.Now;
     }
@@ -316,14 +309,6 @@ public partial class MainWindow
         {
             UpdateDashboard(reader, s, inventories);
         }
-
-        // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
-        if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)
-        {
-            _lastPositionCompare = DateTime.Now;
-            // Constat des essais du 2026-11-18 : E ≈ x ÷ 3 et N ≈ z ÷ 3, à 1 près.
-            _log.Info("Serveur", $"Comparaison des positions : serveur {sp} (÷3 : E {sp.X / 3:0.0}, N {sp.Z / 3:0.0}) ; écran N {hud.North}, E {hud.East} ; écart E {hud.East - sp.X / 3:+0.0;-0.0;0}, N {hud.North - sp.Z / 3:+0.0;-0.0;0}.");
-        }
     }
 
     private async void ServerSnapshotButton_Click(object sender, RoutedEventArgs e)
@@ -342,7 +327,6 @@ public partial class MainWindow
                 Heure = DateTime.Now,
                 Etat = reader.StateDetail,
                 Messages = reader.MessageCount,
-                PositionEcran = _lastHudPosition is { } hp ? $"N {hp.North}, E {hp.East}" : null,
                 Instantane = snapshot with { Resources = snapshot.Resources.Take(50).ToList() },
                 Tables = tables,
             };

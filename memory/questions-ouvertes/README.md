@@ -24,6 +24,7 @@
 | [Q-020](Q-020-exploration-beta.md) | Onglet « Bêta : exploration » : déplacements autonomes dans l'herbe | Haute | Résolue → D-038 |
 | [Q-021](Q-021-voie-reseau-spacetimedb.md) | Passer par le réseau / SpacetimeDB au lieu de la vision ? | Haute | Résolue → D-039 |
 | [Q-022](Q-022-touche-urgence-hors-jeu.md) | Num 5 doit-elle arrêter le bot quand on tape ailleurs ? | Moyenne | Résolue → D-041 |
+| [Q-023](Q-023-recolte-automatique.md) | Récolte automatique : arbre ou roche, vieux arbres, zoom, écoute des clics | Haute | Ouverte |
 
 ## Gabarit
 

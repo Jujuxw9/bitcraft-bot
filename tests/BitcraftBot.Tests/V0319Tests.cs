@@ -99,6 +99,10 @@ public class V0319TaskJournalTests
     }
 
     [Fact]
+    public void Noms_francais_des_vehicules() =>
+        Assert.Equal("sortie d'un véhicule", ActionNames.French("DeployDeployable"));
+
+    [Fact]
     public void Fin_forcee_a_la_deconnexion()
     {
         var journal = Journal();
@@ -118,8 +122,8 @@ public class V0319HudTests
         Assert.DoesNotContain("Vie", names);
         Assert.DoesNotContain("Endurance", names);
         Assert.DoesNotContain("Métier", names);
-        Assert.Contains("Position", names);
-        Assert.Contains("Cible", names);
+        // v0.3.20 : la cible seulement (position, zone et région viennent du serveur, D-048).
+        Assert.Equal(["Cible", "Catégorie", "Santé cible"], names);
     }
 
     [Fact]

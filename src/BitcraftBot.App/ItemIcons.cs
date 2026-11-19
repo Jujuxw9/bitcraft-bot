@@ -17,6 +17,11 @@ public sealed class ItemIcons
 
     private readonly ConcurrentDictionary<string, Task<ImageSource?>> _cache = new();
     private readonly SemaphoreSlim _downloads = new(4);
+
+    // Une seule image décodée à la fois (v0.3.20) : le décodeur WebP de Windows bloque quand plusieurs fils
+    // l'utilisent ensemble (mesuré : 20 images en 3,9 s en parallèle, 0,09 s une par une). Ces fils bloqués
+    // privaient le reste du bot (capture du jeu, lecture du HUD) : l'image du jeu n'arrivait plus.
+    private readonly SemaphoreSlim _decodes = new(1);
     private int _failures;
 
     public static string Folder => Path.Combine(GameDataLoader.Folder, "icones");
@@ -70,7 +75,15 @@ public sealed class ItemIcons
                     _downloads.Release();
                 }
             }
-            return await Task.Run(() => Decode(file));
+            await _decodes.WaitAsync();
+            try
+            {
+                return await Task.Run(() => Decode(file));
+            }
+            finally
+            {
+                _decodes.Release();
+            }
         }
         catch (Exception)
         {

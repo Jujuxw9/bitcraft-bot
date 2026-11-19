@@ -4,123 +4,54 @@ using BitcraftBot.Perception.Hud;
 
 namespace BitcraftBot.App;
 
-// Écrit dans le journal ce qui change sur le HUD (pas chaque lecture, pour garder un journal lisible),
+// Écrit dans le journal ce qui change sur l'écran (v0.3.20 : la cible seulement), pas chaque lecture,
 // plus un résumé toutes les 30 secondes.
 public sealed class HudChangeLogger(SessionLog log)
 {
     private static readonly TimeSpan SummaryInterval = TimeSpan.FromSeconds(30);
-
-    private HudState? _previous;
-    private DateTime _lastSummary = DateTime.MinValue;
-    private int _reads;
-    private int _positionsRead;
-    private int _positionsByTemplates;
-    private readonly ConfirmedText _zone = new();
-    private readonly ConfirmedText _region = new();
-    private readonly ConfirmedText _target = new();
-    private const string NoTarget = "(aucune)";
-    private DateTime _notificationUntil = DateTime.MinValue;
     private static readonly TimeSpan NotificationDuration = TimeSpan.FromSeconds(8);
-    private DateTime _lastDiagnosticAt = DateTime.MinValue;
-    private int _positionFailStreak;
-    private double _totalReadMs;
+    private const string NoTarget = "(aucune)";
+
+    private readonly ConfirmedText _target = new();
     private readonly HashSet<string> _checkedTargets = [];
+    private DateTime _lastSummary = DateTime.MinValue;
+    private DateTime _notificationUntil = DateTime.MinValue;
+    private int _reads;
+    private double _totalReadMs;
+    private bool _first = true;
 
     // Données du jeu (D-033), pour comparer ce qui est lu à l'écran avec ce que disent les fichiers.
     public GameDataStore? GameData { get; set; }
 
     public void Reset()
     {
-        _previous = null;
-        _lastSummary = DateTime.MinValue;
-        _reads = 0;
-        _positionsRead = 0;
-        _positionsByTemplates = 0;
-        _zone.Reset();
-        _region.Reset();
-        _lastDiagnosticAt = DateTime.MinValue;
         _target.Reset();
+        _lastSummary = DateTime.MinValue;
         _notificationUntil = DateTime.MinValue;
-        _positionFailStreak = 0;
+        _reads = 0;
         _totalReadMs = 0;
+        _first = true;
     }
 
     // Passage de niveau lu sur le serveur : le bandeau du jeu recouvre la cible pendant quelques secondes (Q-018).
     public void NotifyLevelUp(DateTime at) => _notificationUntil = at + NotificationDuration;
 
-    // Renvoie une raison quand une image de diagnostic serait utile (situation anormale à comprendre), sinon null.
-    public string? OnHudRead(HudState hud, double captureFps)
+    public void OnHudRead(HudState hud, double captureFps)
     {
-        string? diagnostic = null;
         _reads++;
         _totalReadMs += hud.ReadDuration.TotalMilliseconds;
-        if (hud.Position is not null)
+        if (_first)
         {
-            _positionsRead++;
-            if (hud.PositionSource == PositionSource.Templates)
-            {
-                _positionsByTemplates++;
-            }
-            _positionFailStreak = 0;
-        }
-        else if (++_positionFailStreak == 10)
-        {
-            log.Alerte("Perception", $"Position illisible 10 fois de suite (dernier texte lu : « {hud.RawPosition} »).");
-            diagnostic = "position illisible";
-        }
-
-        var previous = _previous;
-        if (previous is null)
-        {
-            log.Info("Perception", $"Première lecture du HUD : {Describe(hud)}.");
-        }
-        else
-        {
-            LogChanges(previous, hud);
-        }
-
-        if (hud.ReadAt - _lastSummary >= SummaryInterval)
-        {
-            if (previous is not null)
-            {
-                var rate = 100.0 * _positionsRead / _reads;
-                log.Info("Perception", $"Résumé : {Describe(hud)}. Lecture moyenne {_totalReadMs / _reads:0} ms, " +
-                                       $"position lue {rate:0} % du temps (dont {100.0 * _positionsByTemplates / _reads:0} % par les modèles de chiffres), {captureFps:0.0} images/s.");
-            }
-            _lastSummary = hud.ReadAt;
-        }
-        _previous = Merge(previous, hud);
-
-        // Au plus une image de diagnostic par minute.
-        if (diagnostic is not null && hud.ReadAt - _lastDiagnosticAt >= TimeSpan.FromMinutes(1))
-        {
-            _lastDiagnosticAt = hud.ReadAt;
-            return diagnostic;
-        }
-        return null;
-    }
-
-    private void LogChanges(HudState before, HudState now)
-    {
-        // Changements de zone et de région : notés seulement s'ils sont lus deux fois de suite
-        // (évite « S A Pe Meadows » ou « R10 » au lieu de « R18 », lectures ratées isolées).
-        if (_zone.Update(now.ZoneName) is { } zoneChange)
-        {
-            log.Info("Perception", $"Changement de zone : {zoneChange.Before} → {zoneChange.After}.");
-        }
-        var regionText = now.Region is { } r ? $"{r.Name} (R{r.Number})" : null;
-        if (_region.Update(regionText) is { } regionChange)
-        {
-            log.Info("Perception", $"Changement de région : {regionChange.Before} → {regionChange.After}.");
+            _first = false;
+            log.Info("Perception", $"Première lecture de l'écran : {Describe(hud)}.");
         }
 
         // Pendant une notification de montée de niveau, le bandeau recouvre la cible
         // (16/11 à 20:08 : cible « Lim MINING », santé 30/30000). La cible est ignorée 8 s.
-        // Le passage de niveau vient du serveur (NotifyLevelUp, v0.3.19).
-        var masked = now.ReadAt < _notificationUntil;
+        var masked = hud.ReadAt < _notificationUntil;
 
         // Cible qui apparaît, change ou disparaît : notée seulement si lue 2 fois de suite, et pas pendant une notification.
-        if (!masked && _target.Update(now.Target?.Name ?? NoTarget) is { } targetChange)
+        if (!masked && _target.Update(hud.Target?.Name ?? NoTarget) is { } targetChange)
         {
             if (targetChange.After == NoTarget)
             {
@@ -128,9 +59,18 @@ public sealed class HudChangeLogger(SessionLog log)
             }
             else
             {
-                log.Info("Perception", $"Cible : {now.Target}.");
-                CheckAgainstGameData(now.Target!);
+                log.Info("Perception", $"Cible : {hud.Target}.");
+                CheckAgainstGameData(hud.Target!);
             }
+        }
+
+        if (hud.ReadAt - _lastSummary >= SummaryInterval)
+        {
+            if (_lastSummary != DateTime.MinValue)
+            {
+                log.Detail("Perception", $"Résumé : {Describe(hud)}. Lecture moyenne {_totalReadMs / _reads:0} ms, {captureFps:0.0} images/s.");
+            }
+            _lastSummary = hud.ReadAt;
         }
     }
 
@@ -158,22 +98,5 @@ public sealed class HudChangeLogger(SessionLog log)
         }
     }
 
-    // Garde les dernières valeurs connues quand une lecture échoue (pour comparer d'une lecture à l'autre).
-    private static HudState Merge(HudState? previous, HudState now) =>
-        previous is null
-            ? now
-            : now with
-            {
-                ZoneName = now.ZoneName ?? previous.ZoneName,
-                Region = now.Region ?? previous.Region,
-                Position = now.Position ?? previous.Position,
-            };
-
-    public static string Describe(HudState hud)
-    {
-        var position = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "position ?";
-        var region = hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "région ?";
-        var target = hud.Target is null ? "aucune" : hud.Target.ToString();
-        return $"{position}, {hud.ZoneName ?? "zone ?"}, {region}, cible {target}";
-    }
+    public static string Describe(HudState hud) => $"cible {(hud.Target is null ? "aucune" : hud.Target.ToString())}";
 }

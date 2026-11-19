@@ -193,3 +193,13 @@ Demandes de Julien (passation session 14) : supprimer Num 5 ; plus d'information
   - messages bruts du serveur : 1 sur 200 en « Détails » (avant : tous, chacun relu une 2e fois).
 - Vérifié : 262 tests (nouveaux : `V0319Tests`, 9 cas) ; rendu **hors écran** des 5 onglets à 1920 et 800 px et de l'overlay (Julien jouait : aucune fenêtre ouverte).
 - **Pas vérifié** : mesure CPU / RAM avant / après, journal des tâches en réel (il faut la connexion au serveur, donc le jeu fermé avant). .exe fabriqué en local (`artifacts/release/BitcraftBot-v0.3.19.exe`), sans Release GitHub.
+
+## 33. v0.3.20 — stabilité : image du jeu et icônes réparées, écran = cible seulement (2026-11-19)
+
+Essai v0.3.19 de Julien : journal des tâches OK (pêche, coupe : coups, XP, objets justes) ; **image du jeu absente**, **images des recettes absentes**, position écran décrochée.
+
+- **Cause** (reproduite sur un banc hors écran qui fait tourner le vrai code) : les icônes des recettes étaient décodées **en parallèle**. Le décodeur WebP de Windows se bloque alors lui-même : 20 images en 3,9 s au lieu de 0,09 s une par une. Les fils partagés du programme restaient occupés (jusqu'à 30 fils, 50 tâches en attente) ; la capture et l'affichage du jeu attendaient leur tour. Le défaut existait depuis la v0.3.15, la v0.3.19 l'a rendu visible.
+- **Correctifs** : une seule icône décodée à la fois ; la **capture du jeu a son propre fil** (elle ne dépend plus des fils partagés). Mesuré : image du jeu en 0,25 s après « Démarrer », même juste après l'onglet Recettes ; aucune tâche en attente.
+- **Écran** (D-048) : position, zone et région ne sont plus lues ; plus de comparaison écran / serveur ni d'image de diagnostic. Reste la cible sélectionnée (aucune lecture de texte sans panneau de cible).
+- **Journal des tâches** : ressource et métier seulement pour une récolte (avant : « DeployDeployable « Young Beech Tree » ») ; noms en français pour sortir et ranger un véhicule, etc.
+- **Vérifié** : 263 tests ; banc hors écran : 2 sessions de suite, tous les onglets, recherche de recettes pendant la capture, fermeture propre ; aucune erreur. Pas d'essai réel des fonctions serveur (le jeu de Julien était lancé).

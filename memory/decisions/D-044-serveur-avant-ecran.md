@@ -17,4 +17,4 @@
 
 ## Conséquences
 - La lecture de l'écran coûte peu (≈ 9 ms par image) : on la garde entière pour le moment, sans l'utiliser pour les décisions sur la vie et l'endurance.
-- Fait en v0.3.19 : l'écran ne lit plus que la position (contrôle), la zone, la région et la cible sélectionnée.
+- Fait en v0.3.19 puis v0.3.20 (D-048) : l'écran ne lit plus que la cible sélectionnée.

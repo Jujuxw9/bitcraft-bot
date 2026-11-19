@@ -21,7 +21,7 @@ using Frame = BitcraftBot.Perception.Capture.Frame;
 namespace BitcraftBot.App;
 
 // Fenêtre de supervision (D-005). Onglets (v0.3.16) : Bot, Personnage, Carte, Recettes, Paramètres :
-// affiche le jeu en direct, lit le HUD (position, zone, région, cible ; le reste vient du serveur), gère la sécurité, écrit le journal.
+// affiche le jeu en direct, lit la cible sélectionnée à l'écran (le reste vient du serveur), gère la sécurité, écrit le journal.
 // Seule action envoyée au jeu : Maj + E, si le repas automatique est coché (D-042).
 public partial class MainWindow : Window
 {
@@ -41,8 +41,6 @@ public partial class MainWindow : Window
     private readonly HudChangeLogger _hudLogger;
     private readonly HudReader? _hudReader;
     private readonly GameDataLoader _gameData;
-    private const int MaxDiagnostics = 5;
-    private int _diagnosticsSaved;
     private bool _gameVisible = true;
     private DateTime _lastCaptureKeyAt = DateTime.MinValue;
     private GlobalKeyboardHook? _keyboardHook;
@@ -141,7 +139,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.19 : touche Num 5 supprimée (D-047), niveaux et tâches écrits dans le journal (lus sur le serveur), vie, endurance, faim et jauge de métier plus lues à l'écran, moins de CPU (seul l'onglet affiché est redessiné, capture ralentie quand l'image est cachée). Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.3.20 : image du jeu et images des recettes réparées (décodage des images une par une, capture sur un fil à part), l'écran ne lit plus que la cible (position, zone et région viennent du serveur), noms des tâches corrigés. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
         InitServerTab();
         InitTaskJournal();
         InitOverlay();
@@ -237,8 +235,6 @@ public partial class MainWindow : Window
         ReadInputs();
         _safety.Start();
         _hudLogger.Reset();
-        _hudReader?.ResetPosition();
-        _diagnosticsSaved = 0;
         _gameVisible = true;
         _consecutiveCaptureErrors = 0;
         _framesCounted = 0;
@@ -252,7 +248,8 @@ public partial class MainWindow : Window
         _sessionCts = new CancellationTokenSource();
         var token = _sessionCts.Token;
         var fps = _settings.TargetFps;
-        _ = Task.Run(() => CaptureLoopAsync(fps, token), token);
+        // Fil à lui (v0.3.20) : la capture ne dépend plus des fils partagés, qu'une autre tâche peut occuper.
+        new Thread(() => CaptureLoop(fps, token)) { IsBackground = true, Name = "Capture du jeu" }.Start();
         if (_hudReader is not null)
         {
             _ = Task.Run(() => HudLoopAsync(_hudReader, token), token);
@@ -275,58 +272,66 @@ public partial class MainWindow : Window
     }
 
     // Boucle de capture : cadence fixe, compensée (un retard n'est pas cumulé d'une image à l'autre).
-    private async Task CaptureLoopAsync(int fps, CancellationToken token)
+    // Image cachée (autre onglet, fenêtre réduite) : 2 images/s seulement, juste pour la lecture du HUD.
+    private void CaptureLoop(int fps, CancellationToken token)
     {
-        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1.0 / fps));
+        var period = TimeSpan.FromSeconds(1.0 / fps);
+        var clock = Stopwatch.StartNew();
+        var next = TimeSpan.Zero;
         var lastLocate = DateTime.MinValue;
         var lastCapture = DateTime.MinValue;
+        while (!token.IsCancellationRequested)
+        {
+            var now = DateTime.Now;
+            if (_imageShown || now - lastCapture >= HiddenCaptureInterval - TimeSpan.FromMilliseconds(20))
+            {
+                lastCapture = now;
+                CaptureOnce(now, ref lastLocate);
+            }
+            next += period;
+            var wait = next - clock.Elapsed;
+            if (wait < TimeSpan.Zero)
+            {
+                // En retard (PC chargé) : on repart de maintenant, sans rattraper les images manquées.
+                next = clock.Elapsed;
+                wait = TimeSpan.Zero;
+            }
+            token.WaitHandle.WaitOne(wait);
+        }
+    }
+
+    private void CaptureOnce(DateTime now, ref DateTime lastLocate)
+    {
+        if (_gameWindow is null || now - lastLocate >= LocateInterval)
+        {
+            var found = _locator.Find();
+            lastLocate = now;
+            _ = Dispatcher.BeginInvoke(() => OnGameLocated(found));
+            _gameWindow = found;
+        }
+        var area = _gameWindow?.ClientArea ?? GameWindowLocator.PrimaryScreen();
+        var watch = Stopwatch.StartNew();
         try
         {
-            do
+            var frame = _capturer.Capture(area);
+            _captureMsTotal += watch.Elapsed.TotalMilliseconds;
+            _captureMsCount++;
+            _latestFrame = frame;
+            _framesCounted++;
+            _consecutiveCaptureErrors = 0;
+            // Une seule image en attente d'affichage : si l'interface est en retard, on saute des images.
+            if (_imageShown && Interlocked.Exchange(ref _displayPending, 1) == 0)
             {
-                var now = DateTime.Now;
-                if (!_imageShown && now - lastCapture < HiddenCaptureInterval - TimeSpan.FromMilliseconds(20))
-                {
-                    continue;
-                }
-                lastCapture = now;
-                if (_gameWindow is null || now - lastLocate >= LocateInterval)
-                {
-                    var found = _locator.Find();
-                    lastLocate = now;
-                    _ = Dispatcher.BeginInvoke(() => OnGameLocated(found));
-                    _gameWindow = found;
-                }
-                var area = _gameWindow?.ClientArea ?? GameWindowLocator.PrimaryScreen();
-                var watch = Stopwatch.StartNew();
-                try
-                {
-                    var frame = _capturer.Capture(area);
-                    _captureMsTotal += watch.Elapsed.TotalMilliseconds;
-                    _captureMsCount++;
-                    _latestFrame = frame;
-                    _framesCounted++;
-                    _consecutiveCaptureErrors = 0;
-                    // Une seule image en attente d'affichage : si l'interface est en retard, on saute des images.
-                    if (_imageShown && Interlocked.Exchange(ref _displayPending, 1) == 0)
-                    {
-                        _ = Dispatcher.BeginInvoke(DispatcherPriority.Render, () => ShowFrame(frame));
-                    }
-                }
-                catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
-                {
-                    var errors = ++_consecutiveCaptureErrors;
-                    if (errors == 1 || errors % 25 == 0)
-                    {
-                        _log.Erreur("Capture", $"Échec de capture ({errors} de suite) : {ex.Message}");
-                    }
-                }
+                _ = Dispatcher.BeginInvoke(DispatcherPriority.Render, () => ShowFrame(frame));
             }
-            while (await timer.WaitForNextTickAsync(token));
         }
-        catch (OperationCanceledException)
+        catch (Exception ex) when (ex is InvalidOperationException or ArgumentException)
         {
-            // Fin normale de session.
+            var errors = ++_consecutiveCaptureErrors;
+            if (errors == 1 || errors % 25 == 0)
+            {
+                _log.Erreur("Capture", $"Échec de capture ({errors} de suite) : {ex.Message}");
+            }
         }
     }
 
@@ -368,15 +373,7 @@ public partial class MainWindow : Window
                     {
                         break;
                     }
-                    var diagnostic = _hudLogger.OnHudRead(hud, _measuredFps);
-                    if (diagnostic is not null && _diagnosticsSaved < MaxDiagnostics)
-                    {
-                        _diagnosticsSaved++;
-                        // Image de diagnostic à côté du journal : pour comprendre un cas anormal (reste sur le PC, D-026).
-                        var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(_log.FilePath)!, $"diagnostic_{DateTime.Now:HH-mm-ss}.png");
-                        await FrameSaver.SavePngAsync(frame, path);
-                        _log.Info("Perception", $"Image de diagnostic enregistrée ({diagnostic}) : {path}");
-                    }
+                    _hudLogger.OnHudRead(hud, _measuredFps);
                     _ = Dispatcher.BeginInvoke(() => ShowHud(hud));
                 }
                 catch (Exception ex) when (ex is not OperationCanceledException)
@@ -491,8 +488,7 @@ public partial class MainWindow : Window
         {
             return;
         }
-        RememberHudPosition(hud);
-        HudPosition.Text = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "illisible";
+        RememberHudTarget(hud);
         if (hud.Target is null)
         {
             HudTarget.Text = "aucune";
@@ -516,8 +512,7 @@ public partial class MainWindow : Window
         }
         foreach (var (name, rect) in HudLayout.AllZones)
         {
-            var isTargetZone = name is "Cible" or "Catégorie" or "Santé cible";
-            if (isTargetZone && hud.Target is null)
+            if (hud.Target is null)
             {
                 continue;
             }

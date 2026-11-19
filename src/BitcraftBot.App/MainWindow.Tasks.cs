@@ -18,10 +18,15 @@ public partial class MainWindow
             && _gameData.Current?.Extractions.GetValueOrDefault(r.ResourceId) is { } extraction ? extraction.SkillId : null;
     }
 
-    // Ressource visée par l'action (récolte) : d'après la cible de l'action, sinon le dernier coup donné.
+    // Ressource visée par une récolte : d'après la cible de l'action, sinon le dernier coup donné.
+    // Seulement pour une récolte (essai v0.3.19 : « DeployDeployable « Young Beech Tree » », faux).
     private NearbyResource? TargetResource(ActionInfo action)
     {
         var s = _taskSnapshot;
+        if (action.Type != "Extract")
+        {
+            return null;
+        }
         var target = action.Target ?? s?.LastExtract?.Target;
         return target is { } id && s is not null ? s.Resources.FirstOrDefault(r => r.EntityId == id) : null;
     }

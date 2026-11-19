@@ -186,6 +186,15 @@ public static class ActionNames
         ["DeployableMove"] = "déplacement en véhicule",
         ["Prospect"] = "prospection",
         ["PaveTile"] = "pavage",
+        ["DeployDeployable"] = "sortie d'un véhicule",
+        ["StoreDeployable"] = "rangement d'un véhicule",
+        ["SpawnCargo"] = "dépôt d'une cargaison",
+        ["DestroyPaving"] = "retrait d'un pavé",
+        ["ResupplyClaim"] = "ravitaillement d'un terrain",
+        ["SetHome"] = "choix du foyer",
+        ["PlacePlaceable"] = "pose d'un objet",
+        ["InteractPlaceable"] = "utilisation d'un objet",
+        ["AbilityCustom"] = "capacité",
     };
 
     public static string French(string type) => Names.GetValueOrDefault(type) ?? type;

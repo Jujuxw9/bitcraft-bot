@@ -16,6 +16,7 @@
 | [12](2026-11-19-session-12-repas.md) | 2026-11-19 | Claude Code | v0.3.15 : repas automatique (Maj + E), images des objets, raccourcis du jeu |
 | [13](2026-11-19-session-13-actions-theme.md) | 2026-11-19 | Claude Code | v0.3.18 : contrôleur d'actions commun, thème BitCraft, déconnexion garantie, raccourci bureau |
 | [14](2026-11-19-session-14-num5-taches-cpu.md) | 2026-11-19 | Claude Code | v0.3.19 : Num 5 supprimée, journal des niveaux et des tâches, HUD allégé, moins de CPU |
+| [15](2026-11-19-session-15-stabilite-plan-recolte.md) | 2026-11-19 | Claude Code | v0.3.20 : image du jeu et icônes réparées, écran = cible seulement, plan de la récolte automatique |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

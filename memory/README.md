@@ -33,10 +33,10 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-047
+- [README.md](decisions/README.md) — tableau D-001 à D-048
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-022
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-023
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -56,7 +56,9 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v0317.md](echanges/2026-11-19-essai-v0317.md) — essai v0.3.17 (fait : formats et % du métier vérifiés)
 - [2026-11-19-essai-v0318.md](echanges/2026-11-19-essai-v0318.md) — essai v0.3.18 à faire (thème, repas auto actif, Num 5, fermeture)
 - [2026-11-19-passation-session-14.md](echanges/2026-11-19-passation-session-14.md) — passation vers la session 14 (traitée)
-- [2026-11-19-essai-v0319.md](echanges/2026-11-19-essai-v0319.md) — essai v0.3.19 à faire (Num 5, journal des tâches, CPU)
+- [2026-11-19-essai-v0319.md](echanges/2026-11-19-essai-v0319.md) — essai v0.3.19 (fait : journal des tâches OK, image du jeu et icônes en panne → v0.3.20)
+- [2026-11-19-essai-v0320.md](echanges/2026-11-19-essai-v0320.md) — essai v0.3.20 à faire (image du jeu, icônes)
+- [2026-11-19-plan-recolte-auto.md](echanges/2026-11-19-plan-recolte-auto.md) — **plan de bataille de la récolte automatique** (étapes R1 à R7, à valider : Q-023)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -64,7 +66,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.3.19
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.3.20
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)

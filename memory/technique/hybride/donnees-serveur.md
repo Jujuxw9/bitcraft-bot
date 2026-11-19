@@ -48,6 +48,6 @@ Format réel des nouvelles tables v0.3.17 : **vérifié** à l'essai du 2026-11-
 | **Cible sélectionnée** (avant le premier coup) | le serveur ne connaît la ressource qu'au premier coup (`extract_outcome_state`) | v0.2 |
 | Menus, fenêtres et info-bulles ouverts | interface du jeu, pas sur le serveur | v0.3.13 (jeu caché) |
 | Ce que voit la caméra (arbre visible, obstacle) | rendu 3D | H3 |
-| Contrôle croisé de la position | sécurité : écran et serveur doivent concorder | v0.3.7 |
+| ~~Contrôle croisé de la position~~ | retiré en v0.3.20 (D-048) : le serveur est juste, l'écran décrochait | v0.3.7 |
 
-Vie, endurance, faim et jauge de métier ne sont **plus lues à l'écran** depuis la v0.3.19 (demande de Julien) : le serveur les donne exactement. Passages de niveau et tâches (début, fin) : écrits dans le journal d'après le serveur (`experience_state`, `player_action_state`, `extract_outcome_state`, inventaires).
+Vie, endurance, faim et jauge de métier ne sont **plus lues à l'écran** depuis la v0.3.19 ; position, zone et région non plus depuis la v0.3.20 (D-048) (demande de Julien) : le serveur les donne exactement. Passages de niveau et tâches (début, fin) : écrits dans le journal d'après le serveur (`experience_state`, `player_action_state`, `extract_outcome_state`, inventaires).

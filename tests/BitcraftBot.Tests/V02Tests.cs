@@ -139,9 +139,6 @@ public class HudReaderReferenceTests
         var frame = await LoadFrameAsync(ReferenceImage);
         var hud = await new HudReader(reader, KnownNames.Resources).ReadAsync(frame);
 
-        Assert.True(hud.Position == (8927, 6707), $"Position lue : « {hud.RawPosition} »");
-        Assert.Equal("Safe Meadows", hud.ZoneName);
-        Assert.Equal(("Keldan", 18), hud.Region);
         Assert.NotNull(hud.Target);
         Assert.Equal("Mature Oak Tree", hud.Target!.Name);
         Assert.Equal("Tier 1 - Tree", hud.Target.Category);
