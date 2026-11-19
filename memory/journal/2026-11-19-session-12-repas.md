@@ -32,3 +32,4 @@
 - Fait : inventaire `technique/hybride/donnees-serveur.md`, 6 nouvelles lectures (expérience, action, ressource frappée, temps de jeu, énergie, vie et endurance max), tableau de bord, Num 0 sans doublon. 254 tests OK. v0.3.17 publiée.
 - Contrôle de la mémoire : index et liens OK ; corrigé l'en-tête périmé de `technique/architecture.md` (v0.3.4), les renvois à D-032 (D-030, D-033, interface du jeu), le statut de Q-001, Q-002, Q-014, les livrables H2 / H3 ; numéro d'entité du personnage masqué dans `constats.md` (dépôt public).
 - Contrôle du dépôt : aucune donnée privée (e-mail, jeton, identité) ; rien d'obsolète à retirer ; première Release GitHub avec le tag v0.3.17.
+- Release GitHub v0.3.17 : fabriquée avec succès par `.github/workflows/release.yml` (tests compris), fichier `BitcraftBot-v0.3.17.exe`. Tout est poussé. Session à compacter ensuite.
