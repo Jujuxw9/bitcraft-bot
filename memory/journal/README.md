@@ -17,6 +17,7 @@
 | [13](2026-11-19-session-13-actions-theme.md) | 2026-11-19 | Claude Code | v0.3.18 : contrôleur d'actions commun, thème BitCraft, déconnexion garantie, raccourci bureau |
 | [14](2026-11-19-session-14-num5-taches-cpu.md) | 2026-11-19 | Claude Code | v0.3.19 : Num 5 supprimée, journal des niveaux et des tâches, HUD allégé, moins de CPU |
 | [15](2026-11-19-session-15-stabilite-plan-recolte.md) | 2026-11-19 | Claude Code | v0.3.20 : image du jeu et icônes réparées, écran = cible seulement, plan de la récolte automatique |
+| [16](2026-11-19-session-16-r1-camera.md) | 2026-11-19 | Claude Code | v0.4.0 : R1, le bot apprend la caméra (écoute de la souris, formule, carte Caméra) |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

@@ -139,9 +139,10 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.20 : image du jeu et images des recettes réparées (décodage des images une par une, capture sur un fil à part), l'écran ne lit plus que la cible (position, zone et région viennent du serveur), noms des tâches corrigés. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.4.0 (R1) : le bot apprend la caméra en regardant Julien couper (clic droit, caméra recentrée avec W) ; écoute de la souris en lecture seule. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
         InitServerTab();
         InitTaskJournal();
+        InitCamera();
         InitOverlay();
         InitMeals();
         InitLayout();
@@ -171,6 +172,11 @@ public partial class MainWindow : Window
         if (!isInjected)
         {
             Dispatcher.BeginInvoke(NotePhysicalKey);
+        }
+        // W, Q, D : état de la caméra (R1). Tapées par Julien ou, plus tard, par le bot.
+        if (!isExtended)
+        {
+            Dispatcher.BeginInvoke(() => OnCameraKey(scanCode));
         }
         // Num 0 : capture de l'écran du jeu seul (1920×1080 exact), même avec 2 écrans.
         if (!isInjected && CaptureKey.IsCapture(scanCode, isExtended))
@@ -841,6 +847,7 @@ public partial class MainWindow : Window
             return;
         }
         _keyboardHook?.Dispose();
+        CloseCamera();
         _resourceTimer.Stop();
         CloseOverlay();
 

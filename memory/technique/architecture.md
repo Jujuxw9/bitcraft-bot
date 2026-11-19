@@ -281,4 +281,4 @@ Rappel : si une fenêtre (inventaire…) recouvre la jauge, elle n'est pas lue. 
 
 ## 17 et suivantes : brique Server (voie hybride)
 
-Déplacées dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) : brique Server, H1 (lecture du serveur), v0.3.5 à v0.3.10.
+Déplacées dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) : brique Server, H1 (lecture du serveur), v0.3.5 à v0.3.20, puis la récolte automatique (v0.4.x, section 34 et suivantes : écoute de la souris `Input/Mouse`, formule de la caméra `Server/Aim`).

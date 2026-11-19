@@ -36,7 +36,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [README.md](decisions/README.md) — tableau D-001 à D-049
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-023
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-024
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -60,6 +60,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v0320.md](echanges/2026-11-19-essai-v0320.md) — essai v0.3.20 (pas fait : Julien juge que ce n'est pas utile)
 - [2026-11-19-plan-recolte-auto.md](echanges/2026-11-19-plan-recolte-auto.md) — **plan de bataille de la récolte automatique** (étapes R1 à R7, validé : D-049)
 - [2026-11-19-passation-recolte-auto.md](echanges/2026-11-19-passation-recolte-auto.md) — **passation** : prompt pour le nouveau chat (R1 à R7)
+- [2026-11-19-essai-v040.md](echanges/2026-11-19-essai-v040.md) — **essai v0.4.0 à faire** (R1 : couper 10 à 15 arbres à la main, précision < 25 px)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -67,11 +68,11 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.3.20
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.0
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-03)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-04)

@@ -435,6 +435,19 @@
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
+                                <TextBlock Text="CAMÉRA" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="CameraStateText" Text="Caméra : W pas encore vu" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock x:Name="CameraCountText" Text="Clics appris : 0" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="CameraPrecisionText" Text="Précision : —" TextWrapping="Wrap" />
+                                <TextBlock x:Name="CameraFormulaText" Text="" Style="{StaticResource MutedText}" TextWrapping="Wrap" />
+                                <TextBlock x:Name="CameraLastText" Text="" Style="{StaticResource MutedText}" TextWrapping="Wrap" />
+                                <Button x:Name="CameraForgetButton" Content="Oublier les clics" Style="{StaticResource SmallButton}" HorizontalAlignment="Left"
+                                        Margin="0,8,0,0" Click="CameraForgetButton_Click" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
                                 <TextBlock Text="AFFICHAGE" Style="{StaticResource CardTitle}" />
                                 <CheckBox x:Name="OverlayCheck" Content="Overlay sur le jeu" IsChecked="True" Click="OverlayCheck_Click" />
                                 <CheckBox x:Name="ShowZonesCheck" Content="Zones lues sur l'image" IsChecked="True" Click="ShowZonesCheck_Click" />

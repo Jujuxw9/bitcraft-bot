@@ -281,6 +281,7 @@ public partial class MainWindow
         if (reader.State == ReaderState.Connecte)
         {
             TrackTasks(s, inventories, !reader.InventoryRefused);
+            TrackCamera(s);
         }
         else
         {
