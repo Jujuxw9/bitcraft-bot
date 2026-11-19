@@ -52,6 +52,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-18-essai-h2.md](echanges/2026-11-18-essai-h2.md) — essais H2 (v0.3.11, v0.3.12 : faits)
 - [2026-11-19-essai-v0314.md](echanges/2026-11-19-essai-v0314.md) — essai v0.3.14 à faire (overlay, Num 5, sac et banques, recettes)
 - [2026-11-19-essai-v0315.md](echanges/2026-11-19-essai-v0315.md) — essai v0.3.15 à faire (repas automatique, images des recettes)
+- [2026-11-19-essai-v0316.md](echanges/2026-11-19-essai-v0316.md) — essai v0.3.16 à faire (onglets regroupés, bonus actifs)
 
 ### technique/
 - [README.md](technique/README.md) — index

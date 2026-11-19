@@ -83,12 +83,12 @@ public class V0315MealTests
     [Fact]
     public void Secondes_restantes_du_bonus()
     {
-        var now = DateTimeOffset.FromUnixTimeSeconds(10_000);
+        var now = DateTimeOffset.FromUnixTimeSeconds(1_795_000_000);
         var regen = new HashSet<int> { 100 };
         Assert.Null(MealPlanner.FoodRegenSeconds([], false, regen, now));
         Assert.Equal(0, MealPlanner.FoodRegenSeconds([], true, regen, now));
-        Assert.Equal(0, MealPlanner.FoodRegenSeconds([new ActiveBuffInfo(100, 9_000, 900)], true, regen, now));
-        Assert.Equal(400, MealPlanner.FoodRegenSeconds([new ActiveBuffInfo(100, 9_500, 900), new ActiveBuffInfo(7, 9_999, 5000)], true, regen, now));
+        Assert.Equal(0, MealPlanner.FoodRegenSeconds([new ActiveBuffInfo(100, 1_794_999_000, 900)], true, regen, now));
+        Assert.Equal(400, MealPlanner.FoodRegenSeconds([new ActiveBuffInfo(100, 1_794_999_500, 900), new ActiveBuffInfo(7, 1_794_999_999, 5000)], true, regen, now));
         Assert.Equal(-1, new ActiveBuffInfo(5, 0, -1).RemainingSeconds(now));
     }
 
@@ -141,7 +141,8 @@ public class V0315FoodBookTests : IDisposable
         Assert.True(book.Foods[1].IsMeal);
         Assert.Equal(25, book.Foods[1].Hunger);
         Assert.False(book.Foods[2].IsMeal);
-        Assert.Equal("Level 1 Food Regen", book.BuffNames[100]);
+        Assert.Equal("Level 1 Food Regen", book.Buffs[100].Name);
+        Assert.Equal("Food Regen", book.Buffs[100].Type);
     }
 
     // Vraies données (si BITCRAFT_GAMEDATA pointe vers un dossier complet) : le poisson grillé donne le bonus.

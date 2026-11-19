@@ -11,7 +11,6 @@ using BitcraftBot.Core.Logging;
 using BitcraftBot.Core.Monitoring;
 using BitcraftBot.Core.Safety;
 using BitcraftBot.GameData;
-using BitcraftBot.Input.Human;
 using BitcraftBot.Input.Keyboard;
 using BitcraftBot.Input.Native;
 using BitcraftBot.Perception.Capture;
@@ -21,9 +20,9 @@ using Frame = BitcraftBot.Perception.Capture.Frame;
 
 namespace BitcraftBot.App;
 
-// Fenêtre de supervision (D-005), version 0.2 (onglets Supervision, Journal, Système) :
+// Fenêtre de supervision (D-005). Onglets (v0.3.16) : Bot, Personnage, Carte, Recettes, Paramètres :
 // affiche le jeu en direct, lit le HUD (position, vie, endurance, faim, cible), gère la sécurité, écrit le journal.
-// Aucune action n'est envoyée au jeu dans cette version.
+// Seule action envoyée au jeu : Maj + E, si le repas automatique est coché (D-042).
 public partial class MainWindow : Window
 {
     private const int GraphPoints = 120;
@@ -60,7 +59,6 @@ public partial class MainWindow : Window
 
     // Banc d'essai des mouvements (D-035).
     private readonly InputSender _inputSender = new();
-    private CancellationTokenSource? _testCts;
 
     private CancellationTokenSource? _sessionCts;
     private WriteableBitmap? _bitmap;
@@ -138,7 +136,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.15 : repas automatique (Maj + E, désactivé par défaut), images des objets dans Recettes, onglet Journal avant Paramètres. Lecture seule du serveur officiel. Seules actions sur le jeu : Maj + E si le repas automatique est coché, et le banc d'essai.");
+        _log.Info("Session", "Version 0.3.16 : onglets regroupés (Bot, Personnage, Carte, Recettes, Paramètres avec le journal), bonus actifs lus sur le serveur, vie, endurance et faim prises sur le serveur. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E si le repas automatique est coché.");
         InitServerTab();
         InitOverlay();
         InitMeals();
@@ -198,12 +196,6 @@ public partial class MainWindow : Window
         Dispatcher.BeginInvoke(() =>
         {
             StopMealsForEmergency();
-            // Un test de mouvements en cours s'arrête toujours avec Num 5.
-            if (_testCts is { IsCancellationRequested: false } test)
-            {
-                test.Cancel();
-                _log.Alerte("Sécurité", $"Touche {EmergencyKey.DisplayName} : test de mouvements arrêté.");
-            }
             if (!_safety.IsRunning)
             {
                 _log.Info("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée (aucune session en cours).");
@@ -520,9 +512,11 @@ public partial class MainWindow : Window
         RememberHudPosition(hud);
         HudPosition.Text = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "illisible";
         HudZone.Text = $"{hud.ZoneName ?? "?"}, {(hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "?")}";
-        HudHealth.Text = hud.Health.ToString();
-        HudStamina.Text = hud.Stamina.ToString();
-        HudHunger.Text = hud.HungerRatio is { } h ? $"≈{h * 100:0} % (ligne)" : "?";
+        // Vie, endurance, faim : le serveur d'abord (valeurs exactes), l'écran seulement sans serveur (v0.3.16).
+        var server = _serverReader?.State == Server.ReaderState.Connecte ? _lastSnapshot : null;
+        HudHealth.Text = server?.Health is { } sh ? $"{sh:0} (serveur)" : hud.Health + " (écran)";
+        HudStamina.Text = server?.Stamina is { } ss ? $"{ss:0} (serveur)" : hud.Stamina + " (écran)";
+        HudHunger.Text = server?.Satiation is { } sf ? $"{sf:0} / {server.MaxSatiation ?? 100:0} (serveur)" : hud.HungerRatio is { } h ? $"≈{h * 100:0} % (écran)" : "?";
         if (hud.Target is null)
         {
             HudTarget.Text = "aucune";
@@ -554,16 +548,16 @@ public partial class MainWindow : Window
             }
             var ok = hud.ZonesRead.Contains(name);
             var color = ok ? Color.FromRgb(61, 245, 138) : Color.FromRgb(255, 165, 0);
-            // Trait épais : l'image est réduite environ 3 fois dans la fenêtre.
+            // Trait fin (demande de Julien, v0.3.16) : 2 px de l'image, juste autour de la zone lue.
             var box = new Rectangle
             {
-                Width = rect.Width + 8,
-                Height = rect.Height + 8,
+                Width = rect.Width + 4,
+                Height = rect.Height + 4,
                 Stroke = new SolidColorBrush(color),
-                StrokeThickness = 5,
+                StrokeThickness = 2,
             };
-            Canvas.SetLeft(box, rect.X - 4);
-            Canvas.SetTop(box, rect.Y - 4);
+            Canvas.SetLeft(box, rect.X - 2);
+            Canvas.SetTop(box, rect.Y - 2);
             OverlayCanvas.Children.Add(box);
         }
     }
@@ -641,7 +635,7 @@ public partial class MainWindow : Window
         {
             ScrollLogToEnd();
         }
-        // Bandeau du bas de l'onglet Supervision : dernier événement (sauf les détails).
+        // Bandeau du bas de l’onglet Bot : dernier événement (sauf les détails).
         if (entry.Level != LogLevel.Detail)
         {
             LastEventText.Text = line.Text;
@@ -805,108 +799,6 @@ public partial class MainWindow : Window
         SystemRamWarningBox.Text = l.SystemRamAvailableWarningPercent.ToString("0");
     }
 
-    private void TestsEnabledCheck_Click(object sender, RoutedEventArgs e)
-    {
-        var enabled = TestsEnabledCheck.IsChecked == true;
-        UpdateTestButtons();
-        TestStatusText.Text = enabled ? "Banc d'essai activé. Choisissez un test." : "Banc d'essai désactivé.";
-        _log.Info("Test", enabled ? "Banc d'essai des mouvements activé." : "Banc d'essai des mouvements désactivé.");
-        if (!enabled)
-        {
-            _testCts?.Cancel();
-        }
-    }
-
-    private void UpdateTestButtons()
-    {
-        var enabled = TestsEnabledCheck.IsChecked == true;
-        var running = _testCts is not null;
-        TestMouseButton.IsEnabled = enabled && !running;
-        TestCameraButton.IsEnabled = enabled && !running;
-        TestStopButton.IsEnabled = running;
-        AllowClicksCheck.IsEnabled = !running;
-        TestDurationBox.IsEnabled = !running;
-    }
-
-    private void TestStopButton_Click(object sender, RoutedEventArgs e) => _testCts?.Cancel();
-
-    private async void TestMouseButton_Click(object sender, RoutedEventArgs e) => await RunMovementTestAsync(camera: false);
-
-    private async void TestCameraButton_Click(object sender, RoutedEventArgs e) => await RunMovementTestAsync(camera: true);
-
-    private async Task RunMovementTestAsync(bool camera)
-    {
-        if (TestsEnabledCheck.IsChecked != true || _testCts is not null)
-        {
-            return;
-        }
-        var game = _locator.Find();
-        if (game is null)
-        {
-            TestStatusText.Text = "Jeu introuvable : lancez BitCraft d'abord.";
-            _log.Alerte("Test", "Test impossible : fenêtre du jeu introuvable.");
-            return;
-        }
-        if (!int.TryParse(TestDurationBox.Text, out var seconds) || seconds is < 5 or > 120)
-        {
-            seconds = 30;
-            TestDurationBox.Text = "30";
-        }
-        var allowClicks = !camera && AllowClicksCheck.IsChecked == true;
-        var area = game.ClientArea;
-        var options = new MovementTestOptions
-        {
-            GameWindow = game.Handle,
-            // Zone sûre : centre de l'écran, hors minicarte / panneau cible (haut), chat (gauche), barres (bas).
-            Area = new SafeArea(area.X + 350, area.Y + 150, area.X + area.Width - 350, area.Y + area.Height - 280),
-            Duration = TimeSpan.FromSeconds(seconds),
-            AllowLeftClicks = allowClicks,
-            CharacterCenter = (area.X + area.Width / 2, area.Y + (int)(area.Height * 0.55)),
-        };
-
-        _testCts = new CancellationTokenSource();
-        var token = _testCts.Token;
-        UpdateTestButtons();
-        var name = camera ? "caméra" : allowClicks ? "souris avec clics gauche" : "souris sans clic";
-        try
-        {
-            for (var i = 3; i > 0; i--)
-            {
-                TestStatusText.Text = $"Test {name} dans {i} s… (Num 5 pour annuler)";
-                await Task.Delay(1000, token);
-            }
-            _inputSender.BringToFront(game.Handle);
-            await Task.Delay(300, token);
-            if (!_inputSender.IsForeground(game.Handle))
-            {
-                TestStatusText.Text = "Le jeu n'a pas pu passer au premier plan : cliquez dans le jeu puis relancez.";
-                _log.Alerte("Test", "Test annulé : le jeu n'est pas au premier plan.");
-                return;
-            }
-            TestStatusText.Text = $"Test {name} en cours ({seconds} s)…";
-            _log.Info("Test", $"Début du test {name}, {seconds} s, zone souris {options.Area.Left},{options.Area.Top} → {options.Area.Right},{options.Area.Bottom}.");
-            var tester = new MovementTester(_inputSender, new Random(), message =>
-                _log.Write(message.StartsWith("Test ", StringComparison.Ordinal) ? LogLevel.Info : LogLevel.Detail, "Test", message));
-            var result = await Task.Run(() => camera ? tester.RunCameraAsync(options, token) : tester.RunMouseAsync(options, token));
-            TestStatusText.Text = $"Test {name} terminé : {MovementTester.Describe(result)}.";
-            if (result is TestEnd.SourisBougeeALaMain or TestEnd.JeuPlusAuPremierPlan or TestEnd.Erreur)
-            {
-                _log.Alerte("Test", $"Test {name} interrompu : {MovementTester.Describe(result)}.");
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            TestStatusText.Text = $"Test {name} annulé.";
-            _log.Info("Test", $"Test {name} annulé avant le début.");
-        }
-        finally
-        {
-            _testCts.Dispose();
-            _testCts = null;
-            UpdateTestButtons();
-        }
-    }
-
     private void LimitBox_LostFocus(object sender, RoutedEventArgs e)
     {
         var l = _settings.Limits;
@@ -962,7 +854,6 @@ public partial class MainWindow : Window
         {
             _safety.RequestStop(StopReason.Manuel);
         }
-        _testCts?.Cancel();
         _keyboardHook?.Dispose();
         _resourceTimer.Stop();
         CloseServerReader();

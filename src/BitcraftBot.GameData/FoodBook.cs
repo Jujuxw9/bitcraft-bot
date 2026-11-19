@@ -23,7 +23,8 @@ public sealed class FoodBook
     // Bonus de type « Food Regen » (un par niveau d'aliment).
     public required IReadOnlySet<int> FoodRegenBuffIds { get; init; }
 
-    public required IReadOnlyDictionary<int, string> BuffNames { get; init; }
+    // Tous les bonus du jeu (nom, type, effets), pour afficher les bonus actifs du personnage.
+    public required IReadOnlyDictionary<int, BuffDescInfo> Buffs { get; init; }
 
     public static bool CanLoad(string folder) => Tables.All(t => File.Exists(Path.Combine(folder, t + ".json")));
 
@@ -47,7 +48,11 @@ public sealed class FoodBook
         {
             Foods = foods,
             FoodRegenBuffIds = regen,
-            BuffNames = buffs.ToDictionary(b => b.Key, b => Str(b.Value, "description")),
+            Buffs = buffs.ToDictionary(b => b.Key, b => new BuffDescInfo(b.Key, Str(b.Value, "description"),
+                types.GetValueOrDefault(Int(b.Value, "buff_type_id")) ?? "", b.Value.TryGetProperty("beneficial", out var good) && good.ValueKind == JsonValueKind.True,
+                b.Value.TryGetProperty("stats", out var stats) && stats.ValueKind == JsonValueKind.Array
+                    ? stats.EnumerateArray().Select(s => new BuffStat(Str(s, "id"), Dbl(s, "value"), s.TryGetProperty("is_pct", out var p) && p.ValueKind == JsonValueKind.True)).ToList()
+                    : [])),
         };
     }
 
@@ -70,4 +75,61 @@ public sealed class FoodBook
 
     private static double Dbl(JsonElement e, string property) =>
         e.TryGetProperty(property, out var v) && v.ValueKind == JsonValueKind.Number ? v.GetDouble() : 0;
+}
+
+// Un effet d'un bonus : statistique du jeu (ex. « GatheringSpeed »), valeur, en pourcentage ou non.
+public sealed record BuffStat(string Stat, double Value, bool IsPercent)
+{
+    public string Text
+    {
+        get
+        {
+            var value = IsPercent ? $"{Value * 100:+0.#;-0.#} %" : $"{Value:+0.##;-0.##}";
+            return $"{StatNames.French(Stat)} {value}";
+        }
+    }
+}
+
+// Un bonus du jeu (buff_desc). Type : nom du type (« Food Regen », « Food Buffs », « Elixir »…).
+public sealed record BuffDescInfo(int Id, string Name, string Type, bool Beneficial, IReadOnlyList<BuffStat> Stats);
+
+// Noms français des statistiques les plus courantes ; les autres gardent leur nom anglais, en mots séparés.
+public static class StatNames
+{
+    private static readonly Dictionary<string, string> Names = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["MaxHealth"] = "vie max",
+        ["MaxStamina"] = "endurance max",
+        ["PassiveHealthRegenRate"] = "vie regagnée",
+        ["PassiveStaminaRegenRate"] = "endurance regagnée",
+        ["MovementMultiplier"] = "vitesse de marche",
+        ["Armor"] = "armure",
+        ["CooldownMultiplier"] = "temps de recharge",
+        ["Strength"] = "force",
+        ["ColdProtection"] = "protection du froid",
+        ["HeatProtection"] = "protection de la chaleur",
+        ["CraftingSpeed"] = "vitesse de fabrication",
+        ["GatheringSpeed"] = "vitesse de récolte",
+        ["BuildingSpeed"] = "vitesse de construction",
+        ["SatiationRegenRate"] = "faim",
+        ["MaxSatiation"] = "faim max",
+        ["ForestrySpeed"] = "vitesse en forestry",
+        ["MiningSpeed"] = "vitesse en mining",
+        ["ActionSpeed"] = "vitesse d'action",
+    };
+
+    public static string French(string stat)
+    {
+        if (Names.TryGetValue(stat, out var name))
+        {
+            return name;
+        }
+        var words = new System.Text.StringBuilder();
+        foreach (var c in stat)
+        {
+            if (char.IsUpper(c) && words.Length > 0) words.Append(' ');
+            words.Append(char.ToLowerInvariant(c));
+        }
+        return words.ToString();
+    }
 }

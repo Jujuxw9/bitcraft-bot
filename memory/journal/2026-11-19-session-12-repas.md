@@ -20,3 +20,9 @@
 ## Questions ouvertes à Julien
 - Garder `technique/recettes-liste-2026-11-19.md` (autre session) ?
 - Lancer H3 après l'essai ?
+
+## Suite : v0.3.16 (même session)
+- Essai v0.3.15 lu : repas automatique OK en réel, formats des poches et des bonus confirmés, banque OK.
+- Demandes : zones plus fines, overlay « repas auto » activé ou non, bonus avec durée et effets, onglets regroupés, Journal dans Paramètres, onglet Tests supprimé, H3 en attente (« retravailler le bot de manière générale »).
+- Fait : D-043 (onglets), D-044 (serveur d'abord), D-035 terminée. v0.3.16 publiée, 246 tests OK, onglets vérifiés à l'écran (bot de test lancé puis fermé).
+- `technique/recettes-liste-2026-11-19.md` : gardé (notes de fabrication utiles à Julien en jeu, pas au bot). Une autre session le modifie encore : pas touché.

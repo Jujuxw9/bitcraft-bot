@@ -38,7 +38,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-032](D-032-regles-repas.md) | Règles de repas | Remplacée par D-042 | 2026-11-16 |
 | [D-033](D-033-source-donnees-jeu.md) | Source des données du jeu : BitCraft_GameData | Validée | 2026-11-16 |
 | [D-034](D-034-arbres-vieux-d-abord.md) | v0.3 : les vieux arbres d'abord | Validée | 2026-11-16 |
-| [D-035](D-035-banc-essai-mouvements.md) | v0.2.2 : banc d'essai des mouvements humains | Validée | 2026-11-16 |
+| [D-035](D-035-banc-essai-mouvements.md) | v0.2.2 : banc d'essai des mouvements humains | Terminée (retiré en v0.3.16) | 2026-11-16 |
 | [D-036](D-036-choix-arbre-clic-droit.md) | Choisir un vieil arbre : viser le plus grand, cliquer, lire, annuler si besoin | Validée | 2026-11-16 |
 | [D-037](D-037-mouvements-avec-intention.md) | Mouvements de souris et de caméra guidés par une intention | Validée | 2026-11-16 |
 | [D-038](D-038-exploration-beta.md) | Onglet « Bêta : exploration » : règles et réglages | Validée | 2026-11-16 |
@@ -46,6 +46,8 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-040](D-040-dossiers-release-old.md) | Versions rangées dans artifacts/release (dernière) et artifacts/old | Validée | 2026-11-18 |
 | [D-041](D-041-num5-jeu-actif.md) | Num 5 n'agit que si BitCraft est la fenêtre active | Validée | 2026-11-19 |
 | [D-042](D-042-repas-automatique.md) | Repas automatique avec Maj + E (faim < 30 %, plus de bonus) | Validée | 2026-11-19 |
+| [D-043](D-043-onglets-par-usage.md) | Onglets regroupés par usage (Bot, Personnage, Carte, Recettes, Paramètres) | Validée | 2026-11-19 |
+| [D-044](D-044-serveur-avant-ecran.md) | Le serveur d'abord, l'écran en contrôle (cible, jauge) | Validée (à confirmer) | 2026-11-19 |
 
 ## Gabarit
 

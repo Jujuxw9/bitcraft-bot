@@ -20,6 +20,9 @@ public partial class MainWindow
     private readonly TokenStore _tokenStore = new(TokenStore.DefaultPath);
     private DispatcherTimer? _serverTimer;
     private ServerReader? _serverReader;
+
+    // Dernière lecture du serveur (toutes les 500 ms), pour les autres onglets.
+    private PlayerSnapshot? _lastSnapshot;
     private Dictionary<int, ResourceLabel> _resourceLabels = [];
     private (int North, int East)? _lastHudPosition;
     private DateTime _lastPositionCompare = DateTime.MinValue;
@@ -244,7 +247,7 @@ public partial class MainWindow
     {
         UpdateOverlay();
         ServerGameRunningText.Text = IsGameRunning() ? "Jeu : lancé." : "Jeu : fermé.";
-        SrvHudPosition.Text = _lastHudPosition is { } hp ? $"N {hp.North}, E {hp.East}" : "— (lancer « Démarrer » dans Supervision)";
+        SrvHudPosition.Text = _lastHudPosition is { } hp ? $"N {hp.North}, E {hp.East}" : "— (lancer « Démarrer » dans l’onglet Bot)";
         var reader = _serverReader;
         if (reader is null || reader.State == ReaderState.Deconnecte)
         {
@@ -252,6 +255,7 @@ public partial class MainWindow
         }
         ServerTrafficText.Text = $"Messages reçus : {reader.MessageCount} (dont {reader.TransactionCount} changements).";
         var s = reader.Snapshot();
+        _lastSnapshot = s;
         SrvCharacter.Text = s.EntityId is { } id
             ? $"entité {id}, {(s.SignedIn == true ? "connecté dans le jeu" : "pas connecté dans le jeu")}"
             : "—";
@@ -268,6 +272,7 @@ public partial class MainWindow
         ShowResources(reader, s);
         ShowInventories(reader, s);
         RunMeals(reader, s);
+        ShowBuffs(s);
 
         // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)

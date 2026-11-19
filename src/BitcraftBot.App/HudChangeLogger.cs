@@ -18,12 +18,10 @@ public sealed class HudChangeLogger(SessionLog log)
     private readonly ConfirmedText _zone = new();
     private readonly ConfirmedText _region = new();
     private int _staminaDropsWithoutGauge;
-    private int _hungerLowReads;
     private readonly ConfirmedText _target = new();
     private const string NoTarget = "(aucune)";
     private DateTime _notificationUntil = DateTime.MinValue;
     private static readonly TimeSpan NotificationDuration = TimeSpan.FromSeconds(8);
-    private bool _hungerAlerted;
     private DateTime _lastDiagnosticAt = DateTime.MinValue;
     private ProfessionGaugeReading? _lastGauge;
     private int _gaugeMissing;
@@ -45,8 +43,6 @@ public sealed class HudChangeLogger(SessionLog log)
         _region.Reset();
         _staminaDropsWithoutGauge = 0;
         _lastDiagnosticAt = DateTime.MinValue;
-        _hungerLowReads = 0;
-        _hungerAlerted = false;
         _target.Reset();
         _notificationUntil = DateTime.MinValue;
         _lastGauge = null;
@@ -183,24 +179,8 @@ public sealed class HudChangeLogger(SessionLog log)
             }
         }
 
-        // Faim sous 50 % (D-032), seulement après 4 lectures basses de suite (2 s) :
-        // une info-bulle ou une fenêtre peut cacher la ligne de faim (fausses alertes du 16/11 à 20:00).
-        if (!masked && now.HungerRatio is { } hunger)
-        {
-            if (hunger < 0.5)
-            {
-                if (++_hungerLowReads == 4 && !_hungerAlerted)
-                {
-                    log.Alerte("Perception", $"Faim sous 50 % (≈{hunger * 100:0} %) : il faudra manger (D-032).");
-                    _hungerAlerted = true;
-                }
-            }
-            else
-            {
-                _hungerLowReads = 0;
-                _hungerAlerted = false;
-            }
-        }
+        // La faim n'est plus surveillée à l'écran (v0.3.16) : le serveur la donne exactement,
+        // et le repas automatique s'en occupe (D-042).
 
         // Cible qui apparaît, change ou disparaît : notée seulement si lue 2 fois de suite, et pas pendant une notification.
         if (!masked && _target.Update(now.Target?.Name ?? NoTarget) is { } targetChange)

@@ -1,6 +1,6 @@
 # D-035 — v0.2.2 : banc d'essai des mouvements humains
 
-- **Statut** : Validée
+- **Statut** : Terminée (2026-11-19) : banc retiré de l'interface en v0.3.16, les mouvements seront testés directement en H3 (D-043). Le code des mouvements humains reste dans la brique Input.
 - **Date** : 2026-11-16
 - **Validée par** : Julien
 - **Liens** : Q-017, D-004, D-022, D-024

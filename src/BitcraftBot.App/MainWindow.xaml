@@ -52,8 +52,11 @@
 
     <TabControl x:Name="Tabs" Background="#1E1F22" BorderBrush="#3C3F44" Margin="4">
 
-        <!-- ONGLET 1 : SUPERVISION -->
-        <TabItem Header="Supervision">
+        <!-- Onglets regroupés par usage (v0.3.16, demande de Julien) :
+             Bot (piloter) · Personnage (état, bonus, sac) · Carte · Recettes · Paramètres (connexion, affichage, système, journal). -->
+
+        <!-- ONGLET : BOT (démarrer, voir l'écran lu, sécurité, repas automatique) -->
+        <TabItem Header="Bot">
             <Grid Margin="6">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -95,7 +98,14 @@
                         <TextBlock Text="Arrêt d'urgence : touche Num 5, seulement quand BitCraft est la fenêtre active (D-041)."
                                    TextWrapping="Wrap" Foreground="#F28B82" Margin="0,6,0,0" />
 
-                        <TextBlock Text="LECTURE DU HUD" Style="{StaticResource SectionTitle}" />
+                        <TextBlock Text="REPAS AUTOMATIQUE" Style="{StaticResource SectionTitle}" />
+                        <CheckBox x:Name="AutoEatCheck" Content="Manger automatiquement (Maj + E)" Click="AutoEatCheck_Click" />
+                        <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,2,0,0"
+                                   Text="Faim sous 30 % ou plus de bonus de nourriture : le bot mange le premier aliment du sac, un à la fois, sans dépasser le manque. Seulement si BitCraft est actif et que vous ne tapez pas. Num 5 le coupe (D-042)." />
+                        <TextBlock x:Name="AutoEatStatusText" Text="Désactivé." Margin="0,4,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+                        <TextBlock x:Name="AutoEatFoodText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
+
+                        <TextBlock Text="LECTURE DE L’ÉCRAN (HUD)" Style="{StaticResource SectionTitle}" />
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -155,7 +165,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Dernier événement du journal (le journal complet est dans l'onglet Journal) -->
+                <!-- Dernier événement du journal (le journal complet est dans l’onglet Paramètres) -->
                 <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#141517" BorderBrush="#3C3F44" BorderThickness="1"
                         Margin="0,6,0,0" Padding="8,4">
                     <DockPanel>
@@ -167,7 +177,7 @@
             </Grid>
         </TabItem>
 
-        <!-- ONGLET : PERSONNAGE (lecture du serveur, H1, D-039) -->
+        <!-- ONGLET : PERSONNAGE (lecture du serveur, D-039) : en direct, bonus actifs, sac et banques -->
         <TabItem Header="Personnage">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
                 <StackPanel>
@@ -196,7 +206,7 @@
                                     <TextBlock Grid.Row="3" Text="Destination" Style="{StaticResource HudLabel}" />
                                     <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SrvDestination" Text="—" Style="{StaticResource HudValue}" />
                                     <TextBlock Grid.Row="4" Text="Position écran" Style="{StaticResource HudLabel}" />
-                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="SrvHudPosition" Text="— (lancer « Démarrer » dans Supervision)" Style="{StaticResource HudValue}" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="SrvHudPosition" Text="— (lancer « Démarrer » dans l’onglet Bot)" Style="{StaticResource HudValue}" />
                                     <TextBlock Grid.Row="5" Text="Vie" Style="{StaticResource HudLabel}" />
                                     <TextBlock Grid.Row="5" Grid.Column="1" x:Name="SrvHealth" Text="—" Style="{StaticResource HudValue}" />
                                     <TextBlock Grid.Row="6" Text="Endurance" Style="{StaticResource HudLabel}" />
@@ -210,13 +220,31 @@
                                         Margin="0,8,0,0" IsEnabled="False" Click="ServerSnapshotButton_Click" />
                             </StackPanel>
                         </Border>
+
+                    <!-- Bonus actifs (active_buff_state, lecture seule) -->
+                    <Border Style="{StaticResource Card}" Width="920">
+                        <StackPanel>
+                            <TextBlock Text="2. BONUS ACTIFS" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                            <TextBlock x:Name="BuffSummary" Text="Pas connecté." Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,0,0,6" />
+                            <ListView x:Name="BuffList" MaxHeight="260" Background="#141517" Foreground="#E6E6E6" BorderBrush="#3C3F44">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Bonus" Width="230" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Type" Width="130" DisplayMemberBinding="{Binding Type}" />
+                                        <GridViewColumn Header="Reste" Width="90" DisplayMemberBinding="{Binding Remaining}" />
+                                        <GridViewColumn Header="Effets" Width="420" DisplayMemberBinding="{Binding Effects}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
                     </WrapPanel>
 
                     <!-- 4. Sac et banques (inventory_state, lecture seule) -->
                     <Border Style="{StaticResource Card}" HorizontalAlignment="Left" MinWidth="760">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="2. SAC ET BANQUES" Style="{StaticResource SectionTitle}" Margin="0,0,16,0" VerticalAlignment="Center" />
+                                <TextBlock Text="3. SAC ET BANQUES" Style="{StaticResource SectionTitle}" Margin="0,0,16,0" VerticalAlignment="Center" />
                                 <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,6,0" />
                                 <ComboBox x:Name="InventoryPicker" Width="320" SelectionChanged="InventoryPicker_SelectionChanged" />
                                 <TextBlock Text="Chercher :" VerticalAlignment="Center" Margin="16,0,6,0" />
@@ -243,8 +271,8 @@
             </ScrollViewer>
         </TabItem>
 
-        <!-- Onglet Carte (H2) : carte et tableau des ressources lues sur le serveur -->
-        <TabItem Header="Carte (H2)">
+        <!-- ONGLET : CARTE (ressources lues sur le serveur, H2) -->
+        <TabItem Header="Carte">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
                 <StackPanel>
                     <!-- Bandeau : personnage et filtres -->
@@ -316,7 +344,7 @@
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
-                                <TextBlock Text="Distance en cases du jeu (mêmes unités que N / E). Position : à 1 case près (le serveur arrondit un peu la position quand on s'arrête). « Meilleur arbre » : l'arbre mûr le plus proche, celui que le bot visera en H3. « Cible à l'écran » : la ressource que vous ciblez dans le jeu, retrouvée par son nom et sa santé (il faut lancer « Démarrer » dans Supervision pour lire l'écran)."
+                                <TextBlock Text="Distance en cases du jeu (mêmes unités que N / E). Position : à 1 case près (le serveur arrondit un peu la position quand on s'arrête). « Meilleur arbre » : l'arbre mûr le plus proche, celui que le bot visera en H3. « Cible à l'écran » : la ressource que vous ciblez dans le jeu, retrouvée par son nom et sa santé (il faut lancer « Démarrer » dans l’onglet Bot pour lire l’écran)."
                                            Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,4,0,0" MaxWidth="900" HorizontalAlignment="Left" />
                             </StackPanel>
                         </Grid>
@@ -359,77 +387,15 @@
             </Grid>
         </TabItem>
 
-        <!-- ONGLET : TESTS DES MOUVEMENTS (D-035) -->
-        <TabItem Header="Tests">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
-                <StackPanel MaxWidth="760" HorizontalAlignment="Left">
-                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10"
-                               Text="Banc d'essai des mouvements « humains » (souris et caméra). Fonction de test, désactivée à chaque démarrage. Mettez-vous dans un endroit calme, sans ennemis. Au lancement, le jeu passe au premier plan après 3 secondes." />
-                    <Border Style="{StaticResource Card}">
-                        <StackPanel>
-                            <CheckBox x:Name="TestsEnabledCheck" Content="Activer le banc d'essai" FontWeight="SemiBold"
-                                      Click="TestsEnabledCheck_Click" />
-                            <TextBlock TextWrapping="Wrap" Foreground="#F28B82" Margin="0,4,0,0"
-                                       Text="Arrêt immédiat : touche Num 5, ou bougez vous-même la souris, ou cliquez hors du jeu." />
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource Card}">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="Durée d'un test (secondes) :" VerticalAlignment="Center" Margin="0,0,6,0" />
-                                <TextBox x:Name="TestDurationBox" Text="30" Width="45" />
-                            </StackPanel>
-                            <TextBlock Text="SOURIS" Style="{StaticResource SectionTitle}" />
-                            <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
-                                       Text="Trajets en courbe, vitesse qui accélère puis ralentit, petit dépassement de la cible, pauses variables. La souris reste au centre de l'écran (hors HUD, minicarte, chat, barre d'action)." />
-                            <CheckBox x:Name="AllowClicksCheck" Content="Étape 2 : autoriser les clics gauche (le personnage se déplace un peu)"
-                                      Margin="0,6,0,6" />
-                            <Button x:Name="TestMouseButton" Content="Lancer le test souris" HorizontalAlignment="Left"
-                                    IsEnabled="False" Click="TestMouseButton_Click" />
-                            <TextBlock Text="CAMÉRA" Style="{StaticResource SectionTitle}" />
-                            <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
-                                       Text="Rotations avec Z / Q / S / D, appuis et pauses de durée variable, W de temps en temps pour recentrer. Aucune autre touche." />
-                            <Button x:Name="TestCameraButton" Content="Lancer le test caméra" HorizontalAlignment="Left"
-                                    IsEnabled="False" Click="TestCameraButton_Click" Margin="0,6,0,0" />
-                            <Button x:Name="TestStopButton" Content="Arrêter le test" HorizontalAlignment="Left"
-                                    IsEnabled="False" Click="TestStopButton_Click" Margin="0,12,0,0" />
-                            <TextBlock x:Name="TestStatusText" Text="Banc d'essai désactivé." Margin="0,10,0,0"
-                                       FontWeight="SemiBold" TextWrapping="Wrap" />
-                        </StackPanel>
-                    </Border>
-                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6"
-                               Text="Chaque geste est noté dans l'onglet Journal (cochez « Détails » pour tout voir)." />
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-
-        <!-- ONGLET : JOURNAL (avant Paramètres, demande de Julien du 2026-11-19) -->
-        <TabItem Header="Journal">
-            <DockPanel Margin="6">
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                    <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,10,0" />
-                    <CheckBox x:Name="FilterErreur" Content="Erreurs" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#F28B82" />
-                    <CheckBox x:Name="FilterAlerte" Content="Alertes" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#FDD663" />
-                    <CheckBox x:Name="FilterInfo" Content="Infos" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" />
-                    <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="True" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
-                    <Button Content="Ouvrir le dossier des journaux" Click="OpenLogFolder_Click" />
-                    <TextBlock x:Name="LogFileText" VerticalAlignment="Center" Foreground="#9AA0A6" Margin="8,0,0,0" />
-                </StackPanel>
-                <ListBox x:Name="LogList" Background="#141517" BorderBrush="#3C3F44" FontFamily="Consolas" FontSize="12"
-                         VirtualizingPanel.IsVirtualizing="True">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}" Foreground="{Binding Color}" TextWrapping="Wrap" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
-        </TabItem>
-
-        <!-- ONGLET : PARAMÈTRES (connexion au serveur, affichage, système) -->
+        <!-- ONGLET : PARAMÈTRES : réglages à gauche, journal à droite (v0.3.16) -->
         <TabItem Header="Paramètres">
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
-                <StackPanel>
+            <Grid Margin="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
                     <TextBlock Text="CONNEXION AU SERVEUR (LECTURE SEULE)" Style="{StaticResource SectionTitle}" Margin="0,0,0,4" />
                     <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,6" MaxWidth="1100" HorizontalAlignment="Left"
                                Text="Lecture en direct du serveur officiel, avec le jeton de votre compte. Le bot ne fait que lire : aucune action n'est envoyée au serveur. Le jeton est chiffré par Windows sur ce PC, et n'apparaît jamais dans le journal." />
@@ -484,19 +450,8 @@
                                            Text="Petit cadre en haut à gauche de l'écran du jeu : bot connecté ou non, lecture de l'écran, rappel des touches Num 0 (capture) et Num 5 (arrêt). Il laisse passer les clics et n'apparaît pas dans les captures du bot." />
                             </StackPanel>
                         </Border>
-
-                        <!-- Repas automatique (D-042) -->
-                        <Border Style="{StaticResource Card}" Width="360">
-                            <StackPanel>
-                                <TextBlock Text="4. REPAS AUTOMATIQUE" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
-                                <CheckBox x:Name="AutoEatCheck" Content="Manger automatiquement (Maj + E)" Click="AutoEatCheck_Click" />
-                                <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,6,0,0"
-                                           Text="Le bot appuie sur Maj + E (mange le premier aliment du sac) : si la faim passe sous 30 %, ou s'il n'y a plus de bonus de nourriture. Un aliment à la fois, avec une pause, sans dépasser le manque. Seulement si BitCraft est la fenêtre active et que vous ne tapez pas au clavier. Num 5 le coupe." />
-                                <TextBlock x:Name="AutoEatStatusText" Text="Désactivé." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
-                                <TextBlock x:Name="AutoEatFoodText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Border>
                     </WrapPanel>
+
 
                     <TextBlock Text="SYSTÈME" Style="{StaticResource SectionTitle}" Margin="0,10,0,4" />
                     <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10"
@@ -547,7 +502,35 @@
                         </Border>
                     </WrapPanel>
                 </StackPanel>
-            </ScrollViewer>
+                </ScrollViewer>
+
+                <!-- Journal (ancien onglet Journal) -->
+                <Border Grid.Column="1" Margin="8,0,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="JOURNAL" Style="{StaticResource SectionTitle}" Margin="0,0,0,4" />
+                <DockPanel Margin="6">
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                        <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,10,0" />
+                        <CheckBox x:Name="FilterErreur" Content="Erreurs" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#F28B82" />
+                        <CheckBox x:Name="FilterAlerte" Content="Alertes" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" Foreground="#FDD663" />
+                        <CheckBox x:Name="FilterInfo" Content="Infos" IsChecked="True" Margin="0,0,12,0" Click="LogFilter_Click" />
+                        <CheckBox x:Name="FilterDetail" Content="Détails" IsChecked="True" Margin="0,0,20,0" Click="LogFilter_Click" Foreground="#9AA0A6" />
+                        <Button Content="Ouvrir le dossier des journaux" Click="OpenLogFolder_Click" />
+                        <TextBlock x:Name="LogFileText" VerticalAlignment="Center" Foreground="#9AA0A6" Margin="8,0,0,0" />
+                    </StackPanel>
+                    <ListBox x:Name="LogList" Background="#141517" BorderBrush="#3C3F44" FontFamily="Consolas" FontSize="12"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             VirtualizingPanel.IsVirtualizing="True">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Text}" Foreground="{Binding Color}" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+                    </DockPanel>
+                </Border>
+            </Grid>
         </TabItem>
     </TabControl>
 </Window>

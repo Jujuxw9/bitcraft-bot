@@ -7,12 +7,25 @@ namespace BitcraftBot.Server.World;
 // StartUnix : début, en secondes Unix (heure du serveur). Duration : durée en secondes ; négative = permanent.
 public sealed record ActiveBuffInfo(int BuffId, long StartUnix, int Duration)
 {
+    // Bonus « en pause » : compté seulement en jeu (online_timestamp) et personnage hors ligne.
+    // Le serveur garde alors le temps déjà écoulé (petit nombre) au lieu de l'heure de début (code serveur, OnlineTimestamp::pause).
+    public bool IsPaused => StartUnix == -1 || StartUnix is > 0 and < 1_000_000_000;
+
     // Secondes restantes (code serveur, ActiveBuffState::buff_remaining_time) : -1 si permanent, 0 si fini.
     public int RemainingSeconds(DateTimeOffset now)
     {
         if (Duration < 0)
         {
             return -1;
+        }
+        if (StartUnix == 0)
+        {
+            return 0;
+        }
+        if (IsPaused)
+        {
+            var frozen = Duration - Math.Max(0, StartUnix);
+            return frozen > 0 ? (int)frozen : 0;
         }
         var left = StartUnix + Duration - now.ToUnixTimeSeconds();
         return left > 0 ? (int)Math.Min(left, int.MaxValue) : 0;

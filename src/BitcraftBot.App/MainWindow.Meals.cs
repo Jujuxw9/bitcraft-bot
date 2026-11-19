@@ -33,7 +33,7 @@ public partial class MainWindow
     private DateTime _lastPhysicalKey = DateTime.MinValue;
     private Brush _mealOverlayBrush = OffBrush;
 
-    private string MealOverlayText { get; set; } = "Repas auto : actif";
+    private string MealOverlayText { get; set; } = "● Repas auto : activé";
 
     private sealed record PendingMeal(DateTime At, double? Satiation, int? Regen, string Food, int FoodCount);
 
@@ -260,7 +260,7 @@ public partial class MainWindow
     private void ShowMealState(string text, Brush color, bool alert = false)
     {
         AutoEatStatusText.Text = text[..1].ToUpperInvariant() + text[1..] + ".";
-        MealOverlayText = "Repas auto : " + (text.Length > 46 ? text[..46] + "…" : text);
+        MealOverlayText = "● Repas auto activé : " + (text.Length > 40 ? text[..40] + "…" : text);
         _mealOverlayBrush = color;
         // Journal : seulement quand l'état change (sans les chiffres qui bougent toutes les minutes).
         var key = new string(text.Where(c => !char.IsDigit(c)).ToArray());

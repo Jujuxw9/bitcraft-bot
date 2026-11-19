@@ -4,7 +4,7 @@ using BitcraftBot.Core.Logging;
 
 namespace BitcraftBot.App;
 
-// Une ligne affichée dans l'onglet Journal.
+// Une ligne affichée dans le journal (onglet Paramètres).
 public sealed record LogLine(LogEntry Entry, string Text, Brush Color);
 
 // Garde les dernières lignes du journal et n'affiche que les niveaux cochés.

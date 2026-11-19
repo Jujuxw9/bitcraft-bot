@@ -8,5 +8,5 @@
 - [interface-du-jeu.md](interface-du-jeu.md) — fenêtres internes du jeu
 - [analyse-captures-2026-11-16.md](analyse-captures-2026-11-16.md) — analyse des lots 1 et 2 de captures (touches, HUD, Banque, contour vert, récolte)
 - [analyse-lot5-2026-11-16.md](analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, mise à jour du jeu du 16/11, lot 5 (chiffre 5, vidéos V1 à V3)
-- [recettes-liste-2026-11-19.md](recettes-liste-2026-11-19.md) — chaînes de fabrication et totaux pour la liste de Julien (coquillages, braxite, poils, cailloux, tissu, cuir, lingots, briques)
+- [recettes-liste-2026-11-19.md](recettes-liste-2026-11-19.md) — **notes de jeu pour Julien** (pas pour le bot) : chaînes de fabrication et totaux pour la liste de Julien (coquillages, braxite, poils, cailloux, tissu, cuir, lingots, briques)
 - [raccourcis-du-jeu.md](raccourcis-du-jeu.md) — touches du jeu (Maj + E pour manger, souris, clavier AZERTY) et touches du bot

@@ -124,3 +124,19 @@ Demandes de Julien : repas automatique, images dans Recettes, nom de version dan
 - **Images des objets** : `icon_asset_name` de BitCraft_GameData + CDN public `cdn.brico.app/sprites/<chemin>.webp` (trouvé dans le code de cereal). Téléchargées une fois, gardées dans `donnees-jeu/icones/`, décodées par Windows (décodeur WebP présent sur le PC de Julien). Onglet Recettes : petite image dans la liste et devant chaque ingrédient, grande image en titre et au survol.
 - **.exe** : `artifacts/release/BitcraftBot-vX.Y.Z.exe` ; l'ancien part dans `artifacts/old/vX.Y.Z/`.
 - Tests : 242 OK, dont le vrai schéma et les vraies données (poisson grillé : 25 de faim, bonus « Food Regen »). **Pas encore lancé à l'écran** (Julien jouait).
+
+## 29. v0.3.16 — onglets regroupés, bonus actifs, serveur d'abord (2026-11-19)
+
+Essai de la v0.3.15 par Julien (journal du 19/11 à 20:06) :
+- **Repas automatique vérifié en réel** : « Plain Fish and Bulbs » mangé avec Maj + E, faim 64,6 → 100, bonus de nourriture revenu (30 min), confirmé par le serveur en 0,5 s.
+- **Format des poches confirmé** : `[6000,[0,[1,50,[0,[]],[1,[]]]],false]` = option en somme `[0, pile]`, pile `[id, quantité, type [0]=objet / [1]=cargaison, durabilité]`. 4 inventaires, 52 piles. Banque bien affichée (Julien).
+- **Format des bonus confirmé** : `[buff_id, [début], durée, [valeurs]]`. Début = secondes Unix quand le bonus tourne. Bonus « en pause » (seulement en jeu, personnage hors ligne) : le serveur garde le **temps déjà écoulé** (petit nombre) au lieu de l'heure de début (code serveur, `OnlineTimestamp::pause`). `0` = case vide. Durée `-1` = permanent.
+- Faim maximale : `character_stats_state.values[19]` = 100.
+
+Changements :
+- **Onglets** (D-043) : Bot · Personnage · Carte · Recettes · Paramètres (journal à droite). Onglet Tests supprimé (D-035 terminée).
+- **Bonus actifs** (Personnage) : nom, type, temps restant (ou « en pause »), effets traduits (`buff_desc.stats`, ex. « vitesse de récolte -40 % »).
+- **Serveur d'abord** (D-044) : vie, endurance et faim de l'onglet Bot viennent du serveur ; l'alerte « faim sous 50 % » lue à l'écran est supprimée.
+- Zones lues dessinées plus finement sur l'image (trait de 2 px au lieu de 5).
+- Overlay : ligne « Repas auto » toujours affichée (activé ou désactivé).
+- Tests : 246 OK. Vérifié à l'écran : les 5 onglets s'affichent, journal à droite des Paramètres, 29 images d'objets téléchargées.
