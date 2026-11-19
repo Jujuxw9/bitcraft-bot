@@ -65,14 +65,21 @@ public static class PlayerBuffs
         return result;
     }
 
-    public static double? MaxSatiation(TableCache cache, ulong player)
+    // Vie et endurance maximales : cases 0 et 1 (CharacterStatType::MaxHealth, MaxStamina).
+    public const int MaxHealthStat = 0;
+    public const int MaxStaminaStat = 1;
+
+    public static double? MaxSatiation(TableCache cache, ulong player) => Stat(cache, player, MaxSatiationStat);
+
+    // Une statistique du personnage (character_stats_state.values[index]), si elle est positive.
+    public static double? Stat(TableCache cache, ulong player, int index)
     {
         var row = cache.Rows("character_stats_state").FirstOrDefault(r => r.U64("entity_id") == player);
-        if (row?.Get("values") is not { ValueKind: JsonValueKind.Array } values || values.GetArrayLength() <= MaxSatiationStat)
+        if (row?.Get("values") is not { ValueKind: JsonValueKind.Array } values || values.GetArrayLength() <= index)
         {
             return null;
         }
-        var v = values[MaxSatiationStat];
+        var v = values[index];
         return v.ValueKind == JsonValueKind.Number && v.GetDouble() > 0 ? v.GetDouble() : null;
     }
 

@@ -251,6 +251,7 @@ public partial class MainWindow
         var reader = _serverReader;
         if (reader is null || reader.State == ReaderState.Deconnecte)
         {
+            UpdateDashboard(null, null);
             return;
         }
         ServerTrafficText.Text = $"Messages reçus : {reader.MessageCount} (dont {reader.TransactionCount} changements).";
@@ -273,6 +274,7 @@ public partial class MainWindow
         ShowInventories(reader, s);
         RunMeals(reader, s);
         ShowBuffs(s);
+        UpdateDashboard(reader, s);
 
         // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)

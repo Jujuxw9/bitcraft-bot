@@ -26,3 +26,9 @@
 - Demandes : zones plus fines, overlay « repas auto » activé ou non, bonus avec durée et effets, onglets regroupés, Journal dans Paramètres, onglet Tests supprimé, H3 en attente (« retravailler le bot de manière générale »).
 - Fait : D-043 (onglets), D-044 (serveur d'abord), D-035 terminée. v0.3.16 publiée, 246 tests OK, onglets vérifiés à l'écran (bot de test lancé puis fermé).
 - `technique/recettes-liste-2026-11-19.md` : gardé (notes de fabrication utiles à Julien en jeu, pas au bot). Une autre session le modifie encore : pas touché.
+
+## Suite : v0.3.17 (même session, en autonomie)
+- Réponses de Julien : tableau de bord oui ; jauge de métier depuis le serveur ; contrôleur d'actions en 2ᵉ temps ; D-044 validée avec la méthode « serveur d'abord, écran pour ce qui manque » ; 5 onglets OK pour l'instant.
+- Fait : inventaire `technique/hybride/donnees-serveur.md`, 6 nouvelles lectures (expérience, action, ressource frappée, temps de jeu, énergie, vie et endurance max), tableau de bord, Num 0 sans doublon. 254 tests OK. v0.3.17 publiée.
+- Contrôle de la mémoire : index et liens OK ; corrigé l'en-tête périmé de `technique/architecture.md` (v0.3.4), les renvois à D-032 (D-030, D-033, interface du jeu), le statut de Q-001, Q-002, Q-014, les livrables H2 / H3 ; numéro d'entité du personnage masqué dans `constats.md` (dépôt public).
+- Contrôle du dépôt : aucune donnée privée (e-mail, jeton, identité) ; rien d'obsolète à retirer ; première Release GitHub avec le tag v0.3.17.

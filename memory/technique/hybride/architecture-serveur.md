@@ -140,3 +140,20 @@ Changements :
 - Zones lues dessinées plus finement sur l'image (trait de 2 px au lieu de 5).
 - Overlay : ligne « Repas auto » toujours affichée (activé ou désactivé).
 - Tests : 246 OK. Vérifié à l'écran : les 5 onglets s'affichent, journal à droite des Paramètres, 29 images d'objets téléchargées.
+
+## 30. v0.3.17 — tableau de bord, jauge de métier lue sur le serveur (2026-11-19)
+
+Demandes de Julien : tableau de bord dans l'onglet Bot ; lire la jauge de métier sur le serveur ; D-044 précisée (tout prendre sur le serveur d'abord, puis l'écran pour ce qui manque) ; contrôleur d'actions commun plus tard.
+
+- **Inventaire des données** : `donnees-serveur.md` (lu / disponible / seulement à l'écran).
+- **Nouvelles lectures** (groupe du sac, même repli si refus ; toutes publiques, vérifié sur le vrai schéma) :
+  - `experience_state` : expérience par métier. Niveau et % vers le niveau suivant avec la **formule du serveur** (`ExperienceStack` : 125 niveaux, 52 × (g^n − g) / (g² − g) × 10, g = 2^0,158, calcul en float 32 bits). C'est la jauge de métier, sans lire l'écran.
+  - Métier « en cours » : celui dont l'expérience vient d'augmenter (moins de 20 s). Le serveur ne le dit pas directement.
+  - `player_action_state` : action de la couche « Base » (récolte, fabrication, marche…), début et durée en millisecondes → progression du coup.
+  - `extract_outcome_state` : **ressource frappée** et dégâts du dernier coup. Retrouvée dans les ressources lues : nom, santé, distance. Remplace la cible lue à l'écran dès le premier coup.
+  - `player_state` (temps de jeu), `teleportation_energy_state`, `character_stats_state` cases 0 et 1 (vie et endurance maximales).
+  - Sac : nombre total de cases (`PocketCount`) → « 18 cases pleines sur 24 », alerte « sac plein ».
+- **Tableau de bord** (onglet Bot) : 4 cartes (Personnage : barres de vie, endurance, faim, bonus ; Activité : action, métier et sa barre, ressource frappée, niveaux ; Sac et alentours : sac, position, meilleur arbre ; Le bot : serveur, lecture de l'écran, repas auto, alertes). Image du jeu en dessous, dans la place restante.
+- Num 0 : une seule capture par seconde (touche maintenue = deux fichiers identiques à l'essai v0.3.16).
+- Le journal écrit un **extrait brut** de chaque nouvelle table au premier abonnement : format réel **à vérifier** au prochain essai.
+- Tests : 254 OK. Tableau de bord vérifié à l'écran (sans connexion : le jeu était ouvert).

@@ -266,6 +266,16 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         var inventories = World.Inventories.Of(_cache, e);
         var raw = rows[0].Get("pockets")?.GetRawText() ?? "?";
         log.Info(Category, $"Sac et banques : {inventories.Count} inventaires, {inventories.Sum(i => i.Stacks.Count)} piles d'objets. Exemple brut de poches : {(raw.Length > 400 ? raw[..400] + "…" : raw)}");
+
+        // Tableau de bord (v0.3.17) : un extrait brut de chaque nouvelle table, pour vérifier le format réel.
+        foreach (var table in new[] { "experience_state", "player_action_state", "extract_outcome_state", "player_state", "teleportation_energy_state" })
+        {
+            var row = _cache.Rows(table).FirstOrDefault(r => r.U64("entity_id") == e);
+            var text = row?.ToString() ?? "aucune ligne";
+            log.Info(Category, $"Exemple brut de {table} : {(text.Length > 300 ? text[..300] + "…" : text)}");
+        }
+        var snapshot = Snapshot();
+        log.Info(Category, $"Tableau de bord : {snapshot.Skills?.Count.ToString() ?? "?"} métiers lus, action {snapshot.Action?.Type ?? "aucune"}, vie max {snapshot.MaxHealth?.ToString("0") ?? "?"}, endurance max {snapshot.MaxStamina?.ToString("0") ?? "?"}.");
     }
 
     private void OnSubscriptionApplied()

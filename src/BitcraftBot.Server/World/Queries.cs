@@ -34,6 +34,12 @@ public static class Queries
             // Repas automatique (v0.3.15) : bonus actifs (bonus de nourriture) et faim maximale.
             list.Add($"SELECT * FROM active_buff_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM character_stats_state WHERE entity_id = {e}");
+            // Tableau de bord (v0.3.17) : expérience des métiers, action en cours, dernier coup de récolte, temps de jeu, énergie de téléportation.
+            list.Add($"SELECT * FROM experience_state WHERE entity_id = {e}");
+            list.Add($"SELECT * FROM player_action_state WHERE entity_id = {e}");
+            list.Add($"SELECT * FROM extract_outcome_state WHERE entity_id = {e}");
+            list.Add($"SELECT * FROM player_state WHERE entity_id = {e}");
+            list.Add($"SELECT * FROM teleportation_energy_state WHERE entity_id = {e}");
         }
         if (area is { } a)
         {

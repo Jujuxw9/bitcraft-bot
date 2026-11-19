@@ -44,6 +44,7 @@ public partial class MainWindow : Window
     private const int MaxDiagnostics = 5;
     private int _diagnosticsSaved;
     private bool _gameVisible = true;
+    private DateTime _lastCaptureKeyAt = DateTime.MinValue;
     private GlobalKeyboardHook? _keyboardHook;
 
     // Journal affiché et surveillance des ressources (onglet Système).
@@ -136,7 +137,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.16 : onglets regroupés (Bot, Personnage, Carte, Recettes, Paramètres avec le journal), bonus actifs lus sur le serveur, vie, endurance et faim prises sur le serveur. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E si le repas automatique est coché.");
+        _log.Info("Session", "Version 0.3.17 : tableau de bord dans l’onglet Bot (vie, endurance, faim, bonus, action en cours, métier et sa progression lus sur le serveur, ressource frappée, sac, meilleur arbre). Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E si le repas automatique est coché.");
         InitServerTab();
         InitOverlay();
         InitMeals();
@@ -177,6 +178,12 @@ public partial class MainWindow : Window
                 _log.Info("Capture", $"Touche {CaptureKey.DisplayName} ignorée : le jeu est caché par une autre fenêtre (touche tapée dans un autre programme ?).");
                 return;
             }
+            // Touche maintenue : Windows répète l'appui. Une seule capture par seconde (essai v0.3.16 : deux fois le même fichier).
+            if (DateTime.Now - _lastCaptureKeyAt < TimeSpan.FromSeconds(1))
+            {
+                return;
+            }
+            _lastCaptureKeyAt = DateTime.Now;
             _ = Task.Run(SaveGameScreenshotAsync);
             return;
         }

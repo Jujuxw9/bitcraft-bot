@@ -25,7 +25,7 @@ Inventaire, Compendium, carte, Banque, Vault, Character, Quest Log, chariot, etc
 
 ### Conséquences pour le bot
 - Garder la barre **verrouillée** : un clic raté ne doit pas déplacer un objet (ex. l'aliment).
-- Le bot doit savoir **quelle barre est affichée** avant de cliquer sur une case (repas en case 5, D-032).
+- Le bot devait savoir **quelle barre est affichée** avant de cliquer sur une case (repas en case 5, D-032). **Plus nécessaire** : le repas passe par Maj + E (D-042).
   **Réponse (captures de Julien, 2026-11-16)** : un **petit point blanc** à droite des flèches indique la barre active. Il **descend d'un cran** par barre : barre 1 = à hauteur de la flèche haut, barre 4 = à hauteur de la flèche bas (`barre-action-1` à `-4`). Les barres 2 à 4 de Julien sont vides. Le bot lira la hauteur du point.
 - Endurance vide : les compétences qui en demandent passent en **rouge avec un éclair** (cases 2 et 3, `barre-action-1-endurance-vide`). L'endurance peut descendre jusqu'à **0/100**.
 - Possibilité utile plus tard : une barre dédiée au bot (aliment, outils).
@@ -54,7 +54,7 @@ Julien a **2 écrans** : « Impr. écran » capture les deux. Le bot fournit don
 ## Captures Num 0 du 2026-11-16 (19:58 à 20:03, 57 images)
 - **Num 0 fonctionne** : 57 captures exactes, aucun effet visible dans le jeu.
 - 19:58:16 à 19:59:30 : **coupe de nuit** d'un Mature Oak Tree (contour vert bien visible la nuit, panneaux lisibles).
-- 19:58:58 : **info-bulle d'un aliment** (survol de la case 5) : « Plain Roasted Fish, Tier 1 Basic Food… **Shift + E will eat the first item in your inventory** », Satiation 25, Level 1 Food Regen 15 min. Elle recouvre la barre d'action et la ligne de faim. **Raccourci Shift + E pour manger** : utile pour D-032 (**à vérifier** : « first item » = premier aliment de l'inventaire ?).
+- 19:58:58 : **info-bulle d'un aliment** (survol de la case 5) : « Plain Roasted Fish, Tier 1 Basic Food… **Shift + E will eat the first item in your inventory** », Satiation 25, Level 1 Food Regen 15 min. Elle recouvre la barre d'action et la ligne de faim. **Raccourci Shift + E pour manger** : utile pour D-032 (**vérifié en réel le 2026-11-19** : il mange le premier aliment du sac, D-042).
 - 19:59:36 à 19:59:56 : marche de nuit, **arbres survolés** (contours verts).
 - 20:00:08 à 20:00:28 : **inventaire et chariot superposés**, déplacés à plusieurs endroits (Q-015).
 - 20:00:45 à 20:01:11 : **cueillette** d'une Daisy (Foraging niv. 20, panneau bas « Gather »).

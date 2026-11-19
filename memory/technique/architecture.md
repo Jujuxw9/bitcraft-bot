@@ -1,7 +1,8 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.3.4** (2026-11-16). Le bot regarde le jeu et **lit le HUD**. Il n'agit sur le jeu que dans le banc d'essai des mouvements (onglet Tests, désactivé par défaut). v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14. v0.3.3 (jauge fiable) : section 15. v0.3.4 (montée de niveau) : section 16.
+> État : **v0.3.17** (2026-11-19). Le bot lit le **serveur** en lecture seule (voie hybride, D-039) et l'écran en contrôle (D-044). Seule action sur le jeu : Maj + E pour le repas automatique (D-042). Onglets : D-043. Depuis la v0.3.5, tout est décrit dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) (sections 17 et suivantes). Les sections ci-dessous racontent la v0.1 à la v0.3.4 (lecture de l'écran) :
+> v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14. v0.3.3 (jauge fiable) : section 15. v0.3.4 (montée de niveau) : section 16.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
 
@@ -31,10 +32,10 @@ La sécurité peut couper la boucle à tout moment, quelle que soit l'étape en 
 
 | Brique | Rôle | Contenu en v0.1 |
 |---|---|---|
-| **App** | La fenêtre que voit Julien (WPF) | Image du jeu en direct, boutons Démarrer / Arrêter, réglages de sécurité, journal en direct, position de la fenêtre mémorisée |
+| **App** | La fenêtre que voit Julien (WPF) | 5 onglets (D-043) : Bot (tableau de bord, image du jeu, repas automatique, sécurité), Personnage, Carte, Recettes, Paramètres (avec le journal) |
 | **Core** | Le « cerveau » : règles, sécurité, journal | Surveillance de sécurité (touche d'urgence, durée max), journal de session, horloge |
 | **Perception** | Les « yeux » | Recherche de la fenêtre du jeu, capture de l'écran |
-| **Input** | Les « mains » (et l'écoute du clavier) | Écoute de la touche Num 5 dans tout Windows |
+| **Input** | Les « mains » (et l'écoute du clavier) | Écoute de Num 5 et Num 0, envoi de touches (Maj + E), mouvements humains de souris et de caméra (gardés pour H3) |
 | **GameData** | La « mémoire du jeu » (objets, recettes) | Vide en v0.1. Depuis la v0.3.0 : données BitCraft_GameData téléchargées et vérifiées (D-033, section 12) |
 | **Server** | La lecture du serveur officiel (depuis la v0.3.5, D-039) | Lecture seule avec le jeton de Julien : voir [hybride/architecture-serveur.md](hybride/architecture-serveur.md) |
 

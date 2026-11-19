@@ -67,7 +67,7 @@ Inventaire : `inventory_state` (publique) lu depuis la v0.3.14, voir `architectu
 
 ## Essais réels v0.3.7 et v0.3.8 (2026-11-18, Julien) : la lecture marche
 - Découverte par `idc-global` : OK (compte connu, région 18 « Keldan », `region_connection_info` donne l'hôte **`bitcraft-release.spacetimedb.com`**). `bitcraft-early-access` accepte aussi `idc-18`.
-- Lecture de `idc-18` : OK. Personnage (entité 648518346637266951), vie, endurance, faim, `signed_in_player_state` (passe à 1 quand le jeu se connecte). Environ **700 ressources** dans un carré de 80 petites cases (jointure acceptée).
+- Lecture de `idc-18` : OK. Personnage (numéro d'entité masqué), vie, endurance, faim, `signed_in_player_state` (passe à 1 quand le jeu se connecte). Environ **700 ressources** dans un carré de 80 petites cases (jointure acceptée).
 - Changements reçus en direct : ≈ 1 message par seconde (faim qui baisse), plus les déplacements.
 - **Ordre bot → jeu, puis déconnexion du bot : le jeu reste connecté** (vérifié 2 fois).
 - **Bot connecté alors que le jeu est ouvert : le jeu est éjecté** aussitôt (« Logged in elsewhere », capture de Julien). Le client du jeu se ferme lui-même quand une connexion plus récente du compte apparaît. Pas besoin d'attendre la déconnexion du bot.

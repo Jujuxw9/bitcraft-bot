@@ -6,9 +6,10 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 
 ## État
 
-**v0.3.16** :
-- Voie hybride (D-039) : le bot lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré). Il affiche la position, la vie, l'endurance, la faim et les ressources proches. Vérifié en réel.
-- Lecture de l'écran (HUD) : position, zone, vie, endurance, faim, cible, jauge de métier.
+**v0.3.17** :
+- Voie hybride (D-039) : le bot lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré) : position, vie, endurance, faim, ressources proches, sac et banques, bonus, expérience des métiers, action en cours. Vérifié en réel.
+- **Tableau de bord** dans l'onglet Bot : tout l'état du personnage d'un coup d'œil, dont le métier en cours et sa progression (la jauge de métier, lue sur le serveur).
+- Lecture de l'écran (HUD) en contrôle : cible sélectionnée, menus ouverts (D-044 : le serveur d'abord).
 - Données du jeu (BitCraft_GameData, jamais republiées), surveillance CPU/RAM.
 - H2 : **carte des arbres** autour du joueur, avec leur âge, leur santé, leur distance et leur direction.
 - 5 onglets (D-043) : Bot (piloter, repas automatique), Personnage (en direct, bonus actifs, sac et banques), Carte, Recettes (avec images), Paramètres (connexion, overlay, système, journal).
@@ -19,7 +20,7 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 
 Règle : connecter le bot **avant** de lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter, sinon le jeu serait éjecté.
 
-Prochaine étape : retravailler le bot dans son ensemble, puis H3 (aller au meilleur arbre). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
+Prochaine étape : contrôleur d'actions commun (mêmes sécurités pour toutes les touches et tous les clics), puis H3 (aller au meilleur arbre). Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
 
 ## Principe
 

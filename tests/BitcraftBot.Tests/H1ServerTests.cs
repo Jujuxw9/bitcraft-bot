@@ -312,6 +312,12 @@ public class H1RealSchemaTests
             ["bank_state"] = ["building_entity_id", "coordinates"],
             ["active_buff_state"] = ["entity_id", "active_buffs"],
             ["character_stats_state"] = ["entity_id", "values"],
+            ["experience_state"] = ["entity_id", "experience_stacks"],
+            ["player_action_state"] = ["entity_id", "start_time", "duration", "action_type", "layer", "target", "recipe_id"],
+            ["extract_outcome_state"] = ["entity_id", "target_entity_id", "damage"],
+            ["player_state"] = ["entity_id", "time_played", "signed_in"],
+            ["teleportation_energy_state"] = ["entity_id", "energy"],
+            ["equipment_state"] = ["entity_id", "equipment_slots"],
             ["world_region_state"] = ["region_index"],
             ["world_region_name_state"] = ["id", "player_facing_name"],
         };

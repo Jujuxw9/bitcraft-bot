@@ -67,19 +67,78 @@
                     <ColumnDefinition Width="280" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Image du jeu en direct, avec les zones lues en surimpression -->
-                <Border Grid.Row="0" Grid.Column="0" Background="Black" BorderBrush="#3C3F44" BorderThickness="1">
-                    <Grid>
-                        <Viewbox Stretch="Uniform">
-                            <Grid x:Name="FrameHost">
-                                <Image x:Name="GameImage" Stretch="Fill" RenderOptions.BitmapScalingMode="LowQuality" />
-                                <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False" />
-                            </Grid>
-                        </Viewbox>
-                        <TextBlock x:Name="NoImageText" Text="Pas d'image. Cliquez sur « Démarrer »."
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9AA0A6" />
-                    </Grid>
-                </Border>
+                <!-- Tableau de bord (v0.3.17, D-043) en haut ; image du jeu en vignette en bas -->
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" MinHeight="240" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <WrapPanel x:Name="Dashboard">
+                            <!-- Personnage -->
+                            <Border Style="{StaticResource Card}" Width="380">
+                                <StackPanel>
+                                    <TextBlock Text="PERSONNAGE" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="DashHealthText" Text="Vie : —" />
+                                    <ProgressBar x:Name="DashHealthBar" Maximum="1" Height="10" Margin="0,2,0,6" Foreground="#34A853" Background="#141517" BorderThickness="0" />
+                                    <TextBlock x:Name="DashStaminaText" Text="Endurance : —" />
+                                    <ProgressBar x:Name="DashStaminaBar" Maximum="1" Height="10" Margin="0,2,0,6" Foreground="#FBBC04" Background="#141517" BorderThickness="0" />
+                                    <TextBlock x:Name="DashHungerText" Text="Faim : —" />
+                                    <ProgressBar x:Name="DashHungerBar" Maximum="1" Height="10" Margin="0,2,0,6" Foreground="#E8EAED" Background="#141517" BorderThickness="0" />
+                                    <TextBlock x:Name="DashBonusText" Text="Bonus : —" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DashMiscText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Border>
+                            <!-- Activité (serveur) -->
+                            <Border Style="{StaticResource Card}" Width="380">
+                                <StackPanel>
+                                    <TextBlock Text="ACTIVITÉ" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="DashActionText" Text="Action : —" TextWrapping="Wrap" />
+                                    <ProgressBar x:Name="DashActionBar" Maximum="1" Height="10" Margin="0,2,0,6" Foreground="#8AB4F8" Background="#141517" BorderThickness="0" />
+                                    <TextBlock x:Name="DashSkillText" Text="Métier : —" TextWrapping="Wrap" />
+                                    <ProgressBar x:Name="DashSkillBar" Maximum="1" Height="10" Margin="0,2,0,6" Foreground="#3DF58A" Background="#141517" BorderThickness="0" />
+                                    <TextBlock x:Name="DashHitText" Text="Ressource frappée : —" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DashSkillsText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,6,0,0" FontSize="11" />
+                                </StackPanel>
+                            </Border>
+                            <!-- Sac et alentours -->
+                            <Border Style="{StaticResource Card}" Width="380">
+                                <StackPanel>
+                                    <TextBlock Text="SAC ET ALENTOURS" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="DashSacText" Text="Sac : —" />
+                                    <ProgressBar x:Name="DashSacBar" Maximum="1" Height="10" Margin="0,2,0,6" Foreground="#C58AF9" Background="#141517" BorderThickness="0" />
+                                    <TextBlock x:Name="DashPositionText" Text="Position : —" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DashBestTreeText" Text="Meilleur arbre : —" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                    <TextBlock x:Name="DashTreesText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <!-- Le bot -->
+                            <Border Style="{StaticResource Card}" Width="380">
+                                <StackPanel>
+                                    <TextBlock Text="LE BOT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                    <TextBlock x:Name="DashServerText" Text="Serveur : pas connecté" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DashScreenText" Text="Lecture de l’écran : arrêtée" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DashMealText" Text="Repas auto : désactivé" TextWrapping="Wrap" />
+                                    <TextBlock x:Name="DashAlertText" Text="" Foreground="#FDD663" TextWrapping="Wrap" Margin="0,4,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </ScrollViewer>
+
+                    <!-- Image du jeu en direct, avec les zones lues en surimpression -->
+                    <Border Grid.Row="1" Background="Black" BorderBrush="#3C3F44" BorderThickness="1" Margin="0,6,10,0">
+                        <Grid>
+                            <Viewbox Stretch="Uniform">
+                                <Grid x:Name="FrameHost">
+                                    <Image x:Name="GameImage" Stretch="Fill" RenderOptions.BitmapScalingMode="LowQuality" />
+                                    <Canvas x:Name="OverlayCanvas" IsHitTestVisible="False" />
+                                </Grid>
+                            </Viewbox>
+                            <TextBlock x:Name="NoImageText" Text="Image du jeu : cliquez sur « Démarrer » (lecture de l’écran)."
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9AA0A6" />
+                        </Grid>
+                    </Border>
+                </Grid>
 
                 <!-- Panneau d'état et de commande -->
                 <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="8,0,0,0">

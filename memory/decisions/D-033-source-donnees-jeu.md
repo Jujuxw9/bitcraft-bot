@@ -30,4 +30,4 @@ BitCraftPublic n'a que les schémas, pas les valeurs (Q-004). Le dépôt **githu
 ## Conséquences
 - Les noms de **878 ressources** corrigent les lectures du nom de la cible (avant : 19 noms saisis à la main).
 - Le bot peut exclure ce qui n'est pas un arbre ordinaire (ex. **Maker's Tree**, étiquette « Wonder Resource »).
-- Base pour la suite : endurance par coup, outils requis, nourriture (D-032).
+- Base pour la suite : endurance par coup, outils requis, nourriture (D-042).

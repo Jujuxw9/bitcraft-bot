@@ -20,7 +20,22 @@ public sealed record PlayerSnapshot
     // Faim maximale (character_stats_state) et bonus actifs (active_buff_state). null si non lus.
     public double? MaxSatiation { get; init; }
 
+    public double? MaxHealth { get; init; }
+
+    public double? MaxStamina { get; init; }
+
     public IReadOnlyList<ActiveBuffInfo>? Buffs { get; init; }
+
+    // Tableau de bord (v0.3.17). null si non lus.
+    public IReadOnlyList<SkillProgress>? Skills { get; init; }
+
+    public ActionInfo? Action { get; init; }
+
+    public ExtractInfo? LastExtract { get; init; }
+
+    public int? TimePlayedSeconds { get; init; }
+
+    public double? TeleportEnergy { get; init; }
 
     public string? RegionName { get; init; }
     public int? RegionIndex { get; init; }
@@ -118,7 +133,14 @@ public static class SnapshotBuilder
             Stamina = Of("stamina_state")?.F64("stamina"),
             Satiation = Of("satiation_state")?.F64("satiation"),
             MaxSatiation = PlayerBuffs.MaxSatiation(cache, entity.Value),
+            MaxHealth = PlayerBuffs.Stat(cache, entity.Value, PlayerBuffs.MaxHealthStat),
+            MaxStamina = PlayerBuffs.Stat(cache, entity.Value, PlayerBuffs.MaxStaminaStat),
             Buffs = PlayerBuffs.Of(cache, entity.Value),
+            Skills = PlayerActivity.Skills(cache, entity.Value),
+            Action = PlayerActivity.CurrentAction(cache, entity.Value),
+            LastExtract = PlayerActivity.LastExtract(cache, entity.Value),
+            TimePlayedSeconds = Of("player_state")?.I32("time_played"),
+            TeleportEnergy = Of("teleportation_energy_state")?.F64("energy"),
             RegionIndex = regionIndex,
             RegionName = regionName?.Get("player_facing_name")?.ToString(),
             Resources = position is { } p ? NearbyResources(cache, p, describe) : [],

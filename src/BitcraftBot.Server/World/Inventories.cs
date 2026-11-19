@@ -9,7 +9,8 @@ public sealed record ItemStackInfo(int ItemId, int Quantity, bool IsCargo);
 // Un inventaire lu sur le serveur (table inventory_state, publique, lecture seule).
 // Owner : propriétaire (le personnage pour son sac, le bâtiment pour une banque, 0 pour une banque régionale).
 // PlayerOwner : le joueur à qui l'inventaire appartient (banques : un inventaire par joueur).
-public sealed record InventoryInfo(ulong EntityId, ulong Owner, ulong PlayerOwner, int Index, int CargoIndex, IReadOnlyList<ItemStackInfo> Stacks)
+// PocketCount : nombre de cases (pleines ou vides) ; Stacks ne garde que les cases pleines.
+public sealed record InventoryInfo(ulong EntityId, ulong Owner, ulong PlayerOwner, int Index, int CargoIndex, IReadOnlyList<ItemStackInfo> Stacks, int PocketCount = 0)
 {
     // Banque régionale : pas de bâtiment propriétaire (code serveur, InventoryState::is_regional_bank).
     public bool IsRegionalBank => Owner == 0 && PlayerOwner != 0;
@@ -31,7 +32,8 @@ public static class Inventories
             }
             result.Add(new InventoryInfo(row.U64("entity_id") ?? 0, owner, playerOwner,
                 row.I32("inventory_index") ?? 0, row.I32("cargo_index") ?? 0,
-                row.Get("pockets") is { } pockets ? ParsePockets(pockets) : []));
+                row.Get("pockets") is { } pockets ? ParsePockets(pockets) : [],
+                row.Get("pockets") is { ValueKind: JsonValueKind.Array } all ? all.GetArrayLength() : 0));
         }
         return result.OrderBy(i => i.Owner == player ? 0 : 1).ThenBy(i => i.Owner).ThenBy(i => i.Index).ToList();
     }

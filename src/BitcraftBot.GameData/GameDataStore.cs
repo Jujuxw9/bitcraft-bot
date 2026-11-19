@@ -42,6 +42,9 @@ public sealed class GameDataStore
     public required IReadOnlyDictionary<int, string> Items { get; init; }
     public required IReadOnlyDictionary<int, string> Cargos { get; init; }
     public required IReadOnlySet<int> FoodItemIds { get; init; }
+
+    // Noms des métiers (skill_desc), pour le tableau de bord (v0.3.17).
+    public IReadOnlyDictionary<int, string> Skills { get; init; } = new Dictionary<int, string>();
     public GameDataVersion? Version { get; init; }
 
     private Dictionary<string, ResourceInfo>? _byName;
@@ -92,6 +95,7 @@ public sealed class GameDataStore
             Items = items,
             Cargos = cargos,
             FoodItemIds = foods,
+            Skills = ReadArray(folder, "skill_desc").GroupBy(e => Int(e, "id")).ToDictionary(g => g.Key, g => Str(g.First(), "name")),
             Version = ReadVersion(folder),
         };
     }

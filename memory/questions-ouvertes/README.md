@@ -2,8 +2,8 @@
 
 | ID | Titre | Priorité | Statut |
 |---|---|---|---|
-| [Q-001](Q-001-perception-monde-3d.md) | Perception du monde 3D | Haute | Ouverte |
-| [Q-002](Q-002-cartographie-navigation.md) | Cartographie et navigation | Haute | Ouverte |
+| [Q-001](Q-001-perception-monde-3d.md) | Perception du monde 3D | Haute | En partie résolue : positions des ressources lues sur le serveur (D-039, H2) |
+| [Q-002](Q-002-cartographie-navigation.md) | Cartographie et navigation | Haute | Ouverte (position exacte et ressources par le serveur ; trajets : H3) |
 | [Q-003](Q-003-interface-consignes-n3.md) | Interface de consignes N3 | Basse | Ouverte |
 | [Q-004](Q-004-source-valeurs-donnees.md) | Source des valeurs de données de jeu | Haute | Résolue → D-033 |
 | [Q-005](Q-005-langue-code.md) | Langue du code | Moyenne | Résolue → D-012 |
@@ -15,7 +15,7 @@
 | [Q-011](Q-011-touches-deplacement-camera.md) | Touches de déplacement et de caméra | Haute | Résolue → D-024 |
 | [Q-012](Q-012-purge-captures-historique.md) | Effacer les captures déjà poussées de l'historique Git ? | Basse | Résolue (non) |
 | [Q-013](Q-013-ecorce-ou-troncs.md) | Quel « bois » ramener : écorce, troncs, ou les deux ? | Haute | Résolue → D-027 |
-| [Q-014](Q-014-ennemis-et-danger.md) | Ennemis et danger de mort | Haute | Ouverte |
+| [Q-014](Q-014-ennemis-et-danger.md) | Ennemis et danger de mort | Haute | Ouverte (le serveur a des tables publiques d'ennemis et de combat : à étudier) |
 | [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Moyenne | Ouverte (barre active : point blanc, vu le 16/11) |
 | [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Résolue (modèles de chiffres, T-20261116-04 OK) |
 | [Q-017](Q-017-mode-test-mouvements.md) | Mode test : mouvements « humains » souris et caméra | Moyenne | Résolue → D-035 |
