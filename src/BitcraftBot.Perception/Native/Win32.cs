@@ -101,4 +101,12 @@ internal static class Win32
 
     [DllImport("gdi32.dll")]
     public static extern bool DeleteDC(IntPtr hDc);
+
+    public const uint GA_ROOT = 2;
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr WindowFromPoint(POINT point);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetAncestor(IntPtr hWnd, uint flags);
 }

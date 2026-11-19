@@ -91,3 +91,12 @@ Pour déboguer la connexion sans être devant le PC, le journal (catégorie « S
 - **Familles** : les ~80 catégories du jeu regroupées en 12 familles (arbres, rochers et pierre, minerais, fleurs, plantes à fibres, baies et fruits, champignons, céréales et légumes, sable / argile / terre, pêche, obstacles, autres). Chaque case montre le nombre lu ; chaque famille a sa couleur, la même sur la carte. Boutons « Tout » et « Arbres seulement ».
 - **Cible à l'écran** : ressources du même nom à moins de 8 cases seulement ; le serveur peut avoir jusqu'à 3 % d'avance sur l'écran ; « sûr » seulement si une seule ressource colle ; sinon on garde la précédente. Le journal note chaque changement de cible ou de certitude.
 - Tests : 219 OK (19 nouveaux : familles, cas réels de la cible).
+
+## 26. v0.3.13 — le jeu caché par une autre fenêtre (2026-11-19)
+
+- Constat de l'essai long : la capture copie l'écran ; quand une autre fenêtre passe devant le jeu, c'est elle qui est lue et enregistrée.
+- **Visibilité du jeu** : à 5 points clés (coordonnées, cible, barres, centre), le bot vérifie que la fenêtre du dessus est bien le jeu. Cliquer sur la fenêtre du bot (2ᵉ écran) ne compte pas : le jeu reste visible.
+- Jeu caché ou introuvable → lecture de l'écran **en pause** : pas d'alerte, pas d'image de diagnostic. Le journal note la pause et la reprise.
+- **Num 0** ignorée si le jeu est caché (le journal le dit). **Num 5** inchangée en attendant la réponse de Julien (Q-022).
+- Refus du module global (jeu pas lancé depuis plus d'1 h) : simple information, la lecture directe de la région suffit.
+- Pas vérifié en réel par Claude : le test avec un Bloc-notes par-dessus a été bloqué (risque de fermer celui de Julien). À vérifier pendant le prochain essai.

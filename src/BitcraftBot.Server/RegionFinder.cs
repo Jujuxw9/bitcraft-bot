@@ -68,7 +68,7 @@ public static class RegionFinder
             }
         };
         connection.Closed += reason => done.TrySetResult(RegionDiscovery.Fail(Volatile.Read(ref messages) == 0
-            ? "le module global a refusé la liaison dès l'ouverture (authentification du compte trop ancienne ?)"
+            ? "le module global a refusé la liaison dès l'ouverture (normal si le jeu n'a pas été lancé depuis plus d'une heure : ce module exige une connexion au jeu de moins d'1 h)"
             : $"liaison terminée ({reason})"));
 
         await connection.ConnectAsync(ServerEndpoints.SubscribeUri(ServerEndpoints.Host, GlobalModule), token, cancel);

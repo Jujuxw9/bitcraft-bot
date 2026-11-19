@@ -98,7 +98,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 }
                 else
                 {
-                    log.Alerte(Category, $"Découverte : {Discovery.Error}. Essai direct de la région R{region}.");
+                    log.Info(Category, $"Découverte : {Discovery.Error}. Pas grave : lecture directe de la région R{region}.");
                 }
             }
             _targetModule = module;

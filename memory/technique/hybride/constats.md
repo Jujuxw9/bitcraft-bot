@@ -78,3 +78,8 @@ Position des ressources : `location_state` (jointure sur `entity_id`), **vérifi
 ## Relais Bitjita (piste, non utilisée)
 - `relay.bitjita.com` : relais SpacetimeDB en **lecture seule**, protocole v1, modules `idc-N` et `idc-global`, identités propres au relais (**aucun jeton BitCraft**). Exploitant, règles d'usage et limites : non indiqués.
 - Avantage : aucune liaison avec le compte de Julien, donc **aucun risque de déconnexion** du personnage. Inconvénients : service tiers, disponibilité non garantie.
+
+## Essai long v0.3.12 (2026-11-19, 42 min)
+- Liaison tenue 42 min sans coupure ; mémoire du bot stable (≈ 480 Mo) ; aucune action sur le jeu.
+- Le module global refuse si le jeu n'a pas été lancé depuis plus d'1 h (règle du code serveur, confirmée) ; la région, elle, accepte (règle des 24 h). La lecture directe de R18 suffit.
+- Les touches globales du bot (Num 0, Num 5) se déclenchent aussi quand Julien tape dans un autre programme. Corrigé pour Num 0 (v0.3.13) ; Num 5 : Q-022.

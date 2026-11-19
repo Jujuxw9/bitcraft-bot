@@ -12,6 +12,7 @@
 | [T-20261118-04](T-20261118-04-v037-v038-essai-reel-h1.md) | 2026-11-18 | session réelle | Essai H1 de Julien (v0.3.7, v0.3.8) | OK : lecture serveur et déconnexion sûre ; KO : connexion avec le jeu ouvert = jeu éjecté → v0.3.9 |
 | T-20261118-05 (tests `H2MapTests`) | 2026-11-18 | unitaire | H2 (v0.3.11) : coordonnées N / E sur valeurs réelles, direction, âge, santé, requêtes de lecture | OK (200 tests) ; essai réel : `echanges/2026-11-18-essai-h2.md` |
 | [T-20261118-06](T-20261118-06-v0311-essai-reel-h2.md) | 2026-11-18 | session réelle | Essai H2 de Julien (v0.3.11) | OK : carte, santé, zone, journal ; défauts : cible instable → v0.3.12 |
+| [T-20261119-01](T-20261119-01-v0312-essai-long.md) | 2026-11-19 | session réelle (42 min) | Essai long v0.3.12 | OK : liaison, mémoire stable, familles, cible ; défauts : Num 0 / Num 5 hors jeu, lecture d'une fenêtre devant le jeu → v0.3.13 |
 
 ## Gabarit
 

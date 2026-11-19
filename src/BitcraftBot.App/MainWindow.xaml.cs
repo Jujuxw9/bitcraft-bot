@@ -44,6 +44,7 @@ public partial class MainWindow : Window
     private readonly GameDataLoader _gameData;
     private const int MaxDiagnostics = 5;
     private int _diagnosticsSaved;
+    private bool _gameVisible = true;
     private GlobalKeyboardHook? _keyboardHook;
 
     // Journal affiché et surveillance des ressources (onglet Système).
@@ -137,7 +138,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.12 (H2 : onglet Carte séparé, filtres par famille de ressources, cible à l'écran stable) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel, avec recherche de la région du personnage. Aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.13 (H2 : lecture de l'écran en pause quand une autre fenêtre cache le jeu, Num 0 ignorée hors du jeu) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel, avec recherche de la région du personnage. Aucune action sur le jeu hors banc d'essai.");
         InitServerTab();
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
@@ -164,6 +165,13 @@ public partial class MainWindow : Window
         // Num 0 : capture de l'écran du jeu seul (1920×1080 exact), même avec 2 écrans.
         if (!isInjected && CaptureKey.IsCapture(scanCode, isExtended))
         {
+            // Seulement si le jeu est visible : sinon Julien tape un 0 ailleurs (essai v0.3.12 : 4 captures du Bloc-notes).
+            var game = _gameWindow ?? new GameWindowLocator().Find();
+            if (game is null || !GameVisibility.IsUncovered(game))
+            {
+                _log.Info("Capture", $"Touche {CaptureKey.DisplayName} ignorée : le jeu est caché par une autre fenêtre (touche tapée dans un autre programme ?).");
+                return;
+            }
             _ = Task.Run(SaveGameScreenshotAsync);
             return;
         }
@@ -240,6 +248,7 @@ public partial class MainWindow : Window
         _hudLogger.Reset();
         _hudReader?.ResetPosition();
         _diagnosticsSaved = 0;
+        _gameVisible = true;
         _consecutiveCaptureErrors = 0;
         _framesCounted = 0;
         _captureMsTotal = 0;
@@ -337,6 +346,20 @@ public partial class MainWindow : Window
                     continue;
                 }
                 if (frame.Width != HudLayout.ReferenceWidth || frame.Height != HudLayout.ReferenceHeight)
+                {
+                    continue;
+                }
+                // Jeu caché par une autre fenêtre (ou introuvable) : on ne lit pas l'écran, pour ne pas lire
+                // (ni enregistrer en image) une autre fenêtre de Julien. Cliquer sur le bot ne cache pas le jeu.
+                var visible = _gameWindow is { } gw && GameVisibility.IsUncovered(gw);
+                if (visible != _gameVisible)
+                {
+                    _gameVisible = visible;
+                    _log.Info("Perception", visible
+                        ? "Jeu de nouveau visible : lecture de l'écran reprise."
+                        : "Jeu caché par une autre fenêtre (ou introuvable) : lecture de l'écran en pause, sans alerte ni image.");
+                }
+                if (!visible)
                 {
                     continue;
                 }
