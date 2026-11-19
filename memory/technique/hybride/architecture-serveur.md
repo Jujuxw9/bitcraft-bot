@@ -170,3 +170,26 @@ Demandes de Julien : supprimer la case Num 5 ; Sécurité dans Paramètres ; rep
 - **Raccourci bureau** : `tools/creer-raccourci-bureau.ps1` crée « BitCraft Bot » → `tools/lancer-bot.ps1`, qui lance le `BitcraftBot-vX.Y.Z.exe` de numéro le plus haut dans `artifacts/release`.
 - Vérifié : 264 tests ; rendu de la fenêtre **hors écran** à 1920, 1200 et 800 px de large (Julien jouait : aucune fenêtre ouverte). Deux défauts trouvés et corrigés au rendu : clés « Muted » et « Card » en double dans le thème (la fenêtre ne s'ouvrait pas), chevauchement en largeur étroite.
 - **À vérifier en réel** (Julien) : déconnexion à la fermeture, repas auto actif au démarrage, alerte sans nourriture, aspect sur son écran.
+
+## 32. v0.3.19 — Num 5 supprimée, journal des niveaux et des tâches, HUD allégé, moins de CPU (2026-11-19)
+
+Demandes de Julien (passation session 14) : supprimer Num 5 ; plus d'informations dans le journal (niveaux, début et fin de tâche) ; ne plus lire vie, endurance, faim et niveaux à l'écran ; optimiser CPU, RAM et vitesse.
+
+- **Num 5** (D-047) : touche, réglage et texte supprimés (`EmergencyKey`, arrêt « touche d'urgence », rappels dans l'overlay et la carte Sécurité). Restent : bouton « Arrêter », souris bougée, pause 3 s quand Julien tape, durée max, case du repas auto.
+- **Journal des niveaux et des tâches** (`TaskJournal`, brique Server, testé sans le jeu). Appelé à chaque lecture du serveur (500 ms), il écrit **une ligne par événement** :
+  - `[Métier] Forestry passe niveau 30 (était 29).` — niveau calculé avec la formule du serveur ; la première lecture ne compte pas.
+  - `[Tâche] Début : récolte « Mature Oak Tree », Forestry niv. 29, à N 6707, E 8927.` — action de la couche « Base » ; ressource d'après la cible de l'action (ou le dernier coup) ; métier d'après les données du jeu.
+  - `[Tâche] Fin : récolte « Mature Oak Tree », 42 s, 12 coups, Forestry +360 XP, objets : +6 Rough Bark.` — fin après 3 s sans action, ou dès que la cible ou la recette change ; coups = actions distinctes du serveur ; objets = différence du sac et de la ceinture (pas les banques). Fabrication : « étapes » et objets utilisés en « − ».
+  - Pas des tâches : déplacements, gestes, escalade, téléportation, repas (déjà écrit par le repas auto).
+  - Liaison coupée : la tâche en cours est écrite telle quelle.
+  - Le passage de niveau masque la cible lue à l'écran 8 s (bandeau du jeu, Q-018) : avant, c'était la jauge lue à l'écran qui le faisait.
+- **HUD allégé** : l'écran ne lit plus que la position (contrôle croisé), la zone, la région et la cible. Retirés : textes de vie et d'endurance (2 lectures OCR par passage), barres, ligne de faim, jauge de métier ; leurs zones ; l'alerte « endurance qui baisse sans jauge ». Sans serveur, le tableau de bord affiche « — ». Les classes de la jauge (`ProfessionGaugeReader`) restent, non appelées, pour H3 si besoin.
+- **Optimisations** :
+  - instantané du serveur et inventaires recalculés **seulement si un message est arrivé** depuis le passage précédent ; inventaires calculés une fois par passage (avant : 3 fois) ;
+  - seul l'**onglet affiché** est redessiné (Bot : tableau de bord ; Personnage : fiche, sac, bonus ; Carte : carte et tableau). Le journal, le repas auto et la cible à l'écran tournent toujours ;
+  - « Jeu lancé ? » (liste des processus) : toutes les 3 s et seulement dans Paramètres (avant : 2 fois par seconde) ;
+  - capture à **2 images/s** quand l'image du jeu n'est pas visible (autre onglet, fenêtre réduite), au lieu de 5 ; l'image n'est plus envoyée à l'affichage ;
+  - une seule recherche de la fenêtre du jeu (overlay, contrôleur, Num 0) ;
+  - messages bruts du serveur : 1 sur 200 en « Détails » (avant : tous, chacun relu une 2e fois).
+- Vérifié : 262 tests (nouveaux : `V0319Tests`, 9 cas) ; rendu **hors écran** des 5 onglets à 1920 et 800 px et de l'overlay (Julien jouait : aucune fenêtre ouverte).
+- **Pas vérifié** : mesure CPU / RAM avant / après, journal des tâches en réel (il faut la connexion au serveur, donc le jeu fermé avant). .exe **pas fabriqué** (pas de Release demandée ; la fabrication locale a été bloquée par le contrôle automatique).

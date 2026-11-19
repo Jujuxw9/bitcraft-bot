@@ -80,8 +80,16 @@ public partial class MainWindow
         }
     }
 
-    private void ShowResources(ServerReader reader, PlayerSnapshot s)
+    // visible : l'onglet Carte est affiché. Sinon, seul le journal (cible à l'écran, meilleur arbre) est tenu à jour.
+    private void ShowResources(ServerReader reader, PlayerSnapshot s, bool visible)
     {
+        if (!visible)
+        {
+            var bestHidden = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
+            var targetHidden = CurrentHudTarget();
+            LogMatches(bestHidden, _targetMatcher.Match(targetHidden?.Name, targetHidden?.Health, s.Resources), targetHidden);
+            return;
+        }
         MapPlayerText.Text = s.Position is { } me
             ? $"Vous : {me.ScreenText} (±1){(s.Walking == true ? ", en marche" : "")} — vie {s.Health:0}, endurance {s.Stamina:0}, satiété {s.Satiation:0} — {s.RegionName ?? "région ?"}"
             : "En attente de la position du personnage…";

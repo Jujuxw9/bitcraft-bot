@@ -262,7 +262,7 @@ public class CaptureKeyTests
     [Theory]
     [InlineData(0x52, false, true)]  // Num 0
     [InlineData(0x52, true, false)]  // Inser (touche étendue, même scancode)
-    [InlineData(0x4C, false, false)] // Num 5 = arrêt d'urgence, pas une capture
+    [InlineData(0x4C, false, false)] // Num 5 : plus aucune fonction (D-047)
     public void RecognizesOnlyNumpad0(int scanCode, bool extended, bool expected) =>
         Assert.Equal(expected, BitcraftBot.Input.Keyboard.CaptureKey.IsCapture(scanCode, extended));
 }

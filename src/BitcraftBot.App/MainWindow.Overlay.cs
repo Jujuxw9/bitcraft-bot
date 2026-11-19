@@ -9,14 +9,11 @@ namespace BitcraftBot.App;
 // et rappel des touches. Visible seulement quand le jeu est visible (pas par-dessus un autre programme).
 public partial class MainWindow
 {
-    private static readonly TimeSpan OverlayLocateInterval = TimeSpan.FromSeconds(2);
     private static readonly Brush OnBrush = Frozen(129, 201, 149);
     private static readonly Brush WaitBrush = Frozen(253, 214, 99);
     private static readonly Brush OffBrush = Frozen(170, 170, 170);
 
     private OverlayWindow? _overlay;
-    private GameWindow? _overlayGame;
-    private DateTime _overlayLocatedAt = DateTime.MinValue;
 
     private void InitOverlay()
     {
@@ -33,13 +30,8 @@ public partial class MainWindow
     // Appelé toutes les 500 ms (minuterie de l'onglet Personnage).
     private void UpdateOverlay()
     {
-        var game = _gameWindow;
-        if (game is null && DateTime.Now - _overlayLocatedAt >= OverlayLocateInterval)
-        {
-            _overlayLocatedAt = DateTime.Now;
-            _overlayGame = new GameWindowLocator().Find();
-        }
-        game ??= _overlayGame;
+        // Recherche de la fenêtre du jeu partagée avec le contrôleur d'actions (v0.3.19).
+        var game = CurrentGame();
 
         var visible = _settings.OverlayEnabled && game is not null
                       && (_inputSender.IsForeground(game.Handle) || GameVisibility.IsUncovered(game));

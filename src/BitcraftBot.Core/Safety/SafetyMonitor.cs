@@ -6,7 +6,6 @@ namespace BitcraftBot.Core.Safety;
 public enum StopReason
 {
     Manuel,
-    ToucheUrgence,
     DureeMaximale,
     SourisBougee,
     Anomalie,
@@ -15,7 +14,6 @@ public enum StopReason
 // Réglages de sécurité (D-004, D-022). Chaque mécanisme est activable dans l'interface.
 public sealed class SafetyOptions
 {
-    public bool EmergencyKeyEnabled { get; set; } = true;
     public bool MaxDurationEnabled { get; set; } = true;
     public TimeSpan MaxDuration { get; set; } = TimeSpan.FromMinutes(15);
 
@@ -73,15 +71,6 @@ public sealed class SafetyMonitor
         }
     }
 
-    // Appelé par le crochet clavier quand la touche d'urgence est pressée.
-    public void OnEmergencyKey()
-    {
-        if (Options.EmergencyKeyEnabled)
-        {
-            RequestStop(StopReason.ToucheUrgence);
-        }
-    }
-
     public void RequestStop(StopReason reason)
     {
         if (!IsRunning)
@@ -97,7 +86,6 @@ public sealed class SafetyMonitor
     public static string Describe(StopReason reason) => reason switch
     {
         StopReason.Manuel => "arrêt demandé avec le bouton",
-        StopReason.ToucheUrgence => "ARRÊT D'URGENCE (touche Num 5)",
         StopReason.DureeMaximale => "durée maximale de session atteinte",
         StopReason.SourisBougee => "souris bougée à la main",
         StopReason.Anomalie => "anomalie détectée",

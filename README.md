@@ -15,7 +15,7 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 - 5 onglets (D-043), **thème aux couleurs de BitCraft**, peu de texte, fenêtre adaptative (D-046).
 - **Contrôleur d'actions commun** (D-045) : toutes les touches et tous les clics passent par les mêmes sécurités.
 - Overlay sur l'écran du jeu : état du bot et rappel des touches.
-- Sécurité : arrêt d'urgence `Num 5` toujours actif (quand BitCraft est actif, D-041), durée maximale, arrêt si la souris bouge, journaux. Déconnexion du serveur garantie à la fermeture. Capture du jeu avec `Num 0`.
+- Sécurité : bouton « Arrêter », durée maximale, arrêt si la souris bouge, pause des actions quand on tape au clavier, journaux (plus de touche `Num 5` depuis la v0.3.19, D-047). Déconnexion du serveur garantie à la fermeture. Capture du jeu avec `Num 0`.
 - Repas automatique (Maj + E) quand la faim passe sous 30 % ou que le bonus de nourriture est fini (D-042, actif au démarrage, alerte s'il n'y a pas de nourriture ; vérifié en réel).
 - Images des objets dans l'onglet Recettes.
 

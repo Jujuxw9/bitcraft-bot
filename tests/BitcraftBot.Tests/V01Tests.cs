@@ -49,54 +49,17 @@ public class SafetyMonitorTests
     }
 
     [Fact]
-    public void EmergencyKey_StopsSession_WhenEnabled()
-    {
-        var monitor = new SafetyMonitor(new SafetyOptions(), new FakeClock(T0));
-        StopReason? reason = null;
-        monitor.StopRequested += r => reason = r;
-        monitor.Start();
-
-        monitor.OnEmergencyKey();
-
-        Assert.False(monitor.IsRunning);
-        Assert.Equal(StopReason.ToucheUrgence, reason);
-    }
-
-    [Fact]
-    public void EmergencyKey_Ignored_WhenDisabled()
-    {
-        var monitor = new SafetyMonitor(new SafetyOptions { EmergencyKeyEnabled = false }, new FakeClock(T0));
-        monitor.Start();
-        monitor.OnEmergencyKey();
-        Assert.True(monitor.IsRunning);
-    }
-
-    [Fact]
     public void StopRequested_FiresOnlyOnce()
     {
         var monitor = new SafetyMonitor(new SafetyOptions(), new FakeClock(T0));
         var count = 0;
         monitor.StopRequested += _ => count++;
         monitor.Start();
-        monitor.OnEmergencyKey();
+        monitor.RequestStop(StopReason.Anomalie);
         monitor.RequestStop(StopReason.Manuel);
         monitor.Tick();
         Assert.Equal(1, count);
     }
-}
-
-public class EmergencyKeyTests
-{
-    [Fact]
-    public void Numpad5_IsEmergencyStop() => Assert.True(EmergencyKey.IsEmergencyStop(0x4C, isExtended: false));
-
-    [Theory]
-    [InlineData(0x06, false)] // touche 5 de la rangée du haut
-    [InlineData(0x4C, true)]  // même scancode mais touche étendue
-    [InlineData(0x4B, false)] // Num 4
-    [InlineData(0x2D, false)] // touche X (cache les arbres)
-    public void OtherKeys_AreNotEmergencyStop(int scanCode, bool extended) =>
-        Assert.False(EmergencyKey.IsEmergencyStop(scanCode, extended));
 }
 
 public class SessionLogTests

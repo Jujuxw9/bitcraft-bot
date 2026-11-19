@@ -243,36 +243,79 @@ public partial class MainWindow
         }
     }
 
+    // Onglets (ordre du XAML) : seul l'onglet affiché est redessiné (v0.3.19, moins de CPU).
+    private const int BotTab = 0;
+    private const int CharacterTab = 1;
+    private const int MapTab = 2;
+    private const int SettingsTab = 4;
+    private static readonly TimeSpan GameRunningInterval = TimeSpan.FromSeconds(3);
+
+    private ServerReader? _snapshotReader;
+    private long _snapshotVersion = -1;
+    private IReadOnlyList<InventoryInfo> _lastInventories = [];
+    private DateTime _gameRunningCheckedAt = DateTime.MinValue;
+
     private void OnServerTick()
     {
         UpdateOverlay();
-        ServerGameRunningText.Text = IsGameRunning() ? "Jeu : lancé." : "Jeu : fermé.";
+        var tab = Tabs.SelectedIndex;
+        if (tab == SettingsTab && DateTime.Now - _gameRunningCheckedAt >= GameRunningInterval)
+        {
+            _gameRunningCheckedAt = DateTime.Now;
+            ServerGameRunningText.Text = IsGameRunning() ? "Jeu : lancé." : "Jeu : fermé.";
+        }
         var reader = _serverReader;
         if (reader is null || reader.State == ReaderState.Deconnecte)
         {
-            UpdateDashboard(null, null);
+            FlushTasks();
+            if (tab == BotTab) UpdateDashboard(null, null, []);
             return;
         }
-        var s = reader.Snapshot();
-        _lastSnapshot = s;
-        SrvCharacter.Text = s.EntityId is { } id
-            ? $"entité {id}, {(s.SignedIn == true ? "connecté dans le jeu" : "pas connecté dans le jeu")}"
-            : "—";
-        SrvRegion.Text = s.RegionIndex is { } ri ? $"{s.RegionName ?? "?"} (index {ri})"
-            : reader.Discovery is { Success: true } dr ? $"{dr.RegionName ?? "?"} (région {dr.RegionId}, {dr.Module})"
-            : reader.Discovery is { Error: { } de } ? $"inconnue ({de})" : "—";
-        SrvPosition.Text = s.Position is { } p ? $"{p.ScreenText}  (serveur : {p})" : "—";
-        SrvDestination.Text = s.Destination is { } d ? $"{d.ScreenText}{(s.Walking == true ? " — en marche" : "")}" : "—";
-        SrvHealth.Text = s.Health is { } h ? $"{h:0.#}" : "—";
-        SrvStamina.Text = s.Stamina is { } st ? $"{st:0.#}" : "—";
-        SrvSatiation.Text = s.Satiation is { } sa ? $"{sa:0.#}" : "—";
-        SrvUpdated.Text = reader.LastUpdate is { } at ? $"{at:HH:mm:ss}" : "—";
+        // Instantané et inventaires recalculés seulement si le serveur a envoyé quelque chose depuis le dernier passage.
+        var version = reader.MessageCount;
+        if (!ReferenceEquals(reader, _snapshotReader) || version != _snapshotVersion || _lastSnapshot is null)
+        {
+            _snapshotReader = reader;
+            _snapshotVersion = version;
+            _lastSnapshot = reader.Snapshot();
+            _lastInventories = reader.InventoryRefused ? [] : reader.Inventories();
+        }
+        var s = _lastSnapshot;
+        var inventories = _lastInventories;
 
-        ShowResources(reader, s);
-        ShowInventories(reader, s);
-        RunMeals(reader, s);
-        ShowBuffs(s);
-        UpdateDashboard(reader, s);
+        // Toujours, même onglet caché : journal des tâches, repas automatique, métier en cours, cible et meilleur arbre.
+        _skillTracker.Update(s.Skills, DateTime.Now);
+        if (reader.State == ReaderState.Connecte)
+        {
+            TrackTasks(s, inventories, !reader.InventoryRefused);
+        }
+        else
+        {
+            FlushTasks();
+        }
+        RunMeals(reader, s, inventories);
+        ShowResources(reader, s, tab == MapTab);
+
+        if (tab == CharacterTab)
+        {
+            SrvCharacter.Text = s.EntityId is { } id
+                ? $"entité {id}, {(s.SignedIn == true ? "connecté dans le jeu" : "pas connecté dans le jeu")}"
+                : "—";
+            SrvRegion.Text = s.RegionIndex is { } ri ? $"{s.RegionName ?? "?"} (index {ri})"
+                : reader.Discovery is { Success: true } dr ? $"{dr.RegionName ?? "?"} (région {dr.RegionId}, {dr.Module})"
+                : reader.Discovery is { Error: { } de } ? $"inconnue ({de})" : "—";
+            SrvPosition.Text = s.Position is { } p ? $"{p.ScreenText}  (serveur : {p})" : "—";
+            SrvDestination.Text = s.Destination is { } d ? $"{d.ScreenText}{(s.Walking == true ? " — en marche" : "")}" : "—";
+            SrvHealth.Text = s.Health is { } h ? $"{h:0.#}" : "—";
+            SrvStamina.Text = s.Stamina is { } st ? $"{st:0.#}" : "—";
+            SrvUpdated.Text = reader.LastUpdate is { } at ? $"{at:HH:mm:ss}" : "—";
+            ShowInventories(reader, s, inventories);
+            ShowBuffs(s);
+        }
+        if (tab == BotTab)
+        {
+            UpdateDashboard(reader, s, inventories);
+        }
 
         // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)

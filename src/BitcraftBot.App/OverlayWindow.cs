@@ -37,7 +37,7 @@ public sealed class OverlayWindow : Window
         ResizeMode = ResizeMode.NoResize;
         SizeToContent = SizeToContent.WidthAndHeight;
         Title = "BitCraft Bot — overlay";
-        _keys.Text = "Num 0 : capture   ·   Num 5 : arrêt (jeu actif)";
+        _keys.Text = "Num 0 : capture";
         _keys.Foreground = new SolidColorBrush(Color.FromRgb(147, 168, 191));
         Content = new Border
         {

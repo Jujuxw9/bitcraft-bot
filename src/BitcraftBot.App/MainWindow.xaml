@@ -432,7 +432,6 @@
                                 </StackPanel>
                                 <CheckBox x:Name="AnomalyCheck" Content="Arrêt si RAM du bot critique" IsChecked="True" Click="SafetyCheck_Click" />
                                 <CheckBox x:Name="MouseStopCheck" Content="Arrêt si la souris bouge" IsChecked="True" Click="SafetyCheck_Click" />
-                                <TextBlock Text="Num 5 : arrêt d'urgence (jeu actif)" Style="{StaticResource MutedText}" Margin="0,8,0,0" />
                             </StackPanel>
                         </Border>
 

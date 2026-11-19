@@ -79,18 +79,6 @@ public partial class MainWindow
         Grid.SetColumn(second, narrow ? 0 : 1);
         Grid.SetRow(second, narrow ? 1 : 0);
     }
-
-    // Sans serveur : vie, endurance et faim du tableau de bord viennent de l'écran (secours, D-044).
-    private void ShowScreenVitals(HudState hud)
-    {
-        SetBar(DashHealthText, DashHealthBar, "Vie", hud.Health.Value, hud.Health.Max);
-        SetBar(DashStaminaText, DashStaminaBar, "Endurance", hud.Stamina.Value, hud.Stamina.Max);
-        if (hud.HungerRatio is { } ratio)
-        {
-            DashHungerText.Text = $"Faim ≈{ratio * 100:0} %";
-            DashHungerBar.Value = Math.Clamp(ratio, 0, 1);
-        }
-    }
 }
 
 // Règles de mise en page, testables sans fenêtre.

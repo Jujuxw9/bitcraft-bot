@@ -44,12 +44,13 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-038](D-038-exploration-beta.md) | Onglet « Bêta : exploration » : règles et réglages | Validée | 2026-11-16 |
 | [D-039](D-039-voie-hybride.md) | Voie hybride prioritaire : lire le serveur, agir au clavier et à la souris | Validée | 2026-11-17 |
 | [D-040](D-040-dossiers-release-old.md) | Versions rangées dans artifacts/release (dernière) et artifacts/old | Validée | 2026-11-18 |
-| [D-041](D-041-num5-jeu-actif.md) | Num 5 n'agit que si BitCraft est la fenêtre active | Validée | 2026-11-19 |
+| [D-041](D-041-num5-jeu-actif.md) | Num 5 n'agit que si BitCraft est la fenêtre active | Remplacée par D-047 | 2026-11-19 |
 | [D-042](D-042-repas-automatique.md) | Repas automatique avec Maj + E (faim < 30 %, plus de bonus) | Validée | 2026-11-19 |
 | [D-043](D-043-onglets-par-usage.md) | Onglets regroupés par usage (Bot, Personnage, Carte, Recettes, Paramètres) | Validée | 2026-11-19 |
 | [D-044](D-044-serveur-avant-ecran.md) | Le serveur d'abord, l'écran en contrôle (cible, jauge) | Validée | 2026-11-19 |
 | [D-045](D-045-controleur-actions.md) | Contrôleur d'actions commun : mêmes sécurités pour toutes les touches et clics ; Num 5 toujours actif | Validée | 2026-11-19 |
 | [D-046](D-046-interface-bitcraft.md) | Interface aux couleurs de BitCraft, peu de texte, adaptative | Validée | 2026-11-19 |
+| [D-047](D-047-suppression-num5.md) | Plus de touche d'arrêt d'urgence (Num 5 supprimée) | Validée, remplaçants à confirmer | 2026-11-19 |
 
 ## Gabarit
 

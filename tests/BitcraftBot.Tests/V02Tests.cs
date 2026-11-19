@@ -122,19 +122,6 @@ public class BarReaderTests
     }
 }
 
-public class GaugeConsistencyTests
-{
-    [Theory]
-    [InlineData(65, 100, 0.657, true)]
-    [InlineData(100, 100, 0.99, true)]
-    [InlineData(74, 100, 1.0, false)] // texte 74 alors que la barre est pleine : lecture rejetée
-    [InlineData(10, 100, 0.5, false)]
-    public void TextAndBarMustAgree(int value, int max, double fill, bool expected) =>
-        Assert.Equal(expected, HudReader.IsConsistent(value, max, fill));
-}
-
-// Lecture complète sur une vraie capture du jeu (images/reference-ui).
-// Valeurs attendues relevées à l'œil sur l'image : coupe d'un Mature Oak Tree.
 public class HudReaderReferenceTests
 {
     private static readonly string ReferenceImage = Path.Combine(FindRepoRoot(), "images", "reference-ui",
@@ -155,12 +142,6 @@ public class HudReaderReferenceTests
         Assert.True(hud.Position == (8927, 6707), $"Position lue : « {hud.RawPosition} »");
         Assert.Equal("Safe Meadows", hud.ZoneName);
         Assert.Equal(("Keldan", 18), hud.Region);
-        Assert.Equal(100, hud.Health.Value);
-        Assert.Equal(100, hud.Health.Max);
-        Assert.Equal(65, hud.Stamina.Value);
-        Assert.Equal(100, hud.Stamina.Max);
-        Assert.InRange(hud.Stamina.FillRatio!.Value, 0.60, 0.70);
-        Assert.InRange(hud.HungerRatio!.Value, 0.95, 1.0);
         Assert.NotNull(hud.Target);
         Assert.Equal("Mature Oak Tree", hud.Target!.Name);
         Assert.Equal("Tier 1 - Tree", hud.Target.Category);

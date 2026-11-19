@@ -6,7 +6,7 @@ namespace BitcraftBot.App;
 
 // Contrôleur d'actions commun (v0.3.18) : toutes les touches et tous les clics du bot passent par lui,
 // avec les mêmes sécurités (jeu actif et visible, Julien ne tape pas, une action à la fois, limite par minute,
-// Num 5, souris bougée, touches toujours relâchées). Aujourd'hui, seule action : Maj + E (repas automatique).
+// souris bougée, touches toujours relâchées). Aujourd'hui, seule action : Maj + E (repas automatique).
 public partial class MainWindow
 {
     private readonly ActionController _actions;
@@ -38,6 +38,7 @@ public partial class MainWindow
     }
 
     // Fenêtre du jeu : celle de la lecture de l'écran si elle tourne, sinon cherchée (au plus toutes les 2 s).
+    // Seule recherche partagée par l'overlay, le contrôleur d'actions et la touche Num 0 (v0.3.19).
     private GameWindow? CurrentGame()
     {
         if (_gameWindow is { } g)
@@ -47,7 +48,7 @@ public partial class MainWindow
         if (DateTime.Now - _actionGameAt >= TimeSpan.FromSeconds(2))
         {
             _actionGameAt = DateTime.Now;
-            _actionGame = new GameWindowLocator().Find();
+            _actionGame = _locator.Find();
         }
         return _actionGame;
     }

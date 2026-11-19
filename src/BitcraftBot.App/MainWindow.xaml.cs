@@ -21,7 +21,7 @@ using Frame = BitcraftBot.Perception.Capture.Frame;
 namespace BitcraftBot.App;
 
 // Fenêtre de supervision (D-005). Onglets (v0.3.16) : Bot, Personnage, Carte, Recettes, Paramètres :
-// affiche le jeu en direct, lit le HUD (position, vie, endurance, faim, cible), gère la sécurité, écrit le journal.
+// affiche le jeu en direct, lit le HUD (position, zone, région, cible ; le reste vient du serveur), gère la sécurité, écrit le journal.
 // Seule action envoyée au jeu : Maj + E, si le repas automatique est coché (D-042).
 public partial class MainWindow : Window
 {
@@ -76,6 +76,10 @@ public partial class MainWindow : Window
     private int _captureMsCount;
     private int _consecutiveCaptureErrors;
 
+    // Image du jeu visible dans l'onglet Bot ? Sinon la capture tombe à 2 images/s, juste pour la lecture du HUD (v0.3.19).
+    private volatile bool _imageShown = true;
+    private static readonly TimeSpan HiddenCaptureInterval = TimeSpan.FromMilliseconds(500);
+
     public MainWindow()
     {
         InitializeComponent();
@@ -107,10 +111,9 @@ public partial class MainWindow : Window
             _hudLogger.GameData = store;
         };
 
-        // Num 5 toujours actif (v0.3.18, demande de Julien : plus de case pour le couper).
+        // Plus de touche d'arrêt d'urgence (D-047, v0.3.19) : bouton « Arrêter », souris bougée, durée max.
         _safety = new SafetyMonitor(new SafetyOptions
         {
-            EmergencyKeyEnabled = true,
             MaxDurationEnabled = _settings.MaxDurationEnabled,
             MaxDuration = TimeSpan.FromMinutes(Math.Clamp(_settings.MaxDurationMinutes, 1, 240)),
         });
@@ -138,8 +141,9 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.18 : nouveau thème BitCraft, moins de texte, contrôleur d'actions commun (toutes les touches et clics passent par les mêmes sécurités), repas automatique actif au démarrage, Num 5 toujours actif, déconnexion garantie à la fermeture. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.3.19 : touche Num 5 supprimée (D-047), niveaux et tâches écrits dans le journal (lus sur le serveur), vie, endurance, faim et jauge de métier plus lues à l'écran, moins de CPU (seul l'onglet affiché est redessiné, capture ralentie quand l'image est cachée). Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
         InitServerTab();
+        InitTaskJournal();
         InitOverlay();
         InitMeals();
         InitLayout();
@@ -156,7 +160,7 @@ public partial class MainWindow : Window
         {
             _keyboardHook = new GlobalKeyboardHook();
             _keyboardHook.KeyDown += OnGlobalKeyDown;
-            _log.Info("Sécurité", $"Écoute du clavier active (arrêt d'urgence : {EmergencyKey.DisplayName} ; capture du jeu : {CaptureKey.DisplayName}).");
+            _log.Info("Sécurité", $"Écoute du clavier active (capture du jeu : {CaptureKey.DisplayName} ; une touche tapée par Julien bloque les actions du bot 3 s).");
         }
         catch (InvalidOperationException ex)
         {
@@ -174,7 +178,7 @@ public partial class MainWindow : Window
         if (!isInjected && CaptureKey.IsCapture(scanCode, isExtended))
         {
             // Seulement si le jeu est visible : sinon Julien tape un 0 ailleurs (essai v0.3.12 : 4 captures du Bloc-notes).
-            var game = _gameWindow ?? new GameWindowLocator().Find();
+            var game = CurrentGame();
             if (game is null || !GameVisibility.IsUncovered(game))
             {
                 _log.Info("Capture", $"Touche {CaptureKey.DisplayName} ignorée : le jeu est caché par une autre fenêtre (touche tapée dans un autre programme ?).");
@@ -187,35 +191,7 @@ public partial class MainWindow : Window
             }
             _lastCaptureKeyAt = DateTime.Now;
             _ = Task.Run(SaveGameScreenshotAsync);
-            return;
         }
-        // Une touche simulée par un programme ne compte jamais comme arrêt d'urgence.
-        if (isInjected || !EmergencyKey.IsEmergencyStop(scanCode, isExtended))
-        {
-            return;
-        }
-        // D-041 (Julien, 2026-11-19) : Num 5 n'agit que si BitCraft est la fenêtre active (au premier plan).
-        // Tapée dans un autre programme, elle ne fait rien (essai long : arrêt d'urgence en tapant « 50 »).
-        var gameNow = _gameWindow ?? new GameWindowLocator().Find();
-        if (gameNow is null || !_inputSender.IsForeground(gameNow.Handle))
-        {
-            _log.Detail("Sécurité", $"Touche {EmergencyKey.DisplayName} ignorée : BitCraft n'est pas la fenêtre active.");
-            return;
-        }
-        // Tout de suite (sans attendre l'interface) : l'action en cours est interrompue, touches relâchées.
-        _actions.Halt($"touche {EmergencyKey.DisplayName}");
-        Dispatcher.BeginInvoke(() =>
-        {
-            StopMealsForEmergency();
-            if (!_safety.IsRunning)
-            {
-                _log.Info("Sécurité", $"Touche {EmergencyKey.DisplayName} pressée (aucune session en cours).");
-            }
-            else
-            {
-                _safety.OnEmergencyKey();
-            }
-        });
     }
 
     // Capture du jeu seul, sans compression, rangée dans images/analyse du dépôt (sinon dans « captures » à côté du .exe).
@@ -288,7 +264,7 @@ public partial class MainWindow : Window
         _actions.Resume("« Démarrer »");
         SetStatus("EN COURS", "Lecture de l'écran", "#1B4D33");
         // Réglages réellement appliqués à cette session (D-031).
-        _log.Info("Session", $"Session démarrée. Réglages : touche d'urgence toujours active, arrêt si la souris bouge {(_actions.Options.StopOnMouseMove ? "actif" : "désactivé")}, " +
+        _log.Info("Session", $"Session démarrée. Réglages : arrêt si la souris bouge {(_actions.Options.StopOnMouseMove ? "actif" : "désactivé")}, " +
                              $"durée max {(_safety.Options.MaxDurationEnabled ? $"{_safety.Options.MaxDuration.TotalMinutes:0} min" : "désactivée")}, " +
                              $"{fps} images/s visées, lecture du HUD toutes les {HudInterval.TotalMilliseconds:0} ms, " +
                              $"arrêt sur anomalie {(_settings.AnomalyStopEnabled ? "actif" : "désactivé")}.");
@@ -303,11 +279,17 @@ public partial class MainWindow : Window
     {
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1.0 / fps));
         var lastLocate = DateTime.MinValue;
+        var lastCapture = DateTime.MinValue;
         try
         {
             do
             {
                 var now = DateTime.Now;
+                if (!_imageShown && now - lastCapture < HiddenCaptureInterval - TimeSpan.FromMilliseconds(20))
+                {
+                    continue;
+                }
+                lastCapture = now;
                 if (_gameWindow is null || now - lastLocate >= LocateInterval)
                 {
                     var found = _locator.Find();
@@ -326,7 +308,7 @@ public partial class MainWindow : Window
                     _framesCounted++;
                     _consecutiveCaptureErrors = 0;
                     // Une seule image en attente d'affichage : si l'interface est en retard, on saute des images.
-                    if (Interlocked.Exchange(ref _displayPending, 1) == 0)
+                    if (_imageShown && Interlocked.Exchange(ref _displayPending, 1) == 0)
                     {
                         _ = Dispatcher.BeginInvoke(DispatcherPriority.Render, () => ShowFrame(frame));
                     }
@@ -419,16 +401,8 @@ public partial class MainWindow : Window
         var elapsed = FormatDuration(_safety.LastSessionDuration);
         var captureMs = _captureMsCount > 0 ? _captureMsTotal / _captureMsCount : 0;
 
-        if (reason == StopReason.ToucheUrgence)
-        {
-            SetStatus("ARRÊT D'URGENCE", description, "#6E1F1F");
-            _log.Alerte("Sécurité", $"Session arrêtée après {elapsed} : {description}.");
-        }
-        else
-        {
-            SetStatus("ARRÊTÉ", description, "#1F2F45");
-            _log.Info("Session", $"Session arrêtée après {elapsed} : {description}.");
-        }
+        SetStatus("ARRÊTÉ", description, "#1F2F45");
+        _log.Info("Session", $"Session arrêtée après {elapsed} : {description}.");
         _log.Info("Capture", $"Bilan : {_measuredFps:0.0} images/s mesurées, capture moyenne {captureMs:0} ms par image.");
         if (_lastResource is { } r)
         {
@@ -438,6 +412,7 @@ public partial class MainWindow : Window
 
     private void OnUiTick()
     {
+        _imageShown = Tabs.SelectedIndex == BotTab && WindowState != WindowState.Minimized && IsVisible;
         _safety.Tick();
         if (!_safety.IsRunning)
         {
@@ -518,11 +493,6 @@ public partial class MainWindow : Window
         }
         RememberHudPosition(hud);
         HudPosition.Text = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "illisible";
-        // Vie, endurance, faim : le serveur d'abord (D-044) ; sans serveur, le tableau de bord prend l'écran.
-        if (_serverReader?.State != Server.ReaderState.Connecte)
-        {
-            ShowScreenVitals(hud);
-        }
         if (hud.Target is null)
         {
             HudTarget.Text = "aucune";

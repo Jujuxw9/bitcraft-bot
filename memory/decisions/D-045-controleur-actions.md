@@ -15,13 +15,13 @@ Toutes les touches et tous les clics du bot passent par **un seul contrôleur** 
 - BitCraft **fenêtre active et visible**, vérifié avant l'action **et avant chaque appui ou pas de souris** ;
 - rien si Julien a tapé au clavier depuis moins de 3 s ;
 - au plus **20 actions par minute** ;
-- **Num 5** (jeu actif, D-041) : l'action en cours est interrompue tout de suite, plus rien ne part jusqu'à « Démarrer » ou la réactivation du repas auto ;
+- ~~Num 5~~ (supprimée en v0.3.19, D-047). Le blocage (`Halt`) reste : souris bougée, fermeture du bot. Reprise : « Démarrer » ou réactivation du repas auto ;
 - **souris bougée par Julien** pendant un geste du bot (écart > 4 px) : arrêt d'urgence (case « Arrêt si la souris bouge », cochée par défaut) ;
 - clics seulement dans une zone autorisée ;
 - touches et bouton **toujours relâchés**, même en cas d'erreur ou d'arrêt ;
 - chaque action, refus ou interruption est écrit dans le journal (catégorie « Actions »).
 
-Num 5 est **toujours actif** : la case pour le couper est supprimée (demande de Julien, v0.3.18).
+v0.3.18 : Num 5 toujours actif. v0.3.19 : Num 5 supprimée (D-047).
 
 ## Alternatives écartées
 - Garder des sécurités propres à chaque fonction : risque d'oubli quand H3 et H4 ajouteront des actions.

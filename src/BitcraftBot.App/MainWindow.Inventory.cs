@@ -17,7 +17,7 @@ public partial class MainWindow
     private sealed record InventoryRow(string Name, string Quantity, string Kind, string Tier, string Where);
 
     // Appelé par la minuterie de l'onglet (toutes les 500 ms) ; la liste est refaite au plus toutes les 2 s, et seulement si elle a changé.
-    private void ShowInventories(ServerReader reader, PlayerSnapshot s)
+    private void ShowInventories(ServerReader reader, PlayerSnapshot s, IReadOnlyList<InventoryInfo> inventories)
     {
         if (DateTime.Now - _inventoryShownAt < InventoryInterval)
         {
@@ -29,7 +29,6 @@ public partial class MainWindow
             InventorySummary.Text = "Lecture refusée (journal).";
             return;
         }
-        var inventories = reader.Inventories();
         var banks = reader.BankPositions();
         var stacks = new List<(string Where, ItemStackInfo Stack)>();
         foreach (var inv in inventories)
@@ -83,8 +82,7 @@ public partial class MainWindow
             {
                 var (where, id, cargo) = g.Key;
                 var key = (cargo ? "C" : "I") + id;
-                var name = (cargo ? store?.Cargos.GetValueOrDefault(id) : store?.Items.GetValueOrDefault(id))
-                           ?? (_recipes?.Entries.TryGetValue(key, out var e1) == true ? e1.Name : $"objet n° {id}");
+                var name = ItemName(id, cargo);
                 var tier = _recipes?.Entries.TryGetValue(key, out var e2) == true ? e2.Tier.ToString() : "?";
                 return new InventoryRow(name, g.Sum(x => x.Stack.Quantity).ToString("N0"), cargo ? "Cargaison" : "Objet", tier, where);
             })
@@ -117,5 +115,13 @@ public partial class MainWindow
             return $"Banque à {at.ScreenText}";
         }
         return $"Coffre (bâtiment n° {inv.Owner})";
+    }
+
+    // Nom d'un objet ou d'une cargaison d'après les données du jeu.
+    private string ItemName(int id, bool cargo)
+    {
+        var store = _gameData.Current;
+        return (cargo ? store?.Cargos.GetValueOrDefault(id) : store?.Items.GetValueOrDefault(id))
+               ?? (_recipes?.Entries.TryGetValue((cargo ? "C" : "I") + id, out var e) == true ? e.Name : $"{(cargo ? "cargaison" : "objet")} n° {id}");
     }
 }

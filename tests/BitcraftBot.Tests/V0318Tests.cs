@@ -111,7 +111,7 @@ public class V0318Tests
     public async Task Arret_d_urgence_pendant_l_appui_relache_tout_et_bloque_la_suite()
     {
         var (controller, device, _) = Make();
-        device.OnKeyDown = () => { if (device.Down.Count == 1) controller.Halt("touche Num 5"); };
+        device.OnKeyDown = () => { if (device.Down.Count == 1) controller.Halt("fermeture du bot"); };
         var result = await controller.PressAsync("Repas", GameKeys.Shift, GameKeys.E);
         Assert.Equal(ActionOutcome.Interrompu, result.Outcome);
         Assert.Empty(device.Down);
@@ -119,7 +119,7 @@ public class V0318Tests
 
         var next = await controller.PressAsync("Repas", GameKeys.E);
         Assert.Equal(ActionOutcome.Refuse, next.Outcome);
-        Assert.Contains("Num 5", next.Detail);
+        Assert.Contains("fermeture du bot", next.Detail);
 
         device.OnKeyDown = null;
         controller.Resume("essai");

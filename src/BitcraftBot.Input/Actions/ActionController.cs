@@ -96,7 +96,7 @@ public sealed class ActionOptions
 // - BitCraft fenêtre active et visible, vérifié avant chaque appui ;
 // - rien si Julien tape au clavier ;
 // - nombre d'actions par minute limité ;
-// - arrêt d'urgence (Num 5) : l'action en cours est interrompue et plus rien ne part jusqu'à la reprise ;
+// - arrêt (Halt : fermeture, souris bougée) : l'action en cours est interrompue et plus rien ne part jusqu'à la reprise ;
 // - souris bougée par Julien pendant un geste : arrêt d'urgence ;
 // - touches et bouton toujours relâchés, même en cas d'erreur ;
 // - chaque action est écrite dans le journal.

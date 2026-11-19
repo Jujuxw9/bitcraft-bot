@@ -367,16 +367,19 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         SetState(ReaderState.Perdu, $"Liaison terminée : {reason}.");
     }
 
-    // Les 5 premiers messages d'une liaison sont notés avec un extrait (jeton masqué) ; ensuite, type et taille en « Détails ».
+    // Les 5 premiers messages d'une liaison sont notés avec un extrait (jeton masqué) ;
+    // ensuite, un message sur RawMessageSample en « Détails » (v0.3.19 : avant, chaque message, relu une 2e fois).
+    public const int RawMessageSample = 200;
+
     private void LogRawMessage(long index, string json)
     {
         if (index <= 5)
         {
             log.Info(Category, ServerMessages.Summarize(index, json, withExcerpt: true));
         }
-        else
+        else if (index % RawMessageSample == 0)
         {
-            log.Detail(Category, ServerMessages.Summarize(index, json, withExcerpt: false));
+            log.Detail(Category, ServerMessages.Summarize(index, json, withExcerpt: false) + $" (1 message sur {RawMessageSample} noté)");
         }
     }
 

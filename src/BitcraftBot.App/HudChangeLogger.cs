@@ -17,14 +17,11 @@ public sealed class HudChangeLogger(SessionLog log)
     private int _positionsByTemplates;
     private readonly ConfirmedText _zone = new();
     private readonly ConfirmedText _region = new();
-    private int _staminaDropsWithoutGauge;
     private readonly ConfirmedText _target = new();
     private const string NoTarget = "(aucune)";
     private DateTime _notificationUntil = DateTime.MinValue;
     private static readonly TimeSpan NotificationDuration = TimeSpan.FromSeconds(8);
     private DateTime _lastDiagnosticAt = DateTime.MinValue;
-    private ProfessionGaugeReading? _lastGauge;
-    private int _gaugeMissing;
     private int _positionFailStreak;
     private double _totalReadMs;
     private readonly HashSet<string> _checkedTargets = [];
@@ -41,15 +38,15 @@ public sealed class HudChangeLogger(SessionLog log)
         _positionsByTemplates = 0;
         _zone.Reset();
         _region.Reset();
-        _staminaDropsWithoutGauge = 0;
         _lastDiagnosticAt = DateTime.MinValue;
         _target.Reset();
         _notificationUntil = DateTime.MinValue;
-        _lastGauge = null;
-        _gaugeMissing = 0;
         _positionFailStreak = 0;
         _totalReadMs = 0;
     }
+
+    // Passage de niveau lu sur le serveur : le bandeau du jeu recouvre la cible pendant quelques secondes (Q-018).
+    public void NotifyLevelUp(DateTime at) => _notificationUntil = at + NotificationDuration;
 
     // Renvoie une raison quand une image de diagnostic serait utile (situation anormale à comprendre), sinon null.
     public string? OnHudRead(HudState hud, double captureFps)
@@ -92,22 +89,6 @@ public sealed class HudChangeLogger(SessionLog log)
             }
             _lastSummary = hud.ReadAt;
         }
-        // Endurance qui baisse sans jauge de métier pendant 3 s : action probable mais jauge non vue (cas du 16/11 à 19:47).
-        if (hud.Profession is null && previous?.Stamina.Value is { } stBefore && hud.Stamina.Value is { } stNow && stNow < stBefore)
-        {
-            _staminaDropsWithoutGauge++;
-        }
-        else if (hud.Profession is not null)
-        {
-            _staminaDropsWithoutGauge = 0;
-        }
-        if (_staminaDropsWithoutGauge >= 3)
-        {
-            log.Alerte("Perception", "L'endurance baisse mais la jauge de métier n'est pas vue.");
-            diagnostic ??= "endurance en baisse sans jauge de métier";
-            _staminaDropsWithoutGauge = 0;
-        }
-
         _previous = Merge(previous, hud);
 
         // Au plus une image de diagnostic par minute.
@@ -133,54 +114,10 @@ public sealed class HudChangeLogger(SessionLog log)
             log.Info("Perception", $"Changement de région : {regionChange.Before} → {regionChange.After}.");
         }
 
-        // Jauge de métier : début et fin d'action, montée de niveau.
-        // Fin d'action notée seulement après 4 lectures sans jauge (2 s) : une absence isolée n'est pas une fin.
-        if (now.Profession is { } gauge)
-        {
-            if (_lastGauge is null)
-            {
-                log.Info("Perception", $"Action en cours : {gauge}.");
-            }
-            else if (gauge.Level is { } level && _lastGauge.Level is { } levelBefore && level > levelBefore)
-            {
-                log.Info("Perception", $"Niveau gagné : {gauge.Profession ?? "métier"} passe niveau {level}. Notification à l'écran : vie, faim et cible ignorées 8 s (Q-018).");
-                _notificationUntil = now.ReadAt + NotificationDuration;
-            }
-            _lastGauge = gauge;
-            _gaugeMissing = 0;
-        }
-        else if (_lastGauge is not null && ++_gaugeMissing >= 4)
-        {
-            log.Info("Perception", $"Fin d'action (jauge de métier disparue, dernière valeur : {_lastGauge}).");
-            _lastGauge = null;
-            _gaugeMissing = 0;
-        }
-
-        // Pendant une notification de montée de niveau, le bandeau recouvre la cible, la vie et la faim
-        // (16/11 à 20:08 : faim lue à 0 %, cible « Lim MINING », santé 30/30000). Ces valeurs sont ignorées.
+        // Pendant une notification de montée de niveau, le bandeau recouvre la cible
+        // (16/11 à 20:08 : cible « Lim MINING », santé 30/30000). La cible est ignorée 8 s.
+        // Le passage de niveau vient du serveur (NotifyLevelUp, v0.3.19).
         var masked = now.ReadAt < _notificationUntil;
-
-        // Vie qui baisse : signe d'attaque (Q-014).
-        if (!masked && now.Health.Value is { } hp && before.Health.Value is { } hpBefore && hp < hpBefore)
-        {
-            log.Alerte("Perception", $"Vie en baisse : {hpBefore} → {hp}.");
-        }
-
-        // Endurance vide ou pleine (D-028).
-        if (now.Stamina.Value is { } st && before.Stamina.Value is { } stBefore)
-        {
-            if (st == 0 && stBefore > 0)
-            {
-                log.Info("Perception", "Endurance à 0 : la récolte s'arrête (D-028).");
-            }
-            else if (st == now.Stamina.Max && stBefore < now.Stamina.Max)
-            {
-                log.Info("Perception", "Endurance pleine : la récolte peut reprendre.");
-            }
-        }
-
-        // La faim n'est plus surveillée à l'écran (v0.3.16) : le serveur la donne exactement,
-        // et le repas automatique s'en occupe (D-042).
 
         // Cible qui apparaît, change ou disparaît : notée seulement si lue 2 fois de suite, et pas pendant une notification.
         if (!masked && _target.Update(now.Target?.Name ?? NoTarget) is { } targetChange)
@@ -230,17 +167,13 @@ public sealed class HudChangeLogger(SessionLog log)
                 ZoneName = now.ZoneName ?? previous.ZoneName,
                 Region = now.Region ?? previous.Region,
                 Position = now.Position ?? previous.Position,
-                Health = now.Health.IsTextRead ? now.Health : previous.Health,
-                Stamina = now.Stamina.IsTextRead ? now.Stamina : previous.Stamina,
             };
 
     public static string Describe(HudState hud)
     {
         var position = hud.Position is { } p ? $"N {p.North}, E {p.East}" : "position ?";
         var region = hud.Region is { } r ? $"{r.Name} (R{r.Number})" : "région ?";
-        var hunger = hud.HungerRatio is { } h ? $"≈{h * 100:0} %" : "?";
         var target = hud.Target is null ? "aucune" : hud.Target.ToString();
-        var gauge = hud.Profession is null ? "aucune action" : hud.Profession.ToString();
-        return $"{position}, {hud.ZoneName ?? "zone ?"}, {region}, vie {hud.Health}, endurance {hud.Stamina}, faim {hunger}, cible {target}, métier {gauge}";
+        return $"{position}, {hud.ZoneName ?? "zone ?"}, {region}, cible {target}";
     }
 }

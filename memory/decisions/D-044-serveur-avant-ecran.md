@@ -12,9 +12,9 @@
   - la **cible** (ce que le joueur a sélectionné : le serveur ne le dit pas) ;
   - ~~la jauge de métier~~ : lue sur le serveur depuis la v0.3.17 (`experience_state`, formule des niveaux du serveur) ;
   - le **contrôle** : comparer la position écran et serveur, détecter un menu ou une fenêtre qui cache le jeu.
-- Sans connexion au serveur, l'écran sert de secours (affiché « (écran) »).
+- ~~Sans connexion au serveur, l'écran sert de secours~~ : v0.3.19, vie, endurance, faim et jauge de métier ne sont **plus lues à l'écran** (demande de Julien). Sans serveur, le tableau de bord affiche « — ».
 - L'alerte « faim sous 50 % » lue à l'écran est supprimée (fausse alerte sur l'écran titre ; le repas automatique s'en charge).
 
 ## Conséquences
 - La lecture de l'écran coûte peu (≈ 9 ms par image) : on la garde entière pour le moment, sans l'utiliser pour les décisions sur la vie et l'endurance.
-- Plus tard, possible : ne lire à l'écran que la cible sélectionnée, pour économiser du CPU.
+- Fait en v0.3.19 : l'écran ne lit plus que la position (contrôle), la zone, la région et la cible sélectionnée.

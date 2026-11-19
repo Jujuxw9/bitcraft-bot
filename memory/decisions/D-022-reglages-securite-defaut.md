@@ -9,6 +9,8 @@
 D-004 fixe 4 mécanismes d'arrêt sans valeurs par défaut. Julien propose le pavé numérique pour l'arrêt d'urgence (choix de la touche laissé à Claude) et 15 min de session.
 
 ## Décision
+> v0.3.19 : la touche d'arrêt d'urgence Num 5 est **supprimée** (D-047). La durée max reste.
+
 - Touche d'arrêt d'urgence : **pavé numérique 5** (`Num 5`). Au centre du pavé, facile à trouver sans regarder.
 - Détection par le code de la touche physique (scancode), pour marcher que le Verr. Num soit actif ou non.
 - Durée maximale d'une session : **15 minutes**.

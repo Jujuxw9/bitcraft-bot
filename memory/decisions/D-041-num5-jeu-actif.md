@@ -2,7 +2,7 @@
 
 # D-041 — Num 5 n'agit que si BitCraft est la fenêtre active
 
-- **Statut** : Validée
+- **Statut** : Remplacée par D-047 (v0.3.19 : Num 5 n'a plus de fonction)
 - **Date** : 2026-11-19
 - **Validée par** : Julien (« num 5 seulement en jeu, si autre programme il ne doit rien se passer »)
 - **Liens** : complète D-022 ; résout Q-022

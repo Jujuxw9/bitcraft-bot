@@ -30,7 +30,7 @@ public sealed class MovementTestOptions
 }
 
 // Exécute les tests de mouvements (D-035), avec ses sécurités :
-// jeu au premier plan obligatoire, arrêt si Julien bouge la souris, arrêt immédiat sur annulation (Num 5).
+// jeu au premier plan obligatoire, arrêt si Julien bouge la souris, arrêt immédiat sur annulation.
 public sealed class MovementTester(InputSender sender, Random random, Action<string> log)
 {
     // Écart toléré entre la position voulue et la position réelle du curseur avant de conclure

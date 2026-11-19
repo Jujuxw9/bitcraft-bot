@@ -17,22 +17,6 @@ public static class HudLayout
     public static readonly ScreenRect ZoneName = new(1650, 326, 210, 24);
     public static readonly ScreenRect Region = new(1665, 354, 180, 24);
 
-    // Barres du bas : texte « 100/100 » dans la barre verte (vie) et jaune (endurance).
-    public static readonly ScreenRect HealthText = new(720, 954, 140, 22);
-    public static readonly ScreenRect StaminaText = new(1080, 954, 150, 22);
-
-    // Lignes de pixels parcourues pour mesurer le remplissage des barres.
-    public const int BarsRow = 964;
-    public const int HealthBarStart = 642;
-    public const int HealthBarEnd = 907;
-    public const int StaminaBarStart = 1012;
-    public const int StaminaBarEnd = 1280;
-
-    // Faim : fine ligne blanche à gauche du losange central. Elle raccourcit depuis la gauche.
-    public const int HungerRow = 944;
-    public const int HungerLineStart = 668;
-    public const int HungerLineEnd = 917;
-
     // Panneau de la cible, en haut au centre (nom, catégorie, santé de la ressource).
     public static readonly ScreenRect TargetName = new(745, 22, 330, 24);
     public static readonly ScreenRect TargetCategory = new(1080, 22, 175, 24);
@@ -47,11 +31,8 @@ public static class HudLayout
         ("Position", Coordinates),
         ("Zone", ZoneName),
         ("Région", Region),
-        ("Vie", HealthText),
-        ("Endurance", StaminaText),
         ("Cible", TargetName),
         ("Catégorie", TargetCategory),
         ("Santé cible", TargetHealth),
-        ("Métier", ProfessionGaugeReader.ScreenArea),
     ];
 }

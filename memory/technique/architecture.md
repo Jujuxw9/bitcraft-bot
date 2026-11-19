@@ -1,7 +1,7 @@
 # Architecture logicielle
 
 > Document de référence pour Julien (D-023) : il décrit **comment le bot est organisé et pourquoi**, sans entrer dans le code.
-> État : **v0.3.17** (2026-11-19). Le bot lit le **serveur** en lecture seule (voie hybride, D-039) et l'écran en contrôle (D-044). Seule action sur le jeu : Maj + E pour le repas automatique (D-042). Onglets : D-043. Depuis la v0.3.5, tout est décrit dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) (sections 17 et suivantes). Les sections ci-dessous racontent la v0.1 à la v0.3.4 (lecture de l'écran) :
+> État : **v0.3.19** (2026-11-19). Le bot lit le **serveur** en lecture seule (voie hybride, D-039) et l'écran en contrôle (D-044). Seule action sur le jeu : Maj + E pour le repas automatique (D-042). Onglets : D-043. Depuis la v0.3.5, tout est décrit dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) (sections 17 et suivantes). Les sections ci-dessous racontent la v0.1 à la v0.3.4 (lecture de l'écran) :
 > v0.2 : section 8. v0.2.1 (onglets, CPU/RAM) : section 9. Lecture de la position : section 10. v0.2.2 (banc d'essai des mouvements) : section 11. v0.3.0 (coordonnées par modèles, données du jeu) : section 12. v0.3.1 (jauge de métier) : section 13. v0.3.2 (capture Num 0, diagnostic) : section 14. v0.3.3 (jauge fiable) : section 15. v0.3.4 (montée de niveau) : section 16.
 
 ## 1. Le principe : une boucle « voir → décider → agir »
@@ -19,7 +19,7 @@
      v0.1 ✔               v0.2 – v0.3            v0.4 et +             v0.4 et +
 
    ┌──────────────────────────────────────────────────────────────────────────────────┐
-   │ SÉCURITÉ (au-dessus de tout) : touche Num 5, durée max, souris bougée, anomalie    │  v0.1 ✔ (2 sur 4)
+   │ SÉCURITÉ (au-dessus de tout) : bouton Arrêter, durée max, souris bougée, anomalie  │  v0.1 ✔ (2 sur 4)
    └──────────────────────────────────────────────────────────────────────────────────┘
    ┌──────────────────────────────────────────────────────────────────────────────────┐
    │ SUPERVISION (2e écran) : image du jeu, état, journal, réglages                    │  v0.1 ✔
@@ -33,9 +33,9 @@ La sécurité peut couper la boucle à tout moment, quelle que soit l'étape en 
 | Brique | Rôle | Contenu en v0.1 |
 |---|---|---|
 | **App** | La fenêtre que voit Julien (WPF) | 5 onglets (D-043) : Bot (tableau de bord, image du jeu, repas automatique, sécurité), Personnage, Carte, Recettes, Paramètres (avec le journal) |
-| **Core** | Le « cerveau » : règles, sécurité, journal | Surveillance de sécurité (touche d'urgence, durée max), journal de session, horloge |
+| **Core** | Le « cerveau » : règles, sécurité, journal | Surveillance de sécurité (durée max ; touche d'urgence supprimée en v0.3.19, D-047), journal de session, horloge |
 | **Perception** | Les « yeux » | Recherche de la fenêtre du jeu, capture de l'écran |
-| **Input** | Les « mains » (et l'écoute du clavier) | Écoute de Num 5 et Num 0 ; **contrôleur d'actions commun** (D-045) : toute touche ou tout clic passe par lui, avec les mêmes sécurités ; mouvements humains de souris et de caméra (pour H3) |
+| **Input** | Les « mains » (et l'écoute du clavier) | Écoute de Num 0 (capture) et des touches tapées par Julien (pause des actions 3 s) ; **contrôleur d'actions commun** (D-045) : toute touche ou tout clic passe par lui, avec les mêmes sécurités ; mouvements humains de souris et de caméra (pour H3) |
 | **GameData** | La « mémoire du jeu » (objets, recettes) | Vide en v0.1. Depuis la v0.3.0 : données BitCraft_GameData téléchargées et vérifiées (D-033, section 12) |
 | **Server** | La lecture du serveur officiel (depuis la v0.3.5, D-039) | Lecture seule avec le jeton de Julien : voir [hybride/architecture-serveur.md](hybride/architecture-serveur.md) |
 
@@ -50,7 +50,7 @@ Règle de dépendance : **App** utilise toutes les briques. **Core** ne dépend 
    - il vérifie la durée de session.
 3. **Arrêt**, de trois façons :
    - bouton **Arrêter** ;
-   - touche **Num 5**, même quand le jeu est au premier plan → bandeau rouge « ARRÊT D'URGENCE » ;
+   - ~~touche Num 5~~ (supprimée en v0.3.19, D-047) ;
    - **durée max** atteinte (15 min par défaut).
 4. **Fermeture** : la position, la taille et les réglages de sécurité sont enregistrés dans `config.local.json`.
 
@@ -170,7 +170,7 @@ Premier code qui **agit** sur le jeu, uniquement dans l'onglet **Tests**, **dés
 ### Sécurités, vérifiées avant **chaque** mouvement
 - Le jeu doit être **au premier plan** : sinon arrêt (jamais d'action dans une autre application).
 - Si le curseur n'est pas là où le bot l'a mis (écart > 25 px) : **Julien a bougé la souris**, donc arrêt.
-- **Num 5** : arrêt immédiat. Les touches simulées par le bot ne peuvent pas déclencher l'arrêt d'urgence.
+- ~~Num 5 : arrêt immédiat~~ (supprimée en v0.3.19, D-047).
 - Souris limitée au **centre de l'écran** (hors minicarte, panneau cible, chat, barres).
 - Clics gauche (étape 2) seulement si cochés, dans un rayon d'environ 220 px autour du personnage. **Jamais de clic droit.**
 - À la fin, quoi qu'il arrive, **bouton et touches relâchés**.
@@ -273,7 +273,7 @@ Problème vu grâce aux images de diagnostic de la v0.3.2 : l'intérieur vide de
 ## 16. v0.3.4 : montée de niveau
 
 Journal v0.3.2 du 16/11 à 20:08 : pendant le bandeau de montée de niveau (Mining 16), la faim est lue à 0 %, la vie à ~0 %, la cible « Lim MINING » et sa santé 30/30000.
-- Quand la jauge montre un **niveau gagné**, la vie, la faim et la cible sont **ignorées 8 s** (Q-018).
+- Quand la jauge montre un **niveau gagné**, la vie, la faim et la cible sont **ignorées 8 s** (Q-018). v0.3.19 : la jauge n'est plus lue à l'écran ; le passage de niveau vient du serveur et masque la cible 8 s.
 - La cible n'est notée que si elle est lue **2 fois de suite** (un nom raté isolé est ignoré).
 - Vérifié en rejouant la séquence du 16/11 : niveau noté, aucune fausse alerte.
 

@@ -10,7 +10,7 @@ namespace BitcraftBot.App;
 // Repas automatique (D-042, demande de Julien du 2026-11-19) : Maj + E quand la faim passe sous 30 %
 // ou quand le bonus de nourriture est fini. Un aliment à la fois, avec une pause, vérifié sur le serveur.
 // Sécurités : personnage connecté dans le jeu, au plus 8 aliments en 10 minutes, et celles du contrôleur d'actions
-// (BitCraft actif et visible, Julien ne tape pas, Num 5 coupe tout). Actif à chaque démarrage (v0.3.18).
+// (BitCraft actif et visible, Julien ne tape pas, souris bougée = arrêt). Actif à chaque démarrage (v0.3.18).
 public partial class MainWindow
 {
     private const int MaxMealsPer10Min = 8;
@@ -37,7 +37,7 @@ public partial class MainWindow
 
     private void InitMeals()
     {
-        // Actif à chaque démarrage (demande de Julien, v0.3.18). Num 5 ou la case le coupent jusqu'à la fermeture.
+        // Actif à chaque démarrage (demande de Julien, v0.3.18). La case le coupe jusqu'à la fermeture.
         SetAutoEat(true, "au démarrage du bot");
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadFoodsInBackground);
     }
@@ -96,12 +96,12 @@ public partial class MainWindow
     private void NotePhysicalKey() => _lastPhysicalKey = DateTime.Now;
 
     // Appelé toutes les 500 ms avec la dernière lecture du serveur.
-    private void RunMeals(ServerReader reader, PlayerSnapshot s)
+    private void RunMeals(ServerReader reader, PlayerSnapshot s, IReadOnlyList<InventoryInfo> inventories)
     {
         var now = DateTime.Now;
         var foods = _foods;
         var sac = s.EntityId is { } me && !reader.InventoryRefused
-            ? reader.Inventories().FirstOrDefault(i => i.Owner == me && i.Index == 0)
+            ? inventories.FirstOrDefault(i => i.Owner == me && i.Index == 0)
             : null;
         var regen = foods is null ? null : MealPlanner.FoodRegenSeconds(s.Buffs ?? [], s.Buffs is not null, foods.FoodRegenBuffIds, DateTimeOffset.UtcNow);
         var (next, blocker) = sac is not null && foods is not null ? MealPlanner.FirstFood(sac.Stacks, foods.Foods) : (null, null);
@@ -236,15 +236,6 @@ public partial class MainWindow
             _log.Info("Repas", "Nourriture de nouveau dans le sac.");
         }
         _hadFood = hasFood;
-    }
-
-    // Num 5 : le repas automatique s'arrête (il faut recocher la case).
-    private void StopMealsForEmergency()
-    {
-        if (_settings.AutoEatEnabled)
-        {
-            SetAutoEat(false, $"touche {Input.Keyboard.EmergencyKey.DisplayName}");
-        }
     }
 
     private void ShowMealState(string text, Brush color, bool alert = false)

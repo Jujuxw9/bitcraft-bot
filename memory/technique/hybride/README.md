@@ -3,7 +3,7 @@
 Principe (D-039) : le bot **lit** l'état du jeu sur le serveur, **agit** au clavier et à la souris.
 
 - [constats.md](constats.md) — ce qui est vérifié sur la connexion, le jeton, les tables
-- [architecture-serveur.md](architecture-serveur.md) — brique Server, versions v0.3.5 à v0.3.11 (H2)
+- [architecture-serveur.md](architecture-serveur.md) — brique Server, versions v0.3.5 à v0.3.19
 
 ## Schéma
 

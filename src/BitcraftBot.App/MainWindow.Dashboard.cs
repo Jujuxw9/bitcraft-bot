@@ -12,8 +12,9 @@ public partial class MainWindow
 
     private readonly SkillTracker _skillTracker = new();
 
-    // Appelé toutes les 500 ms. reader et s sont null si le bot n'est pas connecté au serveur.
-    private void UpdateDashboard(ServerReader? reader, PlayerSnapshot? s)
+    // Appelé toutes les 500 ms, seulement quand l'onglet Bot est affiché (v0.3.19).
+    // reader et s sont null si le bot n'est pas connecté au serveur.
+    private void UpdateDashboard(ServerReader? reader, PlayerSnapshot? s, IReadOnlyList<InventoryInfo> inventories)
     {
         var now = DateTime.Now;
         var state = reader?.State ?? ReaderState.Deconnecte;
@@ -44,7 +45,6 @@ public partial class MainWindow
         DashBonusText.Text = $"Bonus nourriture : {RegenText(regen)} · {active} bonus";
 
         // Activité : action en cours, métier (la « jauge de métier », lue sur le serveur), ressource frappée.
-        _skillTracker.Update(s.Skills, now);
         if (s.Action is { } action)
         {
             var progress = action.Progress(nowUtc);
@@ -77,7 +77,7 @@ public partial class MainWindow
             : "Cible : —";
 
         // Sac et alentours.
-        var sac = s.EntityId is { } me ? reader!.Inventories().FirstOrDefault(i => i.Owner == me && i.Index == 0) : null;
+        var sac = s.EntityId is { } me ? inventories.FirstOrDefault(i => i.Owner == me && i.Index == 0) : null;
         if (sac is { PocketCount: > 0 })
         {
             var full = sac.Stacks.Count >= sac.PocketCount;

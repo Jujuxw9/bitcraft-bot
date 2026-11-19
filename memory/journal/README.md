@@ -15,6 +15,7 @@
 | [11](2026-11-19-session-11-essai-long.md) | 2026-11-19 | Claude Code | Essai long (42 min), v0.3.13 et v0.3.14 (overlay, banques, recettes, Paramètres) |
 | [12](2026-11-19-session-12-repas.md) | 2026-11-19 | Claude Code | v0.3.15 : repas automatique (Maj + E), images des objets, raccourcis du jeu |
 | [13](2026-11-19-session-13-actions-theme.md) | 2026-11-19 | Claude Code | v0.3.18 : contrôleur d'actions commun, thème BitCraft, déconnexion garantie, raccourci bureau |
+| [14](2026-11-19-session-14-num5-taches-cpu.md) | 2026-11-19 | Claude Code | v0.3.19 : Num 5 supprimée, journal des niveaux et des tâches, HUD allégé, moins de CPU |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 
