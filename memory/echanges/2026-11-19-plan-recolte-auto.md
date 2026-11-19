@@ -1,6 +1,6 @@
 # Plan de bataille : récolte automatique (arbre ou roche)
 
-Rédigé le 2026-11-19 (session 15), à la demande de Julien. À valider par Julien (questions en fin de page, Q-023).
+Rédigé le 2026-11-19 (session 15), à la demande de Julien. **Validé** : réponses de Julien dans D-049 (arbres d'abord, vieux arbres, W pour la caméra, Q / D avec précaution, ses clics = indices, pas vérité).
 
 ## 1. Où on en est
 
@@ -17,7 +17,7 @@ Rédigé le 2026-11-19 (session 15), à la demande de Julien. À valider par Jul
 
 Le serveur dit où est l'arbre **dans le monde** (x, z). Pour le couper, il faut un **clic droit sur l'arbre à l'écran** (D-024). Il faut donc convertir « position dans le monde » en « pixel à l'écran ». Ça dépend de la caméra : son angle, son zoom, sa rotation.
 
-Bonne nouvelle : le personnage est toujours au centre de l'écran, et la touche **W** remet la caméra dans la même orientation. Avec un zoom fixe, la conversion est une simple formule (une projection), à mesurer une fois.
+Bonne nouvelle : le personnage est toujours au centre de l'écran, et la touche **W** remet la caméra dans la même orientation **et au même zoom** (Julien). La conversion est alors une simple formule (une projection), à mesurer une fois. Q / D tournent la vue : sensibles, appuis très courts seulement, puis W.
 
 Deuxième bonne nouvelle : le serveur dit **quelle ressource le personnage frappe** (`player_action_state`, `extract_outcome_state`). Le bot peut donc **vérifier chaque clic** sans lire l'écran : « j'ai visé l'arbre n° 123, le personnage frappe-t-il l'arbre n° 123 ? ».
 
@@ -45,6 +45,7 @@ Chaque étape s'arrête sur un essai de Julien. On ne passe à la suivante que s
 ### R1 — Apprendre la caméra en regardant Julien jouer (v0.4.0, aucune action)
 - Le bot note **où Julien fait un clic droit** (écoute de la souris, comme celle du clavier : lecture seule) et **ce que le serveur dit qu'il frappe** juste après.
 - Chaque paire « pixel cliqué / position de la ressource dans le monde » sert à calculer la formule de la caméra.
+- Ces paires sont des **indices, pas la vérité** (D-049) : Julien ne clique pas toujours au centre, la caméra a pu tourner. Paire gardée seulement si le serveur confirme la ressource frappée ; paires trop éloignées des autres écartées.
 - Livrable : carte « Caméra » dans Paramètres : nombre de clics appris, précision (en pixels).
 - **Test de Julien** : couper 10 à 15 arbres à la main, à des distances variées, caméra recentrée (W), zoom habituel.
 - Réussi si : précision meilleure que ~25 pixels (la moitié de la largeur d'un tronc).
@@ -99,6 +100,8 @@ Chaque étape s'arrête sur un essai de Julien. On ne passe à la suivante que s
 | Mort du personnage | R7 ; arrêt dès que la vie baisse |
 
 ## 6. Ce que Julien devra faire
+
+- Avant R1 : appuyer sur **W** avant de couper, ne pas zoomer (W remet le zoom).
 
 - R1 : jouer normalement 15 min en coupant à la main (le bot apprend).
 - À chaque étape : un essai court et le journal.

@@ -2,7 +2,7 @@
 
 - **Créée le** : 2026-11-19
 - **Priorité** : Haute
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-049 (2026-11-19)
 - **Liens** : `echanges/2026-11-19-plan-recolte-auto.md`, D-021, D-024, D-034, D-036, Q-014
 
 ## Question

@@ -33,7 +33,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-048
+- [README.md](decisions/README.md) — tableau D-001 à D-049
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-023
@@ -57,8 +57,9 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v0318.md](echanges/2026-11-19-essai-v0318.md) — essai v0.3.18 à faire (thème, repas auto actif, Num 5, fermeture)
 - [2026-11-19-passation-session-14.md](echanges/2026-11-19-passation-session-14.md) — passation vers la session 14 (traitée)
 - [2026-11-19-essai-v0319.md](echanges/2026-11-19-essai-v0319.md) — essai v0.3.19 (fait : journal des tâches OK, image du jeu et icônes en panne → v0.3.20)
-- [2026-11-19-essai-v0320.md](echanges/2026-11-19-essai-v0320.md) — essai v0.3.20 à faire (image du jeu, icônes)
-- [2026-11-19-plan-recolte-auto.md](echanges/2026-11-19-plan-recolte-auto.md) — **plan de bataille de la récolte automatique** (étapes R1 à R7, à valider : Q-023)
+- [2026-11-19-essai-v0320.md](echanges/2026-11-19-essai-v0320.md) — essai v0.3.20 (pas fait : Julien juge que ce n'est pas utile)
+- [2026-11-19-plan-recolte-auto.md](echanges/2026-11-19-plan-recolte-auto.md) — **plan de bataille de la récolte automatique** (étapes R1 à R7, validé : D-049)
+- [2026-11-19-passation-recolte-auto.md](echanges/2026-11-19-passation-recolte-auto.md) — **passation** : prompt pour le nouveau chat (R1 à R7)
 
 ### technique/
 - [README.md](technique/README.md) — index

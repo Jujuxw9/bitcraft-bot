@@ -16,10 +16,14 @@
 - Quelques objets n'ont pas d'image sur le CDN (ex. Wooden Armguards) : case vide, normal.
 
 ## Décisions prises
-- D-048 (écran = cible seulement).
+- D-048 (écran = cible seulement), D-049 (choix de la récolte automatique).
 
 ## Questions ouvertes créées
-- Q-023 (récolte automatique : arbre ou roche, vieux arbres, zoom, écoute des clics).
+- Q-023 (récolte automatique), résolue dans la même session → D-049.
+
+## Fin de session
+- Réponses de Julien à Q-023 → D-049 : arbres d'abord ; vieux arbres (« le plus simple ») ; W remet caméra et zoom, Q / D sensibles ; écoute de ses clics d'accord, mais « source d'idée, pas vérité absolue ».
+- Julien ne teste pas la v0.3.20.
 
 ## Prochaines étapes
-- Essai v0.3.20 par Julien. Réponses à Q-023, puis R1 (apprendre la caméra).
+- Nouveau chat avec `echanges/2026-11-19-passation-recolte-auto.md` : R1 (apprendre la caméra), puis R2.

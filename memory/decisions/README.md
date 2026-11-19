@@ -52,6 +52,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-046](D-046-interface-bitcraft.md) | Interface aux couleurs de BitCraft, peu de texte, adaptative | Validée | 2026-11-19 |
 | [D-047](D-047-suppression-num5.md) | Plus de touche d'arrêt d'urgence (Num 5 supprimée) | Validée | 2026-11-19 |
 | [D-048](D-048-ecran-cible-seulement.md) | L'écran ne lit plus que la cible sélectionnée | Validée | 2026-11-19 |
+| [D-049](D-049-recolte-auto-choix.md) | Récolte auto : arbres d'abord, vieux arbres, caméra W (Q/D avec précaution), clics de Julien comme indices | Validée | 2026-11-19 |
 
 ## Gabarit
 
