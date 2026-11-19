@@ -23,7 +23,7 @@
 | [Q-019](Q-019-identifier-arbre-sans-cliquer.md) | Savoir si un arbre est vieux ou jeune avant de le couper | Haute | Résolue → D-036 |
 | [Q-020](Q-020-exploration-beta.md) | Onglet « Bêta : exploration » : déplacements autonomes dans l'herbe | Haute | Résolue → D-038 |
 | [Q-021](Q-021-voie-reseau-spacetimedb.md) | Passer par le réseau / SpacetimeDB au lieu de la vision ? | Haute | Résolue → D-039 |
-| [Q-022](Q-022-touche-urgence-hors-jeu.md) | Num 5 doit-elle arrêter le bot quand on tape ailleurs ? | Moyenne | Ouverte |
+| [Q-022](Q-022-touche-urgence-hors-jeu.md) | Num 5 doit-elle arrêter le bot quand on tape ailleurs ? | Moyenne | Résolue → D-041 |
 
 ## Gabarit
 

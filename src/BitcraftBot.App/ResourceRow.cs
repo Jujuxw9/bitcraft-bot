@@ -4,7 +4,7 @@ using BitcraftBot.Server.World;
 
 namespace BitcraftBot.App;
 
-// Une ligne du tableau des ressources (onglet Serveur). Mise à jour sur place pour garder
+// Une ligne du tableau des ressources (onglet Carte). Mise à jour sur place pour garder
 // la sélection et le défilement pendant que la santé ou la distance changent.
 public sealed class ResourceRow : INotifyPropertyChanged
 {

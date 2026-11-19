@@ -32,9 +32,12 @@ public sealed class LocalSettings
     // Seuils de surveillance CPU / RAM (onglet Système).
     public BitcraftBot.Core.Monitoring.ResourceLimits Limits { get; set; } = new();
 
-    // Onglet Serveur (H1) : région lue (R18 = module idc-18) et adresse e-mail du compte, gardées sur ce PC seulement.
+    // Onglet Paramètres (connexion) : région lue (R18 = module idc-18) et adresse e-mail du compte, gardées sur ce PC seulement.
     public int ServerRegion { get; set; } = 18;
     public string ServerEmail { get; set; } = string.Empty;
+
+    // Overlay sur l'écran du jeu (onglet Paramètres).
+    public bool OverlayEnabled { get; set; } = true;
 
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 

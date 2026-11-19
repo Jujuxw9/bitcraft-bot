@@ -92,7 +92,7 @@
                             <Button x:Name="StartButton" Content="Démarrer" Click="StartButton_Click" />
                             <Button x:Name="StopButton" Content="Arrêter" Click="StopButton_Click" IsEnabled="False" />
                         </StackPanel>
-                        <TextBlock Text="Arrêt d'urgence : touche Num 5 (même quand le jeu est au premier plan)."
+                        <TextBlock Text="Arrêt d'urgence : touche Num 5, seulement quand BitCraft est la fenêtre active (D-041)."
                                    TextWrapping="Wrap" Foreground="#F28B82" Margin="0,6,0,0" />
 
                         <TextBlock Text="LECTURE DU HUD" Style="{StaticResource SectionTitle}" />
@@ -190,58 +190,17 @@
             </DockPanel>
         </TabItem>
 
-        <!-- ONGLET : SERVEUR (voie hybride, livrable H1, D-039) -->
-        <TabItem Header="Serveur (H1)">
+        <!-- ONGLET : PERSONNAGE (lecture du serveur, H1, D-039) -->
+        <TabItem Header="Personnage">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
                 <StackPanel>
                     <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10" MaxWidth="1100" HorizontalAlignment="Left"
-                               Text="Lecture en direct du serveur officiel, en lecture seule, avec le jeton de votre compte. Le bot ne fait que lire : aucune action n'est envoyée au serveur. Le jeton est chiffré par Windows sur ce PC, et n'apparaît jamais dans le journal." />
+                               Text="Ce que le serveur dit de votre personnage, en direct. Connexion : onglet « Paramètres »." />
                     <WrapPanel>
-                        <!-- 1. Compte -->
-                        <Border Style="{StaticResource Card}" Width="360">
-                            <StackPanel>
-                                <TextBlock Text="1. COMPTE BITCRAFT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
-                                <TextBlock Text="Adresse e-mail liée au compte BitCraft :" />
-                                <TextBox x:Name="ServerEmailBox" Margin="0,2,0,6" />
-                                <Button x:Name="RequestCodeButton" Content="Recevoir le code par e-mail" HorizontalAlignment="Left"
-                                        Click="RequestCodeButton_Click" />
-                                <TextBlock Text="Code reçu :" Margin="0,8,0,0" />
-                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                    <TextBox x:Name="ServerCodeBox" Width="140" Margin="0,0,6,0" />
-                                    <Button x:Name="ValidateCodeButton" Content="Valider le code" Click="ValidateCodeButton_Click" />
-                                </StackPanel>
-                                <TextBlock x:Name="TokenStatusText" Text="Aucun jeton enregistré." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
-                                <Button x:Name="ForgetTokenButton" Content="Oublier le jeton" HorizontalAlignment="Left" Margin="0,6,0,0"
-                                        Click="ForgetTokenButton_Click" />
-                            </StackPanel>
-                        </Border>
-
-                        <!-- 2. Connexion -->
-                        <Border Style="{StaticResource Card}" Width="360">
-                            <StackPanel>
-                                <TextBlock Text="2. CONNEXION (LECTURE SEULE)" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Région : R" VerticalAlignment="Center" />
-                                    <TextBox x:Name="ServerRegionBox" Text="18" Width="40" Margin="2,0,0,0" />
-                                </StackPanel>
-                                <Border Background="#3A2E12" CornerRadius="4" Padding="8" Margin="0,8,0,8">
-                                    <TextBlock TextWrapping="Wrap" Foreground="#FDD663"
-                                               Text="Ordre à respecter : 1) jeu fermé, 2) connecter le bot ici, 3) lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter : il éjecterait le jeu (« Logged in elsewhere »). Une fois le jeu lancé, déconnecter le bot ne touche pas le jeu." />
-                                </Border>
-                                <TextBlock x:Name="ServerGameRunningText" Text="Jeu : —" TextWrapping="Wrap" />
-                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                    <Button x:Name="ServerConnectButton" Content="Se connecter" Click="ServerConnectButton_Click" />
-                                    <Button x:Name="ServerDisconnectButton" Content="Se déconnecter" IsEnabled="False" Click="ServerDisconnectButton_Click" />
-                                </StackPanel>
-                                <TextBlock x:Name="ServerStateText" Text="Pas connecté." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
-                                <TextBlock x:Name="ServerTrafficText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Border>
-
                         <!-- 3. En direct -->
                         <Border Style="{StaticResource Card}" Width="360">
                             <StackPanel>
-                                <TextBlock Text="3. PERSONNAGE EN DIRECT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <TextBlock Text="1. PERSONNAGE EN DIRECT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -276,6 +235,33 @@
                         </Border>
                     </WrapPanel>
 
+                    <!-- 4. Sac et banques (inventory_state, lecture seule) -->
+                    <Border Style="{StaticResource Card}" HorizontalAlignment="Left" MinWidth="760">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="2. SAC ET BANQUES" Style="{StaticResource SectionTitle}" Margin="0,0,16,0" VerticalAlignment="Center" />
+                                <TextBlock Text="Afficher :" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <ComboBox x:Name="InventoryPicker" Width="320" SelectionChanged="InventoryPicker_SelectionChanged" />
+                                <TextBlock Text="Chercher :" VerticalAlignment="Center" Margin="16,0,6,0" />
+                                <TextBox x:Name="InventorySearchBox" Width="180" TextChanged="InventorySearchBox_TextChanged" />
+                            </StackPanel>
+                            <TextBlock x:Name="InventorySummary" Text="Pas connecté." Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,0,0,6" />
+                            <ListView x:Name="InventoryList" Height="380" Background="#141517" Foreground="#E6E6E6" BorderBrush="#3C3F44">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Objet" Width="250" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Quantité" Width="80" DisplayMemberBinding="{Binding Quantity}" />
+                                        <GridViewColumn Header="Type" Width="90" DisplayMemberBinding="{Binding Kind}" />
+                                        <GridViewColumn Header="Palier" Width="50" DisplayMemberBinding="{Binding Tier}" />
+                                        <GridViewColumn Header="Où" Width="260" DisplayMemberBinding="{Binding Where}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <TextBlock Text="Lu sur le serveur, en lecture seule : votre sac, votre ceinture d'outils et vos coffres de banque dans la région où vous êtes. Une banque n'apparaît qu'après l'avoir ouverte au moins une fois dans le jeu."
+                                       Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,4,0,0" MaxWidth="760" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Border>
+
                 </StackPanel>
             </ScrollViewer>
         </TabItem>
@@ -287,7 +273,7 @@
                     <!-- Bandeau : personnage et filtres -->
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
-                            <TextBlock x:Name="MapPlayerText" Text="Pas connecté : connectez-vous dans l'onglet « Serveur (H1) »." FontWeight="SemiBold" TextWrapping="Wrap" />
+                            <TextBlock x:Name="MapPlayerText" Text="Pas connecté : connectez-vous dans l'onglet « Paramètres »." FontWeight="SemiBold" TextWrapping="Wrap" />
                             <StackPanel Orientation="Horizontal" Margin="0,8,0,4">
                                 <TextBlock Text="AFFICHER" Style="{StaticResource SectionTitle}" VerticalAlignment="Center" Margin="0,0,12,0" />
                                 <Button Content="Tout" Click="FamilyAll_Click" Padding="8,1" Margin="0,0,6,0" />
@@ -362,6 +348,40 @@
             </ScrollViewer>
         </TabItem>
 
+        <!-- ONGLET : RECETTES (données du jeu BitCraft_GameData, D-033) -->
+        <TabItem Header="Recettes">
+            <Grid Margin="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="CHERCHER UN OBJET" Style="{StaticResource SectionTitle}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <TextBox x:Name="RecipeSearchBox" Width="420" FontSize="15" TextChanged="RecipeSearchBox_TextChanged" />
+                            <TextBlock x:Name="RecipeSearchInfo" Text="" Foreground="#9AA0A6" VerticalAlignment="Center" Margin="12,0,0,0" />
+                        </StackPanel>
+                        <TextBlock Text="Tapez une partie du nom en anglais (ex. « plank », « oak », « ingot »). Les données viennent de BitCraft_GameData (mises à jour chaque jour)."
+                                   Foreground="#9AA0A6" TextWrapping="Wrap" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Border>
+                <Grid Grid.Row="1" Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="340" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ListBox x:Name="RecipeResults" Background="#141517" Foreground="#E6E6E6" BorderBrush="#3C3F44"
+                             SelectionChanged="RecipeResults_SelectionChanged" />
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Margin="8,0,0,0">
+                        <StackPanel x:Name="RecipeDetails" Margin="4,0,0,0">
+                            <TextBlock Text="Choisissez un objet dans la liste." Foreground="#9AA0A6" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </TabItem>
+
         <!-- ONGLET : TESTS DES MOUVEMENTS (D-035) -->
         <TabItem Header="Tests">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
@@ -406,10 +426,67 @@
             </ScrollViewer>
         </TabItem>
 
-        <!-- ONGLET : SYSTÈME -->
-        <TabItem Header="Système">
+        <!-- ONGLET : PARAMÈTRES (connexion au serveur, affichage, système) -->
+        <TabItem Header="Paramètres">
             <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="6">
                 <StackPanel>
+                    <TextBlock Text="CONNEXION AU SERVEUR (LECTURE SEULE)" Style="{StaticResource SectionTitle}" Margin="0,0,0,4" />
+                    <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,6" MaxWidth="1100" HorizontalAlignment="Left"
+                               Text="Lecture en direct du serveur officiel, avec le jeton de votre compte. Le bot ne fait que lire : aucune action n'est envoyée au serveur. Le jeton est chiffré par Windows sur ce PC, et n'apparaît jamais dans le journal." />
+                    <WrapPanel>
+                        <!-- 1. Compte -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="1. COMPTE BITCRAFT" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <TextBlock Text="Adresse e-mail liée au compte BitCraft :" />
+                                <TextBox x:Name="ServerEmailBox" Margin="0,2,0,6" />
+                                <Button x:Name="RequestCodeButton" Content="Recevoir le code par e-mail" HorizontalAlignment="Left"
+                                        Click="RequestCodeButton_Click" />
+                                <TextBlock Text="Code reçu :" Margin="0,8,0,0" />
+                                <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                    <TextBox x:Name="ServerCodeBox" Width="140" Margin="0,0,6,0" />
+                                    <Button x:Name="ValidateCodeButton" Content="Valider le code" Click="ValidateCodeButton_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="TokenStatusText" Text="Aucun jeton enregistré." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <Button x:Name="ForgetTokenButton" Content="Oublier le jeton" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                        Click="ForgetTokenButton_Click" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- 2. Connexion -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="2. CONNEXION" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Région : R" VerticalAlignment="Center" />
+                                    <TextBox x:Name="ServerRegionBox" Text="18" Width="40" Margin="2,0,0,0" />
+                                </StackPanel>
+                                <Border Background="#3A2E12" CornerRadius="4" Padding="8" Margin="0,8,0,8">
+                                    <TextBlock TextWrapping="Wrap" Foreground="#FDD663"
+                                               Text="Ordre à respecter : 1) jeu fermé, 2) connecter le bot ici, 3) lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter : il éjecterait le jeu (« Logged in elsewhere »). Une fois le jeu lancé, déconnecter le bot ne touche pas le jeu." />
+                                </Border>
+                                <TextBlock x:Name="ServerGameRunningText" Text="Jeu : —" TextWrapping="Wrap" />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button x:Name="ServerConnectButton" Content="Se connecter" Click="ServerConnectButton_Click" />
+                                    <Button x:Name="ServerDisconnectButton" Content="Se déconnecter" IsEnabled="False" Click="ServerDisconnectButton_Click" />
+                                </StackPanel>
+                                <TextBlock x:Name="ServerStateText" Text="Pas connecté." Margin="0,8,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                <TextBlock x:Name="ServerTrafficText" Text="" Foreground="#9AA0A6" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Affichage sur l'écran du jeu -->
+                        <Border Style="{StaticResource Card}" Width="360">
+                            <StackPanel>
+                                <TextBlock Text="3. AFFICHAGE SUR L'ÉCRAN DU JEU" Style="{StaticResource SectionTitle}" Margin="0,0,0,6" />
+                                <CheckBox x:Name="OverlayCheck" Content="Afficher l'overlay (état du bot et touches)" IsChecked="True" Click="OverlayCheck_Click" />
+                                <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,6,0,0"
+                                           Text="Petit cadre en haut à gauche de l'écran du jeu : bot connecté ou non, lecture de l'écran, rappel des touches Num 0 (capture) et Num 5 (arrêt). Il laisse passer les clics et n'apparaît pas dans les captures du bot." />
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+
+                    <TextBlock Text="SYSTÈME" Style="{StaticResource SectionTitle}" Margin="0,10,0,4" />
                     <TextBlock TextWrapping="Wrap" Foreground="#9AA0A6" Margin="0,0,0,10"
                                Text="Consommation mesurée chaque seconde. Le bot ne fait que lire ces valeurs : il ne modifie ni le jeu ni Windows. Si sa RAM dépasse le seuil critique, la session s'arrête toute seule." />
                     <WrapPanel>

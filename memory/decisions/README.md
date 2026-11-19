@@ -44,6 +44,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-038](D-038-exploration-beta.md) | Onglet « Bêta : exploration » : règles et réglages | Validée | 2026-11-16 |
 | [D-039](D-039-voie-hybride.md) | Voie hybride prioritaire : lire le serveur, agir au clavier et à la souris | Validée | 2026-11-17 |
 | [D-040](D-040-dossiers-release-old.md) | Versions rangées dans artifacts/release (dernière) et artifacts/old | Validée | 2026-11-18 |
+| [D-041](D-041-num5-jeu-actif.md) | Num 5 n'agit que si BitCraft est la fenêtre active | Validée | 2026-11-19 |
 
 ## Gabarit
 

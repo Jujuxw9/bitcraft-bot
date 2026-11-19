@@ -100,3 +100,16 @@ Pour déboguer la connexion sans être devant le PC, le journal (catégorie « S
 - **Num 0** ignorée si le jeu est caché (le journal le dit). **Num 5** inchangée en attendant la réponse de Julien (Q-022).
 - Refus du module global (jeu pas lancé depuis plus d'1 h) : simple information, la lecture directe de la région suffit.
 - Pas vérifié en réel par Claude : le test avec un Bloc-notes par-dessus a été bloqué (risque de fermer celui de Julien). À vérifier pendant le prochain essai.
+
+## 27. v0.3.14 — onglets, overlay, sac et banques, recettes (2026-11-19)
+
+Demandes de Julien, triées dans cet ordre : sécurité (Num 5), rangement (Paramètres), overlay, banque, recettes.
+
+- **Num 5** (D-041) : n'agit que si BitCraft est la fenêtre active. Ailleurs, rien (ligne « détail » au journal).
+- **Onglets** : Supervision · Journal · **Personnage** · Carte (H2) · **Recettes** · Tests · **Paramètres**.
+  - Paramètres : compte, connexion, affichage (overlay), système (CPU / RAM, seuils). Place prévue pour les futurs réglages.
+  - Personnage : personnage en direct, instantané, **sac et banques**.
+- **Overlay** : petite fenêtre à part, posée en haut à gauche de l'écran du jeu (pas une modification du jeu). Elle laisse passer les clics, ne prend jamais le clavier, et est exclue des captures d'écran (Windows « exclude from capture »). Lignes : connexion au serveur, lecture de l'écran (en cours / en pause / arrêtée), rappel Num 0 et Num 5. Visible seulement quand le jeu est actif ou non caché. Case à cocher dans Paramètres (gardée dans `config.local.json`). Vérifié : fenêtre affichée en (14, 14), 248 × 64 px, avec le jeu lancé.
+- **Sac et banques** : `inventory_state` est **publique**. Deux lectures (sans jointure) : `owner_entity_id = personnage` (sac = index 0, ceinture = index 1) et `player_owner_entity_id = personnage` (un coffre par joueur dans chaque banque ; `owner_entity_id = 0` = banque régionale). Plus `bank_state` (position des banques de la région, case « axiale » → x + z / 2). Tableau : objet, quantité (piles regroupées), type, palier, où ; filtre par endroit et recherche. Si le serveur refuse, le bot réessaie sans le sac ni les banques. Au premier abonnement, le journal écrit un extrait brut des poches, pour vérifier le format réel (**à vérifier** au prochain essai).
+- **Recettes** : nouvelles tables BitCraft_GameData `crafting_recipe_desc` (12 Mo) et `building_type_desc`, téléchargées avec les autres. Livre chargé en tâche de fond (≈ 0,5 s) : 9322 objets et cargaisons, 8707 recettes. Recherche par morceaux de nom ; fiche : description, palier, catégorie, rareté ; « Comment l'obtenir » (récolte : ressource, chance ; fabrication : atelier et palier, ingrédients cliquables, métier et niveau, outil et niveau, nombre d'actions, durée, endurance ; conditions : connaissance à découvrir, technologie de colonie) ; « Sert à ».
+- Tests : 229 OK, dont le vrai schéma (`inventory_state`, `bank_state`) et les vraies données (Rough Plank, Rough Log).

@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -25,6 +25,13 @@ public static class Queries
             $"SELECT * FROM satiation_state WHERE entity_id = {e}",
             $"SELECT * FROM signed_in_player_state WHERE entity_id = {e}",
         };
+        if (withInventory)
+        {
+            // Sac, ceinture et coffres de banque du personnage (inventory_state est publique), et les banques de la région.
+            list.Add($"SELECT * FROM inventory_state WHERE owner_entity_id = {e}");
+            list.Add($"SELECT * FROM inventory_state WHERE player_owner_entity_id = {e}");
+            list.Add("SELECT * FROM bank_state");
+        }
         if (area is { } a)
         {
             list.AddRange(Resources(a, withHealth));

@@ -30,6 +30,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private string? _targetModule;
     private bool _resourcesRefused;
     private bool _healthRefused;
+    private bool _inventoryRefused;
+    private bool _inventoryLogged;
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
     private long _messages;
@@ -56,6 +58,13 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
     public bool HealthRefused => _healthRefused;
 
+    public bool InventoryRefused => _inventoryRefused;
+
+    // Sac, ceinture et coffres de banque du personnage.
+    public IReadOnlyList<InventoryInfo> Inventories() => _entityId is { } e ? World.Inventories.Of(_cache, e) : [];
+
+    public IReadOnlyDictionary<ulong, ServerPosition> BankPositions() => Banks.Positions(_cache);
+
     // Résultat de la dernière découverte par le module global (null si elle n'a pas été faite).
     public RegionDiscovery? Discovery { get; private set; }
 
@@ -71,6 +80,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _area = null;
         _resourcesRefused = false;
         _healthRefused = false;
+        _inventoryRefused = false;
+        _inventoryLogged = false;
         ResourceAreaUpdated = null;
         Interlocked.Exchange(ref _messages, 0);
         Interlocked.Exchange(ref _transactions, 0);
@@ -183,6 +194,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 _cache.Reset(subscription.Tables);
                 LastUpdate = DateTime.Now;
                 log.Info(Category, "Abonnement accepté : " + DescribeCounts());
+                LogFirstInventory();
                 OnSubscriptionApplied();
                 break;
 
@@ -201,12 +213,19 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
             case SubscriptionErrorEvent error:
                 log.Erreur(Category, $"Abonnement refusé par le serveur : {error.Error}");
-                if (_area is { } refusedArea && !_healthRefused && _entityId is { } he)
+                if (_entityId is { } ie && !_inventoryRefused)
+                {
+                    // D'abord sans le sac et les banques (requêtes ajoutées en v0.3.14).
+                    _inventoryRefused = true;
+                    log.Alerte(Category, "Nouvel essai sans le sac ni les banques.");
+                    Subscribe(Queries.FollowPlayer(_identity!, ie, _area, withHealth: !_healthRefused, withInventory: false), "suivi sans le sac ni les banques");
+                }
+                else if (_area is { } refusedArea && !_healthRefused && _entityId is { } he)
                 {
                     // D'abord sans la santé des ressources (requête ajoutée en v0.3.11), en gardant les ressources.
                     _healthRefused = true;
                     log.Alerte(Category, "Nouvel essai sans la santé des ressources.");
-                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false), "ressources sans la santé");
+                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false, withInventory: !_inventoryRefused), "ressources sans la santé");
                 }
                 else if (_area is not null && !_resourcesRefused)
                 {
@@ -216,7 +235,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                     _area = null;
                     if (_entityId is { } e)
                     {
-                        Subscribe(Queries.FollowPlayer(_identity!, e, null), "suivi sans ressources");
+                        Subscribe(Queries.FollowPlayer(_identity!, e, null, withInventory: !_inventoryRefused), "suivi sans ressources");
                     }
                 }
                 else
@@ -229,6 +248,24 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 log.Detail(Category, $"Message « {unknown.Type} » ignoré.");
                 break;
         }
+    }
+
+    // Une fois par connexion : un extrait brut d'un inventaire, pour vérifier le format réel des poches (v0.3.14).
+    private void LogFirstInventory()
+    {
+        if (_inventoryLogged || _entityId is not { } e)
+        {
+            return;
+        }
+        var rows = _cache.Rows("inventory_state").ToList();
+        if (rows.Count == 0)
+        {
+            return;
+        }
+        _inventoryLogged = true;
+        var inventories = World.Inventories.Of(_cache, e);
+        var raw = rows[0].Get("pockets")?.GetRawText() ?? "?";
+        log.Info(Category, $"Sac et banques : {inventories.Count} inventaires, {inventories.Sum(i => i.Stacks.Count)} piles d'objets. Exemple brut de poches : {(raw.Length > 400 ? raw[..400] + "…" : raw)}");
     }
 
     private void OnSubscriptionApplied()
@@ -244,7 +281,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         {
             _entityId = snapshot.EntityId;
             log.Info(Category, $"Personnage trouvé (entité {_entityId}).");
-            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null), "suivi du personnage");
+            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null, withInventory: !_inventoryRefused), "suivi du personnage");
             return;
         }
         SetState(ReaderState.Connecte, "Lecture en direct.");
@@ -274,7 +311,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         var why = previous is { } old
             ? $"ressources autour de {p.ScreenText} : le personnage s'est éloigné de {new ServerPosition(old.CenterX, old.CenterZ).ScreenDistanceTo(p):0.0} cases écran du centre de l'ancienne zone"
             : $"ressources autour de {p.ScreenText}";
-        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused), why);
+        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused), why);
     }
 
     private void Subscribe(IReadOnlyList<string> queries, string why)
@@ -316,7 +353,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             SetState(ReaderState.Erreur, detail);
             return;
         }
-        log.Alerte(Category, $"Liaison terminée : {reason}. Pas de reconnexion automatique (voir l'onglet Serveur).");
+        log.Alerte(Category, $"Liaison terminée : {reason}. Pas de reconnexion automatique (voir l'onglet Paramètres).");
         SetState(ReaderState.Perdu, $"Liaison terminée : {reason}.");
     }
 

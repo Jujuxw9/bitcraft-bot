@@ -308,6 +308,8 @@ public class H1RealSchemaTests
             ["location_state"] = ["entity_id", "x", "z"],
             ["resource_state"] = ["entity_id", "resource_id"],
             ["resource_health_state"] = ["entity_id", "health"],
+            ["inventory_state"] = ["entity_id", "pockets", "inventory_index", "owner_entity_id", "player_owner_entity_id"],
+            ["bank_state"] = ["building_entity_id", "coordinates"],
             ["world_region_state"] = ["region_index"],
             ["world_region_name_state"] = ["id", "player_facing_name"],
         };

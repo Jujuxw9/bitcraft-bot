@@ -33,7 +33,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-040
+- [README.md](decisions/README.md) — tableau D-001 à D-041
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-022
@@ -49,7 +49,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-16-demande-captures-lot5.md](echanges/2026-11-16-demande-captures-lot5.md) — lot 5 : captures et vidéos précises demandées
 - [2026-11-16-demande-lot6.md](echanges/2026-11-16-demande-lot6.md) — lot 6 : reste du lot 5, captures avec Num 0
 - [2026-11-18-essai-h1.md](echanges/2026-11-18-essai-h1.md) — essai H1 (fait : lecture OK, ordre bot → jeu)
-- [2026-11-18-essai-h2.md](echanges/2026-11-18-essai-h2.md) — essai H2 à faire par Julien (v0.3.11 : carte des arbres)
+- [2026-11-18-essai-h2.md](echanges/2026-11-18-essai-h2.md) — essais H2 (v0.3.11, v0.3.12 : faits)
+- [2026-11-19-essai-v0314.md](echanges/2026-11-19-essai-v0314.md) — essai v0.3.14 à faire (overlay, Num 5, sac et banques, recettes)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -57,11 +58,11 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.3.13 (H2)
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.3.14 (onglets, overlay, banques, recettes)
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-01)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-02)

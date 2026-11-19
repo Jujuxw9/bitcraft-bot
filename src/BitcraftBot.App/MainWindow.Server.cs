@@ -11,7 +11,7 @@ using HudState = BitcraftBot.Perception.Hud.HudState;
 
 namespace BitcraftBot.App;
 
-// Onglet « Serveur (H1) » : connexion au compte par code e-mail, puis lecture en direct du serveur (D-039).
+// Connexion au compte par code e-mail (onglet Paramètres), lecture en direct du serveur (onglet Personnage) (D-039).
 public partial class MainWindow
 {
     private static readonly TimeSpan ServerUiInterval = TimeSpan.FromMilliseconds(500);
@@ -242,6 +242,7 @@ public partial class MainWindow
 
     private void OnServerTick()
     {
+        UpdateOverlay();
         ServerGameRunningText.Text = IsGameRunning() ? "Jeu : lancé." : "Jeu : fermé.";
         SrvHudPosition.Text = _lastHudPosition is { } hp ? $"N {hp.North}, E {hp.East}" : "— (lancer « Démarrer » dans Supervision)";
         var reader = _serverReader;
@@ -265,6 +266,7 @@ public partial class MainWindow
         SrvUpdated.Text = reader.LastUpdate is { } at ? $"{at:HH:mm:ss}" : "—";
 
         ShowResources(reader, s);
+        ShowInventories(reader, s);
 
         // Pour trouver la conversion entre les coordonnées du serveur et celles de l'écran (H2).
         if (s.Position is { } sp && _lastHudPosition is { } hud && DateTime.Now - _lastPositionCompare >= PositionCompareInterval)

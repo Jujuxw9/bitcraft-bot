@@ -138,8 +138,10 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.3.13 (H2 : lecture de l'écran en pause quand une autre fenêtre cache le jeu, Num 0 ignorée hors du jeu) : lecture du HUD, capture avec Num 0, et nouvel onglet « Serveur (H1) » : lecture seule du serveur officiel, avec recherche de la région du personnage. Aucune action sur le jeu hors banc d'essai.");
+        _log.Info("Session", "Version 0.3.14 : onglets Personnage (sac et banques), Carte, Recettes et Paramètres ; overlay sur l'écran du jeu ; Num 5 seulement quand BitCraft est actif. Lecture seule du serveur officiel. Aucune action sur le jeu hors banc d'essai.");
         InitServerTab();
+        InitOverlay();
+        _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);
         _ = _gameData.StartAsync();
         _log.Info("Système", $"Surveillance CPU/RAM active. Seuils : RAM du bot {_settings.Limits.BotRamWarningMb:0} Mo (alerte) / {_settings.Limits.BotRamCriticalMb:0} Mo (arrêt), " +
                              $"CPU du bot {_settings.Limits.BotCpuWarningPercent:0} %, RAM libre du PC {_settings.Limits.SystemRamAvailableWarningPercent:0} %.");
@@ -178,6 +180,14 @@ public partial class MainWindow : Window
         // Une touche simulée par un programme ne compte jamais comme arrêt d'urgence.
         if (isInjected || !EmergencyKey.IsEmergencyStop(scanCode, isExtended))
         {
+            return;
+        }
+        // D-041 (Julien, 2026-11-19) : Num 5 n'agit que si BitCraft est la fenêtre active (au premier plan).
+        // Tapée dans un autre programme, elle ne fait rien (essai long : arrêt d'urgence en tapant « 50 »).
+        var gameNow = _gameWindow ?? new GameWindowLocator().Find();
+        if (gameNow is null || !_inputSender.IsForeground(gameNow.Handle))
+        {
+            _log.Detail("Sécurité", $"Touche {EmergencyKey.DisplayName} ignorée : BitCraft n'est pas la fenêtre active.");
             return;
         }
         Dispatcher.BeginInvoke(() =>
@@ -950,6 +960,7 @@ public partial class MainWindow : Window
         _keyboardHook?.Dispose();
         _resourceTimer.Stop();
         CloseServerReader();
+        CloseOverlay();
 
         // Position « normale » de la fenêtre (même si elle est agrandie), pour retrouver le bon écran.
         var bounds = WindowState == WindowState.Normal ? new Rect(Left, Top, Width, Height) : RestoreBounds;

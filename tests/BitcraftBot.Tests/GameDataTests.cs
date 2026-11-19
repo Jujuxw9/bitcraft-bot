@@ -31,6 +31,8 @@ public class GameDataTests
             ["food_desc"] = "[{\"item_id\":10000}]",
             ["tool_type_desc"] = "[{\"id\":1,\"name\":\"Axe\",\"skill_id\":2}]",
             ["skill_desc"] = "[{\"id\":2,\"name\":\"Forestry\"}]",
+            ["crafting_recipe_desc"] = "[]",
+            ["building_type_desc"] = "[]",
         };
     }
 

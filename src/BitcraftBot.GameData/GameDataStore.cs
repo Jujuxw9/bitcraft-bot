@@ -28,6 +28,9 @@ public sealed class GameDataStore
         "food_desc",
         "tool_type_desc",
         "skill_desc",
+        // Onglet Recettes (v0.3.14) : recettes d'artisanat et types d'ateliers.
+        "crafting_recipe_desc",
+        "building_type_desc",
     ];
 
     public required IReadOnlyList<ResourceInfo> Resources { get; init; }

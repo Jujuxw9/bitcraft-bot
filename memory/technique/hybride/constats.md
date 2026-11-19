@@ -38,7 +38,7 @@
 | Métiers | `experience_state` |
 | Équipement | `equipment_state` |
 | Joueur | `player_state`, `signed_in_player_state` |
-Position des ressources : `location_state` (jointure sur `entity_id`), **vérifié** en v0.3.7. Santé : `resource_health_state` (entity_id, health), publique, une ligne par ressource dès son apparition (code serveur) ; lue depuis la v0.3.11, **à vérifier en réel**. Inventaire : nom de table **à vérifier** dans le schéma réel.
+Inventaire : `inventory_state` (publique) lu depuis la v0.3.14, voir `architecture-serveur.md` section 27. Position des ressources : `location_state` (jointure sur `entity_id`), **vérifié** en v0.3.7. Santé : `resource_health_state` (entity_id, health), publique, une ligne par ressource dès son apparition (code serveur) ; lue depuis la v0.3.11, **vérifié en réel** (la santé baisse en même temps que dans le jeu).
 
 ## Gain attendu par rapport à la vision
 - Position exacte sans OCR. Arbres connus avec leur type et leur âge **sans cliquer** (règle Q-019 / D-036 simplifiée). Ennemis connus même hors écran. Inventaire plein connu sans lire l'écran.
