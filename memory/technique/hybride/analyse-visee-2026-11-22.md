@@ -47,9 +47,11 @@ Garde-fous en plus : 3 ratés de suite → arrêt et message ; au plus 2 essais 
 
 ## 6. Prochaines étapes (ordre proposé)
 
-1. **Essai de la v0.4.1** : le bot dit ce qu'il voit (bureau, autre programme, accueil, connexion, chargement, en jeu). Num 0 sur l'accueil et la connexion. Réponses à Q-025.
-2. **R1 bis — lire la direction de la caméra sur la mini-carte** (v0.4.2, aucune action) : afficher « caméra vers le nord-est (45°) » ; essai de Julien en tournant la caméra.
-3. **R1 ter — réapprendre la formule avec la direction** (v0.4.3, aucune action) : mêmes clics de Julien, direction notée à chaque clic.
+Mise à jour du 2026-11-22 après les réponses de Julien (D-052) : le cône est confirmé, pas de touche d'interaction, le panneau du haut ne change pas au survol, fenêtres du jeu à détecter : oui.
+
+1. **Essai de la v0.4.2** : ce que voit le bot, réglages du jeu ; Num 0 sur l'accueil et la connexion. Réponse à Q-026 (4 réglages).
+2. **R1 bis — direction de la caméra et fenêtres ouvertes** (v0.4.3, aucune action) : afficher « caméra vers le nord-est (45°) » (cône de la mini-carte) et « fenêtre ouverte : inventaire » ; essai de Julien en tournant la caméra et en ouvrant des fenêtres.
+3. **R1 ter — réapprendre la formule avec la direction** (v0.4.4, aucune action) : mêmes clics de Julien, direction notée à chaque clic.
 4. **R2 — dessiner les arbres du serveur sur l'image du jeu** (aucune action) : la preuve visuelle.
 5. **R3 — survoler sans cliquer** + détection du contour vert.
 6. **R4 — un clic, une coupe, vérifiée par le serveur.** Puis R5 (boucle), R6 (roches), R7 (ennemis).
@@ -57,7 +59,8 @@ Garde-fous en plus : 3 ratés de suite → arrêt et message ; au plus 2 essais 
 ## 7. Améliorations et corrections possibles (hors visée)
 
 - **Écrans d'accueil et de connexion** : mots-clés supposés (v0.4.1) ; à corriger avec les captures de Julien.
-- **Fenêtres du jeu ouvertes** (inventaire, carte) : les détecter avant toute action (Q-015).
+- **Fenêtres du jeu ouvertes** (inventaire, carte) : les détecter avant toute action : **validé (D-052)**, prévu en v0.4.3. Les positions des fenêtres sont rangées par le jeu (`WindowOffset`, voir `../reglages-du-jeu.md`).
+- **Réglages du jeu** : 4 réglages gênent la visée (Q-026), vérifiés au démarrage depuis la v0.4.2.
 - **Liaison serveur** : le 22/11 à 20:51, le module global **et** la région idc-18 ont refusé la liaison dès l'ouverture ; 70 s plus tard (20:53), tout a marché (global accepté, région sur `bitcraft-release`). Cause inconnue (À vérifier). Pas de reconnexion automatique (règle du projet) : si ça se reproduit, le bot pourrait proposer « Réessayer dans 1 min ».
 - **Overlay** : afficher sur le jeu ce que le bot voit et ce qu'il va faire (aide pour les essais).
 - **Rangement de la mémoire** : agent mémoire (`tools/agent-memoire/`) à lancer de temps en temps.

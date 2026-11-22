@@ -26,8 +26,41 @@ public partial class MainWindow
     private DateTime _lastUnknownCapture = DateTime.MinValue;
     private string? _lastUnknownText;
 
+    // Réglages du jeu lus au démarrage (registre, lecture seule, liste blanche : jamais le jeton ni l'e-mail).
+    private void CheckGameSettings()
+    {
+        try
+        {
+            var checks = GameSettings.Read();
+            if (checks.Count == 0)
+            {
+                _log.Info("Réglages du jeu", "Réglages de BitCraft introuvables (jeu jamais lancé sur ce PC ?).");
+                return;
+            }
+            foreach (var c in checks.Where(c => !c.Ok))
+            {
+                var message = $"« {c.French} » vaut {c.Value ?? "?"} (conseillé : {c.Expected}) : {c.Why}.";
+                if (c.Required)
+                {
+                    _log.Alerte("Réglages du jeu", message);
+                }
+                else
+                {
+                    _log.Info("Réglages du jeu", message);
+                }
+            }
+            var ok = checks.Count(c => c.Ok);
+            _log.Info("Réglages du jeu", $"{ok} réglage(s) sur {checks.Count} comme conseillé ({string.Join(", ", checks.Where(c => c.Ok).Select(c => c.French))}).");
+        }
+        catch (Exception ex) when (ex is System.Security.SecurityException or UnauthorizedAccessException or IOException)
+        {
+            _log.Detail("Réglages du jeu", $"Lecture impossible : {ex.Message}");
+        }
+    }
+
     private void InitScreenWatch(OcrReader? ocr)
     {
+        CheckGameSettings();
         _screenCts = new CancellationTokenSource();
         var token = _screenCts.Token;
         var classifier = ocr is null ? null : new GameScreenClassifier(ocr);

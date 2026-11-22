@@ -235,3 +235,11 @@ Retour de l'essai R1 (22/11) : voir `analyse-visee-2026-11-22.md` (la formule de
 - **Caméra** (D-050) : 3 s d'attente après W (avant : 1 s). Précision annoncée **« pas fiable »** tant que moins de 8 clics sont gardés ou que plus d'un tiers est écarté (les 17 clics du 22/11 : « pas fiable », test automatique).
 - **Vérifié** : 300 tests (`V041Tests` : capture en jeu, écran de chargement réel, image noire, mots-clés, situations, contrôleur). Banc hors écran (PowerShell) sur le vrai bureau : « Autre programme : le bot (jeu fermé) » ; CPU du bot 1,9 s sur 8 s, démarrage compris.
 - **Pas vérifié** : accueil et connexion (aucune capture), lecture dans le vrai jeu en direct.
+
+## 36. v0.4.2 — réglages du jeu vérifiés au démarrage (2026-11-22)
+
+Demande de Julien : « lis les settings de mon client, dis-moi ce qu'il faut changer ».
+
+- Réglages trouvés dans le registre (`HKCU\Software\ClockworkLabs\BitCraft`) : voir `technique/reglages-du-jeu.md`. Le même endroit contient le jeton du jeu et l'e-mail de Julien : le bot ne lit qu'une **liste blanche** de 10 réglages (`src/BitcraftBot.Perception/Screen/GameSettings.cs`), **n'écrit jamais**.
+- Au démarrage, journal « [Réglages du jeu] » : alerte si un réglage indispensable est faux (langue, échelle, 1920 × 1080, mini-carte orientée nord) ; info pour les 4 réglages conseillés (Q-026).
+- Vérifié : 303 tests (`V042GameSettingsTests`, dont une lecture du vrai registre sans aucun « @ ») ; banc hors écran : « 6 réglage(s) sur 10 comme conseillé », les 4 autres signalés.

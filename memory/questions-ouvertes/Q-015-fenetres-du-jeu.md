@@ -1,5 +1,5 @@
 # Q-015 — Gérer les fenêtres internes du jeu (déplaçables, superposées)
-- **Statut** : Ouverte
+- **Statut** : En partie résolue → D-052 (détecter avant toute action ; détection à coder)
 - **Priorité** : Moyenne (Haute à partir de v0.4, quand le bot agira)
 - **Créée le** : 2026-11-16
 ## Question

@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.1 : le bot dit ce qu'il voit (bureau, autre programme, jeu réduit, accueil, connexion, chargement, en jeu) et n'agit qu'en jeu ; caméra : 3 s d'attente après W. Apprentissage de la caméra (R1) toujours actif, en lecture seule. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.4.2 : réglages du jeu vérifiés au démarrage (lecture seule) ; le bot dit ce qu'il voit (bureau, autre programme, jeu réduit, accueil, connexion, chargement, en jeu) et n'agit qu'en jeu ; caméra : 3 s d'attente après W. Apprentissage de la caméra (R1) toujours actif, en lecture seule. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

@@ -187,3 +187,49 @@ public class V041CameraReliabilityTests
     public void Clics_coherents_annonce_fiable() =>
         Assert.True(BitcraftBot.Server.Aim.CameraFit.Compute(FakeCamera.Clicks(15, 7))!.Reliable);
 }
+
+// v0.4.2 : réglages du jeu (registre, lecture seule, liste blanche).
+public class V042GameSettingsTests
+{
+    [Fact]
+    public void Valeurs_comparees_aux_conseils()
+    {
+        var values = new Dictionary<string, string>
+        {
+            ["EarlyAccess:Language"] = "en",
+            ["EarlyAccess:UIScale"] = "1",
+            ["Screenmanager Resolution Width"] = "1920",
+            ["Screenmanager Resolution Height"] = "1080",
+            ["EarlyAccess:LockMinimap"] = "1",
+            ["EarlyAccess:CameraObjectCollision"] = "1",
+        };
+        var checks = GameSettings.Check(n => values.GetValueOrDefault(n));
+        Assert.True(checks.Where(c => c.Required).All(c => c.Ok));
+        Assert.False(checks.Single(c => c.Name == "EarlyAccess:CameraObjectCollision").Ok);
+        Assert.Null(checks.Single(c => c.Name == "EarlyAccess:GrassDensity").Value);
+        // Jamais de jeton ni d'e-mail dans la liste blanche.
+        Assert.DoesNotContain(checks, c => c.Name.Contains("Token", StringComparison.OrdinalIgnoreCase) || c.Name.Contains("Email", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Formats_du_registre_unity()
+    {
+        Assert.Equal("1", GameSettings.Format(4607182418800017408L));   // double 1,0
+        Assert.Equal("0.5", GameSettings.Format(4602678819172646912L)); // double 0,5
+        Assert.Equal("500", GameSettings.Format(500));
+        Assert.Equal("en", GameSettings.Format(new byte[] { (byte)'e', (byte)'n', 0 }));
+    }
+
+    [Fact]
+    public void Lecture_du_vrai_registre_sans_secret()
+    {
+        var checks = GameSettings.Read();
+        // Sur le PC de Julien : les réglages existent. Ailleurs : liste vide, rien à vérifier.
+        if (checks.Count == 0)
+        {
+            return;
+        }
+        Assert.Contains(checks, c => c.Name == "EarlyAccess:Language" && c.Value is not null);
+        Assert.All(checks, c => Assert.DoesNotContain("@", c.Value ?? ""));
+    }
+}

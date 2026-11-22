@@ -33,10 +33,10 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-050
+- [README.md](decisions/README.md) — tableau D-001 à D-052
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-025
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-026
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -61,7 +61,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-plan-recolte-auto.md](echanges/2026-11-19-plan-recolte-auto.md) — **plan de bataille de la récolte automatique** (étapes R1 à R7, validé : D-049)
 - [2026-11-19-passation-recolte-auto.md](echanges/2026-11-19-passation-recolte-auto.md) — **passation** : prompt pour le nouveau chat (R1 à R7)
 - [2026-11-19-essai-v040.md](echanges/2026-11-19-essai-v040.md) — essai v0.4.0 (fait le 22/11 : formule de la caméra pas fiable, voir l'analyse de la visée)
-- [2026-11-22-essai-v041.md](echanges/2026-11-22-essai-v041.md) — **essai v0.4.1 à faire** (ce que voit le bot : bureau, accueil, connexion, chargement, jeu)
+- [2026-11-22-essai-v041.md](echanges/2026-11-22-essai-v041.md) — **essai v0.4.2 à faire** (ce que voit le bot, réglages du jeu ; Num 0 sur accueil et connexion)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -72,6 +72,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.1
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [hybride/analyse-visee-2026-11-22.md](technique/hybride/analyse-visee-2026-11-22.md) — **analyse de la visée après l'essai R1** : méthode fiable, prochaines étapes, améliorations
+- [reglages-du-jeu.md](technique/reglages-du-jeu.md) — réglages du jeu lus dans le registre, 4 à changer ? (Q-026)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos

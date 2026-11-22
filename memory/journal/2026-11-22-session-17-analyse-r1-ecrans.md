@@ -36,3 +36,9 @@ Analyser l'essai R1 de Julien, noter ses réponses (Q-024), reconnaître les éc
   3. D-038 (onglet « Bêta : exploration ») : jamais codé. Abandonné, reporté ou à faire après la récolte ?
   4. Q-008 (déconnexion et cadence), Q-014 (ennemis), Q-015 (fenêtres du jeu) : toujours ouvertes ; Q-015 devient importante pour la récolte auto.
 - Règles B9 à B12 ajoutées à l'agent mémoire.
+
+## Suite de la session (réponses de Julien)
+- Réponses : panneau au survol NON, touche d'interaction NON, cône = caméra OUI, captures OK, vue plus haute ?, Release GitHub JAMAIS, D-018 remplacée OUI, onglet Bêta ?, fenêtres du jeu à détecter OUI.
+- **D-051** (jamais de Release GitHub ; D-010 remplacée en partie), **D-018 → remplacée par D-048**, **D-052** (visée vérifiée + fenêtres détectées avant toute action). Q-015 et Q-025 en partie résolues. D-038 laissée telle quelle (Julien ne sait pas).
+- **Réglages du jeu lus** (registre, lecture seule) : `technique/reglages-du-jeu.md`. 4 réglages conseillés à changer (Q-026) : collision de la caméra, caméra adoucie, coffres ouverts seuls, herbe. Le registre contient aussi le jeton et l'e-mail : jamais recopiés.
+- **v0.4.2** : vérification des réglages au démarrage (liste blanche). 303 tests, banc hors écran. .exe local.

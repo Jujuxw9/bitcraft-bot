@@ -1,6 +1,6 @@
 # D-010 — Distribution : .exe unique en GitHub Releases
 
-- **Statut** : Validée
+- **Statut** : Remplacée en partie par D-051 (le .exe unique reste ; plus de GitHub Releases)
 - **Date** : 2026-11-15
 - **Validée par** : Julien
 - **Liens** : D-009

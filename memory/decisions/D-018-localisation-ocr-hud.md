@@ -1,7 +1,7 @@
 # D-018 — Localisation par OCR du HUD
 > Note (vérification de la mémoire, 2026-11-22) : plus appliquée depuis la v0.3.20 (D-048) : la position vient du serveur (D-044).
 
-- **Statut** : Validée
+- **Statut** : Remplacée par D-048 (2026-11-22, accord de Julien)
 - **Date** : 2026-11-15
 - **Validée par** : Julien
 - **Liens** : Q-002
