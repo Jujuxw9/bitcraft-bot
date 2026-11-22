@@ -53,9 +53,10 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-047](D-047-suppression-num5.md) | Plus de touche d'arrêt d'urgence (Num 5 supprimée) | Validée | 2026-11-19 |
 | [D-048](D-048-ecran-cible-seulement.md) | L'écran ne lit plus que la cible sélectionnée | Validée | 2026-11-19 |
 | [D-049](D-049-recolte-auto-choix.md) | Récolte auto : arbres d'abord, vieux arbres, caméra W (Q/D avec précaution), clics de Julien comme indices | Validée | 2026-11-19 |
-| [D-050](D-050-camera-reponses-q024.md) | Caméra : bouton du milieu tourne la vue, W revient en 3 s et remet le zoom | Validée | 2026-11-22 |
+| [D-050](D-050-camera-reponses-q024.md) | Caméra : bouton du milieu tourne la vue, W revient en 3 s et remet le zoom | Validée ; point 2 remplacé par D-053 | 2026-11-22 |
 | [D-051](D-051-jamais-de-release-github.md) | Jamais de Release ni de tag GitHub : .exe local seulement | Validée | 2026-11-22 |
 | [D-052](D-052-visee-verifiee-fenetres.md) | Visée vérifiée (cône de la mini-carte, contour vert, serveur) et détection des fenêtres du jeu avant toute action | Validée | 2026-11-22 |
+| [D-053](D-053-attente-apres-w-1s.md) | Après W, la caméra revient en 1 s (et pas 3 s) | Validée | 2026-11-23 |
 
 ## Gabarit
 

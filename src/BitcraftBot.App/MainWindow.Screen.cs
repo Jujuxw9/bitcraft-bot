@@ -64,12 +64,12 @@ public partial class MainWindow
         _screenCts = new CancellationTokenSource();
         var token = _screenCts.Token;
         var classifier = ocr is null ? null : new GameScreenClassifier(ocr);
-        new Thread(() => ScreenLoop(classifier, token)) { IsBackground = true, Name = "Ce que voit le bot", Priority = ThreadPriority.BelowNormal }.Start();
+        new Thread(() => ScreenLoop(classifier, ocr, token)) { IsBackground = true, Name = "Ce que voit le bot", Priority = ThreadPriority.BelowNormal }.Start();
     }
 
     private void CloseScreenWatch() => _screenCts?.Cancel();
 
-    private void ScreenLoop(GameScreenClassifier? classifier, CancellationToken token)
+    private void ScreenLoop(GameScreenClassifier? classifier, OcrReader? ocr, CancellationToken token)
     {
         var locator = new GameWindowLocator();
         var capturer = new ScreenCapturer();
@@ -103,6 +103,18 @@ public partial class MainWindow
                     situation = situation with { Game = reading.Screen, Evidence = reading.Evidence };
                     _lastReading = reading;
                     KeepScreenCapture(frame, reading);
+                    if (reading.Screen == GameScreen.EnJeu)
+                    {
+                        WatchView(now, frame, ocr);
+                    }
+                    else
+                    {
+                        ClearView();
+                    }
+                }
+                else
+                {
+                    ClearView();
                 }
                 OnSituation(situation);
             }

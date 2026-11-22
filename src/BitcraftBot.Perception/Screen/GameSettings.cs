@@ -22,7 +22,7 @@ public static class GameSettings
         ("EarlyAccess:LockMinimap", "mini-carte orientée nord", "1", true, "lecture de la direction de la caméra sur la mini-carte"),
         ("EarlyAccess:MinimapRadius", "zoom de la mini-carte", "500", false, "taille du cône de la caméra sur la mini-carte"),
         ("EarlyAccess:CameraObjectCollision", "collision de la caméra", "0", false, "avec 1, la caméra avance quand un arbre la gêne : vue imprévisible (À vérifier)"),
-        ("EarlyAccess:CameraPanSmoothing", "caméra adoucie", "0", false, "avec 1, W ramène la caméra en douceur (3 s, D-050)"),
+        ("EarlyAccess:CameraPanSmoothing", "caméra adoucie", "0", false, "avec 1, W ramène la caméra en douceur (1 s, D-050)"),
         ("EarlyAccess:AutoOpenStoragesInRange", "ouvrir les coffres proches", "0", false, "avec 1, des fenêtres s'ouvrent seules près d'un coffre et cachent la vue"),
         ("EarlyAccess:GrassDensity", "herbe", "0", false, "l'herbe haute cache le pied des arbres et le contour vert du survol"),
     ];

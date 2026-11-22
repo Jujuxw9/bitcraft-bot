@@ -135,18 +135,22 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                                        <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
                                     </Grid.RowDefinitions>
                                     <TextBlock Grid.Row="0" Text="Je vois" Style="{StaticResource Label}" />
                                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SeenText" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" />
-                                    <TextBlock Grid.Row="1" Text="Cible" Style="{StaticResource Label}" />
-                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="HudTarget" Text="—" Style="{StaticResource Value}" />
-                                    <TextBlock Grid.Row="2" Text="Santé" Style="{StaticResource Label}" />
-                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="HudTargetHealth" Text="—" Style="{StaticResource Value}" />
-                                    <TextBlock Grid.Row="3" Text="Durée" Style="{StaticResource Label}" />
-                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="ElapsedText" Text="—" Style="{StaticResource Value}" />
-                                    <TextBlock Grid.Row="4" Text="Images/s" Style="{StaticResource Label}" />
-                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="FpsText" Text="—" Style="{StaticResource Value}" />
+                                    <TextBlock Grid.Row="1" Text="Caméra" Style="{StaticResource Label}" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="HeadingText" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Row="2" Text="Fenêtres" Style="{StaticResource Label}" />
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="WindowsText" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" />
+                                    <TextBlock Grid.Row="3" Text="Cible" Style="{StaticResource Label}" />
+                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="HudTarget" Text="—" Style="{StaticResource Value}" />
+                                    <TextBlock Grid.Row="4" Text="Santé" Style="{StaticResource Label}" />
+                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="HudTargetHealth" Text="—" Style="{StaticResource Value}" />
+                                    <TextBlock Grid.Row="5" Text="Durée" Style="{StaticResource Label}" />
+                                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="ElapsedText" Text="—" Style="{StaticResource Value}" />
+                                    <TextBlock Grid.Row="6" Text="Images/s" Style="{StaticResource Label}" />
+                                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="FpsText" Text="—" Style="{StaticResource Value}" />
                                 </Grid>
                             </StackPanel>
                         </Border>

@@ -19,6 +19,7 @@
 | [15](2026-11-19-session-15-stabilite-plan-recolte.md) | 2026-11-19 | Claude Code | v0.3.20 : image du jeu et icônes réparées, écran = cible seulement, plan de la récolte automatique |
 | [16](2026-11-19-session-16-r1-camera.md) | 2026-11-19 | Claude Code | v0.4.0 : R1, le bot apprend la caméra (écoute de la souris, formule, carte Caméra) |
 | [17](2026-11-22-session-17-analyse-r1-ecrans.md) | 2026-11-22 | Claude Code | Analyse de l'essai R1, v0.4.1 : ce que voit le bot, agent mémoire |
+| [18](2026-11-23-session-18-cone-fenetres.md) | 2026-11-23 | Claude Code | v0.4.3 : direction de la caméra (cône de la mini-carte), fenêtres du jeu, écran de connexion, 1 s après W (D-053) |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

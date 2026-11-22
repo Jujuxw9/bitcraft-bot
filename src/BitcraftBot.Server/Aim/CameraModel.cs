@@ -16,6 +16,10 @@ public sealed record CameraPair
     public string? Tag { get; init; }
     public ulong EntityId { get; init; }
 
+    // Cap de la caméra au moment du clic (0 = nord, 90 = est), lu sur le cône de la mini-carte (v0.4.3).
+    // null : clic appris avant la v0.4.3 ou cône pas lu.
+    public double? Heading { get; init; }
+
     // Point cliqué, ramené au centre de l'image et divisé par la hauteur : indépendant de la taille de la fenêtre
     // (la caméra du jeu garde le même angle de vue vertical quand la fenêtre change de taille, à vérifier).
     public double U => ClientHeight <= 0 ? 0 : (PixelX - ClientWidth / 2.0) / ClientHeight;

@@ -30,7 +30,7 @@ Principe : aucune étape ne fait confiance à la précédente. Chaque étape se 
 |---|---|---|---|
 | 0. Prêt ? | Écran « en jeu » (v0.4.1), aucune fenêtre du jeu ouverte, endurance pleine (D-028), personnage arrêté | Écran + serveur | Attendre |
 | 1. Choisir | Le vieil arbre le plus proche (serveur, D-034), à moins de ~8 cases, sans ennemi autour (R7) | Serveur | Arbre suivant |
-| 2. Orienter | W, attendre 3 s (D-050), lire la direction de la caméra sur la mini-carte | Écran : cône lu 2 fois de suite pareil | Ne pas viser |
+| 2. Orienter | W, attendre 1 s (D-053), lire la direction de la caméra sur la mini-carte | Écran : cône lu 2 fois de suite pareil | Ne pas viser |
 | 3. Prévoir | Formule : position de l'arbre au sol + direction de la caméra → pixel du **pied du tronc** | Formule « fiable » seulement | Ne pas viser |
 | 4. Survoler | Souris au point prévu (geste humain), sans cliquer | Contour vert à l'écran autour du curseur | Petite recherche autour (quelques points), sinon arbre suivant |
 | 5. Cliquer | Clic droit | — | — |
@@ -49,8 +49,8 @@ Garde-fous en plus : 3 ratés de suite → arrêt et message ; au plus 2 essais 
 
 Mise à jour du 2026-11-22 après les réponses de Julien (D-052) : le cône est confirmé, pas de touche d'interaction, le panneau du haut ne change pas au survol, fenêtres du jeu à détecter : oui.
 
-1. **Essai de la v0.4.2** : ce que voit le bot, réglages du jeu ; Num 0 sur l'accueil et la connexion. Réponse à Q-026 (4 réglages).
-2. **R1 bis — direction de la caméra et fenêtres ouvertes** (v0.4.3, aucune action) : afficher « caméra vers le nord-est (45°) » (cône de la mini-carte) et « fenêtre ouverte : inventaire » ; essai de Julien en tournant la caméra et en ouvrant des fenêtres.
+1. **Essai de la v0.4.2** : fait le 22/11 (accueil, chargement, en jeu reconnus ; connexion corrigée en v0.4.3 ; herbe baissée, Q-026).
+2. **R1 bis — direction de la caméra et fenêtres ouvertes** (v0.4.3 faite le 23/11, à essayer par Julien) : afficher « caméra vers le nord-est (45°) » (cône de la mini-carte) et « fenêtre ouverte : inventaire » ; essai de Julien en tournant la caméra et en ouvrant des fenêtres.
 3. **R1 ter — réapprendre la formule avec la direction** (v0.4.4, aucune action) : mêmes clics de Julien, direction notée à chaque clic.
 4. **R2 — dessiner les arbres du serveur sur l'image du jeu** (aucune action) : la preuve visuelle.
 5. **R3 — survoler sans cliquer** + détection du contour vert.

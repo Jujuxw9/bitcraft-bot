@@ -29,8 +29,8 @@ public sealed class CameraLearner
 {
     public static readonly TimeSpan ConfirmWindow = TimeSpan.FromSeconds(20);
 
-    // Après W, la caméra du jeu revient en douceur : 3 s d'attente avant de croire les clics (Julien, Q-024 → D-050).
-    public static readonly TimeSpan ResetSettle = TimeSpan.FromSeconds(3);
+    // Après W, la caméra du jeu revient en douceur : 1 s d'attente avant de croire les clics (Julien, D-050 corrigée le 2026-11-22).
+    public static readonly TimeSpan ResetSettle = TimeSpan.FromSeconds(1);
 
     // Personnage immobile : déplacé de moins de ça (unités de l'écran) dans la seconde avant le clic.
     public const double StillDistance = 0.4;
@@ -44,7 +44,7 @@ public sealed class CameraLearner
     private readonly LinkedList<(DateTime At, ServerPosition Position)> _history = new();
     private Pending? _pending;
 
-    private sealed record Pending(DateTime At, int X, int Y, int Width, int Height, ActionInfo? Action, ExtractInfo? Extract);
+    private sealed record Pending(DateTime At, int X, int Y, int Width, int Height, ActionInfo? Action, ExtractInfo? Extract, double? Heading);
 
     public CameraState State { get; private set; } = CameraState.Inconnue;
 
@@ -99,7 +99,8 @@ public sealed class CameraLearner
     }
 
     // Clic droit de Julien dans la zone utile du jeu. x, y : depuis le coin haut gauche de cette zone.
-    public CameraEvent? OnRightClick(DateTime now, int x, int y, int width, int height, PlayerSnapshot? s)
+    // heading : cap de la caméra lu sur la mini-carte au moment du clic (v0.4.3), null si pas lu.
+    public CameraEvent? OnRightClick(DateTime now, int x, int y, int width, int height, PlayerSnapshot? s, double? heading = null)
     {
         if (s?.Position is null)
         {
@@ -113,10 +114,10 @@ public sealed class CameraLearner
         if (State == CameraState.Recentree && now - StateSince < ResetSettle)
         {
             _pending = null;
-            return new CameraEvent(false, "Clic droit ignoré : W appuyé il y a moins de 3 s (la caméra revient en douceur).");
+            return new CameraEvent(false, "Clic droit ignoré : W appuyé il y a moins de 1 s (la caméra revient en douceur).");
         }
         // Un nouveau clic remplace le précédent : c'est le dernier qui compte pour le jeu.
-        _pending = new Pending(now, x, y, width, height, s.Action, s.LastExtract);
+        _pending = new Pending(now, x, y, width, height, s.Action, s.LastExtract, heading);
         return null;
     }
 
@@ -175,6 +176,7 @@ public sealed class CameraLearner
             Resource = resource.Name,
             Tag = resource.Tag,
             EntityId = resource.EntityId,
+            Heading = pending.Heading,
         };
         var distance = Math.Sqrt(pair.East * pair.East + pair.North * pair.North);
         if (distance > MaxDistance)
@@ -194,7 +196,7 @@ public sealed class CameraLearner
         var direction = ResourceNames.Direction(pair.East, pair.North);
         var before = LastPredictionErrorPx is { } e ? $" Formule d'avant : écart {e:0} px." : "";
         events.Add(new CameraEvent(true,
-            $"Clic appris n° {_pairs.Count} : « {resource.Name} » à {distance:0.0} cases {direction}, pixel ({pair.PixelX}, {pair.PixelY}).{before} {Summary()}"));
+            $"Clic appris n° {_pairs.Count} : « {resource.Name} » à {distance:0.0} cases {direction}, pixel ({pair.PixelX}, {pair.PixelY}), caméra {(pair.Heading is { } hd ? $"vers {hd:0}°" : "direction pas lue")}.{before} {Summary()}"));
         return events;
     }
 

@@ -129,7 +129,7 @@ public partial class MainWindow
         {
             return;
         }
-        if (_camera.OnRightClick(at, x - area.X, y - area.Y, area.Width, area.Height, _lastSnapshot) is { } e)
+        if (_camera.OnRightClick(at, x - area.X, y - area.Y, area.Width, area.Height, _lastSnapshot, FreshHeading(at)) is { } e)
         {
             WriteCameraEvent(e);
         }

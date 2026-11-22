@@ -25,7 +25,10 @@ public partial class MainWindow
             // Écran inconnu : pas de blocage (le jeu peut afficher une fenêtre qui cache les coordonnées).
             ScreenNotReady = () => _situation is { Place: Perception.Screen.Place.Jeu, Game: Perception.Screen.GameScreen.Accueil or Perception.Screen.GameScreen.Connexion or Perception.Screen.GameScreen.Chargement } s
                 ? $"le jeu n'est pas prêt ({Perception.Screen.GameScreens.French(s.Game!.Value)})"
-                : null,
+                // D-052 : une fenêtre du jeu ouverte (vue il y a moins de 3 s) bloque toute action.
+                : _view is { Windows.Count: > 0 } v && DateTime.Now - v.At < TimeSpan.FromSeconds(3)
+                    ? $"fenêtre du jeu ouverte ({string.Join(", ", v.Windows.Select(w => w.French))})"
+                    : null,
         };
         var controller = new ActionController(_inputSender, context, new ActionOptions { StopOnMouseMove = _settings.StopOnMouseMove });
         controller.Log += (level, message) =>

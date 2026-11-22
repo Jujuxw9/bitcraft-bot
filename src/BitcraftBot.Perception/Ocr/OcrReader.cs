@@ -41,9 +41,21 @@ public sealed class OcrReader
         }
         var (pixels, width, height) = prepared.Value;
         using var bitmap = SoftwareBitmap.CreateCopyFromBuffer(pixels.AsBuffer(), BitmapPixelFormat.Bgra8, width, height);
-        var result = await _engine.RecognizeAsync(bitmap);
-        return string.Join(' ', result.Lines.Select(l => l.Text)).Trim();
+        // Le moteur de Windows ne lit qu'une image à la fois (« Another RecognizeAsync operation is already running! »,
+        // journal du 22/11) : la lecture du HUD et « ce que voit le bot » passent chacun leur tour.
+        await _gate.WaitAsync();
+        try
+        {
+            var result = await _engine.RecognizeAsync(bitmap);
+            return string.Join(' ', result.Lines.Select(l => l.Text)).Trim();
+        }
+        finally
+        {
+            _gate.Release();
+        }
     }
+
+    private readonly SemaphoreSlim _gate = new(1, 1);
 
     // Marge blanche ajoutée autour du texte : l'OCR lit mieux un texte qui ne touche pas les bords.
     private const int Margin = 12;

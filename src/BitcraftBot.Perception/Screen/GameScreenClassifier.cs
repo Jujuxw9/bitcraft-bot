@@ -34,8 +34,8 @@ public static class GameScreens
 // Reconnaît l'écran du jeu, du plus sûr au moins sûr :
 // 1. En jeu : les coordonnées « N 8958, E 6747 » sous la mini-carte (lecture d'une petite zone, rapide).
 // 2. Chargement : le mot « LOADING » en bas à gauche (vu le 2026-11-16, « Initializing player… »).
-// 3. Sinon, lecture de tout l'écran et mots-clés : connexion (Login…), accueil (Press / Click…).
-//    Les mots de l'accueil et de la connexion sont SUPPOSÉS (aucune capture de ces écrans) : À vérifier.
+// 3. Sinon, lecture de tout l'écran et mots-clés : connexion (Enter BitCraft, Log out…), accueil (Press any button),
+//    puis coordonnées dans le texte de tout l'écran. Mots vérifiés sur les captures de Julien du 2026-11-22.
 //    Écran pas reconnu : « inconnu », avec le texte lu, pour corriger les mots-clés.
 public sealed partial class GameScreenClassifier(OcrReader ocr)
 {
@@ -44,10 +44,14 @@ public sealed partial class GameScreenClassifier(OcrReader ocr)
 
     public static readonly string[] LoadingWords = ["loading", "initializing", "connecting"];
 
-    // À vérifier (Q-025) : mots supposés des écrans de connexion et d'accueil.
-    public static readonly string[] LoginWords = ["login", "log in", "sign in", "email", "password", "username"];
+    // Connexion : vu le 2026-11-22 (compte déjà connu) : « WELCOME », « ENTER BITCRAFT », « LOG OUT »,
+    // « ANNOUNCEMENTS », « HAVING TROUBLE? », « CHANGE YOUR EMAIL ». Les mots « login », « password »… restent
+    // pour l'écran sans compte connu (pas encore vu, À vérifier).
+    public static readonly string[] LoginWords =
+        ["enter bitcraft", "log out", "having trouble", "change your email", "announcements", "login", "log in", "sign in", "password", "username"];
 
-    public static readonly string[] WelcomeWords = ["press any", "press to", "click to", "click anywhere", "any key", "tap to", "continue"];
+    // Accueil : « PRESS ANY BUTTON TO START » (vu le 2026-11-22).
+    public static readonly string[] WelcomeWords = ["press any", "any button", "to start"];
 
     public async Task<ScreenReading> ClassifyAsync(Frame frame)
     {
@@ -69,26 +73,34 @@ public sealed partial class GameScreenClassifier(OcrReader ocr)
         var whole = new ScreenRect(0, 0, frame.Width, frame.Height);
         var bright = await ocr.ReadAsync(frame, whole, TextStyle.BrightText, 200, scale: 1);
         var dark = await ocr.ReadAsync(frame, whole, TextStyle.DarkText, 70, scale: 1);
-        var text = Compact($"{bright} {dark}");
-        return ClassifyText(text);
+        // Tout le texte sert à reconnaître l'écran ; seul le journal reçoit un extrait (avant : coupé à 300 caractères
+        // AVANT la reconnaissance, les mots de la connexion tombaient dans la partie coupée).
+        return ClassifyText($"{bright} {dark}");
     }
 
     // Reconnaissance par mots-clés du texte de tout l'écran (séparée pour être testée sans image).
     public static ScreenReading ClassifyText(string text)
     {
+        var extract = Compact(text);
         if (FindWord(text, LoadingWords) is { } lw)
         {
-            return new ScreenReading(GameScreen.Chargement, $"mot « {lw} »", text);
+            return new ScreenReading(GameScreen.Chargement, $"mot « {lw} »", extract);
         }
         if (FindWord(text, LoginWords) is { } li)
         {
-            return new ScreenReading(GameScreen.Connexion, $"mot « {li} » (supposé, à vérifier)", text);
+            return new ScreenReading(GameScreen.Connexion, $"mot « {li} »", extract);
         }
         if (FindWord(text, WelcomeWords) is { } we)
         {
-            return new ScreenReading(GameScreen.Accueil, $"mot « {we} » (supposé, à vérifier)", text);
+            return new ScreenReading(GameScreen.Accueil, $"mot « {we} »", extract);
         }
-        return new ScreenReading(GameScreen.Inconnu, string.IsNullOrWhiteSpace(text) ? "aucun texte lu" : "aucun mot connu", text);
+        // Coordonnées trouvées dans le texte de tout l'écran (la petite zone a pu être mal lue : bandeau
+        // « ENTERING … » au-dessus, journal du 22/11 à 23:48:10).
+        if (CoordinatesShape().Match(text) is { Success: true } c)
+        {
+            return new ScreenReading(GameScreen.EnJeu, $"coordonnées « {c.Value.Trim()} » dans le texte de l'écran", extract);
+        }
+        return new ScreenReading(GameScreen.Inconnu, string.IsNullOrWhiteSpace(text) ? "aucun texte lu" : "aucun mot connu", extract);
     }
 
     // « N 8958, E 6747 », même mal lu (« N 0927, E 6707 », « N 8923r E 6713 ») : seule la présence compte ici.
@@ -103,8 +115,9 @@ public sealed partial class GameScreenClassifier(OcrReader ocr)
         {
             return null;
         }
+        // Début de mot obligatoire : « disconnecting » (annonces de l'écran de connexion) ne doit pas donner « connecting ».
         var normalized = " " + Spaces().Replace(text.ToLowerInvariant(), " ") + " ";
-        return words.FirstOrDefault(w => normalized.Contains(w, StringComparison.Ordinal));
+        return words.FirstOrDefault(w => Regex.IsMatch(normalized, @"(?<![\p{L}\p{N}])" + Regex.Escape(w), RegexOptions.CultureInvariant));
     }
 
     // Les zones sont mesurées en 1920 × 1080 : ramenées à la taille de l'image.

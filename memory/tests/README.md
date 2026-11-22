@@ -17,6 +17,7 @@
 | T-20261119-02 (tests `V0314Tests`) | 2026-11-19 | unitaire + vraies données | v0.3.14 : poches (3 formats), requêtes d'inventaire, livre des recettes (données de test et vraies données) | OK (229 tests) ; essai réel : `echanges/2026-11-19-essai-v0314.md` |
 | T-20261119-04 (tests `V040Tests` + banc hors écran) | 2026-11-19 | unitaire + banc | v0.4.0 (R1) : formule de la caméra sur caméra simulée, faux indices, appariement clic / récolte ; carte Caméra, enregistrement des clics, écoute de la souris | OK (277 tests) ; essai réel : `echanges/2026-11-19-essai-v040.md` |
 | T-20261122-01 (essai réel R1 + tests `V041Tests` + banc) | 2026-11-22 | session réelle + unitaire + banc | Essai R1 de Julien (17 clics) ; v0.4.1 : ce que voit le bot (capture en jeu, chargement réel, situations), précision « pas fiable » | R1 : **KO** (4 clics gardés sur 17, écarts 148 à 3 375 px : W ne fixe pas la direction) ; v0.4.1 : OK (300 tests) ; essai : `echanges/2026-11-22-essai-v041.md` |
+| T-20261123-01 (essai réel v0.4.2 + tests `V043Tests` + planche + banc) | 2026-11-23 | session réelle + unitaire + visuel + banc | Journal de l'essai v0.4.2 de Julien ; v0.4.3 : direction de la caméra sur 5 mini-cartes de référence et une planche de 48, fenêtres du jeu sur toutes les captures, écrans accueil / connexion / jeu avec bandeau, lectures de texte simultanées | v0.4.2 : connexion **KO**, reste OK ; v0.4.3 : OK (336 tests), démarrage hors écran OK ; **pas essayé en direct dans le jeu** ; essai : `echanges/2026-11-23-essai-v043.md` |
 
 ## Gabarit
 

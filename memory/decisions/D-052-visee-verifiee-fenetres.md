@@ -20,3 +20,9 @@
 
 ## Conséquences
 - Prochaines versions (aucune action) : lecture du cône de la mini-carte, détection des fenêtres ouvertes, puis réapprentissage de la formule avec la direction.
+
+## Suite (2026-11-23, v0.4.3)
+- **Cône de la mini-carte lu** : le personnage est toujours au centre de la mini-carte ; le bot cherche les deux bords blancs du cône (~100° d'écart) et donne un cap (0 = nord). Vérifié à l'œil sur 48 mini-cartes et par 5 tests. Pas de réponse quand le cône n'est pas net.
+- **Fenêtres du jeu vues** (corps crème des fenêtres, carte du monde grise) avec leur titre ; vérifié sur toutes les captures (aucune fausse fenêtre sur le HUD normal).
+- **Une fenêtre ouverte bloque toute action** (contrôleur d'actions, y compris Maj + E). La fermeture par Échap n'est pas faite.
+- Détail : `technique/hybride/architecture-serveur.md` section 37.

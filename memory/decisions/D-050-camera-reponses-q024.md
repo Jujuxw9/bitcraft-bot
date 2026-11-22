@@ -1,6 +1,6 @@
 # D-050 — Caméra : bouton du milieu tourne la vue, W revient en 3 s et remet le zoom
 
-- **Statut** : Validée
+- **Statut** : Validée ; point 2 (3 s après W) remplacé par D-053 (1 s, 2026-11-23)
 - **Date** : 2026-11-22
 - **Validée par** : Julien (réponses à Q-024)
 - **Liens** : Q-024, D-049, R1 (v0.4.0), v0.4.1

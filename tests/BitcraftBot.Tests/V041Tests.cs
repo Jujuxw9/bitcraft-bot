@@ -39,6 +39,39 @@ public class V041ScreenTests
         Assert.Equal(GameScreen.Chargement, reading.Screen);
     }
 
+    // Captures de Julien du 2026-11-22 (e-mail et discussion masqués).
+    [Theory]
+    [InlineData("20261122_reference-ui_ecran-accueil_001.png", GameScreen.Accueil)]
+    [InlineData("20261122_reference-ui_ecran-connexion_001.png", GameScreen.Connexion)]
+    [InlineData("20261122_reference-ui_ecran-jeu-bandeau_001.png", GameScreen.EnJeu)]
+    [InlineData("20261122_reference-ui_ecran-jeu-coupe_001.png", GameScreen.EnJeu)]
+    public async Task Captures_du_22_11_reconnues(string file, GameScreen expected)
+    {
+        var ocr = OcrReader.TryCreate();
+        if (ocr is null)
+        {
+            return;
+        }
+        var frame = await HudReaderReferenceTests.LoadFrameAsync(Reference("ecrans", file));
+        var reading = await new GameScreenClassifier(ocr).ClassifyAsync(frame);
+        Assert.True(expected == reading.Screen, $"{file} : {reading.Screen} ({reading.Evidence}) {reading.Text}");
+    }
+
+    // Deux lectures en même temps (HUD + « ce que voit le bot ») : plus d'erreur « Another RecognizeAsync… ».
+    [Fact]
+    public async Task Lectures_simultanees_sans_erreur()
+    {
+        var ocr = OcrReader.TryCreate();
+        if (ocr is null)
+        {
+            return;
+        }
+        var frame = await HudReaderReferenceTests.LoadFrameAsync(Reference("ecrans", "20261122_reference-ui_ecran-jeu-coupe_001.png"));
+        var classifier = new GameScreenClassifier(ocr);
+        var readings = await Task.WhenAll(Enumerable.Range(0, 4).Select(_ => Task.Run(() => classifier.ClassifyAsync(frame))));
+        Assert.All(readings, r => Assert.Equal(GameScreen.EnJeu, r.Screen));
+    }
+
     [Fact]
     public async Task Image_noire_ecran_inconnu()
     {
@@ -62,8 +95,15 @@ public class V041ScreenTests
     [Theory]
     [InlineData("LOADING Initializing player...", GameScreen.Chargement)]
     [InlineData("Welcome back LOGIN Settings Quit", GameScreen.Connexion)]
+    [InlineData("PRESS ANY BUTTON TO START", GameScreen.Accueil)]
     [InlineData("Press any key to continue", GameScreen.Accueil)]
-    [InlineData("CLICK ANYWHERE", GameScreen.Accueil)]
+    [InlineData("WELCOME WORLD Starfell ENTER BITCRAFT LOG OUT", GameScreen.Connexion)]
+    // Texte réel du 22/11 à 23:44:58 (le début seulement) : les mots utiles sont plus loin que 300 caractères.
+    [InlineData("BITCRÅFT Starfell English BitCraft 1.0 World is now available! 1.0 UPDATE - Starfell Awakened " +
+                "gitCrcft s 1.0 update brings major overhauls to manv game systems and content. Full list of changes can be " +
+                "found in the patchnotes and BitCraft Online Welcome to aircraft Online! If you do not receive an email code, " +
+                "please check your spam settings. HAVING TROUBLE? Visit our support site CHANGE YOUR EMAIL", GameScreen.Connexion)]
+    [InlineData("Mature Oak Tree Axe Tier 1 11923/12000 Forestry 30 3:46 O N 8945. E 6766 SAFE MEADOWS", GameScreen.EnJeu)]
     [InlineData("BITCRAFT ONLINE", GameScreen.Inconnu)]
     [InlineData("", GameScreen.Inconnu)]
     public void Mots_cles_de_l_ecran(string text, GameScreen expected) =>
@@ -74,6 +114,8 @@ public class V041ScreenTests
     {
         Assert.Equal("login", GameScreenClassifier.FindWord("Please LOGIN now", GameScreenClassifier.LoginWords));
         Assert.Null(GameScreenClassifier.FindWord("Logistics", GameScreenClassifier.LoginWords));
+        Assert.Null(GameScreenClassifier.FindWord("If you are disconnecting", GameScreenClassifier.LoadingWords));
+        Assert.Equal("loading", GameScreenClassifier.FindWord("LOADING...", GameScreenClassifier.LoadingWords));
     }
 
     [Fact]
