@@ -16,6 +16,7 @@
 | T-20261119-03 (tests `V0318Tests` + rendu hors écran) | 2026-11-19 | unitaire + rendu | v0.3.18 : contrôleur d'actions (10 cas), fenêtre rendue à 1920 / 1200 / 800 px | OK (264 tests) ; 2 défauts trouvés au rendu et corrigés ; essai réel : `echanges/2026-11-19-essai-v0318.md` |
 | T-20261119-02 (tests `V0314Tests`) | 2026-11-19 | unitaire + vraies données | v0.3.14 : poches (3 formats), requêtes d'inventaire, livre des recettes (données de test et vraies données) | OK (229 tests) ; essai réel : `echanges/2026-11-19-essai-v0314.md` |
 | T-20261119-04 (tests `V040Tests` + banc hors écran) | 2026-11-19 | unitaire + banc | v0.4.0 (R1) : formule de la caméra sur caméra simulée, faux indices, appariement clic / récolte ; carte Caméra, enregistrement des clics, écoute de la souris | OK (277 tests) ; essai réel : `echanges/2026-11-19-essai-v040.md` |
+| T-20261122-01 (essai réel R1 + tests `V041Tests` + banc) | 2026-11-22 | session réelle + unitaire + banc | Essai R1 de Julien (17 clics) ; v0.4.1 : ce que voit le bot (capture en jeu, chargement réel, situations), précision « pas fiable » | R1 : **KO** (4 clics gardés sur 17, écarts 148 à 3 375 px : W ne fixe pas la direction) ; v0.4.1 : OK (300 tests) ; essai : `echanges/2026-11-22-essai-v041.md` |
 
 ## Gabarit
 

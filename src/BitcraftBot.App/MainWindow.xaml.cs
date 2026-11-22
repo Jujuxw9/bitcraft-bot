@@ -16,6 +16,7 @@ using BitcraftBot.Input.Native;
 using BitcraftBot.Perception.Capture;
 using BitcraftBot.Perception.Hud;
 using BitcraftBot.Perception.Ocr;
+using BitcraftBot.Perception.Screen;
 using Frame = BitcraftBot.Perception.Capture.Frame;
 
 namespace BitcraftBot.App;
@@ -98,6 +99,7 @@ public partial class MainWindow : Window
         _hudLogger = new HudChangeLogger(_log);
 
         var ocr = OcrReader.TryCreate();
+        _ocr = ocr;
         _hudReader = ocr is null ? null : new HudReader(ocr, KnownNames.Resources);
         _gameData = new GameDataLoader(_log);
         _gameData.Loaded += store =>
@@ -139,10 +141,11 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.0 (R1) : le bot apprend la caméra en regardant Julien couper (clic droit, caméra recentrée avec W) ; écoute de la souris en lecture seule. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.4.1 : le bot dit ce qu'il voit (bureau, autre programme, jeu réduit, accueil, connexion, chargement, en jeu) et n'agit qu'en jeu ; caméra : 3 s d'attente après W. Apprentissage de la caméra (R1) toujours actif, en lecture seule. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
+        InitScreenWatch(_ocr);
         InitOverlay();
         InitMeals();
         InitLayout();
@@ -372,6 +375,11 @@ public partial class MainWindow : Window
                 {
                     continue;
                 }
+                // Accueil, connexion, chargement : pas de cible à lire (v0.4.1).
+                if (_situation is { Place: Place.Jeu, Game: not GameScreen.EnJeu })
+                {
+                    continue;
+                }
                 try
                 {
                     var hud = await reader.ReadAsync(frame);
@@ -443,7 +451,7 @@ public partial class MainWindow : Window
         string message;
         if (found is null)
         {
-            message = "Jeu introuvable : capture de l'écran principal à la place.";
+            message = "Fenêtre du jeu pas trouvée (jeu fermé ou réduit) : capture de l'écran principal à la place.";
             GameWindowText.Text = "○ Jeu introuvable";
         }
         else
@@ -460,7 +468,8 @@ public partial class MainWindow : Window
             // On n'écrit dans le journal que quand la situation change.
             if (found is null)
             {
-                _log.Alerte("Capture", message);
+                // Pas une alerte : la ligne « [Écran] » dit déjà où est Julien (bureau, autre programme, jeu réduit).
+                _log.Info("Capture", message);
             }
             else
             {
@@ -848,6 +857,7 @@ public partial class MainWindow : Window
         }
         _keyboardHook?.Dispose();
         CloseCamera();
+        CloseScreenWatch();
         _resourceTimer.Stop();
         CloseOverlay();
 

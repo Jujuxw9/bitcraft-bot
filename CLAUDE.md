@@ -40,6 +40,7 @@
 - Ajouter un fichier dans `memory/journal/` (gabarit dans `memory/journal/README.md`).
 - Mettre à jour `memory/echanges/resume-global.md` (10 lignes max).
 - Mettre à jour les index (`README.md` de chaque dossier modifié).
+- Lancer `tools/agent-memoire/verifier-memoire.ps1` (via PowerShell) : 0 erreur avant le commit. Vérification de sens plus complète : agent mémoire (`tools/agent-memoire/PROMPT.md`, modèle Sonnet).
 
 ## Style attendu par Julien
 

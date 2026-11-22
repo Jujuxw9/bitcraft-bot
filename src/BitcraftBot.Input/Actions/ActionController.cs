@@ -74,6 +74,9 @@ public sealed class ActionContext
     public Func<DateTime> LastPhysicalKey { get; init; } = () => DateTime.MinValue;
 
     public Func<DateTime> Now { get; init; } = () => DateTime.Now;
+
+    // Écran du jeu pas prêt (accueil, connexion, chargement) : la raison, sinon null (v0.4.1).
+    public Func<string?> ScreenNotReady { get; init; } = () => null;
 }
 
 public sealed class ActionOptions
@@ -194,6 +197,10 @@ public sealed class ActionController
         if (!_context.GameVisible())
         {
             return "le jeu est caché par une autre fenêtre";
+        }
+        if (_context.ScreenNotReady() is { } screen)
+        {
+            return screen;
         }
         var now = _context.Now();
         if (now - _context.LastPhysicalKey() < Options.UserQuietTime)

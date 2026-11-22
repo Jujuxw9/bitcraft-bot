@@ -218,3 +218,18 @@ Essai v0.3.19 de Julien : journal des tâches OK (pêche, coupe : coups, XP, obj
 - **Vérifié** : 277 tests (`V040Tests` : caméra simulée en perspective, clics imprécis de ±8 px et hauteur variable sur le tronc → précision 10 à 12 px dès 8 à 15 clics ; 3 faux indices sur 17 écartés ; appariement clic / récolte : 8 cas). Banc hors écran (PowerShell) : fenêtre, carte, enregistrement puis relecture des clics, fermeture propre ; écoute de la souris installée et clic droit décodé. Sonde : l'écoute reçoit bien les vrais mouvements de souris de Windows.
 - **Écarts notés** : (1) dans l'outil Bash de Claude, l'écoute de la souris ne reçoit rien (isolement du bac à sable) ; dans PowerShell, oui : tester les écoutes via PowerShell. (2) Windows ignore une molette « de 0 cran » : impossible de tester l'écoute sans toucher l'écran de Julien ; pas de vrai clic simulé (Julien utilisait son PC). (3) Pas d'essai réel en jeu : il faut Julien.
 - **À vérifier** (Q-024) : le bouton du milieu tourne-t-il la caméra ? W ramène-t-il la caméra d'un coup ou en douceur ? La molette compte comme « caméra tournée ».
+
+## 35. v0.4.1 — ce que voit le bot, 3 s après W, précision « pas fiable » (2026-11-22)
+
+Retour de l'essai R1 (22/11) : voir `analyse-visee-2026-11-22.md` (la formule de la caméra ne marche pas : W ne fixe pas la direction du monde ; clics sur le feuillage). Demandes de Julien : reconnaître bureau / autre programme / jeu, et dans le jeu accueil / connexion / chargement / en jeu.
+
+- **Ce que voit le bot** (`src/BitcraftBot.Perception/Screen/`, `MainWindow.Screen.cs`) : fil à part « Ce que voit le bot », **toujours actif** (même sans « Démarrer »), une fois par seconde.
+  - Hors image : fenêtre au premier plan (classe et nom du programme, **jamais le titre** : il peut être privé). Bureau (`Progman`, `WorkerW`, barre des tâches), autre programme, jeu réduit, jeu visible.
+  - Dans le jeu (image regardée seulement si le jeu est visible) : **en jeu** = coordonnées « N …, E … » sous la mini-carte (zone étroite d'abord : la zone large attrape la distance « 35m ») ; **chargement** = mot « LOADING » en bas à gauche ; sinon lecture de tout l'écran et mots-clés **supposés** pour connexion (« login », « sign in »…) et accueil (« press any », « click to »…) : À vérifier (Q-025). Écran pas reconnu : « écran inconnu » + texte lu dans le journal.
+  - Une situation n'est écrite qu'après 2 lectures identiques (`[Écran] Jeu : écran de chargement (mot « loading » en bas à gauche).`). Affichée dans l'onglet Bot, carte Écran, ligne « Je vois ».
+  - Captures gardées dans `images/analyse` : une par écran reconnu (accueil, connexion, chargement) par lancement du bot, et les écrans inconnus (une par minute au plus) : pour corriger la reconnaissance.
+- **Sécurité** : le contrôleur d'actions refuse toute action si l'écran est accueil, connexion ou chargement (« le jeu n'est pas prêt »). Écran inconnu : pas de blocage (une fenêtre du jeu peut cacher les coordonnées). La lecture de la cible s'arrête hors du jeu.
+- « Jeu introuvable » n'est plus une alerte : la ligne `[Écran]` dit où est Julien.
+- **Caméra** (D-050) : 3 s d'attente après W (avant : 1 s). Précision annoncée **« pas fiable »** tant que moins de 8 clics sont gardés ou que plus d'un tiers est écarté (les 17 clics du 22/11 : « pas fiable », test automatique).
+- **Vérifié** : 300 tests (`V041Tests` : capture en jeu, écran de chargement réel, image noire, mots-clés, situations, contrôleur). Banc hors écran (PowerShell) sur le vrai bureau : « Autre programme : le bot (jeu fermé) » ; CPU du bot 1,9 s sur 8 s, démarrage compris.
+- **Pas vérifié** : accueil et connexion (aucune capture), lecture dans le vrai jeu en direct.

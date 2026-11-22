@@ -1,5 +1,5 @@
 # Q-001 — Perception du monde 3D
-- **Statut** : Ouverte
+- **Statut** : En partie résolue : positions des ressources lues sur le serveur (D-039, H2). Reste : savoir où est une ressource à l'écran (récolte automatique, R1 à R3).
 - **Priorité** : Haute
 - **Créée le** : 2026-11-15
 ## Question

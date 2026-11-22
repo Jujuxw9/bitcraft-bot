@@ -25,7 +25,8 @@
 | [Q-021](Q-021-voie-reseau-spacetimedb.md) | Passer par le réseau / SpacetimeDB au lieu de la vision ? | Haute | Résolue → D-039 |
 | [Q-022](Q-022-touche-urgence-hors-jeu.md) | Num 5 doit-elle arrêter le bot quand on tape ailleurs ? | Moyenne | Résolue → D-041 |
 | [Q-023](Q-023-recolte-automatique.md) | Récolte automatique : arbre ou roche, vieux arbres, zoom, écoute des clics | Haute | Résolue → D-049 |
-| [Q-024](Q-024-camera-boutons.md) | Caméra : bouton du milieu, retour de W, molette | Moyenne | Ouverte |
+| [Q-024](Q-024-camera-boutons.md) | Caméra : bouton du milieu, retour de W, molette | Moyenne | Résolue → D-050 |
+| [Q-025](Q-025-visee-fiable.md) | Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion | Haute | Ouverte |
 
 ## Gabarit
 

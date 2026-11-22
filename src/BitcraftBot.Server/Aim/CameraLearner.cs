@@ -29,8 +29,8 @@ public sealed class CameraLearner
 {
     public static readonly TimeSpan ConfirmWindow = TimeSpan.FromSeconds(20);
 
-    // Après W, la caméra du jeu revient en douceur (à vérifier) : on attend un peu avant de croire les clics.
-    public static readonly TimeSpan ResetSettle = TimeSpan.FromSeconds(1);
+    // Après W, la caméra du jeu revient en douceur : 3 s d'attente avant de croire les clics (Julien, Q-024 → D-050).
+    public static readonly TimeSpan ResetSettle = TimeSpan.FromSeconds(3);
 
     // Personnage immobile : déplacé de moins de ça (unités de l'écran) dans la seconde avant le clic.
     public const double StillDistance = 0.4;
@@ -113,7 +113,7 @@ public sealed class CameraLearner
         if (State == CameraState.Recentree && now - StateSince < ResetSettle)
         {
             _pending = null;
-            return new CameraEvent(false, "Clic droit ignoré : W appuyé il y a moins d'une seconde.");
+            return new CameraEvent(false, "Clic droit ignoré : W appuyé il y a moins de 3 s (la caméra revient en douceur).");
         }
         // Un nouveau clic remplace le précédent : c'est le dernier qui compte pour le jeu.
         _pending = new Pending(now, x, y, width, height, s.Action, s.LastExtract);
@@ -206,7 +206,8 @@ public sealed class CameraLearner
             var need = CameraFit.MinimumPairs(CameraFormula.Plate);
             return _pairs.Count < need ? $"Formule : {_pairs.Count} clic(s) sur {need} minimum." : "Formule : impossible (clics alignés ?).";
         }
-        var precision = f.MedianErrorPx is { } m ? $"précision {m:0} px" : "précision pas encore mesurable (5 clics)";
+        var precision = f.MedianErrorPx is not { } m ? "précision pas encore mesurable (5 clics)"
+            : f.Reliable ? $"précision {m:0} px" : $"PAS FIABLE (précision {m:0} px sur trop peu de clics gardés)";
         var rejected = f.Rejected > 0 ? $", {f.Rejected} écarté(s)" : "";
         return $"Formule {(f.Formula == CameraFormula.Plate ? "plate" : "perspective")}, {precision} ({f.Used} clic(s) gardé(s){rejected}).";
     }

@@ -62,6 +62,10 @@ public sealed class CameraFit
 
     public int ReferenceHeight { get; private set; }
 
+    // Formule digne de confiance : au moins 8 clics gardés, et au plus un tiers des clics écartés.
+    // Essai R1 du 2026-11-22 : « précision 18 px » affichée avec 4 clics gardés sur 17 : trompeur.
+    public bool Reliable => MedianErrorPx is not null && Used >= 8 && Rejected * 2 <= Used;
+
     public IReadOnlyList<CameraPair> Inliers { get; private set; } = [];
 
     public static int MinimumPairs(CameraFormula f) => f == CameraFormula.Plate ? 3 : 4;

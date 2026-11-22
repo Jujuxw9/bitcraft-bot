@@ -33,10 +33,10 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-049
+- [README.md](decisions/README.md) — tableau D-001 à D-050
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-024
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-025
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -60,7 +60,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v0320.md](echanges/2026-11-19-essai-v0320.md) — essai v0.3.20 (pas fait : Julien juge que ce n'est pas utile)
 - [2026-11-19-plan-recolte-auto.md](echanges/2026-11-19-plan-recolte-auto.md) — **plan de bataille de la récolte automatique** (étapes R1 à R7, validé : D-049)
 - [2026-11-19-passation-recolte-auto.md](echanges/2026-11-19-passation-recolte-auto.md) — **passation** : prompt pour le nouveau chat (R1 à R7)
-- [2026-11-19-essai-v040.md](echanges/2026-11-19-essai-v040.md) — **essai v0.4.0 à faire** (R1 : couper 10 à 15 arbres à la main, précision < 25 px)
+- [2026-11-19-essai-v040.md](echanges/2026-11-19-essai-v040.md) — essai v0.4.0 (fait le 22/11 : formule de la caméra pas fiable, voir l'analyse de la visée)
+- [2026-11-22-essai-v041.md](echanges/2026-11-22-essai-v041.md) — **essai v0.4.1 à faire** (ce que voit le bot : bureau, accueil, connexion, chargement, jeu)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -68,11 +69,12 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.0
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.1
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
+- [hybride/analyse-visee-2026-11-22.md](technique/hybride/analyse-visee-2026-11-22.md) — **analyse de la visée après l'essai R1** : méthode fiable, prochaines étapes, améliorations
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261119-04)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261122-01)

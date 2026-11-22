@@ -1,6 +1,6 @@
 # Q-024 — Caméra : bouton du milieu, retour de W, molette
 
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-050 (2026-11-22)
 - **Date** : 2026-11-19
 - **Priorité** : Moyenne
 - **Liens** : D-049, R1 (v0.4.0)

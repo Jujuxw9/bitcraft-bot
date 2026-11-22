@@ -195,8 +195,10 @@ public partial class MainWindow
         CameraCountText.Text = $"Clics appris : {_camera.Pairs.Count}{(_camera.WaitingConfirmation ? " (un clic attend la récolte)" : "")}";
         if (_camera.Fit is { MedianErrorPx: { } m } f)
         {
-            CameraPrecisionText.Text = $"Précision : {m:0} px (but : moins de 25 px)";
-            CameraPrecisionText.Foreground = Theme(m <= 25 ? "Good" : "Warn");
+            CameraPrecisionText.Text = f.Reliable
+                ? $"Précision : {m:0} px (but : moins de 25 px)"
+                : $"Pas fiable : {f.Used} clics gardés, {f.Rejected} écartés";
+            CameraPrecisionText.Foreground = Theme(f.Reliable && m <= 25 ? "Good" : "Warn");
             CameraFormulaText.Text = $"Formule {(f.Formula == CameraFormula.Plate ? "plate" : "perspective")}, {f.Used} clic(s) gardé(s)"
                                      + (f.Rejected > 0 ? $", {f.Rejected} écarté(s)" : "");
         }

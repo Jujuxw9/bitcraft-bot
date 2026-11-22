@@ -53,6 +53,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-047](D-047-suppression-num5.md) | Plus de touche d'arrêt d'urgence (Num 5 supprimée) | Validée | 2026-11-19 |
 | [D-048](D-048-ecran-cible-seulement.md) | L'écran ne lit plus que la cible sélectionnée | Validée | 2026-11-19 |
 | [D-049](D-049-recolte-auto-choix.md) | Récolte auto : arbres d'abord, vieux arbres, caméra W (Q/D avec précaution), clics de Julien comme indices | Validée | 2026-11-19 |
+| [D-050](D-050-camera-reponses-q024.md) | Caméra : bouton du milieu tourne la vue, W revient en 3 s et remet le zoom | Validée | 2026-11-22 |
 
 ## Gabarit
 

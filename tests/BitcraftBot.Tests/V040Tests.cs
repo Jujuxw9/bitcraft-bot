@@ -225,7 +225,7 @@ public class V040CameraLearnerTests
         // W recentre : le clic suivant compte (après 1 s).
         learner.OnReset(T0.AddSeconds(1));
         Assert.NotNull(learner.OnRightClick(T0.AddSeconds(1.5), 900, 500, 1920, 1080, Snap()));
-        Assert.Null(learner.OnRightClick(T0.AddSeconds(2.5), 900, 500, 1920, 1080, Snap()));
+        Assert.Null(learner.OnRightClick(T0.AddSeconds(4.5), 900, 500, 1920, 1080, Snap()));
         Assert.True(learner.WaitingConfirmation);
     }
 

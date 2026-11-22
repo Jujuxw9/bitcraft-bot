@@ -22,6 +22,10 @@ public partial class MainWindow
             GameWindow = () => CurrentGame()?.Handle,
             GameVisible = () => CurrentGame() is { } g && GameVisibility.IsUncovered(g),
             LastPhysicalKey = () => _lastPhysicalKey,
+            // Écran inconnu : pas de blocage (le jeu peut afficher une fenêtre qui cache les coordonnées).
+            ScreenNotReady = () => _situation is { Place: Perception.Screen.Place.Jeu, Game: Perception.Screen.GameScreen.Accueil or Perception.Screen.GameScreen.Connexion or Perception.Screen.GameScreen.Chargement } s
+                ? $"le jeu n'est pas prêt ({Perception.Screen.GameScreens.French(s.Game!.Value)})"
+                : null,
         };
         var controller = new ActionController(_inputSender, context, new ActionOptions { StopOnMouseMove = _settings.StopOnMouseMove });
         controller.Log += (level, message) =>
