@@ -2,6 +2,8 @@
 
 Suite de [../architecture.md](../architecture.md) (sections 1 à 16 : vision, HUD, données du jeu). Découpé le 2026-11-18 (fichier trop long).
 
+> Chaque section décrit l'état de **sa** version (journal des versions). Une fonction a pu changer depuis : la section la plus récente fait foi (ex. Num 5 supprimée en section 32).
+
 ## 17. Voie hybride (D-039, 2026-11-17) : nouvelle brique Server
 
 - Sixième brique : **Server** (`src/BitcraftBot.Server`). Rôle : lire en direct l'état du jeu sur le serveur officiel, **en lecture seule**, avec le jeton de Julien.

@@ -1,4 +1,5 @@
 # D-044 — Le serveur d'abord, l'écran en contrôle
+> Note (vérification de la mémoire, 2026-11-22) : la comparaison position écran / serveur n'existe plus depuis la v0.3.20 (D-048).
 
 - **Statut** : Validée
 - **Date** : 2026-11-19

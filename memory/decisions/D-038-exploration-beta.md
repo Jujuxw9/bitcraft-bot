@@ -1,4 +1,5 @@
 # D-038 — Onglet « Bêta : exploration » : règles et réglages
+> Note (vérification de la mémoire, 2026-11-22) : Num 5 supprimée (D-047). Onglet « Bêta : exploration » jamais codé à ce jour (À vérifier avec Julien : abandonné ou reporté ?).
 
 - **Statut** : Validée
 - **Date** : 2026-11-16

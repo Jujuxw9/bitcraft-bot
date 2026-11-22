@@ -1,4 +1,5 @@
 # Q-002 — Cartographie et navigation
+> Note (vérification de la mémoire, 2026-11-22) : la position ne se lit plus à l'écran (D-018 plus appliquée) : elle vient du serveur (D-044, D-048).
 - **Statut** : Ouverte
 - **Priorité** : Haute
 - **Créée le** : 2026-11-15

@@ -1,4 +1,5 @@
 # D-004 — Sécurité : 4 mécanismes d'arrêt
+> Note (vérification de la mémoire, 2026-11-22) : le mécanisme n° 1 (touche globale d'arrêt d'urgence, Num 5) est supprimé depuis la v0.3.19 (D-047). Les autres mécanismes restent.
 
 - **Statut** : Validée
 - **Date** : 2026-11-15

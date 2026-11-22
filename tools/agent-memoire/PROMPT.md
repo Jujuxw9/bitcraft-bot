@@ -20,6 +20,7 @@ Lire les décisions (D-NNN) et questions (Q-NNN) **récentes d'abord** (les 15 d
 - deux décisions validées qui se contredisent ;
 - une décision remplacée sans le dire (statut toujours « Validée » alors qu'une plus récente dit le contraire) ;
 - une question « Ouverte » à laquelle Julien a déjà répondu (dans un journal, un essai, une décision) ;
+- les règles B9 à B12 de REGLES.md (consigne sans décision, décision dépassée sans note, terme d'une décision remplacée qui réapparaît, questions anciennes) ;
 - le résumé global qui ne correspond plus à l'état réel (version, prochaine étape) ;
 - un fait marqué comme vrai sans preuve, qui devrait être « À vérifier » ;
 - des doublons (le même sujet expliqué à deux endroits avec des contenus différents).

@@ -31,3 +31,14 @@
 ## C. Organisation (rappel de `memory/README.md`)
 - `decisions/` : une décision par fichier ; `questions-ouvertes/` : une question par fichier ; `journal/` : une entrée par session ; `echanges/` : conversations et essais ; `technique/` : architecture, analyses ; `tests/` : comptes rendus de tests.
 - Identifiants séquentiels, jamais réutilisés. Dates au format `AAAA-MM-JJ`.
+
+## D. Règles ajoutées après la première vérification (2026-11-22)
+
+| N° | Règle |
+|---|---|
+| B9 | Toute règle de `CLAUDE.md` issue d'une demande de Julien a sa décision D-NNN (ou la décision renvoie à CLAUDE.md). Sinon : signaler. |
+| B10 | Une décision « Validée » dont le texte dit « n'est plus appliquée », « supprimée », « remplace » ou « modifie » a un statut ou une note qui le dit. |
+| B11 | Un terme d'une décision remplacée (ex. Num 5, Release GitHub, lecture de la position à l'écran) qui réapparaît dans une décision « Validée » ou un index porte une note « historique » ou est corrigé. Exception : les sections datées du journal des versions (`technique/hybride/architecture-serveur.md`). |
+| B12 | Les questions « Ouvertes » sans mise à jour depuis plus de 30 jours sont listées dans le rapport, pour clôture ou reprise. |
+
+Format du rapport : chaque point porte « mécanique » (corrigeable par l'agent) ou « sens » (à trancher par Julien).

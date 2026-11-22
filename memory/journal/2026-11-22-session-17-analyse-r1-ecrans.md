@@ -26,3 +26,13 @@ Analyser l'essai R1 de Julien, noter ses réponses (Q-024), reconnaître les éc
 ## Prochaines étapes
 - Essai v0.4.1 (`echanges/2026-11-22-essai-v041.md`), réponses à Q-025.
 - R1 bis : lire la direction de la caméra sur la mini-carte (v0.4.2, aucune action).
+
+## Vérification de la mémoire (agent Sonnet, lecture seule)
+- Script : 0 erreur (D-041, Q-001 corrigés ; `echanges/2026-11-15-prompt-init-repo.md` fait 304 lignes, archive laissée telle quelle).
+- Corrigé (notes datées, sens inchangé) : D-004, D-018, D-022, D-038, D-040, D-042, D-044, Q-002, Q-022 ; titre de D-045 dans l'index ; essais v0.3.14, v0.3.15, v0.3.18 marqués « archive » ; en-têtes de `architecture.md` (état v0.4.1, sections 1 à 16 historiques) et `architecture-serveur.md`.
+- **À trancher par Julien** :
+  1. Pas de Release GitHub : seulement dans CLAUDE.md, aucune décision ; D-010 dit encore « publiées en GitHub Releases ». Faire une décision D-051 ? « Jamais » ou « pour le moment » ?
+  2. D-018 (position lue à l'écran) : la passer « Remplacée par D-048 » ?
+  3. D-038 (onglet « Bêta : exploration ») : jamais codé. Abandonné, reporté ou à faire après la récolte ?
+  4. Q-008 (déconnexion et cadence), Q-014 (ennemis), Q-015 (fenêtres du jeu) : toujours ouvertes ; Q-015 devient importante pour la récolte auto.
+- Règles B9 à B12 ajoutées à l'agent mémoire.

@@ -1,4 +1,5 @@
 # D-040 — Versions rangées dans artifacts/release et artifacts/old
+> Note (vérification de la mémoire, 2026-11-22) : depuis la v0.3.15, le .exe porte la version dans son nom : BitcraftBot-vX.Y.Z.exe (CLAUDE.md). Depuis le 2026-11-19, pas de Release ni de tag GitHub (demande de Julien, CLAUDE.md).
 
 - **Statut** : Validée
 - **Date** : 2026-11-18

@@ -1,4 +1,5 @@
 # D-022 — Réglages par défaut de la sécurité
+> Note (vérification de la mémoire, 2026-11-22) : la partie Num 5 est remplacée par D-047 (plus de touche d'arrêt). Le « À vérifier : Num 5 pas utilisé par le jeu » est sans objet.
 
 - **Statut** : Validée
 - **Date** : 2026-11-16

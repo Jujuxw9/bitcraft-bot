@@ -1,4 +1,5 @@
 # Q-022 — Num 5 doit-elle arrêter le bot quand on tape dans un autre programme ?
+> Note (vérification de la mémoire, 2026-11-22) : D-041 est elle-même remplacée par D-047 (plus de Num 5).
 - **Statut** : Résolue → D-041 (2026-11-19)
 - **Priorité** : Moyenne
 - **Créée le** : 2026-11-19

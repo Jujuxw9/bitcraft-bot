@@ -1,7 +1,7 @@
 # Recettes : liste de Julien du 2026-11-19
 
 Source : BitCraft_GameData (D-033), commit `856b4f3`, données du 2026-11-19. Tables utilisées : `item_desc`, `cargo_desc`, `resource_desc`, `extraction_recipe_desc`, `crafting_recipe_desc`, `item_list_desc`, `enemy_desc`, `building_type_desc`.
-Hypothèse : tout est au **niveau 1** (« Rough », « Ferralith », « Basic »). À confirmer par Julien.
+**Niveau 1** confirmé par Julien (2026-11-19). Stations : au centre de Snowrest. Pas d'ajout de ces ressources à la carte du bot (réponse « non »). Méthode : un objet à la fois, Julien dit « OK c'est bon » avant le suivant.
 
 ## Liste demandée
 

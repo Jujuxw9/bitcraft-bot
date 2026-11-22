@@ -1,4 +1,5 @@
 # D-042 — Repas automatique avec Maj + E
+> Note (vérification de la mémoire, 2026-11-22) : Num 5 n'existe plus (D-047) : les phrases qui en parlent sont historiques. Le repas auto se coupe par sa case.
 
 - **Statut** : Validée
 - **Date** : 2026-11-19
