@@ -1,6 +1,6 @@
 # Q-027 — Module « @GPT » : le bot répond dans le chat du jeu ?
 
-- **Statut** : Ouverte
+- **Statut** : En partie résolue → D-054 (2026-11-23) ; restent les questions 2 (pendant la récolte), 7 et 9
 - **Priorité** : Basse (la récolte automatique passe d'abord)
 - **Créée le** : 2026-11-23
 - **Liens** : D-024, D-039, D-045, D-052 ; étude : [technique/chat-gpt.md](../technique/chat-gpt.md)
@@ -25,4 +25,12 @@ Voir l'étude : architecture, risques (règles du jeu, modération, contenu, co�
 
 ## Ce qui bloque
 
-Rien n'est codé. Il faut les réponses de Julien, au moins 1, 2, 3, 4 et 8.
+Les réponses 1, 3, 4, 6 et 8 sont données (D-054). Le mode essai (lecture, réponse affichée sans envoi) peut être codé. L'envoi réel attend les réponses 2, 7 et 9.
+
+## Réponses de Julien (2026-11-23) → D-054
+
+Ses mots : « je change de décision, c'est utile seulement pour repondre à des messages chat ok. Il faut que la personne utilise le @GPT (en majuscule). Reponse à tout le monde, seulement 1 réponse par minute max. Ensuite, répondre à la question la plus récente. Possible que la personne ne formule pas de question, mais juste une phrase. y repondre quand meme. canaux region seulement pour commencer. pas de clé API. besoin d'une clé ? pas possible de faire une phrase automatique simple universelle pour le debut ? »
+
+- 1 : oui, Entrée permise pour le chat seulement. 3 : tout le monde, « @GPT » en majuscules. 4 : Région. 6 : 1 par minute, le plus récent. 8 : pas de clé → phrases toutes faites d'abord (Haiku plus tard).
+- 5 (ton) : implicite : drôle et neutre, en phrases toutes faites.
+- **Restent** : 2 (prendre le clavier **pendant la récolte** ?), 7 (marquer « [GPT] » / dire que c'est un bot ?), 9 (mode essai d'abord ? recommandé).

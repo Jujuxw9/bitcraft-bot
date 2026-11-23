@@ -1,6 +1,6 @@
 # D-024 — Commandes utilisées par le bot
 
-- **Statut** : Validée
+- **Statut** : Validée ; Entrée remplacée en partie par D-054 (permise pour répondre dans le chat)
 - **Date** : 2026-11-16
 - **Validée par** : Julien (2026-11-16)
 - **Liens** : Q-011, Q-002, D-021
@@ -14,7 +14,7 @@ Les réglages de touches (captures `reglages-touches`) montrent : ZQSD tourne la
 - Trajets courts : **clic gauche** au sol.
 - Trajets longs (Banque) : **clic sur la minicarte** (option activée), ou carte du monde.
 - Caméra : **W** pour la recentrer avant chaque recherche, pour avoir une vue stable. **ZQSD** pour la faire tourner si besoin.
-- Touches interdites au bot : **X** (cache les arbres), Entrée (chat).
+- Touches interdites au bot : **X** (cache les arbres), Entrée (chat). **Depuis D-054 : Entrée permise, seulement pour répondre dans le chat.**
 - Le bot envoie les touches par leur position physique (scancode), donc indépendamment de AZERTY/QWERTY.
 
 ## Réserve de Julien (2026-11-16)

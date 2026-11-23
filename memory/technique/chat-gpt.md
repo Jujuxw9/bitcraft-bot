@@ -1,12 +1,12 @@
 # Module « @GPT » : répondre dans le chat du jeu (étude)
 
-- **Statut** : étude seulement (2026-11-23). **Rien n'est codé.** La suite attend les réponses de Julien : [Q-027](../questions-ouvertes/Q-027-chat-gpt.md).
-- **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase (drôle, petit troll sympa, ou sérieuse sur le jeu). Réponse écrite par Claude Haiku 5.5 (API Anthropic). **Pas de spam.**
-- **Liens** : D-024 (touche Entrée interdite au bot), D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
+- **Statut** : règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
+- **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase courte. **Pas de spam.**
+- **Liens** : D-054, D-024, D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
 
-## ⚠ Incohérence à signaler
+## Incohérence avec D-024 (réglée par D-054)
 
-**D-024 interdit au bot la touche Entrée (le chat).** Écrire dans le chat demande Entrée. Le module ne peut donc pas exister sans une **nouvelle décision de Julien** qui lève cette interdiction (pour le chat seulement, avec des limites). C'est la question 1 de Q-027.
+D-024 interdisait au bot la touche Entrée (le chat). Julien l'a levée le 2026-11-23, **pour répondre dans le chat seulement** (D-054).
 
 ## 1. Lire le chat : possible, en lecture seule
 
@@ -76,6 +76,17 @@ Limites de cette voie :
 3. **Réponse** : appel à Claude Haiku 5.5 (SDK officiel Anthropic pour C#) avec des consignes fixes, le pseudo et le texte du joueur. Effort bas (réponse courte). Filtre de mots, coupe à 250 caractères.
 4. **Envoi** : une tâche « écrire dans le chat » passe au contrôleur d'actions (D-045), qui attend une pause de la récolte, vérifie l'écran, ouvre le chat, tape, envoie, vérifie que le chat est fermé.
 5. **Mode essai** d'abord : le bot affiche la réponse dans sa fenêtre **sans l'envoyer**. Julien juge le ton. L'envoi réel vient ensuite.
+
+## 5. Ce qui est déjà codé (2026-11-23, pas encore branché dans le bot)
+
+Brique Server, fichier `World/GptChat.cs`. **Il ne fait que lire et choisir : aucun envoi, ni au serveur ni au jeu.** Pas encore relié à la fenêtre du bot ni à l'abonnement (la session principale modifie ces fichiers en ce moment : on les branchera ensemble).
+
+- **Lecture du chat** : transforme les lignes de `chat_message_state` en messages (pseudo, langue, canal, texte, heure). Requête prête : canal Région seulement.
+- **Choix du message** (règles de D-054) : « @GPT » en majuscules exactement ; canal Région ; jamais les messages de Julien ; un message de plus de 2 minutes est oublié (par exemple au démarrage) ; au plus 1 réponse par minute ; s'il y en a plusieurs en attente, le plus récent seulement, les autres sont oubliés ; chaque message ne reçoit qu'une réponse.
+- **Phrases toutes faites** : 10 en français, 10 en anglais, courtes, drôles et neutres, avec le pseudo du joueur. Français si le joueur écrit avec le jeu en français (`fr/` devant le pseudo), anglais sinon. Le pseudo est nettoyé (lettres, chiffres, - et _ seulement). Une marque optionnelle (« [GPT] ») est prévue, en attente de la réponse de Julien. Tout tient dans 250 caractères.
+- **Tests** : 17 tests automatiques (`GptChatTests`), tous réussis ; les 369 tests du projet passent.
+
+Prochaines étapes : brancher l'abonnement et afficher dans la fenêtre du bot « message reçu → réponse prévue » (**mode essai, sans envoi**) ; puis, après les réponses de Julien (clavier pendant la récolte, marque), l'écriture au clavier par le contrôleur d'actions. Claude Haiku viendra quand Julien aura une clé API.
 
 ## Ce qui reste À vérifier
 

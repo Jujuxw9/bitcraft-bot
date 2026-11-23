@@ -20,3 +20,8 @@
 
 ## Prochaines étapes
 - Réponses de Julien à Q-027, puis (si oui) mode essai : lecture du chat et réponse affichée dans la fenêtre du bot, sans envoi.
+
+## Suite (même jour) : réponses de Julien → D-054
+- D-054 écrite : Entrée permise pour répondre dans le chat (D-024 remplacée en partie), « @GPT » en majuscules, tout le monde, Région, 1 réponse par minute (la plus récente), même sans question, phrases toutes faites (pas de clé API).
+- Code : `World/GptChat.cs` (lecture du chat, choix du message, phrases toutes faites), aucun envoi, pas encore branché. 17 tests, 369 au total, tous réussis.
+- Restent dans Q-027 : clavier pendant la récolte, marque « [GPT] », mode essai.

@@ -36,7 +36,7 @@ Mis à jour le 2026-11-19. Sources : captures des réglages de touches (2026-11-
 | Compendium | C | |
 | Banque personnelle (Vault) | V | |
 | Carte | **À vérifier** | Non lisible sur les captures (M9) |
-| Chat | Entrée | **Interdite au bot** (D-024) |
+| Chat | Entrée | Permise au bot **seulement pour répondre dans le chat** (D-054) |
 | Se déplacer au clavier | Non assignées | Le bot se déplace à la souris |
 
 ## Touches du bot (hors du jeu)

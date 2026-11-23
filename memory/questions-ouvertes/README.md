@@ -28,7 +28,7 @@
 | [Q-024](Q-024-camera-boutons.md) | Caméra : bouton du milieu, retour de W, molette | Moyenne | Résolue → D-050 |
 | [Q-025](Q-025-visee-fiable.md) | Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion | Haute | En partie résolue → D-052 (reste : vue plus haute) |
 | [Q-026](Q-026-reglages-du-jeu.md) | Changer 4 réglages du jeu pour fiabiliser la visée (collision et adoucissement de la caméra, coffres, herbe) ? | Haute | En partie traitée (herbe à 0) ; restent 3 réglages |
-| [Q-027](Q-027-chat-gpt.md) | Module « @GPT » : le bot répond dans le chat (lever l'interdiction d'Entrée de D-024, qui, où, ton, fréquence, clé API) ? | Basse | Ouverte |
+| [Q-027](Q-027-chat-gpt.md) | Module « @GPT » : le bot répond dans le chat (lever l'interdiction d'Entrée de D-024, qui, où, ton, fréquence, clé API) ? | Basse | En partie résolue → D-054 (restent : clavier pendant la récolte, marque « [GPT] », mode essai) |
 
 ## Gabarit
 

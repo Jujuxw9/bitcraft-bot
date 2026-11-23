@@ -21,7 +21,7 @@
 | [17](2026-11-22-session-17-analyse-r1-ecrans.md) | 2026-11-22 | Claude Code | Analyse de l'essai R1, v0.4.1 : ce que voit le bot, agent mémoire |
 | [18](2026-11-23-session-18-cone-fenetres.md) | 2026-11-23 | Claude Code | v0.4.3 : direction de la caméra (cône de la mini-carte), fenêtres du jeu, écran de connexion, 1 s après W (D-053) |
 | [19](2026-11-23-session-19-sprint-sol-barre.md) | 2026-11-23 | Claude Code | Analyse de la session de jeu ; v0.4.4 : sprint, barre d'action, sacs au sol, contrôle après W |
-| [18 bis](2026-11-23-etude-chat-gpt.md) | 2026-11-23 | Claude Code (session parallèle) | Étude du module « @GPT » (chat + Claude Haiku), rien codé ; Q-027 |
+| [18 bis](2026-11-23-etude-chat-gpt.md) | 2026-11-23 | Claude Code (session parallèle) | Module « @GPT » : étude, Q-027, D-054, logique du chat codée sans envoi |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 
