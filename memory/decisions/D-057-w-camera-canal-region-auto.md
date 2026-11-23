@@ -16,3 +16,6 @@
 ## Conséquences
 - À coder en v0.4.7. **À vérifier avant** : ce que fait un clic sur le bouton du canal (passe au canal suivant ou ouvre une liste ?). Une capture Num 0 de Julien, chat ouvert, après un clic sur ce bouton, le dira.
 - `technique/hybride/analyse-visee-2026-11-22.md` (R1) : le cap après W = direction du personnage + décalage fixe.
+
+## Mise à jour (2026-11-23, 23:50)
+Point 2 remplacé par [D-058](D-058-v047-chat-canaux-commandes.md) : le jeu a des commandes de canal (/s, /y, /lfg, /t). Chaque réponse choisit son canal par la commande : plus de clic sur le bouton ni de passage au lancement du jeu.

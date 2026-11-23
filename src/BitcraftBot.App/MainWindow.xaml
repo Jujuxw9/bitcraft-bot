@@ -129,8 +129,9 @@
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="CHAT @GPT" Style="{StaticResource CardTitle}" />
-                                <CheckBox x:Name="GptCheck" Content="Répondre à « @GPT » (chat Région)" Click="GptCheck_Click" />
+                                <CheckBox x:Name="GptCheck" Content="Répondre à « @gpt » et « @chatgpt » (Local, Région, LFG, Trade)" Click="GptCheck_Click" />
                                 <TextBlock x:Name="GptStatusText" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="GptTimerText" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
                             </StackPanel>
                         </Border>
 

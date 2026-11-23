@@ -119,3 +119,15 @@ Prochaines étapes : brancher l'abonnement et afficher dans la fenêtre du bot �
 - 1er message : le chat s'est ouvert sur **LOCAL** → rien tapé, chat refermé par Échap, alerte « canal pas Région ». Le jeu ouvre le chat sur le **dernier canal utilisé**. Piste (pas codée, à proposer à Julien) : cliquer sur le bouton du canal pour passer sur Région.
 - La zone de saisie vide (juste après Entrée) est bien reconnue comme chat ouvert.
 - Reste **À vérifier** : le texte reste-t-il dans la zone de saisie après Échap.
+
+## 7. v0.4.7 (2026-11-23, D-058) : tous les canaux joueurs, commandes du jeu, frappe humaine
+
+- **Déclencheur** : « @gpt » ou « @chatgpt », majuscules ou minuscules (`GptChatPicker.IsTrigger`, pas collé à un autre mot : « mail@gpt.fr » ou « @gpts » ne comptent pas).
+- **Canaux lus et répondus** : Local (2), Région (3), Looking For Group (7), Trade (8). Une requête d'abonnement par canal (`ChatMessages.AnsweredQueriesSince`).
+- **Menu du bouton du canal** (capture `images/reference-ui/chat/menu-canaux_001.png`) : un clic ouvre une liste : Local `/s`, Region `/y`, Looking For Group `/lfg`, Trade `/t`. Le bot ne clique pas : il tape la commande.
+- **Envoi** (`ActionController.ChatAsync(…, command)`) : chat ouvert → bouton lu → s'il ne montre pas le bon canal (`ChatInput.IsChannel`, mots « LOCAL », « REGION », « GROUP », « TRADE ») : commande + espace, bouton relu ; changé → la suite ; pas changé → la commande reste au début de la ligne. Les deux cas sont écrits dans le journal.
+- **Temps de lecture** avant de répondre (`GptChatPicker.ReadingTime`) et **frappe irrégulière** (`ActionController.KeyDelay`), voir D-058.
+- **Phrases** : 40 par langue, smiley simple 30 % du temps (`CannedReplies.SmileyChance`).
+- **Carte CHAT** : état (« lit le message de X (3 s) », « écrit dans le chat… ») et minuteur « Prochaine réponse possible dans N s ».
+- **À vérifier** : comportement exact de la commande (bouton changé tout de suite ou lu à l'envoi) ; le texte reste-t-il après Échap.
+- Limite : liste des canaux ouverte = cadre blanc caché, chat vu « fermé » par l'écran.

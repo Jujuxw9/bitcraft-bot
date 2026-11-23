@@ -45,8 +45,8 @@ public static class Queries
                 // Barre d'action et capacités avec leur temps de recharge (v0.4.4 : sprint).
                 list.Add($"SELECT * FROM action_bar_state WHERE player_entity_id = {e}");
                 list.Add($"SELECT * FROM ability_state WHERE owner_entity_id = {e}");
-                // Module « @GPT » (v0.4.5, D-054) : messages du chat Région (table publique, lecture seule).
-                list.Add(ChatMessages.RegionQuerySince(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 300));
+                // Module « @GPT » (v0.4.5, D-054 ; v0.4.7 : Local, Région, Looking For Group, Trade) : chat récent (table publique, lecture seule).
+                list.AddRange(ChatMessages.AnsweredQueriesSince(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - 300));
             }
         }
         if (area is { } a)

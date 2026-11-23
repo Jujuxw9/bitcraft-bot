@@ -70,18 +70,21 @@ public static class ChatInput
         new(text.ToUpperInvariant().Select(c => c switch { '1' => 'I', '0' => 'O', '5' => 'S', _ => c }).Where(char.IsLetter).ToArray());
 
     // Le canal affiché est-il « Région » ? Tolérant à une lettre mal lue (REG10N, RECION…).
-    public static bool IsRegion(string text)
+    public static bool IsRegion(string text) => IsChannel(text, "REGION");
+
+    // Le canal affiché est-il celui attendu (« LOCAL », « REGION », « TRADE », « GROUP »…) ? (v0.4.7)
+    // Tolérant à une lettre mal lue, à condition que le mot ait au moins 5 lettres.
+    public static bool IsChannel(string text, string target)
     {
         var t = CleanChannel(text);
-        if (t.Contains("REGION", StringComparison.Ordinal))
+        if (t.Contains(target, StringComparison.Ordinal))
         {
             return true;
         }
-        if (t.Length is < 5 or > 7)
+        if (target.Length < 5 || t.Length < target.Length - 1 || t.Length > target.Length + 1)
         {
             return false;
         }
-        const string target = "REGION";
         var same = 0;
         for (var i = 0; i < Math.Min(t.Length, target.Length); i++)
         {
@@ -90,6 +93,6 @@ public static class ChatInput
                 same++;
             }
         }
-        return same >= 5;
+        return same >= target.Length - 1;
     }
 }

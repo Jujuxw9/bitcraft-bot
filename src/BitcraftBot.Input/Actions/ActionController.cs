@@ -335,8 +335,17 @@ public sealed class ActionController
     // chat fermé vérifié → Entrée → chat ouvert vérifié → canal « Région » vérifié → texte tapé → Entrée →
     // chat refermé vérifié (sinon Échap). Si quelque chose ne va pas, rien n'est envoyé et le chat est refermé.
     // Julien qui tape une touche pendant la frappe : arrêt, chat refermé.
-    public async Task<ActionResult> ChatAsync(string label, string text, ChatProbe probe)
+    // v0.4.7 : command (« /y », « /s »…) = commande du jeu pour écrire dans le bon canal. Si le bouton ne montre pas
+    // le bon canal, la commande est tapée d'abord ; si le bouton ne change pas, elle reste au début de la ligne
+    // (le jeu la lit à l'envoi). Frappe irrégulière, comme une vraie main (pauses après la ponctuation, hésitations).
+    public async Task<ActionResult> ChatAsync(string label, string text, ChatProbe probe, string? command = null)
     {
+        if (command is not null && (command.Length is < 2 or > 5 || command[0] != '/' || !command[1..].All(char.IsAsciiLetterLower)))
+        {
+            var refused = $"{label} : commande de canal refusée (« {command} »)";
+            Log?.Invoke(ActionLogLevel.Erreur, refused);
+            return new ActionResult(ActionOutcome.Refuse, refused);
+        }
         if (string.IsNullOrWhiteSpace(text) || text.Length > 250 || text.Any(char.IsControl))
         {
             var refused = $"{label} : texte refusé (vide, trop long ou caractère de contrôle)";
@@ -363,19 +372,24 @@ public sealed class ActionController
                     return;
                 }
                 var channel = await probe.Channel();
+                // Petit temps avant la première lettre (on pose les doigts sur le clavier).
+                await _delay(300 + _random.Next(500), token);
                 if (!probe.ChannelOk(channel))
                 {
-                    problem = $"canal du chat pas « Région » (lu : « {channel} »)";
-                    return;
+                    if (command is null)
+                    {
+                        problem = $"canal du chat pas le bon (lu : « {channel} »)";
+                        return;
+                    }
+                    await TypeHumanAsync(command + " ", startedAt, token);
+                    await _delay(350 + _random.Next(400), token);
+                    var after = await probe.Channel();
+                    Log?.Invoke(ActionLogLevel.Info, probe.ChannelOk(after)
+                        ? $"{label} : canal changé par « {command} » (lu avant : « {channel} », après : « {after} »)."
+                        : $"{label} : bouton du canal pas changé par « {command} » (lu avant : « {channel} », après : « {after} ») : commande gardée au début du message.");
                 }
-                foreach (var c in text)
-                {
-                    EnsureStillAllowed(token);
-                    EnsureUserQuiet(startedAt);
-                    _device.TypeChar(c);
-                    await _delay(c == ' ' ? 90 + _random.Next(120) : 45 + _random.Next(85), token);
-                }
-                await _delay(250 + _random.Next(350), token);
+                await TypeHumanAsync(text, startedAt, token);
+                await _delay(300 + _random.Next(500), token);
                 EnsureStillAllowed(token);
                 EnsureUserQuiet(startedAt);
                 await TapAsync(GameKeys.Enter, token);
@@ -402,6 +416,40 @@ public sealed class ActionController
             return new ActionResult(ActionOutcome.Refuse, problem);
         }
         return result;
+    }
+
+    // Frappe lettre par lettre, irrégulière comme une vraie main (v0.4.7, demande de Julien).
+    private async Task TypeHumanAsync(string text, DateTime startedAt, CancellationToken token)
+    {
+        char? previous = null;
+        foreach (var c in text)
+        {
+            EnsureStillAllowed(token);
+            EnsureUserQuiet(startedAt);
+            _device.TypeChar(c);
+            await _delay(KeyDelay(c, previous), token);
+            previous = c;
+        }
+    }
+
+    // Temps entre deux lettres : 55 à 165 ms ; plus long après une espace et après la ponctuation ;
+    // de temps en temps (4 %) une hésitation de 0,3 à 0,9 s.
+    public int KeyDelay(char c, char? previous)
+    {
+        var delay = 55 + _random.Next(110);
+        if (c == ' ')
+        {
+            delay += 30 + _random.Next(90);
+        }
+        if (previous is '.' or ',' or '!' or '?' or ':' or ';' or '…')
+        {
+            delay += 150 + _random.Next(300);
+        }
+        if (_random.NextDouble() < 0.04)
+        {
+            delay += 300 + _random.Next(600);
+        }
+        return delay;
     }
 
     // Échap jusqu'à ce que le chat soit fermé (2 essais). Jamais laissé ouvert sans alerte (D-055).

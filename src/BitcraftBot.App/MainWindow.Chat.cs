@@ -8,8 +8,10 @@ using BitcraftBot.Server.World;
 
 namespace BitcraftBot.App;
 
-// Module « @GPT » (v0.4.5, D-054, D-055) : quand un joueur écrit « @GPT » dans le chat Région, le bot répond
+// Module « @GPT » (v0.4.5, D-054, D-055) : quand un joueur écrit « @GPT » dans le chat, le bot répond
 // une phrase simple, au clavier, comme Julien (jamais par le serveur, D-039).
+// v0.4.7 : « @gpt » ou « @chatgpt » (majuscules ou minuscules), dans Local, Région, Looking For Group ou Trade ;
+// réponse dans le même canal (commandes /s, /y, /lfg, /t) ; temps de lecture avant de répondre ; smiley 30 %.
 // Règles : 1 réponse par minute au plus, au message le plus récent ; jamais aux messages de Julien ;
 // pas d'IA (phrases toutes faites) ; le chat est toujours refermé et vérifié à l'écran.
 // Sécurités du contrôleur d'actions : jeu actif et visible, en jeu, aucune fenêtre du jeu ouverte,
@@ -27,13 +29,26 @@ public partial class MainWindow
     private string _gptLastState = "";
     private int _gptSent;
 
-    private sealed record GptReply(ChatMessage Message, string Text);
+    // ReadyAt : fin du temps de lecture (on ne répond pas à la seconde où le message arrive).
+    private sealed record GptReply(ChatMessage Message, string Text, DateTimeOffset ReadyAt);
 
     private void InitGpt()
     {
         GptCheck.IsChecked = _gptEnabled;
-        _log.Info("Chat", "Réponses « @GPT » activées (canal Région, 1 par minute au plus, phrases toutes faites).");
+        _log.Info("Chat", "Réponses « @gpt » ou « @chatgpt » activées (Local, Région, Looking For Group, Trade ; réponse dans le même canal ; 1 par minute au plus ; phrases toutes faites, smiley 30 %).");
         ShowGptState("en attente du serveur");
+        ShowGptTimer(null);
+    }
+
+    // Minuteur de la carte CHAT : temps avant la prochaine réponse possible (v0.4.7, demande de Julien).
+    private void ShowGptTimer(TimeSpan? cooldown)
+    {
+        GptTimerText.Text = cooldown switch
+        {
+            null => "",
+            { TotalSeconds: < 1 } => "Prochaine réponse possible : maintenant.",
+            var c => $"Prochaine réponse possible dans {Math.Ceiling(c.Value.TotalSeconds):0} s.",
+        };
     }
 
     private void GptCheck_Click(object sender, RoutedEventArgs e)
@@ -50,11 +65,13 @@ public partial class MainWindow
         if (!_gptEnabled)
         {
             ShowGptState("coupé");
+            ShowGptTimer(null);
             return;
         }
         if (reader.State != ReaderState.Connecte || s.EntityId is not { } me)
         {
             ShowGptState("en attente du serveur");
+            ShowGptTimer(null);
             return;
         }
         if (_gptPicker is null || _gptPickerFor != me)
@@ -63,12 +80,15 @@ public partial class MainWindow
             _gptPickerFor = me;
         }
         var now = DateTimeOffset.UtcNow;
+        ShowGptTimer(_gptPicker.Cooldown(now));
 
-        // 1. Un nouveau message « @GPT » ?
+        // 1. Un nouveau message « @gpt » ?
         if (_gptPending is null && !_gptSending && _gptPicker.Pick(reader.ChatMessages(), now) is { } m)
         {
-            _gptPending = new GptReply(m, CannedReplies.For(m, _gptRandom));
-            _log.Info("Chat", $"« @GPT » de {m.Username} : « {Short(m.Text)} ». Réponse prévue : « {_gptPending.Text} ».");
+            var text = CannedReplies.For(m, _gptRandom, smileyChance: CannedReplies.SmileyChance);
+            _gptPending = new GptReply(m, text, now + GptChatPicker.ReadingTime(m.Text, _gptRandom));
+            _log.Info("Chat", $"« @gpt » de {m.Username} ({ChatChannels.Name(m.Channel)}) : « {Short(m.Text)} ». Réponse prévue dans {ChatChannels.Name(m.Channel)} ({ChatChannels.Command(m.Channel)}) : « {text} ».");
+            ShowGptTimer(_gptPicker.Cooldown(now));
         }
         if (_gptPending is not { } p || _gptSending)
         {
@@ -84,7 +104,14 @@ public partial class MainWindow
             return;
         }
 
-        // 3. Le jeu est-il prêt ? (personnage connecté, pas de repas en cours, sécurités du contrôleur)
+        // 3. Temps de lecture du message (comme quelqu'un qui lit, puis réfléchit).
+        if (now < p.ReadyAt)
+        {
+            ShowGptState($"lit le message de {p.Message.Username} ({Math.Ceiling((p.ReadyAt - now).TotalSeconds):0} s)");
+            return;
+        }
+
+        // 4. Le jeu est-il prêt ? (personnage connecté, pas de repas en cours, sécurités du contrôleur)
         var wait = s.SignedIn != true ? "personnage pas connecté dans le jeu"
             : _pendingMeal is not null ? "repas en cours"
             : _actions.WhyNot();
@@ -102,11 +129,12 @@ public partial class MainWindow
         ShowGptState("écrit dans le chat…");
         try
         {
-            var result = await _actions.ChatAsync("Réponse « @GPT »", reply.Text, ChatProbeForGame());
+            var channel = reply.Message.Channel;
+            var result = await _actions.ChatAsync("Réponse « @GPT »", reply.Text, ChatProbeForGame(channel), ChatChannels.Command(channel));
             if (result.Done)
             {
                 _gptSent++;
-                _log.Info("Chat", $"Réponse envoyée à {reply.Message.Username} : « {reply.Text} ».");
+                _log.Info("Chat", $"Réponse envoyée à {reply.Message.Username} dans {ChatChannels.Name(channel)} : « {reply.Text} ».");
             }
             else
             {
@@ -122,7 +150,8 @@ public partial class MainWindow
     }
 
     // Ce que l'envoi regarde à l'écran : image neuve du jeu (jamais d'une autre fenêtre de Julien).
-    private ChatProbe ChatProbeForGame() => new()
+    // channel : canal où répondre ; le bouton du chat doit afficher son nom (« LOCAL », « REGION »…).
+    private ChatProbe ChatProbeForGame(int channel) => new()
     {
         IsOpen = () => Task.Run(() => CaptureGameNow() is { } frame ? ChatInput.IsOpen(frame) : (bool?)null),
         Channel = async () =>
@@ -137,7 +166,7 @@ public partial class MainWindow
             var zone = new ScreenRect((int)(z.X * sx), (int)(z.Y * sy), (int)(z.Width * sx), (int)(z.Height * sy));
             return ChatInput.CleanChannel(await _ocr.ReadAsync(frame, zone, TextStyle.BrightText, 150));
         },
-        ChannelOk = ChatInput.IsRegion,
+        ChannelOk = text => ChatInput.IsChannel(text, ChatChannels.ButtonWord(channel)),
     };
 
     private Frame? CaptureGameNow()

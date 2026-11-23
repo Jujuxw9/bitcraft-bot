@@ -61,6 +61,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-055](D-055-chat-gpt-suite.md) | Module « @GPT » : clavier pendant la récolte, chat refermé, pas de mention « bot », Haiku plus tard | Validée | 2026-11-23 |
 | [D-056](D-056-v045-chat-reel-camera.md) | v0.4.5 : réponses « @GPT » envoyées pour de vrai, caméra adoucie coupée, molette après W (quand le bot fera W), exploration en v0.5 | Validée | 2026-11-23 |
 | [D-057](D-057-w-camera-canal-region-auto.md) | W remet une caméra fixe par rapport au personnage ; chat passé automatiquement sur Région au lancement du jeu | Validée | 2026-11-23 |
+| [D-058](D-058-v047-chat-canaux-commandes.md) | v0.4.7 : « @gpt » et « @chatgpt », réponse dans le canal du message par les commandes du jeu (/s, /y, /lfg, /t), 40 phrases, smiley 30 %, frappe humaine, minuteur | Validée | 2026-11-23 |
 
 ## Gabarit
 

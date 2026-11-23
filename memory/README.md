@@ -67,6 +67,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-23-passation-v044.md](echanges/2026-11-23-passation-v044.md) — **passation** : prompt pour le prochain chat (après la v0.4.4)
 - [2026-11-23-passation-v045.md](echanges/2026-11-23-passation-v045.md) — **passation** après la v0.4.5 (module « @GPT » branché, envoi réel ; chat ouvert reconnu ; prochaines étapes).
 - [2026-11-23-passation-v046.md](echanges/2026-11-23-passation-v046.md) — **passation** après la v0.4.6 (recettes en logigramme ; chat qui marche ; W à revoir ; prochaines étapes).
+- [2026-11-23-passation-v047.md](echanges/2026-11-23-passation-v047.md) — **passation** après la v0.4.7 (chat dans 4 canaux par les commandes du jeu ; prochaines étapes).
 
 ### technique/
 - [README.md](technique/README.md) — index

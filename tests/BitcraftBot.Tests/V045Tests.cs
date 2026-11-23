@@ -194,7 +194,7 @@ public class V045Tests
         var (controller, device, probe, _) = Make(channel: "LOCAL");
         var result = await controller.ChatAsync("Réponse", "Salut", probe);
         Assert.False(result.Done);
-        Assert.Contains("Région", result.Detail);
+        Assert.Contains("canal", result.Detail);
         Assert.Equal("", device.Typed);
         Assert.Contains("Échap", device.Events);
         Assert.False(device.ChatOpen);

@@ -53,10 +53,14 @@ public class GptChatTests
     [Theory]
     [InlineData("@GPT tu vas bien ?", true)]
     [InlineData("salut @GPT", true)]
-    [InlineData("@gpt tu vas bien ?", false)]
-    [InlineData("@Gpt", false)]
+    [InlineData("@gpt tu vas bien ?", true)]
+    [InlineData("@Gpt", true)]
+    [InlineData("@ChatGPT ça va ?", true)]
+    [InlineData("hey @chatgpt, help", true)]
     [InlineData("GPT sans arobase", false)]
-    public void Declencheur_en_majuscules_seulement(string text, bool expected)
+    [InlineData("@gpts", false)]
+    [InlineData("mail@gpt.fr", false)]
+    public void Declencheur_gpt_ou_chatgpt_sans_tenir_compte_des_majuscules(string text, bool expected)
     {
         Assert.Equal(expected, GptChatPicker.IsTrigger(text));
     }
@@ -67,7 +71,7 @@ public class GptChatTests
         var picker = new GptChatPicker(Me);
         var messages = new[]
         {
-            Msg(1, "@GPT local", Now, channel: 2),
+            Msg(1, "@GPT système", Now, channel: 0),
             Msg(2, "@GPT moi", Now, owner: Me),
             Msg(3, "@GPT vieux", Now.AddMinutes(-3)),
             Msg(4, "pas de déclencheur", Now),
