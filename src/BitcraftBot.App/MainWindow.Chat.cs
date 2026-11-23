@@ -21,6 +21,9 @@ public partial class MainWindow
     private const int ChatLogTextMax = 80;
 
     private readonly Random _gptRandom = new();
+
+    // Base de phrases par thème (v0.4.8, fichiers World/Phrases/*.txt intégrés au .exe).
+    private readonly ChatPhraseBook _gptPhrases = ChatPhraseBook.LoadEmbedded();
     private bool _gptEnabled = true;
     private GptChatPicker? _gptPicker;
     private ulong _gptPickerFor;
@@ -32,10 +35,35 @@ public partial class MainWindow
     // ReadyAt : fin du temps de lecture (on ne répond pas à la seconde où le message arrive).
     private sealed record GptReply(ChatMessage Message, string Text, DateTimeOffset ReadyAt);
 
+    // v0.4.8 : dernier vrai clic de Julien (heure en ticks) et dernier moment où le jeu n'était pas au premier plan.
+    // Après un retour dans le jeu ou un clic, le bot attend 2 s avant d'ouvrir le chat (journal du 24/11 00:03).
+    private static readonly TimeSpan GptCalmTime = TimeSpan.FromSeconds(2);
+    private long _gptLastClickTicks = DateTime.MinValue.Ticks;
+    private DateTime _gptGameInactiveAt = DateTime.MinValue;
+
+    private DateTime GptLastClick => new(Interlocked.Read(ref _gptLastClickTicks));
+
     private void InitGpt()
     {
+        // Écoute de la souris déjà ouverte par la caméra (lecture seule) : on note seulement l'heure des vrais clics.
+        if (_mouseHook is not null)
+        {
+            _mouseHook.ButtonDown += (_, _, _, injected) =>
+            {
+                if (!injected)
+                {
+                    Interlocked.Exchange(ref _gptLastClickTicks, DateTime.Now.Ticks);
+                }
+            };
+        }
         GptCheck.IsChecked = _gptEnabled;
-        _log.Info("Chat", "Réponses « @gpt » ou « @chatgpt » activées (Local, Région, Looking For Group, Trade ; réponse dans le même canal ; 1 par minute au plus ; phrases toutes faites, smiley 30 %).");
+        _log.Info("Chat", "Réponses « @gpt » ou « @chatgpt » activées (Local, Région, Looking For Group, Trade ; réponse dans le même canal ; 1 par minute au plus ; phrases par thème, smiley 30 %, faute volontaire 5 %).");
+        var phrases = _gptPhrases.Themes.Sum(t => t.Phrases.Values.Sum(l => l.Count));
+        _log.Info("Chat", $"Base de phrases : {_gptPhrases.Themes.Count} thèmes, {phrases} phrases.");
+        foreach (var error in _gptPhrases.Errors)
+        {
+            _log.Alerte("Chat", $"Base de phrases : {error}.");
+        }
         ShowGptState("en attente du serveur");
         ShowGptTimer(null);
     }
@@ -80,14 +108,20 @@ public partial class MainWindow
             _gptPickerFor = me;
         }
         var now = DateTimeOffset.UtcNow;
+        if (!GameIsForeground())
+        {
+            _gptGameInactiveAt = DateTime.Now;
+        }
         ShowGptTimer(_gptPicker.Cooldown(now));
 
         // 1. Un nouveau message « @gpt » ?
         if (_gptPending is null && !_gptSending && _gptPicker.Pick(reader.ChatMessages(), now) is { } m)
         {
-            var text = CannedReplies.For(m, _gptRandom, smileyChance: CannedReplies.SmileyChance);
+            var reply = ChatReplies.For(m, _gptPhrases, _gptRandom);
+            var text = reply.Text;
             _gptPending = new GptReply(m, text, now + GptChatPicker.ReadingTime(m.Text, _gptRandom));
-            _log.Info("Chat", $"« @gpt » de {m.Username} ({ChatChannels.Name(m.Channel)}) : « {Short(m.Text)} ». Réponse prévue dans {ChatChannels.Name(m.Channel)} ({ChatChannels.Command(m.Channel)}) : « {text} ».");
+            _log.Info("Chat", $"« @gpt » de {m.Username} ({ChatChannels.Name(m.Channel)}) : « {Short(m.Text)} ». Thème : {reply.Theme}. Réponse prévue dans {ChatChannels.Name(m.Channel)} ({ChatChannels.Command(m.Channel)}) : « {text} »."
+                + (reply.Typo is { } typo ? $" Faute volontaire : {typo}." : ""));
             ShowGptTimer(_gptPicker.Cooldown(now));
         }
         if (_gptPending is not { } p || _gptSending)
@@ -114,7 +148,10 @@ public partial class MainWindow
         // 4. Le jeu est-il prêt ? (personnage connecté, pas de repas en cours, sécurités du contrôleur)
         var wait = s.SignedIn != true ? "personnage pas connecté dans le jeu"
             : _pendingMeal is not null ? "repas en cours"
-            : _actions.WhyNot();
+            : _actions.WhyNot()
+              ?? (DateTime.Now - _gptGameInactiveAt < GptCalmTime ? "le jeu vient de revenir au premier plan"
+                  : DateTime.Now - GptLastClick < GptCalmTime ? "clic de souris récent"
+                  : null);
         if (wait is not null)
         {
             ShowGptState($"réponse en attente : {wait}");
@@ -167,6 +204,7 @@ public partial class MainWindow
             return ChatInput.CleanChannel(await _ocr.ReadAsync(frame, zone, TextStyle.BrightText, 150));
         },
         ChannelOk = text => ChatInput.IsChannel(text, ChatChannels.ButtonWord(channel)),
+        LastUserClick = () => GptLastClick,
     };
 
     private Frame? CaptureGameNow()

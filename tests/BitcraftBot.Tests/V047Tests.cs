@@ -80,37 +80,26 @@ public class V047Tests
     [Fact]
     public void Quarante_phrases_par_langue_toutes_differentes()
     {
-        Assert.Equal(40, CannedReplies.French.Count);
-        Assert.Equal(40, CannedReplies.English.Count);
-        Assert.Equal(40, CannedReplies.French.Distinct().Count());
-        Assert.Equal(40, CannedReplies.English.Distinct().Count());
-    }
-
-    // D-055 : jamais d'allusion au fait que c'est un bot.
-    [Fact]
-    public void Aucune_phrase_ne_parle_de_bot()
-    {
-        var forbidden = new[] { "bot", "robot", " ia ", " ai ", "circuit", "bip", "beep", "program", "intelligence" };
-        foreach (var p in CannedReplies.French.Concat(CannedReplies.English))
-        {
-            var lower = " " + p.ToLowerInvariant() + " ";
-            Assert.DoesNotContain(forbidden, f => lower.Contains(f, StringComparison.Ordinal));
-        }
+        // v0.4.8 : les 40 phrases de la v0.4.7 sont devenues le thème [autre] de la base de phrases.
+        var autre = ChatPhraseBook.LoadEmbedded().Theme("autre")!;
+        Assert.Equal(40, autre.Phrases["fr"].Distinct().Count());
+        Assert.Equal(40, autre.Phrases["en"].Distinct().Count());
     }
 
     [Fact]
     public void Smiley_ajoute_selon_la_chance()
     {
         var m = Msg(1, "@gpt", Now);
-        var always = CannedReplies.For(m, new Random(5), smileyChance: 1);
+        var book = ChatPhraseBook.LoadEmbedded();
+        var always = ChatReplies.For(m, book, new Random(5), smileyChance: 1, typoChance: 0).Text;
         Assert.Contains(CannedReplies.Smileys, s => always.EndsWith(" " + s, StringComparison.Ordinal));
-        var never = CannedReplies.For(m, new Random(5), smileyChance: 0);
+        var never = ChatReplies.For(m, book, new Random(5), smileyChance: 0, typoChance: 0).Text;
         Assert.DoesNotContain(CannedReplies.Smileys, s => never.EndsWith(" " + s, StringComparison.Ordinal));
 
         // Environ 30 % sur 2000 tirages.
         var random = new Random(9);
         var count = Enumerable.Range(0, 2000).Count(_ =>
-            CannedReplies.Smileys.Any(s => CannedReplies.For(m, random, smileyChance: CannedReplies.SmileyChance).EndsWith(" " + s, StringComparison.Ordinal)));
+            CannedReplies.Smileys.Any(s => ChatReplies.For(m, book, random, typoChance: 0).Text.EndsWith(" " + s, StringComparison.Ordinal)));
         Assert.InRange(count, 500, 700);
     }
 

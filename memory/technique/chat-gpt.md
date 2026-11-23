@@ -1,6 +1,6 @@
 # Module « @GPT » : répondre dans le chat du jeu (étude)
 
-- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6). Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
+- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6) ; v0.4.7 tous les canaux (section 7) ; **v0.4.8 réponses par thème, frappe vérifiée lettre par lettre, fautes 5 % (D-059, section 8)**. Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
 - **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase courte. **Pas de spam.**
 - **Liens** : D-054, D-024, D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
 
@@ -131,3 +131,34 @@ Prochaines étapes : brancher l'abonnement et afficher dans la fenêtre du bot �
 - **Carte CHAT** : état (« lit le message de X (3 s) », « écrit dans le chat… ») et minuteur « Prochaine réponse possible dans N s ».
 - **À vérifier** : comportement exact de la commande (bouton changé tout de suite ou lu à l'envoi) ; le texte reste-t-il après Échap.
 - Limite : liste des canaux ouverte = cadre blanc caché, chat vu « fermé » par l'écran.
+
+### Journal v0.4.7 lu (23/11 23:53 au 24/11 00:07)
+- **La commande change le bouton tout de suite** : chat ouvert sur LOCAL, « /y » + espace, bouton relu « REGION ». Point « À vérifier » de D-058 réglé.
+- 2 réponses envoyées sur Région (TheKrazyTurkey). Local, Looking For Group, Trade : aucun « @gpt » reçu, **pas encore vus**.
+- 3e réponse (00:03:48) : le jeu revenait au premier plan ; chat ouvert, puis **vu fermé 1 s après** ; le bot a tapé 11 s **dans le jeu** ; Entrée a rouvert le chat ; Échap, alerte. Cause probable : clic de Julien pour revenir dans le jeu (**À vérifier**). Corrigé en v0.4.8.
+
+## 8. v0.4.8 (2026-11-24, D-059) : frappe vérifiée, base de phrases par thème, fautes volontaires
+
+### Sécurité de la frappe (`ActionController.ChatAsync`, `TypeHumanAsync`)
+- **Avant chaque lettre** : image neuve du jeu (`ChatProbe.IsOpen`), le chat doit être ouvert ; sinon plus aucune lettre et pas d'Entrée (« chat fermé pendant la frappe : arrêt, rien envoyé »). Vérifié aussi juste avant Entrée.
+- Le temps de la vérification est pris sur la pause entre deux lettres (vitesse de frappe presque inchangée). **À vérifier** : temps d'une capture sur le PC de Julien (si elle est lente, la frappe ralentit un peu).
+- **Clic de Julien** (vrai clic, `ChatProbe.LastUserClick`, écoute de la souris déjà ouverte par la caméra) pendant la frappe : arrêt, chat refermé.
+- **2 s d'attente** (`MainWindow.Chat.cs`) après un retour du jeu au premier plan ou un clic de Julien, avant d'ouvrir le chat.
+
+### Base de phrases (`World/ChatPhrases.cs`, fichiers `World/Phrases/fr.txt` et `en.txt`)
+- Fichiers texte intégrés au .exe (ressources). Format expliqué en tête de `fr.txt` : `[theme]`, `mots: …` (« b* » = début de mot, « c d » = mots à la suite, accents et majuscules ignorés, « ? » = point d'interrogation), `- phrase` (`{nom}` = pseudo).
+- **28 thèmes**, dans cet ordre (l'ordre départage les égalités) : toi, perso, insulte, arbres, minage, peche, chasse, cueillette, cuisine, artisanat, construction, commerce, groupe, niveau, ou, aide, jeu, meteo, fatigue, blague, compliment, excuse, merci, cava, aurevoir, salutation, question, autre. Environ 10 phrases par thème et par langue ; « autre » = les 40 phrases de la v0.4.7.
+- **Choix du thème** : le « @gpt » est retiré, puis on compte les mots de chaque thème trouvés dans le message (mots de toutes les langues). Le plus de mots gagne ; égalité : le plus haut dans le fichier ; aucun : « autre ».
+- **Choix de la phrase** : au hasard dans le thème, dans la langue du joueur (sinon anglais, sinon « autre ») ; une phrase dite parmi les 12 dernières n'est pas reprise.
+- Thèmes sensibles : « toi » (on demande si c'est un bot) répond en restant vague, sans jamais parler de bot ; « perso » (âge, pays, réseaux) ne donne **aucune info** sur Julien ; « insulte » répond calmement.
+- Le journal écrit le thème choisi : « Thème : arbres. »
+- Ajouter une langue : un fichier `xx.txt` (même thèmes). Ajouter un thème : un bloc dans `fr.txt` et `en.txt`.
+
+### Fautes volontaires (`World/ChatTypos.cs`)
+- 5 % des réponses (`ChatReplies.TypoChance`), une seule faute, un seul mot, jamais le pseudo ni le smiley.
+- 40 % du temps, si le message s'y prête : faute de grammaire courante (fr : a/à, et/est, ces/ses, on/ont, c'est/s'est, terminaisons é/er/ez, ais/ait… ; en : your/you're, its/it's, there/their, then/than, to/too…).
+- Sinon faute de frappe : deux lettres inversées, une lettre oubliée, une lettre doublée, la touche d'à côté (AZERTY en français, QWERTY en anglais), accent oublié. Jamais sur la première lettre.
+- Le journal écrit la faute : « Faute volontaire : « cope » au lieu de « coupe » (lettre oubliée). »
+
+### Tests
+- `V048Tests` (13 tests, plus 25 messages types) : chat vu avant chaque lettre, chat fermé pendant la frappe ou juste avant Entrée, clic de Julien ; fichiers sans erreur, mêmes thèmes, 8 phrases au moins ; aucun mot interdit (D-055) sur toute la base ; 25 messages → thème attendu ; pas de répétition ; fautes (pseudo jamais touché, une seule, ~5 %).

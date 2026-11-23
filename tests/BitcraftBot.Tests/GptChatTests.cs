@@ -105,22 +105,24 @@ public class GptChatTests
     [Fact]
     public void Phrase_dans_la_langue_du_joueur_avec_son_pseudo()
     {
-        var fr = CannedReplies.For(Msg(1, "@GPT", Now, user: "fr/Bob"), new Random(1));
-        Assert.Contains("Bob", fr);
-        Assert.Contains(fr, CannedReplies.French.Select(p => string.Format(p, "Bob")));
-        var en = CannedReplies.For(Msg(2, "@GPT", Now, user: "en/Alice"), new Random(1), "[GPT] ");
-        Assert.StartsWith("[GPT] ", en);
-        Assert.Contains(en[6..], CannedReplies.English.Select(p => string.Format(p, "Alice")));
+        // v0.4.8 : phrases du thème [autre] (message sans mot reconnu), dans la langue du joueur.
+        var book = ChatPhraseBook.LoadEmbedded();
+        var autre = book.Theme("autre")!;
+        var fr = ChatReplies.For(Msg(1, "@GPT", Now, user: "fr/Bob"), book, new Random(1), smileyChance: 0, typoChance: 0);
+        Assert.Equal("autre", fr.Theme);
+        Assert.Contains(fr.Text, autre.Phrases["fr"].Select(p => p.Replace("{nom}", "Bob")));
+        var en = ChatReplies.For(Msg(2, "@GPT", Now, user: "en/Alice"), book, new Random(1), smileyChance: 0, typoChance: 0);
+        Assert.Contains(en.Text, autre.Phrases["en"].Select(p => p.Replace("{nom}", "Alice")));
     }
 
     [Fact]
     public void Toutes_les_phrases_tiennent_dans_250_caracteres()
     {
         var longName = new string('x', 24);
-        foreach (var p in CannedReplies.French.Concat(CannedReplies.English))
+        foreach (var p in ChatPhraseBook.LoadEmbedded().Themes.SelectMany(t => t.Phrases.Values.SelectMany(l => l)))
         {
-            Assert.Contains("{0}", p);
-            Assert.True(("[GPT] " + string.Format(p, longName)).Length <= CannedReplies.MaxLength);
+            // Pseudo le plus long + smiley : toujours sous la limite du serveur.
+            Assert.True((p.Replace("{nom}", longName) + " :-)").Length <= CannedReplies.MaxLength, p);
         }
     }
 

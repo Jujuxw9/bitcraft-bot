@@ -58,6 +58,9 @@ public sealed class ChatProbe
 
     // Le canal lu est-il le bon ?
     public required Func<string, bool> ChannelOk { get; init; }
+
+    // Dernier clic de souris de Julien (vrai clic, pas celui du bot). Un clic pendant la frappe arrête tout (v0.4.8).
+    public Func<DateTime> LastUserClick { get; init; } = () => DateTime.MinValue;
 }
 
 public enum ActionOutcome
@@ -381,17 +384,32 @@ public sealed class ActionController
                         problem = $"canal du chat pas le bon (lu : « {channel} »)";
                         return;
                     }
-                    await TypeHumanAsync(command + " ", startedAt, token);
+                    if (!await TypeHumanAsync(command + " ", startedAt, probe, token))
+                    {
+                        problem = ClosedWhileTyping;
+                        return;
+                    }
                     await _delay(350 + _random.Next(400), token);
                     var after = await probe.Channel();
                     Log?.Invoke(ActionLogLevel.Info, probe.ChannelOk(after)
                         ? $"{label} : canal changé par « {command} » (lu avant : « {channel} », après : « {after} »)."
                         : $"{label} : bouton du canal pas changé par « {command} » (lu avant : « {channel} », après : « {after} ») : commande gardée au début du message.");
                 }
-                await TypeHumanAsync(text, startedAt, token);
+                if (!await TypeHumanAsync(text, startedAt, probe, token))
+                {
+                    problem = ClosedWhileTyping;
+                    return;
+                }
                 await _delay(300 + _random.Next(500), token);
                 EnsureStillAllowed(token);
-                EnsureUserQuiet(startedAt);
+                EnsureUserQuiet(startedAt, probe);
+                // v0.4.8 : chat encore ouvert juste avant Entrée (sinon Entrée le rouvrirait, journal du 24/11 00:04).
+                if (await probe.IsOpen() != true)
+                {
+                    problem = ClosedWhileTyping;
+                    return;
+                }
+                EnsureStillAllowed(token);
                 await TapAsync(GameKeys.Enter, token);
                 if (await WaitChatAsync(probe, open: false, token))
                 {
@@ -419,18 +437,41 @@ public sealed class ActionController
     }
 
     // Frappe lettre par lettre, irrégulière comme une vraie main (v0.4.7, demande de Julien).
-    private async Task TypeHumanAsync(string text, DateTime startedAt, CancellationToken token)
+    // v0.4.8 (journal du 24/11 00:03, Julien : « vérifier entre chaque frappe ») : AVANT CHAQUE LETTRE, image neuve
+    // du jeu, le chat doit être ouvert. Sinon : plus aucune lettre (elle partirait dans le jeu comme une action).
+    // Renvoie false si le chat n'est plus ouvert. Le temps de la vérification est pris sur la pause entre deux lettres.
+    private async Task<bool> TypeHumanAsync(string text, DateTime startedAt, ChatProbe probe, CancellationToken token)
     {
         char? previous = null;
+        var pause = 0;
         foreach (var c in text)
         {
+            var checkStart = System.Diagnostics.Stopwatch.GetTimestamp();
             EnsureStillAllowed(token);
-            EnsureUserQuiet(startedAt);
+            EnsureUserQuiet(startedAt, probe);
+            if (await probe.IsOpen() != true)
+            {
+                return false;
+            }
+            var checkMs = (int)System.Diagnostics.Stopwatch.GetElapsedTime(checkStart).TotalMilliseconds;
+            if (pause - checkMs > 0)
+            {
+                await _delay(pause - checkMs, token);
+            }
+            EnsureStillAllowed(token);
+            EnsureUserQuiet(startedAt, probe);
             _device.TypeChar(c);
-            await _delay(KeyDelay(c, previous), token);
+            pause = KeyDelay(c, previous);
             previous = c;
         }
+        if (pause > 0)
+        {
+            await _delay(pause, token);
+        }
+        return true;
     }
+
+    private const string ClosedWhileTyping = "chat fermé pendant la frappe : arrêt, rien envoyé";
 
     // Temps entre deux lettres : 55 à 165 ms ; plus long après une espace et après la ponctuation ;
     // de temps en temps (4 %) une hésitation de 0,3 à 0,9 s.
@@ -513,11 +554,17 @@ public sealed class ActionController
     }
 
     // Julien a tapé une touche depuis le début de l'envoi : on arrête (il reprend la main).
-    private void EnsureUserQuiet(DateTime since)
+    private void EnsureUserQuiet(DateTime since, ChatProbe? probe = null)
     {
         if (_context.LastPhysicalKey() > since)
         {
             _interruption = "vous avez tapé au clavier";
+            throw new OperationCanceledException();
+        }
+        // v0.4.8 : un clic de Julien peut fermer le chat (ou changer de fenêtre) : on arrête aussi.
+        if (probe is not null && probe.LastUserClick() > since)
+        {
+            _interruption = "vous avez cliqué avec la souris";
             throw new OperationCanceledException();
         }
     }

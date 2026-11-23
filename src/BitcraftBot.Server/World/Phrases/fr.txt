@@ -1,0 +1,418 @@
+# Phrases du chat « @gpt » en français (joueurs qui ont le jeu en français : « fr/ » devant le pseudo).
+#
+# Comment c'est rangé :
+#   [theme]          début d'un thème (minuscules, sans espace ni accent)
+#   mots: a, b*, c d mots qui font reconnaître le thème dans le message du joueur
+#                    « b* » = tout mot qui commence par « b » ; « c d » = les deux mots à la suite
+#                    accents et majuscules : pas besoin, ils sont ignorés ; « ? » = point d'interrogation
+#   - phrase         une réponse possible ; {nom} = pseudo du joueur
+#   # ...            commentaire, ignoré
+#
+# Le thème choisi = celui dont le plus de mots sont trouvés. Égalité : le plus haut dans ce fichier gagne.
+# Aucun mot trouvé : [autre] (tout en bas).
+# Les mots de en.txt comptent aussi (un joueur français peut écrire en anglais).
+# Règles : phrases courtes (250 caractères au plus avec le pseudo), gentilles, jamais d'allusion à un bot (D-055),
+# jamais d'info sur Julien, pas de fausse info précise sur le jeu.
+# Ajouter une phrase : une ligne « - ... » sous le thème. Ajouter un thème : un bloc [nom] ici ET dans en.txt.
+
+[toi]
+mots: qui es tu, qui est tu, t es qui, tu es qui, c est qui, ton nom, ton pseudo, pseudo, bot, robot, ia
+mots: intelligence artificielle, chatgpt, gpt, openai, humain, vraie personne, machine, script, automat*, vitals
+- C'est juste un pseudo, {nom}. Je le trouvais drôle sur le moment.
+- Juste un bûcheron qui passe, {nom}.
+- {nom}, on me demande souvent. La réponse : quelqu'un qui aime trop les arbres.
+- Le pseudo, c'était une blague. Elle a un peu trop bien marché.
+- {nom}, je suis surtout quelqu'un qui a oublié de manger ce midi.
+- Pourquoi tout le monde me pose la question ? C'est le pseudo, hein {nom} ?
+- {nom}, je réponds de temps en temps, quand j'ai les mains libres.
+- Disons que je suis le voisin un peu bizarre de la forêt.
+- {nom}, j'ai choisi ce pseudo à 2 h du matin. Mauvaise idée, je sais.
+- Un simple aventurier, {nom}. Avec une hache et beaucoup de patience.
+- {nom}, je suis aussi surpris que toi que des gens me parlent.
+- Je suis là pour couper du bois et dire des bêtises, {nom}.
+
+[perso]
+mots: age, quel age, pays, d ou tu viens, tu viens d ou, tu habites, ville, vrai nom, adresse, numero, telephone
+mots: instagram, insta, discord, snap*, facebook, copine, copain, marie*, fille ou garcon
+- {nom}, je garde un peu de mystère, c'est mon charme.
+- Secret de bûcheron, {nom}.
+- Je viens de la forêt d'à côté. C'est tout ce que je dirai.
+- {nom}, ici je suis juste un joueur qui coupe du bois, ça me va très bien.
+- Ah, ça c'est privé {nom}. Mais je peux te parler d'arbres pendant des heures.
+- {nom}, je préfère qu'on parle du jeu, je suis plus intéressant en jeu.
+- Mon âge ? Plus vieux qu'un jeune chêne, plus jeune qu'un vieux.
+- {nom}, je ne donne pas mes infos, mais je te donne un bonjour gratuit.
+- Joker sur cette question, {nom}.
+- {nom}, on dira que j'habite près de Snowrest. C'est presque vrai.
+
+[insulte]
+mots: noob, nul, nulle, nuls, idiot*, con, conne, debile*, ta gueule, tg, tais toi, ferme la, moche, nase, boulet
+mots: stupid*, dumb, shut up, ugly, trash, suck*, loser, hate, deteste, pathetique, pathetic, cringe, chiant*, ennuyeux, boring
+- Ouch {nom}. Je le note dans mon carnet des compliments bizarres.
+- {nom}, tout le monde a ses mauvais jours. Courage.
+- D'accord {nom}. Je retourne à mes arbres, eux au moins ils m'aiment bien.
+- {nom}, je ne vais pas me fâcher, j'ai trop de bois à couper.
+- Ça va aller {nom}, respire un coup.
+- Merci pour ton avis, {nom}. Je vais y réfléchir. Ou pas.
+- {nom}, on est tous un peu noob sur quelque chose.
+- Pas de souci {nom}, je te souhaite quand même une bonne partie.
+- Haha, {nom}, tu me rappelles moi le lundi matin.
+- {nom}, je t'offre une baie pour calmer tout ça.
+- Je ne réponds pas aux piques, {nom}. Seulement aux pioches.
+
+[arbres]
+mots: arbre*, bois, buche*, tronc*, hache*, bucheron*, foret*, sapin*, chene*, seve, souche*, branche*
+- {nom}, couper du bois, c'est ma thérapie.
+- Les arbres, c'est la vie. Surtout quand ils tombent du bon côté.
+- {nom}, un tronc à la fois, c'est la clé.
+- J'ai coupé tellement d'arbres aujourd'hui que je rêve en écorce.
+- {nom}, prends une bonne hache, ça change tout.
+- La forêt, c'est calme. Sauf quand je passe avec ma hache.
+- {nom}, j'ai une relation compliquée avec les sapins.
+- Rien de mieux que le bruit d'un arbre qui tombe, {nom}.
+- {nom}, si tu cherches du bois, suis les écureuils énervés.
+- Les chênes, c'est long, mais ça vaut le coup.
+- {nom}, je vais finir par connaître chaque arbre par son prénom.
+- Bûcheron un jour, bûcheron toujours, {nom}.
+
+[minage]
+mots: mine, miner, minage, mineur, pierre*, minerai*, pioche*, caillou*, roche*, cuivre, fer, metal*, filon*
+- {nom}, la pioche et moi, c'est une longue histoire.
+- Les cailloux, c'est moins joli que les arbres, mais c'est utile.
+- {nom}, miner c'est relaxant. Jusqu'au moment où l'inventaire est plein.
+- J'ai tapé tellement de pierres que j'ai des muscles en granit.
+- {nom}, un bon filon, ça se garde secret.
+- Toc toc toc… c'est le bruit de ma journée, {nom}.
+- {nom}, pense à prendre de quoi réparer ta pioche.
+- La roche, c'est têtu. Comme moi.
+- {nom}, je mine un peu, mais je préfère le bois.
+- Si tu trouves du bon minerai, {nom}, ne le crie pas trop fort.
+
+[peche]
+mots: peche, pecher, pecheur, poisson*, canne, appat*, hamecon*, riviere*, lac
+- {nom}, la pêche c'est l'art d'attendre en ayant l'air occupé.
+- Les poissons et moi, on ne se comprend pas toujours.
+- {nom}, j'ai attrapé une vieille chaussure une fois. Enfin, presque.
+- Rien de tel qu'un lac calme pour réfléchir, {nom}.
+- {nom}, la patience, c'est 90 % de la pêche.
+- J'ai raconté une blague aux poissons, ils n'ont pas mordu.
+- {nom}, un bon coin de pêche, ça ne se partage pas, haha.
+- La pêche, c'est ma pause entre deux arbres.
+- {nom}, si ça ne mord pas, change d'endroit.
+- Le poisson grillé après une longue journée, {nom}, il n'y a rien de mieux.
+
+[chasse]
+mots: chass*, animal*, animaux, sanglier*, cerf*, loup*, viande, monstre*, creature*, bete*
+- {nom}, les sangliers d'ici ont un sale caractère.
+- La chasse, c'est pas mon fort. Je cours moins vite que les cerfs.
+- {nom}, fais attention aux loups, ils ne rigolent pas.
+- J'ai essayé de chasser, l'animal m'a chassé.
+- {nom}, bonne chasse, et reviens entier.
+- Un sanglier m'a regardé de travers ce matin, je n'ai pas insisté.
+- {nom}, toujours garder de quoi se soigner avant de chasser.
+- Les bêtes du coin, je les laisse tranquilles, elles me laissent tranquille.
+- {nom}, la viande, c'est bon pour le moral.
+- Je suis plutôt cueillette que chasse, {nom}.
+
+[cueillette]
+mots: fleur*, baie*, cueill*, plante*, herbe*, champignon*, lavande, daisy, marguerite*, graine*, fibre*
+- {nom}, cueillir des fleurs, c'est mon côté poète.
+- Les baies, c'est petit mais c'est bon.
+- {nom}, j'ai les poches pleines de fleurs, c'est normal ?
+- La lavande sent bon, ça compense le reste.
+- {nom}, la cueillette, c'est la récolte des gens patients.
+- J'ai cueilli tellement de fleurs que je pourrais ouvrir une boutique.
+- {nom}, attention aux champignons, on ne sait jamais.
+- Rien de tel qu'une balade cueillette pour se détendre, {nom}.
+- {nom}, les plantes, au moins, elles ne se sauvent pas.
+- Une fleur pour toi, {nom}. Virtuelle, mais sincère.
+
+[cuisine]
+mots: faim, manger, mange, bouffe*, nourriture, cuisin*, soupe, pain, repas, miam, gateau*, recette de cuisine, cuire, cuit
+- {nom}, j'ai faim rien que d'en parler.
+- La soupe, c'est la base. Surtout après une journée de bois.
+- {nom}, toujours garder un truc à manger dans le sac.
+- J'ai oublié de manger, mon personnage aussi.
+- {nom}, un bon repas et ça repart.
+- Le pain chaud, {nom}, c'est le vrai trésor du jeu.
+- {nom}, je cuisine mal, mais avec amour.
+- Miam. Bon, je vais aller manger un truc, moi aussi.
+- {nom}, la faim, c'est le vrai boss de fin.
+- J'ai brûlé ma dernière soupe, {nom}. Ne demande pas.
+
+[artisanat]
+mots: craft*, fabriqu*, forge*, smith*, outil*, tier, recette*, menuis*, couture, tailleur, cuir, macon*, atelier*, station*, erudit*
+- {nom}, l'artisanat, c'est 10 % de talent et 90 % de matériaux.
+- Il me manque toujours un truc pour fabriquer ce que je veux.
+- {nom}, la forge, ça chauffe. Littéralement.
+- Je passe ma vie entre l'atelier et la forêt, {nom}.
+- {nom}, un bon outil, ça change la vie.
+- Les recettes, je les connais à moitié. L'autre moitié, je devine.
+- {nom}, prépare tous les matériaux avant, ça évite les allers-retours.
+- Fabriquer, c'est satisfaisant. Ranger après, moins.
+- {nom}, monter un tier, c'est long, mais ça vaut le coup.
+- Je suis plus récolte qu'artisanat, {nom}, mais j'y viens.
+
+[construction]
+mots: construi*, batiment*, maison*, fondation*, mur, murs, toit*, cabane*, chantier*, decor*
+- {nom}, construire, c'est mon rêve. Pour l'instant je coupe le bois pour.
+- Une maison, il faut du bois. Beaucoup de bois. Je m'en occupe.
+- {nom}, j'aimerais bien une petite cabane près d'un lac.
+- Les chantiers, c'est toujours plus long que prévu, {nom}.
+- {nom}, une bonne base, c'est une base bien rangée.
+- J'ai commencé un mur. Il est toujours en projet.
+- {nom}, si tu construis, je veux bien visiter.
+- Construire, c'est le meilleur moyen de vider ses coffres, {nom}.
+- {nom}, la déco, c'est ce qui prend le plus de temps.
+- Un toit au-dessus de la tête, c'est déjà pas mal, {nom}.
+
+[commerce]
+mots: vend*, achet*, prix, combien, echang*, wts, wtb, marchand*, boutique*, monnaie, argent, payer, paye
+- {nom}, je n'ai rien à vendre pour l'instant, désolé.
+- Demande sur Trade, {nom}, il y a souvent du monde.
+- {nom}, je garde tout, je suis un écureuil dans l'âme.
+- Mon prix ? Un bonjour et un sourire, {nom}.
+- {nom}, je n'ai pas grand-chose de valeur, à part ma bonne humeur.
+- Le commerce, c'est pas mon truc, je suis bûcheron avant tout.
+- {nom}, compare un peu les prix avant d'acheter.
+- J'aurais bien échangé, mais mon sac est plein de bois.
+- {nom}, je n'achète rien, je suis à sec.
+- Bonne chance pour ta vente, {nom} !
+
+[groupe]
+mots: groupe, lfg, equipe, ensemble, rejoin*, guilde*, recrut*, empire*, claim*, coop, avec moi, avec nous, on joue
+- {nom}, je joue plutôt en solo en ce moment, mais merci !
+- Gentil de demander, {nom}. Je suis un peu ours, mais j'apprécie.
+- {nom}, je suis occupé avec mes arbres, peut-être une autre fois.
+- Merci {nom}, je réfléchis. Je réfléchis lentement.
+- {nom}, l'union fait la force. Moi je fais le bois.
+- Je ne suis pas très disponible là, {nom}, mais bonne chance pour ton groupe.
+- {nom}, ça a l'air sympa ! Je repasse plus tard peut-être.
+- Je suis du genre loup solitaire. Un loup solitaire bûcheron.
+- {nom}, si tu as besoin de bois un jour, pense à moi.
+- Bonne recrue à toi, {nom}, quelqu'un va sûrement répondre.
+
+[niveau]
+mots: niveau*, level*, lvl, xp, exp, experience, grind*, competence*, skill*, monter
+- {nom}, monter de niveau, c'est une question de patience.
+- Je grind tranquille, une bûche à la fois.
+- {nom}, l'XP vient toute seule quand on s'amuse.
+- Mon niveau ? Suffisant pour couper un arbre. C'est l'essentiel.
+- {nom}, le grind, c'est long, mais avec de la musique ça passe.
+- Je monte doucement, {nom}. Très doucement.
+- {nom}, chaque niveau compte. Même les petits.
+- J'ai pris un niveau tout à l'heure, j'étais trop content.
+- {nom}, ne te compare pas aux autres, avance à ton rythme.
+- L'expérience, ça ne s'achète pas, {nom}. Ça se coupe.
+
+[ou]
+mots: ou est, ou sont, ou se trouve, ou trouver, ou acheter, trouver, chemin, direction, coordonn*, coords, carte, localis*, perdu*
+- {nom}, aucune idée exacte, mais la carte aide pas mal.
+- Je me perds moi-même, {nom}, alors je ne suis pas le meilleur guide.
+- {nom}, demande sur Région, quelqu'un saura sûrement.
+- Pas sûr, {nom}. Essaie de regarder un peu plus loin.
+- {nom}, moi je suis toujours dans la forêt, alors…
+- Bonne question, {nom}. Je n'ai pas la réponse précise, désolé.
+- {nom}, j'aurais du mal à t'expliquer le chemin sans me tromper.
+- Si je le savais, {nom}, j'y serais déjà !
+- {nom}, la carte est ton amie. Plus que moi sur ce coup.
+- Je ne suis pas sûr, {nom}. Les autres joueurs connaissent mieux le coin.
+
+[aide]
+mots: aide, aider, aidez, tuto*, guide, conseil*, astuce*, debutant*, nouveau, nouvelle, comment on fait, comment faire, je comprends pas
+- {nom}, le meilleur conseil : prends ton temps.
+- {nom}, je ne suis pas expert, mais demande sur Région, il y a des gens sympas.
+- Pour commencer, récolte un peu de tout, {nom}. Ça sert toujours.
+- {nom}, au début on est tous perdus, ça va venir.
+- Garde toujours à manger et des outils de rechange, {nom}.
+- {nom}, je t'aiderais bien, mais je suis encore en train d'apprendre aussi.
+- Petit conseil, {nom} : range ton inventaire avant qu'il déborde.
+- {nom}, regarde les guides des joueurs, il y en a de très bien.
+- Courage {nom}, le début est le plus dur.
+- {nom}, demande aux autres, ici les gens aiment bien aider.
+
+[jeu]
+mots: bitcraft, jeu, serveur*, update*, maj, patch*, bug*, lag*, crash*, beta, wipe
+- {nom}, ce jeu me prend tout mon temps libre.
+- Un petit lag, et hop, mon arbre a disparu.
+- {nom}, BitCraft c'est relaxant, sauf quand l'inventaire est plein.
+- Les bugs, ça fait partie du charme, {nom}.
+- {nom}, j'aime bien ce jeu, même si je ne fais que couper du bois.
+- Ça lagge un peu chez moi aussi, {nom}.
+- {nom}, vivement la prochaine mise à jour.
+- Je découvre encore plein de trucs dans ce jeu, {nom}.
+- {nom}, le jeu est beau, surtout au coucher du soleil.
+- Un crash, et c'est l'occasion de faire une pause, {nom}.
+
+[meteo]
+mots: meteo, pluie, pleut, il fait nuit, la nuit tombe, soleil, froid, neige*, chaud, orage*, nuage*, brouillard, vent
+- {nom}, il fait toujours beau quand on coupe du bois.
+- La nuit, la forêt fait un peu peur, je l'avoue.
+- {nom}, j'aime bien quand il pleut, ça fait ambiance.
+- Il fait froid du côté de Snowrest, prends un manteau, {nom}.
+- {nom}, le coucher de soleil ici est magnifique.
+- Le vent souffle, les arbres bougent, et moi je coupe.
+- {nom}, la météo du jour : bois, avec quelques éclaircies.
+- Il neige dans mon cœur, {nom}. Et un peu dans le jeu aussi.
+- {nom}, par ce temps, une soupe chaude s'impose.
+- La nuit tombe, {nom}. Parfait pour une dernière récolte.
+
+[fatigue]
+mots: fatigu*, dodo, dormir, dors, sommeil, afk, pause, reveil*, cafe, epuise*, creve
+- {nom}, moi aussi je suis fatigué. Encore un arbre et j'arrête. Promis.
+- Une petite pause, ça fait du bien, {nom}.
+- {nom}, le café est mon meilleur allié.
+- Dodo bientôt, {nom}. Mais pas tout de suite.
+- {nom}, je dis toujours « dernier arbre », et je mens toujours.
+- Bonne pause {nom}, ne t'endors pas devant l'écran.
+- J'ai les yeux qui piquent, {nom}, signe qu'il faudrait dormir.
+- {nom}, le sommeil, c'est pour ceux qui ont fini leurs récoltes.
+- Repose-toi bien {nom}, les arbres seront encore là demain.
+- {nom}, je suis à moitié endormi sur ma hache.
+
+[blague]
+mots: lol, mdr, ptdr, haha*, hihi, xd, blague*, rigol*, raconte, marrant*, drole*, lmao, rofl, kek
+- Haha {nom}, tu m'as fait rire.
+- {nom}, pourquoi les arbres n'aiment pas l'hiver ? Parce qu'on leur coupe tout. Bon, je sors.
+- Mdr {nom}.
+- {nom}, c'est l'histoire d'un bûcheron… non, je l'ai oubliée.
+- Une blague ? Mon inventaire. Il est toujours plein.
+- {nom}, que dit un arbre à un autre arbre ? Rien, ils sont timides.
+- Haha, bien joué {nom}.
+- {nom}, j'ai ri tellement fort que j'ai lâché ma hache.
+- Tu sais ce qui est drôle, {nom} ? Moi qui cherche ma pioche depuis dix minutes.
+- {nom}, ma vie de bûcheron est une comédie, je t'assure.
+- Lol. Je n'ai pas mieux, {nom}.
+
+[compliment]
+mots: bravo, gg, genial*, top, cool, nice, great, awesome, adore, love, best, meilleur*, bg, incroyable, wow, impressionnant*, sympa, gentil*, <3
+- Merci {nom}, ça fait plaisir !
+- Oh, {nom}, tu vas me faire rougir.
+- {nom}, toi aussi tu es top.
+- Trop gentil {nom} !
+- {nom}, je garde ce compliment au chaud.
+- Merci beaucoup {nom}, belle journée à toi !
+- Ça me touche, {nom}. Sincèrement.
+- {nom}, c'est toi le meilleur.
+- Haha merci {nom}, je fais de mon mieux.
+- {nom}, ça m'a mis de bonne humeur pour la journée.
+
+[excuse]
+mots: desole*, pardon, oups, excuse*, my bad, sorry, sry, oops, mb
+- Pas de souci {nom} !
+- {nom}, ce n'est rien, ça arrive à tout le monde.
+- T'inquiète {nom}.
+- Aucun problème, {nom}.
+- {nom}, c'est déjà oublié.
+- Tout va bien {nom}, pas de stress.
+- {nom}, j'ai fait pire ce matin, crois-moi.
+- Pas grave {nom}, on continue.
+
+[merci]
+mots: merci*, mrc, cimer, thanks, thank*, thx, ty, tysm
+- De rien {nom} !
+- Avec plaisir {nom}.
+- {nom}, pas de quoi !
+- C'est normal {nom}.
+- Quand tu veux {nom}.
+- {nom}, je t'en prie.
+- De rien, {nom}. Bonne récolte !
+- Pas de souci {nom}, à charge de revanche.
+- {nom}, ça me fait plaisir.
+
+[cava]
+mots: ca va, cv, comment vas, comment tu vas, tu vas bien, vas bien, quoi de neuf, la forme, en forme, how are you, how r u, hru, how are u, whats up, what s up, wassup
+- Ça va bien {nom}, et toi ?
+- {nom}, tranquille, je coupe du bois. Et toi ?
+- Super {nom}, merci ! Et de ton côté ?
+- {nom}, ça va, un peu fatigué mais ça va.
+- Bien, merci {nom}. Toujours dans la forêt.
+- {nom}, la forme ! Les arbres un peu moins.
+- Ça roule {nom}, et toi ça va ?
+- {nom}, pas mal du tout. Et toi, bonne journée ?
+- Ça va {nom}, rien de neuf, toujours du bois.
+- {nom}, ça va mieux maintenant que quelqu'un me parle.
+
+[aurevoir]
+mots: bye, byebye, ciao, tchao, a plus, a plus tard, a toute, a bientot, bonne nuit, bisous, au revoir, adieu, bonne soiree, bonne journee, je vais y aller
+mots: good night, gn, see you, see ya, cya, later, gotta go, farewell
+- À plus {nom} !
+- Bonne soirée {nom} !
+- {nom}, à bientôt !
+- Bye {nom}, prends soin de toi.
+- Ciao {nom} !
+- {nom}, bonne nuit, et fais de beaux rêves de forêt.
+- À la prochaine {nom}.
+- {nom}, à plus tard, bonne récolte !
+- Salut {nom}, reviens vite.
+- Bonne journée {nom} !
+
+[salutation]
+mots: salut, bonjour, coucou, bonsoir, slt, cc, wesh, bjr, kikou, re, yo, hello, hi, hey, hola, sup, hiya, howdy, good morning
+- Salut {nom} !
+- Coucou {nom} !
+- Hey {nom}, ça va ?
+- Bonjour {nom} !
+- Yo {nom} !
+- {nom} ! Salut à toi.
+- Salut {nom}, bonne journée !
+- Bonsoir {nom} !
+- Coucou {nom}, quoi de beau ?
+- Salut {nom}, content de te voir.
+- Re {nom} !
+
+[question]
+mots: ?, pourquoi, why
+- Bonne question, {nom}. Je n'ai pas de réponse sûre, désolé.
+- {nom}, je dirais oui. Mais je dis souvent oui.
+- Hmm, {nom}, je ne sais pas trop.
+- {nom}, aucune idée, mais je suis curieux aussi.
+- Je pense que oui, {nom}. Enfin, je crois.
+- {nom}, ça dépend. Tout dépend toujours.
+- Pas sûr {nom}. Demande à quelqu'un de plus sérieux que moi.
+- {nom}, la réponse est probablement « plus de bois ».
+- Je réfléchis, {nom}… non, rien ne vient.
+- {nom}, très bonne question. Trop bonne pour moi.
+- Peut-être, {nom}. Peut-être pas.
+
+[autre]
+- Bonne question, {nom}. Je réfléchis… encore… voilà : coupe plus d'arbres.
+- {nom}, mon cœur dit oui. Mon chat dit non. Je suis l'avis du chat.
+- Désolé {nom}, j'étais en train de compter mes troncs. Tu disais ?
+- {nom}, la réponse est 42. Ou une pioche. Souvent une pioche.
+- Message reçu, {nom}. Transmis au conseil des arbres. Ils sont lents.
+- {nom}, je te répondrais bien, mais mon endurance est à 0 %.
+- Excellente remarque, {nom}. Je la note sur une feuille de chêne.
+- {nom}, j'ai consulté les étoiles de Snowrest : elles disent « va manger ».
+- {nom}, j'ai lu trop vite, mais bonne journée quand même !
+- Hmm, {nom}… laisse-moi finir ce tronc et je te dis.
+- {nom}, c'est noté. Enfin, c'est gravé dans l'écorce.
+- Ah {nom}, toujours là pour animer le chat !
+- {nom}, demande à la lavande, elle sait tout.
+- Je dirais oui, {nom}. Mais je dis oui à tout le monde aujourd'hui.
+- {nom}, j'ai une réponse, mais elle est restée dans mon sac.
+- Pas maintenant {nom}, je négocie avec un sanglier.
+- {nom}, la vraie question c'est : qui a mangé ma soupe ?
+- Excellent {nom}, tu viens de gagner un bâton imaginaire.
+- {nom}, j'y réfléchis en coupant du bois, c'est là que j'ai mes meilleures idées.
+- Oui {nom}. Non. Peut-être. Ça dépend de la météo.
+- {nom}, j'ai demandé à mon cheval, il a haussé les épaules.
+- Si tu le dis {nom}, alors c'est sûrement vrai.
+- {nom}, j'ai perdu le fil, mais j'ai trouvé une baie.
+- Tu tombes bien {nom}, je cherchais quelqu'un à qui dire bonjour.
+- {nom}, j'ai la tête dans les feuilles, repose ta question plus tard.
+- Bien vu {nom}. Je n'aurais pas dit mieux. Je n'aurais rien dit, en fait.
+- {nom}, j'ai demandé au forgeron, il a dit « plus de charbon ».
+- C'est une question à trois haches, {nom}.
+- {nom}, je médite sous un chêne, reviens dans dix minutes.
+- Ah, {nom} ! Justement, je pensais à toi. Enfin, au bois. Mais aussi à toi.
+- {nom}, la sagesse de la forêt dit : bois de l'eau.
+- Merci {nom}, ça m'a fait sourire.
+- {nom}, j'ai essayé de réfléchir, j'ai fait tomber ma hache.
+- Grande question, {nom}. Petite réponse : oui.
+- {nom}, je te réponds dès que mon pain est cuit.
+- Bonne chance {nom}, et que tes récoltes soient belles.
+- {nom}, entre nous, personne ne sait vraiment.
+- Je note, {nom}. Sur mon carnet de bûcheron.
+- {nom}, j'ai demandé à un écureuil, il est parti avec ma noisette.
+- Tout ira bien, {nom}. Les arbres repoussent toujours.

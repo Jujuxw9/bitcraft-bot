@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.7 : chat « @gpt » ou « @chatgpt » (majuscules ou minuscules) dans Local, Région, Looking For Group et Trade, réponse dans le même canal (/s, /y, /lfg, /t) ; 30 phrases de plus, smiley 30 % ; temps de lecture avant de répondre ; frappe irrégulière ; minuteur avant la prochaine réponse.");
+        _log.Info("Session", "Version 0.4.8 : chat « @gpt » : chat vérifié à l'écran avant chaque lettre, arrêt si vous cliquez, 2 s d'attente après un retour dans le jeu ; réponses choisies selon le thème du message (base de phrases par thème, 28 thèmes) ; pas deux fois la même phrase de suite ; faute volontaire 5 % du temps.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

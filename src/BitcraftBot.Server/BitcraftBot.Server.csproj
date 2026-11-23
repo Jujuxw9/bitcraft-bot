@@ -14,4 +14,9 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="11.0.0" />
   </ItemGroup>
 
+  <!-- Phrases du chat « @gpt » par thème (v0.4.8) : fichiers texte intégrés au .exe, un par langue -->
+  <ItemGroup>
+    <EmbeddedResource Include="World\Phrases\*.txt" LogicalName="BitcraftBot.Chat.%(Filename).txt" />
+  </ItemGroup>
+
 </Project>

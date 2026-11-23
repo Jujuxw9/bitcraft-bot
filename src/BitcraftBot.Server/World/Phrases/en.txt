@@ -1,0 +1,400 @@
+# Phrases du chat « @gpt » en anglais (tous les joueurs qui n'ont pas « fr/ » devant le pseudo).
+# Même format et mêmes thèmes que fr.txt (voir l'explication en tête de fr.txt), dans le même ordre.
+# Les mots ci-dessous servent aussi pour les joueurs français qui écrivent en anglais.
+
+[toi]
+mots: who are you, who r u, who is this, who are u, your name, real person, are you real, human, artificial, chatgpt, gpt, openai, bot, robot, ai bot, machine, script, automat*, vitals
+- It's just a name, {nom}. Thought it was funny at the time.
+- Just a lumberjack passing by, {nom}.
+- {nom}, I get asked that a lot. Answer: someone who likes trees way too much.
+- The name was a joke. It worked a little too well.
+- {nom}, mostly I'm someone who forgot to eat lunch.
+- Why does everyone ask me that? It's the name, right {nom}?
+- {nom}, I answer now and then, when my hands are free.
+- Let's say I'm the slightly weird neighbor of the forest.
+- {nom}, I picked this name at 2 am. Bad idea, I know.
+- Just a simple adventurer, {nom}. With an axe and a lot of patience.
+- {nom}, I'm as surprised as you that people talk to me.
+- I'm here to chop wood and say silly things, {nom}.
+
+[perso]
+mots: how old, your age, where are you from, where do you live, what country, country, city, real name, address, phone, instagram, insta, discord, snap*, facebook, girlfriend, boyfriend, married
+- {nom}, I keep a bit of mystery, it's part of my charm.
+- Lumberjack secret, {nom}.
+- I come from the forest next door. That's all I'll say.
+- {nom}, here I'm just a player chopping wood, and that suits me fine.
+- Ah, that's private {nom}. But I can talk about trees for hours.
+- {nom}, I'd rather talk about the game, I'm more interesting in game.
+- My age? Older than a young oak, younger than an old one.
+- {nom}, I don't give out my info, but here's a free hello.
+- I'll pass on that one, {nom}.
+- {nom}, let's say I live near Snowrest. It's almost true.
+
+[insulte]
+mots: noob, stupid*, idiot*, dumb, shut up, stfu, ugly, trash, suck*, loser, hate, pathetic, cringe, boring, annoying, lame
+- Ouch {nom}. Adding that to my notebook of weird compliments.
+- {nom}, everyone has bad days. Hang in there.
+- Alright {nom}. Back to my trees, at least they like me.
+- {nom}, I won't get mad, I have too much wood to chop.
+- It's gonna be ok {nom}, take a deep breath.
+- Thanks for the feedback, {nom}. I'll think about it. Or not.
+- {nom}, we're all a bit noob at something.
+- No worries {nom}, have a good game anyway.
+- Haha, {nom}, you remind me of myself on Monday mornings.
+- {nom}, here's a berry to calm things down.
+- I don't answer to jabs, {nom}. Only to pickaxes.
+
+[arbres]
+mots: tree*, wood*, log, logs, axe, lumber*, forest*, oak*, pine*, sap, stump*, branch*, chop*
+- {nom}, chopping wood is my therapy.
+- Trees are life. Especially when they fall the right way.
+- {nom}, one log at a time, that's the secret.
+- I chopped so many trees today I'm dreaming in bark.
+- {nom}, get a good axe, it changes everything.
+- The forest is calm. Except when I walk in with my axe.
+- {nom}, I have a complicated relationship with pine trees.
+- Nothing beats the sound of a falling tree, {nom}.
+- {nom}, if you need wood, follow the angry squirrels.
+- Oaks take forever, but they're worth it.
+- {nom}, I'll end up knowing every tree by its first name.
+- Lumberjack once, lumberjack forever, {nom}.
+
+[minage]
+mots: mine, mining, miner, ore, ores, stone*, rock*, pickaxe*, pebble*, copper, iron, metal*, vein*
+- {nom}, me and my pickaxe go way back.
+- Rocks are less pretty than trees, but they're useful.
+- {nom}, mining is relaxing. Until the inventory is full.
+- I've hit so many rocks I have granite muscles now.
+- {nom}, a good vein is a secret you keep.
+- Tock tock tock… that's the sound of my day, {nom}.
+- {nom}, bring something to fix your pickaxe.
+- Rock is stubborn. Like me.
+- {nom}, I mine a little, but I prefer wood.
+- If you find good ore, {nom}, don't shout it too loud.
+
+[peche]
+mots: fish*, rod, bait, hook*, river*, lake*
+- {nom}, fishing is the art of waiting while looking busy.
+- Fish and I don't always understand each other.
+- {nom}, I caught an old shoe once. Well, almost.
+- Nothing like a calm lake to think, {nom}.
+- {nom}, patience is 90% of fishing.
+- I told the fish a joke, they didn't bite.
+- {nom}, a good fishing spot is never shared, haha.
+- Fishing is my break between two trees.
+- {nom}, if nothing bites, try another spot.
+- Grilled fish after a long day, {nom}, nothing better.
+
+[chasse]
+mots: hunt*, animal*, boar*, deer, wolf, wolves, meat, monster*, creature*, beast*
+- {nom}, the boars around here have a bad attitude.
+- Hunting isn't my thing. I run slower than the deer.
+- {nom}, watch out for wolves, they're not joking.
+- I tried to hunt, the animal hunted me.
+- {nom}, good hunting, and come back in one piece.
+- A boar gave me a dirty look this morning, I didn't push it.
+- {nom}, always keep something to heal before a hunt.
+- I leave the local beasts alone, they leave me alone.
+- {nom}, meat is good for morale.
+- I'm more of a gatherer than a hunter, {nom}.
+
+[cueillette]
+mots: flower*, berr*, forag*, plant*, herb*, mushroom*, lavender, daisy, seed*, fiber*, fibre*
+- {nom}, picking flowers is my poetic side.
+- Berries are small but tasty.
+- {nom}, my pockets are full of flowers, is that normal?
+- Lavender smells nice, that makes up for the rest.
+- {nom}, foraging is the harvest of patient people.
+- I picked so many flowers I could open a shop.
+- {nom}, careful with mushrooms, you never know.
+- Nothing like a foraging walk to relax, {nom}.
+- {nom}, at least plants don't run away.
+- A flower for you, {nom}. Virtual, but sincere.
+
+[cuisine]
+mots: hungry, food, eat*, cook*, soup, bread, meal*, yum*, cake*, starving, snack*
+- {nom}, I'm hungry just talking about it.
+- Soup is the basics. Especially after a day of chopping.
+- {nom}, always keep something to eat in your bag.
+- I forgot to eat, my character too.
+- {nom}, a good meal and you're back on track.
+- Warm bread, {nom}, the real treasure of this game.
+- {nom}, I cook badly, but with love.
+- Yum. Ok, I'm going to grab a snack too.
+- {nom}, hunger is the real final boss.
+- I burned my last soup, {nom}. Don't ask.
+
+[artisanat]
+mots: craft*, smith*, forge*, tool*, tier, recipe*, carpent*, tailor*, leather*, mason*, workshop*, station*, scholar*
+- {nom}, crafting is 10% talent and 90% materials.
+- I'm always missing one thing to craft what I want.
+- {nom}, the forge gets hot. Literally.
+- I spend my life between the workshop and the forest, {nom}.
+- {nom}, a good tool changes your life.
+- I know half the recipes. The other half I guess.
+- {nom}, gather all the materials first, it saves trips.
+- Crafting is satisfying. Tidying up after, less so.
+- {nom}, going up a tier takes time, but it's worth it.
+- I'm more into gathering than crafting, {nom}, but I'm getting there.
+
+[construction]
+mots: build*, house*, construct*, foundation*, wall, walls, roof*, cabin*, decor*
+- {nom}, building is my dream. For now I'm chopping the wood for it.
+- A house needs wood. A lot of wood. I'm on it.
+- {nom}, I'd love a little cabin by a lake.
+- Building always takes longer than planned, {nom}.
+- {nom}, a good base is a tidy base.
+- I started a wall. It's still a project.
+- {nom}, if you build something, I'd love to visit.
+- Building is the best way to empty your chests, {nom}.
+- {nom}, decorating takes the most time.
+- A roof over your head is already pretty good, {nom}.
+
+[commerce]
+mots: sell*, buy*, price*, how much, trade, trading, wts, wtb, market*, merchant*, shop*, coin*, money, pay
+- {nom}, I have nothing to sell right now, sorry.
+- Ask in Trade, {nom}, there's usually people around.
+- {nom}, I keep everything, I'm a squirrel at heart.
+- My price? A hello and a smile, {nom}.
+- {nom}, I don't have much of value, except my good mood.
+- Trading isn't my thing, I'm a lumberjack first.
+- {nom}, compare prices a bit before buying.
+- I'd trade, but my bag is full of wood.
+- {nom}, I'm not buying anything, I'm broke.
+- Good luck with your sale, {nom}!
+
+[groupe]
+mots: group, lfg, team, together, join*, guild*, recruit*, empire*, claim*, coop, party, with me, with us, play with
+- {nom}, I'm mostly playing solo right now, but thanks!
+- Nice of you to ask, {nom}. I'm a bit of a hermit, but I appreciate it.
+- {nom}, I'm busy with my trees, maybe another time.
+- Thanks {nom}, I'll think about it. I think slowly.
+- {nom}, teamwork makes the dream work. I make the wood.
+- I'm not really available right now, {nom}, but good luck with your group.
+- {nom}, sounds fun! Maybe I'll come by later.
+- I'm the lone wolf type. A lone lumberjack wolf.
+- {nom}, if you ever need wood, think of me.
+- Good luck recruiting, {nom}, someone will surely answer.
+
+[niveau]
+mots: level*, lvl, xp, exp, experience, grind*, skill*, leveling
+- {nom}, leveling up is a matter of patience.
+- I'm grinding slowly, one log at a time.
+- {nom}, XP comes on its own when you're having fun.
+- My level? Enough to chop a tree. That's what matters.
+- {nom}, the grind is long, but with music it's fine.
+- I'm leveling slowly, {nom}. Very slowly.
+- {nom}, every level counts. Even the small ones.
+- I got a level earlier, I was so happy.
+- {nom}, don't compare yourself to others, go at your own pace.
+- Experience can't be bought, {nom}. It's chopped.
+
+[ou]
+mots: where, where is, where are, find, location, coords, coordinates, map, lost, direction*, way to
+- {nom}, no exact idea, but the map helps a lot.
+- I get lost myself, {nom}, so I'm not the best guide.
+- {nom}, ask in Region chat, someone will know.
+- Not sure, {nom}. Try looking a bit further out.
+- {nom}, I'm always in the forest, so…
+- Good question, {nom}. I don't have the exact answer, sorry.
+- {nom}, I'd have a hard time explaining the way without getting it wrong.
+- If I knew, {nom}, I'd already be there!
+- {nom}, the map is your friend. More than me on this one.
+- I'm not sure, {nom}. Other players know the area better.
+
+[aide]
+mots: help*, tuto*, guide*, advice, tip, tips, beginner*, newbie, new player, how do i, how to, how do you, i don t understand
+- {nom}, best advice: take your time.
+- {nom}, I'm no expert, but ask in Region, people are nice.
+- To start, gather a bit of everything, {nom}. It's always useful.
+- {nom}, we're all lost at first, it'll come.
+- Always keep food and spare tools, {nom}.
+- {nom}, I'd help, but I'm still learning too.
+- Little tip, {nom}: sort your inventory before it overflows.
+- {nom}, check the player guides, some are really good.
+- Hang in there {nom}, the start is the hardest part.
+- {nom}, ask around, people here like to help.
+
+[jeu]
+mots: bitcraft, game, server*, update*, patch*, bug*, lag*, crash*, beta, wipe, devs
+- {nom}, this game eats all my free time.
+- A little lag, and poof, my tree is gone.
+- {nom}, BitCraft is relaxing, except when the inventory is full.
+- Bugs are part of the charm, {nom}.
+- {nom}, I like this game, even if all I do is chop wood.
+- It's lagging a bit for me too, {nom}.
+- {nom}, can't wait for the next update.
+- I'm still discovering lots of stuff in this game, {nom}.
+- {nom}, the game is beautiful, especially at sunset.
+- A crash is a good excuse for a break, {nom}.
+
+[meteo]
+mots: weather, rain*, at night, night time, sun*, cold, snow*, hot, storm*, cloud*, fog*, wind*
+- {nom}, the weather's always nice when you're chopping wood.
+- At night the forest is a bit scary, I admit.
+- {nom}, I like it when it rains, nice vibe.
+- It's cold around Snowrest, bring a coat, {nom}.
+- {nom}, the sunset here is gorgeous.
+- The wind blows, the trees move, and I chop.
+- {nom}, today's forecast: wood, with some sunny spells.
+- {nom}, in this weather, a hot soup is a must.
+- Night is falling, {nom}. Perfect for one last harvest.
+- {nom}, I'll take any weather as long as the trees stay.
+
+[fatigue]
+mots: tired, sleep*, sleepy, afk, break, coffee, exhausted, nap*, bed, wake*
+- {nom}, I'm tired too. One more tree and I stop. Promise.
+- A little break does you good, {nom}.
+- {nom}, coffee is my best friend.
+- Bed soon, {nom}. But not yet.
+- {nom}, I always say "last tree", and I always lie.
+- Enjoy the break {nom}, don't fall asleep at the screen.
+- My eyes are stinging, {nom}, probably a sign I should sleep.
+- {nom}, sleep is for those who finished their harvest.
+- Rest well {nom}, the trees will still be here tomorrow.
+- {nom}, I'm half asleep on my axe.
+
+[blague]
+mots: lol, lmao, rofl, haha*, xd, joke*, funny, kek, hilarious, tell me a
+- Haha {nom}, you made me laugh.
+- {nom}, why did the tree go to the dentist? It needed a root canal. Ok, I'm leaving.
+- Lol {nom}.
+- {nom}, so there's this lumberjack… nope, I forgot it.
+- A joke? My inventory. It's always full.
+- {nom}, what did one tree say to the other? Nothing, they're shy.
+- Haha, well played {nom}.
+- {nom}, I laughed so hard I dropped my axe.
+- You know what's funny, {nom}? Me looking for my pickaxe for ten minutes.
+- {nom}, my lumberjack life is a comedy, I swear.
+- Lol. I've got nothing better, {nom}.
+
+[compliment]
+mots: gg, nice, great, awesome, love, best, amazing, wow, impressive, cool, sweet, legend, goat, <3
+- Thanks {nom}, that's nice!
+- Oh, {nom}, you'll make me blush.
+- {nom}, you're awesome too.
+- So kind {nom}!
+- {nom}, I'll keep that compliment warm.
+- Thanks a lot {nom}, have a great day!
+- That means a lot, {nom}. Really.
+- {nom}, you're the best.
+- Haha thanks {nom}, I'm doing my best.
+- {nom}, that just made my day.
+
+[excuse]
+mots: sorry, sry, oops, my bad, mb, apolog*, excuse me
+- No worries {nom}!
+- {nom}, it's nothing, happens to everyone.
+- All good {nom}.
+- No problem, {nom}.
+- {nom}, already forgotten.
+- It's fine {nom}, no stress.
+- {nom}, I did worse this morning, trust me.
+- Don't worry {nom}, let's move on.
+
+[merci]
+mots: thanks, thank*, thx, ty, tysm, cheers
+- You're welcome {nom}!
+- My pleasure {nom}.
+- {nom}, no problem!
+- Anytime {nom}.
+- {nom}, don't mention it.
+- Sure thing, {nom}. Happy harvesting!
+- No worries {nom}, you'd do the same.
+- {nom}, glad I could.
+
+[cava]
+mots: how are you, how r u, hru, how are u, how s it going, how is it going, whats up, what s up, wassup, how you doing, you ok, u ok
+- I'm good {nom}, you?
+- {nom}, chilling, chopping wood. You?
+- Great {nom}, thanks! How about you?
+- {nom}, doing ok, a bit tired but ok.
+- Good, thanks {nom}. Still in the forest.
+- {nom}, feeling great! The trees, less so.
+- All good {nom}, and you?
+- {nom}, not bad at all. Having a good day?
+- I'm fine {nom}, nothing new, still wood.
+- {nom}, better now that someone's talking to me.
+
+[aurevoir]
+mots: bye, byebye, ciao, good night, gn, see you, see ya, cya, later, gotta go, farewell, take care, have a good, goodbye
+- See you {nom}!
+- Have a good evening {nom}!
+- {nom}, see you soon!
+- Bye {nom}, take care.
+- Ciao {nom}!
+- {nom}, good night, sweet forest dreams.
+- Until next time {nom}.
+- {nom}, see you later, happy harvesting!
+- Later {nom}, come back soon.
+- Have a nice day {nom}!
+
+[salutation]
+mots: hello, hi, hey, yo, hola, sup, hiya, howdy, greetings, good morning, good evening, heya
+- Hi {nom}!
+- Hey {nom}!
+- Hey {nom}, how's it going?
+- Hello {nom}!
+- Yo {nom}!
+- {nom}! Hi there.
+- Hi {nom}, have a nice day!
+- Good evening {nom}!
+- Hey {nom}, what's new?
+- Hi {nom}, good to see you.
+- Heya {nom}!
+
+[question]
+mots: ?, why
+- Good question, {nom}. I don't have a sure answer, sorry.
+- {nom}, I'd say yes. But I say yes a lot.
+- Hmm, {nom}, not too sure.
+- {nom}, no idea, but now I'm curious too.
+- I think so, {nom}. Well, I believe so.
+- {nom}, it depends. It always depends.
+- Not sure {nom}. Ask someone more serious than me.
+- {nom}, the answer is probably "more wood".
+- Thinking, {nom}… nope, nothing.
+- {nom}, very good question. Too good for me.
+- Maybe, {nom}. Maybe not.
+
+[autre]
+- Great question, {nom}. Thinking… still thinking… done: chop more trees.
+- {nom}, my heart says yes. My cat says no. I trust the cat.
+- Sorry {nom}, I was counting my logs. You were saying?
+- {nom}, the answer is 42. Or a pickaxe. Usually a pickaxe.
+- Message received, {nom}. Forwarded to the council of trees. They are slow.
+- {nom}, I'd answer, but my stamina is at 0%.
+- Excellent point, {nom}. Writing it down on an oak leaf.
+- {nom}, I asked the stars over Snowrest: they say "go eat something".
+- {nom}, I read that too fast, but have a nice day anyway!
+- Hmm, {nom}… let me finish this log and I'll tell you.
+- {nom}, noted. Well, carved into the bark.
+- Ah {nom}, always keeping the chat alive!
+- {nom}, ask the lavender, it knows everything.
+- I'd say yes, {nom}. But I'm saying yes to everyone today.
+- {nom}, I had an answer, but it's stuck in my backpack.
+- Not now {nom}, I'm negotiating with a boar.
+- {nom}, the real question is: who ate my soup?
+- Nice {nom}, you just won an imaginary stick.
+- {nom}, I'll think about it while chopping, that's where my best ideas come from.
+- Yes {nom}. No. Maybe. Depends on the weather.
+- {nom}, I asked my horse, he just shrugged.
+- If you say so {nom}, it must be true.
+- {nom}, I lost track, but I found a berry.
+- Good timing {nom}, I was looking for someone to say hi to.
+- {nom}, my head is in the leaves, ask me again later.
+- Well said {nom}. I couldn't have said it better. I wouldn't have said anything, really.
+- {nom}, I asked the blacksmith, he said "more coal".
+- That's a three-axe question, {nom}.
+- {nom}, I'm meditating under an oak, come back in ten minutes.
+- Oh, {nom}! I was just thinking about you. Well, about wood. But also you.
+- {nom}, the wisdom of the forest says: drink some water.
+- Thanks {nom}, that made me smile.
+- {nom}, I tried to think, I dropped my axe.
+- Big question, {nom}. Small answer: yes.
+- {nom}, I'll answer as soon as my bread is baked.
+- Good luck {nom}, may your harvests be plenty.
+- {nom}, between us, nobody really knows.
+- Noted, {nom}. In my lumberjack notebook.
+- {nom}, I asked a squirrel, it ran off with my acorn.
+- It'll be fine, {nom}. Trees always grow back.
