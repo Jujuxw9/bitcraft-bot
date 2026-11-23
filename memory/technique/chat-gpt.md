@@ -1,6 +1,6 @@
 # Module « @GPT » : répondre dans le chat du jeu (étude)
 
-- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6) ; v0.4.7 tous les canaux (section 7) ; **v0.4.8 réponses par thème, frappe vérifiée lettre par lettre, fautes 5 % (D-059, section 8)**. Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
+- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6) ; v0.4.7 tous les canaux (section 7) ; v0.4.9 langue, style, correction, autres bots, fichiers modifiables (D-060, section 9) ; **v0.4.8 réponses par thème, frappe vérifiée lettre par lettre, fautes 5 % (D-059, section 8)**. Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
 - **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase courte. **Pas de spam.**
 - **Liens** : D-054, D-024, D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
 
@@ -162,3 +162,26 @@ Prochaines étapes : brancher l'abonnement et afficher dans la fenêtre du bot �
 
 ### Tests
 - `V048Tests` (13 tests, plus 25 messages types) : chat vu avant chaque lettre, chat fermé pendant la frappe ou juste avant Entrée, clic de Julien ; fichiers sans erreur, mêmes thèmes, 8 phrases au moins ; aucun mot interdit (D-055) sur toute la base ; 25 messages → thème attendu ; pas de répétition ; fautes (pseudo jamais touché, une seule, ~5 %).
+
+## 9. v0.4.9 (2026-11-24, D-060) : langue, style, correction, autres bots, fichiers modifiables
+
+- **Langue** (`World/ChatStyle.cs`, `LanguageOf`) : « fr/ », ou message écrit en français (mots courants français contre anglais, accents comptés).
+- **Style relâché** (`ChatStyle.Casual`, 25 %) : pas de majuscule au début (sauf pseudo), pas de point final, une abréviation une fois sur deux.
+- **Faute corrigée** (`ChatReply.Correction`, 50 % des fautes) : 2e message « *mot » 1,5 à 4 s après, par `SendGptCorrectionAsync` (mêmes sécurités ; pas prêt = abandon).
+- **Autres bots ignorés** (`GptChatPicker.LooksAutomated`) : pseudo avec « bot », marques de bot dans le texte, écho d'une des 10 dernières réponses du bot. Journal : « ignoré : ressemble à un autre bot ».
+- **Fichiers à côté du .exe** (`ChatPhraseBook.Load`) : dossier `phrases-chat` ; `modele-fr.txt` / `modele-en.txt` réécrits à chaque démarrage ; `fr.txt` / `en.txt` posés là remplacent ceux du .exe ; phrase avec un mot interdit refusée (D-055) ; fichier sans [autre] : phrases du .exe. Journal : « Base de phrases : 28 thèmes, 629 phrases (phrases intégrées au .exe) ».
+- **Essai réel** : démarrage du .exe v0.4.9 vérifié (jeu fermé), modèles écrits, fermeture propre. Envoi dans le jeu : pas encore vu.
+- Tests : `V049Tests` (9).
+
+### Pistes pour la suite (proposées le 2026-11-24, pas validées)
+Voir la liste de 10 idées du message de fin de session 23 (aussi recopiée ici) :
+1. Réponse au nom : répondre aussi quand on écrit « ChatGPT » sans « @ ».
+2. Messages privés reçus (table `direct_message_state`, lecture seule) : réponse par la commande du jeu (**À vérifier** : commande /w ?).
+3. Plafond par heure (ex. 20) et par joueur (ex. 1 toutes les 3 min) en plus de 1 par minute.
+4. Pause du chatbot quand Julien écrit lui-même dans le chat depuis peu.
+5. Onglet « Chat » dans le bot : historique des messages reçus et des réponses, bouton « tester une phrase » (mode essai sans envoi).
+6. Réponses selon l'heure (bonjour / bonsoir), le jour, ou le canal (Trade : ton commerce ; LFG : ton groupe).
+7. Infos vraies du jeu lues sur le serveur : niveau de Julien, région, nom de la région (« je suis à Snowrest »), sans info privée.
+8. Claude Haiku avec une clé API de Julien (D-054), phrases toutes faites en secours.
+9. Liste de joueurs « amis » (réponses plus familières) et liste noire (jamais de réponse).
+10. Statistiques : thèmes les plus demandés, messages tombés dans [autre] (pour ajouter des thèmes).

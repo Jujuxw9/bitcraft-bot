@@ -234,7 +234,7 @@ public class V048Tests
     [Fact]
     public void Reponse_avec_theme_et_pseudo()
     {
-        var reply = ChatReplies.For(Msg("@gpt salut", "fr/Bob"), ChatPhraseBook.LoadEmbedded(), new Random(2), smileyChance: 0, typoChance: 0);
+        var reply = ChatReplies.For(Msg("@gpt salut", "fr/Bob"), ChatPhraseBook.LoadEmbedded(), new Random(2), smileyChance: 0, typoChance: 0, casualChance: 0);
         Assert.Equal("salutation", reply.Theme);
         Assert.Null(reply.Typo);
         Assert.Contains(reply.Text, Book.Theme("salutation")!.Phrases["fr"].Select(p => p.Replace("{nom}", "Bob")));

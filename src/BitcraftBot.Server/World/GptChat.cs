@@ -151,7 +151,14 @@ public sealed class GptChatPicker
         {
             return null;
         }
-        var pending = Pending(messages, now);
+        var all = Pending(messages, now);
+        // v0.4.9 : un message qui ressemble à un autre bot est oublié (pas de boucle entre deux bots).
+        foreach (var m in all.Where(LooksAutomated))
+        {
+            _handled.Add(m.EntityId);
+            _ignored.Add(m);
+        }
+        var pending = all.Where(m => !LooksAutomated(m)).ToList();
         if (pending.Count == 0)
         {
             return null;
@@ -163,6 +170,53 @@ public sealed class GptChatPicker
         _lastReply = now;
         return pending[^1];
     }
+
+    private readonly List<ChatMessage> _ignored = [];
+
+    // Messages oubliés parce qu'ils ressemblent à un autre bot, depuis le dernier appel (pour le journal).
+    public IReadOnlyList<ChatMessage> TakeIgnored()
+    {
+        var list = _ignored.ToList();
+        _ignored.Clear();
+        return list;
+    }
+
+    // Dernières réponses envoyées par le bot (un message qui les répète est un écho d'un autre bot).
+    private readonly Queue<string> _sent = new();
+
+    public void NoteSent(string text)
+    {
+        _sent.Enqueue(Normalize(text));
+        while (_sent.Count > 10)
+        {
+            _sent.Dequeue();
+        }
+    }
+
+    private static readonly string[] BotMarkers =
+    [
+        "[bot]", "(bot)", "[ai]", "[ia]", "[gpt]", "auto-reply", "autoreply", "automated message", "message automatique",
+        "réponse automatique", "beep boop", "bip boup", "i am a bot", "i'm a bot", "je suis un bot", "as an ai", "en tant qu'ia",
+        "as a language model", "en tant que modèle",
+    ];
+
+    // Ressemble à un autre bot : pseudo avec « bot », marque de bot dans le texte, ou écho d'une réponse du bot.
+    public bool LooksAutomated(ChatMessage m)
+    {
+        if (m.Username.Contains("bot", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+        var lower = m.Text.ToLowerInvariant();
+        if (BotMarkers.Any(b => lower.Contains(b, StringComparison.Ordinal)))
+        {
+            return true;
+        }
+        var text = Normalize(TriggerPattern.Replace(m.Text, " "));
+        return text.Length >= 12 && _sent.Any(s => s.Contains(text, StringComparison.Ordinal) || text.Contains(s, StringComparison.Ordinal));
+    }
+
+    private static string Normalize(string text) => string.Join(' ', ChatPhraseBook.Tokens(text));
 
     // Temps de lecture avant de répondre (v0.4.7) : 1,5 s, plus 60 ms par lettre du message (6 s au plus),
     // plus 0,5 à 2,5 s au hasard. Comme quelqu'un qui lit, puis réfléchit.

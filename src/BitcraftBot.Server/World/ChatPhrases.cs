@@ -47,7 +47,24 @@ public sealed class ChatPhraseBook
     public ChatTheme? Theme(string name) => _themes.FirstOrDefault(t => t.Name == name);
 
     // Fichiers intégrés au .exe (World/Phrases/*.txt).
-    public static ChatPhraseBook LoadEmbedded()
+    // Français en premier : l'ordre des thèmes du fichier français décide des égalités.
+    public static ChatPhraseBook LoadEmbedded() => Parse(EmbeddedFiles());
+
+    // D-055 : une phrase ne parle jamais de bot. Vérifié au chargement (même pour un fichier modifié à la main).
+    public static readonly IReadOnlyList<string> ForbiddenWords =
+        ["bot", "robot", " ia ", " ai ", "circuit", "bip", "beep", "program", "intelligence", "openai", "chatgpt"];
+
+    public static bool HasForbiddenWord(string phrase)
+    {
+        var lower = " " + phrase.ToLowerInvariant() + " ";
+        return ForbiddenWords.Any(f => lower.Contains(f, StringComparison.Ordinal));
+    }
+
+    // Dossier à côté du .exe (v0.4.9, Julien : amélioration 7) : un fichier « fr.txt » ou « en.txt » posé là
+    // remplace celui intégré au .exe, sans nouvelle version. Les modèles « modele-fr.txt »… y sont réécrits à chaque démarrage.
+    public const string FolderName = "phrases-chat";
+
+    public static IReadOnlyList<(string Language, string Content)> EmbeddedFiles()
     {
         var assembly = typeof(ChatPhraseBook).Assembly;
         var files = new List<(string, string)>();
@@ -59,11 +76,51 @@ public sealed class ChatPhraseBook
                 continue;
             }
             using var reader = new StreamReader(stream, Encoding.UTF8);
-            var language = resource["BitcraftBot.Chat.".Length..^".txt".Length];
-            files.Add((language, reader.ReadToEnd()));
+            files.Add((resource["BitcraftBot.Chat.".Length..^".txt".Length], reader.ReadToEnd()));
         }
-        // Français en premier : l'ordre des thèmes du fichier français décide des égalités.
-        return Parse(files.OrderBy(f => f.Item1 == "fr" ? 0 : 1).ToList());
+        return files.OrderBy(f => f.Item1 == "fr" ? 0 : 1).ToList();
+    }
+
+    // Fichiers intégrés, remplacés langue par langue par ceux du dossier s'ils existent. Overridden : langues remplacées.
+    public static ChatPhraseBook Load(string? folder, out IReadOnlyList<string> overridden)
+    {
+        var files = EmbeddedFiles().ToList();
+        var replaced = new List<string>();
+        if (folder is not null)
+        {
+            try
+            {
+                Directory.CreateDirectory(folder);
+                foreach (var (language, content) in files)
+                {
+                    File.WriteAllText(Path.Combine(folder, $"modele-{language}.txt"), content, new UTF8Encoding(false));
+                }
+                for (var i = 0; i < files.Count; i++)
+                {
+                    var path = Path.Combine(folder, $"{files[i].Item1}.txt");
+                    if (File.Exists(path))
+                    {
+                        files[i] = (files[i].Item1, File.ReadAllText(path, Encoding.UTF8));
+                        replaced.Add(files[i].Item1);
+                    }
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Dossier inaccessible : les phrases intégrées suffisent.
+            }
+        }
+        overridden = replaced;
+        var book = Parse(files);
+        // Fichier modifié qui ne donne rien d'utilisable : retour aux phrases intégrées.
+        if (replaced.Count > 0 && (book.Theme(DefaultTheme) is not { } autre || autre.Phrases.Values.Sum(l => l.Count) == 0))
+        {
+            var fallback = Parse(EmbeddedFiles());
+            fallback._errors.Insert(0, "fichier de phrases à côté du .exe inutilisable (pas de thème [autre]) : phrases intégrées gardées");
+            overridden = [];
+            return fallback;
+        }
+        return book;
     }
 
     public static ChatPhraseBook Parse(IReadOnlyList<(string Language, string Content)> files)
@@ -132,6 +189,11 @@ public sealed class ChatPhraseBook
                 if (phrase.Length == 0 || phrase.Replace("{nom}", "").Contains('{') || phrase.Replace("{nom}", "").Contains('}'))
                 {
                     _errors.Add($"{language}.txt ligne {number} : phrase vide ou accolade inconnue");
+                    continue;
+                }
+                if (HasForbiddenWord(phrase))
+                {
+                    _errors.Add($"{language}.txt ligne {number} : phrase refusée, elle parle de bot (D-055)");
                     continue;
                 }
                 if (!current.Phrases.TryGetValue(language, out var list))
@@ -263,36 +325,48 @@ public sealed class ChatPhraseBook
     }
 }
 
-// Réponse prête à taper : texte, thème reconnu, faute volontaire éventuelle (pour le journal).
-public sealed record ChatReply(string Text, string Theme, string? Typo);
+// Réponse prête à taper : texte, thème reconnu, faute volontaire éventuelle (pour le journal),
+// correction « *mot » à envoyer juste après (v0.4.9), langue choisie.
+public sealed record ChatReply(string Text, string Theme, string? Typo, string? Correction = null, string Language = "en");
 
 public static class ChatReplies
 {
     // Chance d'une faute volontaire dans la réponse (v0.4.8, Julien : « genre 5 % du temps »).
     public const double TypoChance = 0.05;
 
-    // Langue de la réponse : français si le joueur a le jeu en français (« fr/ »), anglais sinon.
-    public static string LanguageOf(ChatMessage message) =>
-        message.Language.StartsWith("fr", StringComparison.OrdinalIgnoreCase) ? "fr" : "en";
+    // Chance de corriger la faute par un 2e message « *mot » (v0.4.9, Julien : amélioration 2).
+    public const double CorrectionChance = 0.5;
+
+    // Langue de la réponse (v0.4.9) : « fr/ » devant le pseudo, ou message écrit en français.
+    public static string LanguageOf(ChatMessage message) => ChatStyle.LanguageOf(message);
 
     public static ChatReply For(ChatMessage message, ChatPhraseBook book, Random random,
-        double smileyChance = CannedReplies.SmileyChance, double typoChance = TypoChance)
+        double smileyChance = CannedReplies.SmileyChance, double typoChance = TypoChance, double casualChance = ChatStyle.CasualChance)
     {
         var theme = book.DetectTheme(message.Text);
         var language = LanguageOf(message);
         var name = CannedReplies.CleanName(message.Username);
         var phrase = book.Pick(theme, language, random) ?? (language == "fr" ? "Coucou {nom} !" : "Hey {nom}!");
         var text = phrase.Replace("{nom}", name, StringComparison.Ordinal);
+        if (casualChance > 0 && random.NextDouble() < casualChance)
+        {
+            text = ChatStyle.Casual(text, language, name, random);
+        }
         string? typo = null;
+        string? correction = null;
         if (typoChance > 0 && random.NextDouble() < typoChance && ChatTypos.Apply(text, language, name, random) is { } faulty)
         {
             typo = faulty.Description;
             text = faulty.Text;
+            if (random.NextDouble() < CorrectionChance)
+            {
+                correction = "*" + faulty.Right;
+            }
         }
         if (smileyChance > 0 && random.NextDouble() < smileyChance)
         {
             text += " " + CannedReplies.Smileys[random.Next(CannedReplies.Smileys.Count)];
         }
-        return new ChatReply(text.Length <= CannedReplies.MaxLength ? text : text[..CannedReplies.MaxLength], theme, typo);
+        return new ChatReply(text.Length <= CannedReplies.MaxLength ? text : text[..CannedReplies.MaxLength], theme, typo, correction, language);
     }
 }

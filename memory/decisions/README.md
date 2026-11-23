@@ -63,6 +63,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-057](D-057-w-camera-canal-region-auto.md) | W remet une caméra fixe par rapport au personnage ; chat passé automatiquement sur Région au lancement du jeu | Validée | 2026-11-23 |
 | [D-058](D-058-v047-chat-canaux-commandes.md) | v0.4.7 : « @gpt » et « @chatgpt », réponse dans le canal du message par les commandes du jeu (/s, /y, /lfg, /t), 40 phrases, smiley 30 %, frappe humaine, minuteur | Validée | 2026-11-23 |
 | [D-059](D-059-v048-chat-frappe-verifiee-themes-fautes.md) | v0.4.8 : chat vérifié avant chaque lettre, clic de Julien = arrêt, 2 s après un retour dans le jeu ; réponses par thème (base de phrases fr/en) ; faute volontaire 5 % | Validée | 2026-11-24 |
+| [D-060](D-060-v049-chat-langue-style-correction-bots-fichiers.md) | v0.4.9 : langue du message, style relâché, faute corrigée « *mot », autres bots ignorés, phrases modifiables dans « phrases-chat » | Validée | 2026-11-24 |
 
 ## Gabarit
 

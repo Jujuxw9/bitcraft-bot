@@ -24,3 +24,9 @@ Reprendre le module « @GPT » : lire le journal v0.4.7, puis améliorer les ré
 - Juste avant 00:03:48 le 24/11, as-tu cliqué dans le jeu pour revenir dessus ?
 - Garder « pas deux fois la même phrase » ?
 - Améliorations proposées (voir le message de fin de session) : à valider une par une.
+
+## Suite : v0.4.9 (même session)
+- Réponses de Julien : améliorations 1, 2, 3, 6, 7 oui ; 4 et 5 pour plus tard ; « pas deux fois la même phrase » gardé ; clic à 00:03:48 : il ne sait plus.
+- Codé : langue du message, style relâché, faute corrigée « *mot », autres bots ignorés, dossier `phrases-chat` à côté du .exe. D-060.
+- 529 tests réussis, compilation sans avertissement, .exe v0.4.9 fabriqué, démarrage vérifié (jeu fermé), journal d'essai effacé.
+- 10 nouvelles pistes proposées (`technique/chat-gpt.md` section 9).

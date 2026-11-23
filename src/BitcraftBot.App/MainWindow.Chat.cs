@@ -22,8 +22,9 @@ public partial class MainWindow
 
     private readonly Random _gptRandom = new();
 
-    // Base de phrases par thème (v0.4.8, fichiers World/Phrases/*.txt intégrés au .exe).
-    private readonly ChatPhraseBook _gptPhrases = ChatPhraseBook.LoadEmbedded();
+    // Base de phrases par thème (v0.4.8, fichiers World/Phrases/*.txt intégrés au .exe) ;
+    // v0.4.9 : un fichier fr.txt ou en.txt dans « phrases-chat » à côté du .exe le remplace.
+    private ChatPhraseBook _gptPhrases = ChatPhraseBook.LoadEmbedded();
     private bool _gptEnabled = true;
     private GptChatPicker? _gptPicker;
     private ulong _gptPickerFor;
@@ -33,7 +34,8 @@ public partial class MainWindow
     private int _gptSent;
 
     // ReadyAt : fin du temps de lecture (on ne répond pas à la seconde où le message arrive).
-    private sealed record GptReply(ChatMessage Message, string Text, DateTimeOffset ReadyAt);
+    // Correction : « *mot » à envoyer juste après, quand la réponse a une faute volontaire (v0.4.9).
+    private sealed record GptReply(ChatMessage Message, string Text, DateTimeOffset ReadyAt, string? Correction = null);
 
     // v0.4.8 : dernier vrai clic de Julien (heure en ticks) et dernier moment où le jeu n'était pas au premier plan.
     // Après un retour dans le jeu ou un clic, le bot attend 2 s avant d'ouvrir le chat (journal du 24/11 00:03).
@@ -58,8 +60,11 @@ public partial class MainWindow
         }
         GptCheck.IsChecked = _gptEnabled;
         _log.Info("Chat", "Réponses « @gpt » ou « @chatgpt » activées (Local, Région, Looking For Group, Trade ; réponse dans le même canal ; 1 par minute au plus ; phrases par thème, smiley 30 %, faute volontaire 5 %).");
+        var folder = System.IO.Path.Combine(AppContext.BaseDirectory, ChatPhraseBook.FolderName);
+        _gptPhrases = ChatPhraseBook.Load(folder, out var overridden);
         var phrases = _gptPhrases.Themes.Sum(t => t.Phrases.Values.Sum(l => l.Count));
-        _log.Info("Chat", $"Base de phrases : {_gptPhrases.Themes.Count} thèmes, {phrases} phrases.");
+        _log.Info("Chat", $"Base de phrases : {_gptPhrases.Themes.Count} thèmes, {phrases} phrases"
+            + (overridden.Count > 0 ? $" (fichier(s) {string.Join(", ", overridden.Select(l => l + ".txt"))} du dossier « {ChatPhraseBook.FolderName} » utilisé(s))." : " (phrases intégrées au .exe)."));
         foreach (var error in _gptPhrases.Errors)
         {
             _log.Alerte("Chat", $"Base de phrases : {error}.");
@@ -115,13 +120,19 @@ public partial class MainWindow
         ShowGptTimer(_gptPicker.Cooldown(now));
 
         // 1. Un nouveau message « @gpt » ?
-        if (_gptPending is null && !_gptSending && _gptPicker.Pick(reader.ChatMessages(), now) is { } m)
+        var picked = _gptPending is null && !_gptSending ? _gptPicker.Pick(reader.ChatMessages(), now) : null;
+        foreach (var bot in _gptPicker.TakeIgnored())
+        {
+            _log.Info("Chat", $"« @gpt » de {bot.Username} ignoré : ressemble à un autre bot (« {Short(bot.Text)} »).");
+        }
+        if (picked is { } m)
         {
             var reply = ChatReplies.For(m, _gptPhrases, _gptRandom);
             var text = reply.Text;
-            _gptPending = new GptReply(m, text, now + GptChatPicker.ReadingTime(m.Text, _gptRandom));
+            _gptPending = new GptReply(m, text, now + GptChatPicker.ReadingTime(m.Text, _gptRandom), reply.Correction);
             _log.Info("Chat", $"« @gpt » de {m.Username} ({ChatChannels.Name(m.Channel)}) : « {Short(m.Text)} ». Thème : {reply.Theme}. Réponse prévue dans {ChatChannels.Name(m.Channel)} ({ChatChannels.Command(m.Channel)}) : « {text} »."
-                + (reply.Typo is { } typo ? $" Faute volontaire : {typo}." : ""));
+                + (reply.Typo is { } typo ? $" Faute volontaire : {typo}." : "")
+                + (reply.Correction is { } fix ? $" Correction prévue juste après : « {fix} »." : ""));
             ShowGptTimer(_gptPicker.Cooldown(now));
         }
         if (_gptPending is not { } p || _gptSending)
@@ -171,7 +182,12 @@ public partial class MainWindow
             if (result.Done)
             {
                 _gptSent++;
+                _gptPicker?.NoteSent(reply.Text);
                 _log.Info("Chat", $"Réponse envoyée à {reply.Message.Username} dans {ChatChannels.Name(channel)} : « {reply.Text} ».");
+                if (reply.Correction is { } fix)
+                {
+                    await SendGptCorrectionAsync(reply.Message.Username, fix, channel);
+                }
             }
             else
             {
@@ -183,6 +199,29 @@ public partial class MainWindow
             // Une seule tentative par message : pas de boucle si le jeu refuse.
             _gptPending = null;
             _gptSending = false;
+        }
+    }
+
+    // v0.4.9 (amélioration 2) : correction « *mot » 1,5 à 4 s après la réponse, comme un vrai joueur.
+    // Mêmes sécurités ; si le jeu n'est pas prêt à ce moment-là, la correction est abandonnée (pas d'attente).
+    private async Task SendGptCorrectionAsync(string user, string fix, int channel)
+    {
+        await Task.Delay(1500 + _gptRandom.Next(2500));
+        var why = _actions.WhyNot() ?? (DateTime.Now - GptLastClick < GptCalmTime ? "clic de souris récent" : null);
+        if (why is not null)
+        {
+            _log.Info("Chat", $"Correction « {fix} » pas envoyée : {why}.");
+            return;
+        }
+        var result = await _actions.ChatAsync("Correction « @GPT »", fix, ChatProbeForGame(channel), ChatChannels.Command(channel));
+        if (result.Done)
+        {
+            _gptPicker?.NoteSent(fix);
+            _log.Info("Chat", $"Correction envoyée à {user} dans {ChatChannels.Name(channel)} : « {fix} ».");
+        }
+        else
+        {
+            _log.Alerte("Chat", $"Correction « {fix} » pas envoyée : {result.Detail}.");
         }
     }
 

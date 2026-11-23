@@ -8,7 +8,8 @@ namespace BitcraftBot.Server.World;
 //   ou (français) un accent oublié.
 public static class ChatTypos
 {
-    public sealed record Typo(string Text, string Description);
+    // Right : le mot juste (pour la correction « *mot » envoyée juste après, v0.4.9).
+    public sealed record Typo(string Text, string Description, string Right);
 
     // Chance de choisir une faute de grammaire quand le message en permet une.
     public const double GrammarShare = 0.4;
@@ -104,7 +105,7 @@ public static class ChatTypos
             return null;
         }
         words[index] = before + faulty + after;
-        return new Typo(string.Join(' ', words), $"« {faulty} » au lieu de « {word} » ({kind})");
+        return new Typo(string.Join(' ', words), $"« {faulty} » au lieu de « {word} » ({kind})", word);
     }
 
     private static Typo? Grammar(string[] words, List<int> candidates, string language, Random random)
@@ -143,7 +144,7 @@ public static class ChatTypos
                     joined.RemoveAt(i + 1);
                     if (random.Next(options.Count + 1) == 0)
                     {
-                        return new Typo(string.Join(' ', joined), "« alot » au lieu de « a lot » (grammaire)");
+                        return new Typo(string.Join(' ', joined), "« alot » au lieu de « a lot » (grammaire)", "a lot");
                     }
                 }
             }
@@ -159,7 +160,7 @@ public static class ChatTypos
             replacement = char.ToUpperInvariant(replacement[0]) + replacement[1..];
         }
         words[index] = before + replacement + after;
-        return new Typo(string.Join(' ', words), $"« {replacement} » au lieu de « {original} » (grammaire)");
+        return new Typo(string.Join(' ', words), $"« {replacement} » au lieu de « {original} » (grammaire)", original);
     }
 
     private static (string Text, string Kind) Keyboard(string word, string language, Random random)

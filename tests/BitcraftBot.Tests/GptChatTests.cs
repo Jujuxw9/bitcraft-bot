@@ -108,10 +108,10 @@ public class GptChatTests
         // v0.4.8 : phrases du thème [autre] (message sans mot reconnu), dans la langue du joueur.
         var book = ChatPhraseBook.LoadEmbedded();
         var autre = book.Theme("autre")!;
-        var fr = ChatReplies.For(Msg(1, "@GPT", Now, user: "fr/Bob"), book, new Random(1), smileyChance: 0, typoChance: 0);
+        var fr = ChatReplies.For(Msg(1, "@GPT", Now, user: "fr/Bob"), book, new Random(1), smileyChance: 0, typoChance: 0, casualChance: 0);
         Assert.Equal("autre", fr.Theme);
         Assert.Contains(fr.Text, autre.Phrases["fr"].Select(p => p.Replace("{nom}", "Bob")));
-        var en = ChatReplies.For(Msg(2, "@GPT", Now, user: "en/Alice"), book, new Random(1), smileyChance: 0, typoChance: 0);
+        var en = ChatReplies.For(Msg(2, "@GPT", Now, user: "en/Alice"), book, new Random(1), smileyChance: 0, typoChance: 0, casualChance: 0);
         Assert.Contains(en.Text, autre.Phrases["en"].Select(p => p.Replace("{nom}", "Alice")));
     }
 
