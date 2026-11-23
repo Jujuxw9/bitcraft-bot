@@ -58,6 +58,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-052](D-052-visee-verifiee-fenetres.md) | Visée vérifiée (cône de la mini-carte, contour vert, serveur) et détection des fenêtres du jeu avant toute action | Validée | 2026-11-22 |
 | [D-053](D-053-attente-apres-w-1s.md) | Après W, la caméra revient en 1 s (et pas 3 s) | Validée | 2026-11-23 |
 | [D-054](D-054-chat-gpt-reponses.md) | Module « @GPT » : Entrée permise pour répondre dans le chat Région, déclencheur « @GPT » en majuscules, 1 réponse par minute (la plus récente), phrases toutes faites sans clé API | Validée | 2026-11-23 |
+| [D-055](D-055-chat-gpt-suite.md) | Module « @GPT » : clavier pendant la récolte, chat refermé, pas de mention « bot », Haiku plus tard | Validée | 2026-11-23 |
 
 ## Gabarit
 

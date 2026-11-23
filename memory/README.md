@@ -33,7 +33,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-054
+- [README.md](decisions/README.md) — tableau D-001 à D-055
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-027
@@ -64,6 +64,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-22-essai-v041.md](echanges/2026-11-22-essai-v041.md) — essai v0.4.2 (fait le 22/11 : connexion pas reconnue, lectures de texte en même temps → v0.4.3)
 - [2026-11-23-essai-v043.md](echanges/2026-11-23-essai-v043.md) — essai v0.4.3 (fait le 23/11 : fenêtres OK, cône figé après W, 20 « écran inconnu » en chasse)
 - [2026-11-23-essai-v044.md](echanges/2026-11-23-essai-v044.md) — **essai v0.4.4 à faire** (sprint, barre d'action, sacs au sol, contrôle après W)
+- [2026-11-23-passation-v044.md](echanges/2026-11-23-passation-v044.md) — **passation** : prompt pour le prochain chat (après la v0.4.4)
 
 ### technique/
 - [README.md](technique/README.md) — index

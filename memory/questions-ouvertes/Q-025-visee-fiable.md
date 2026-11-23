@@ -1,6 +1,6 @@
 # Q-025 — Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion
 
-- **Statut** : En partie résolue → D-052 (2026-11-22) ; point 4 fait le 2026-11-22 (captures, mots corrigés en v0.4.3) ; reste : vue plus haute (point 5)
+- **Statut** : En partie résolue → D-052 (2026-11-22) ; point 4 fait (v0.4.3) ; point 3 précisé le 2026-11-23 : après W, la caméra regarde dans la direction du personnage ; reste : vue plus haute (point 5)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-22
 - **Liens** : D-050, D-049, D-024, analyse `technique/hybride/analyse-visee-2026-11-22.md`

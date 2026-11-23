@@ -20,6 +20,7 @@
 - **Tester en interne chaque livrable** avant de le donner : tests automatiques + essai réel sur le PC.
 - **Poser une question au moindre doute** sur une fonction ou un livrable, plutôt que supposer.
 - **Rappeler à la fin de chaque message les questions encore sans réponse.**
+- **Jamais de session ou d'agent lancé automatiquement** (2026-11-23) : toujours proposer d'abord, et attendre que Julien valide. Une session de plus consomme son quota (limite sur 5 h). Ça vaut aussi pour les sous-agents.
 - Liens envoyés par Julien : les évaluer et les ranger dans `memory/technique/sources.md`. Tout lien utilisé va aussi dans `memory/technique/liens-utilises.md`.
 
 ## Versions et fichiers (D-040)

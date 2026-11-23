@@ -1,6 +1,6 @@
 # Q-027 — Module « @GPT » : le bot répond dans le chat du jeu ?
 
-- **Statut** : En partie résolue → D-054 (2026-11-23) ; restent les questions 2 (pendant la récolte), 7 et 9
+- **Statut** : Résolue → D-054 et D-055 (2026-11-23)
 - **Priorité** : Basse (la récolte automatique passe d'abord)
 - **Créée le** : 2026-11-23
 - **Liens** : D-024, D-039, D-045, D-052 ; étude : [technique/chat-gpt.md](../technique/chat-gpt.md)
@@ -34,3 +34,8 @@ Ses mots : « je change de décision, c'est utile seulement pour repondre à des
 - 1 : oui, Entrée permise pour le chat seulement. 3 : tout le monde, « @GPT » en majuscules. 4 : Région. 6 : 1 par minute, le plus récent. 8 : pas de clé → phrases toutes faites d'abord (Haiku plus tard).
 - 5 (ton) : implicite : drôle et neutre, en phrases toutes faites.
 - **Restent** : 2 (prendre le clavier **pendant la récolte** ?), 7 (marquer « [GPT] » / dire que c'est un bot ?), 9 (mode essai d'abord ? recommandé).
+
+## Réponses de Julien, suite (2026-11-23, soir) → D-055
+- Le bot **peut prendre le clavier pendant la récolte** ; il **ne doit pas oublier de fermer le chat** après l'envoi.
+- **Ne pas dire que c'est un bot** (pas de « [GPT] » ni « IA »).
+- **Haiku plus tard** : on commence tranquille, avec des phrases simples sans IA.
