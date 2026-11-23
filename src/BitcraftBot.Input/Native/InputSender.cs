@@ -15,6 +15,7 @@ public sealed class InputSender : BitcraftBot.Input.Actions.IInputDevice
     private const uint MOUSEEVENTF_VIRTUALDESK = 0x4000;
     private const uint KEYEVENTF_KEYUP = 0x0002;
     private const uint KEYEVENTF_SCANCODE = 0x0008;
+    private const uint KEYEVENTF_UNICODE = 0x0004;
     private const int SM_XVIRTUALSCREEN = 76;
     private const int SM_YVIRTUALSCREEN = 77;
     private const int SM_CXVIRTUALSCREEN = 78;
@@ -117,6 +118,13 @@ public sealed class InputSender : BitcraftBot.Input.Actions.IInputDevice
     public void KeyDown(ushort scanCode) => Send(Key(scanCode, KEYEVENTF_SCANCODE));
 
     public void KeyUp(ushort scanCode) => Send(Key(scanCode, KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP));
+
+    // Caractère tapé tel quel (KEYEVENTF_UNICODE) : marche avec les accents, quelle que soit la disposition du clavier.
+    public void TypeChar(char c)
+    {
+        Send(Key(c, KEYEVENTF_UNICODE));
+        Send(Key(c, KEYEVENTF_UNICODE | KEYEVENTF_KEYUP));
+    }
 
     private static INPUT MouseButton(uint flag) =>
         new() { type = INPUT_MOUSE, u = new InputUnion { mi = new MOUSEINPUT { dwFlags = flag } } };

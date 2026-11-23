@@ -28,6 +28,8 @@ public partial class MainWindow
                 // D-052 : une fenêtre du jeu ouverte (vue il y a moins de 3 s) bloque toute action.
                 : _view is { Windows.Count: > 0 } v && DateTime.Now - v.At < TimeSpan.FromSeconds(3)
                     ? $"fenêtre du jeu ouverte ({string.Join(", ", v.Windows.Select(w => w.French))})"
+                    // v0.4.5 : chat ouvert (Julien écrit) : une touche du bot partirait dans le chat.
+                    : ChatLikelyOpen(DateTime.Now) ? "chat du jeu ouvert"
                     : null,
         };
         var controller = new ActionController(_inputSender, context, new ActionOptions { StopOnMouseMove = _settings.StopOnMouseMove });

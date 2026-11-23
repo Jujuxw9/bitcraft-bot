@@ -271,3 +271,10 @@ Retour de la session de jeu du 23/11 (18:54 à 20:05 : chasse aux Sagi Birds, 19
 - **Après W** : cap du cône relu 1,5 s après W, écrit dans le journal avec une capture du jeu (une toutes les 30 s au plus, `images/analyse/*_apres-w_*.png`), pour vérifier l'observation de Julien.
 - **Interface** : onglet Bot, cartes « SPRINT ET BARRE D'ACTION » et « SACS AU SOL ».
 - **Vérifié** : 352 tests (`V044Tests` : barre lue sous deux formes, recharge, états du sprint, touches, sacs à moi / libre / à un autre avec minuterie, requêtes en lecture seule, personnage au centre sur 6 captures). **Pas vérifié** : en direct (le bot v0.4.3 tournait encore pendant le travail).
+
+## 39. v0.4.5 — réponses « @GPT » au clavier, chat ouvert reconnu (2026-11-23)
+
+- Abonnement : `chat_message_state`, canal Région, 5 dernières minutes (dans le groupe « extras » avec la barre d'action et les sacs au sol).
+- Lecture seule du serveur, comme toujours (D-039) : la réponse part **au clavier, dans le jeu**. Détail : `technique/chat-gpt.md` section 6.
+- Écran : `ChatInput` (zone de saisie du chat) dans la vue du jeu, une fois par seconde. Chat ouvert : aucune action du bot ; W, Q, D ne comptent plus pour la caméra. Entre deux regards, Entrée et Échap tapées par Julien font foi.
+- Le seul « W » vu en v0.4.4 (22:32:17) avait été tapé dans le chat : il ne dit rien sur la caméra. Vrai essai de W à faire.

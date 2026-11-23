@@ -289,6 +289,7 @@ public partial class MainWindow
             FlushTasks();
         }
         RunMeals(reader, s, inventories);
+        RunGpt(reader, s);
         ShowResources(reader, s, tab == MapTab);
 
         if (tab == CharacterTab)

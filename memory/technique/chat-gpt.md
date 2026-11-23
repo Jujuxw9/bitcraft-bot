@@ -1,6 +1,6 @@
 # Module « @GPT » : répondre dans le chat du jeu (étude)
 
-- **Statut** : règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
+- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6). Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
 - **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase courte. **Pas de spam.**
 - **Liens** : D-054, D-024, D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
 
@@ -94,3 +94,21 @@ Prochaines étapes : brancher l'abonnement et afficher dans la fenêtre du bot �
 - Comment le jeu choisit le canal à l'ouverture du chat.
 - Que le jeu accepte la frappe de caractères accentués envoyée par le bot.
 - Quels messages Local le jeu montre (distance).
+
+## 6. Branché en v0.4.5 (2026-11-23, D-056) : envoi réel
+
+- **Lecture** : l'abonnement du suivi du personnage ajoute `chat_message_state` (canal Région, **5 dernières minutes** seulement : le serveur garde 2 jours). Si le serveur refuse, le bot réessaie sans la barre d'action, les sacs au sol ni le chat.
+- **Choix** : toutes les 500 ms, `GptChatPicker` (règles de D-054). Le message choisi et la réponse prévue sont écrits dans le journal (catégorie « Chat », texte du joueur coupé à 80 caractères).
+- **Attente** : personnage connecté dans le jeu, pas de repas en cours, sécurités du contrôleur (jeu actif et visible, en jeu, aucune fenêtre du jeu, **chat fermé**, Julien ne tape pas depuis 3 s). Le message est abandonné s'il a plus de 2 minutes. **Une seule tentative** par message.
+- **Envoi** (`ActionController.ChatAsync`) : chat fermé vérifié à l'écran → Entrée → chat ouvert vérifié (1,5 s au plus) → bouton du canal lu par OCR, doit dire « REGION » → texte tapé lettre par lettre (caractères Unicode, donc accents permis, 45 à 130 ms par lettre) → Entrée → chat fermé vérifié. Si le chat reste ouvert : Échap (2 fois au plus) ; s'il reste ouvert malgré tout : **toutes les actions bloquées** et alerte. Pas d'Échap à l'aveugle (sur le jeu sans chat, Échap ouvrirait le menu).
+- **Julien tape une touche pendant la frappe** : arrêt immédiat, chat refermé, rien n'est envoyé.
+- Entrée et Échap ne sont **pas** dans la liste des touches autorisées du contrôleur : seul l'envoi dans le chat s'en sert.
+- **Chat ouvert reconnu à l'écran** (`ChatInput`) : cadre blanc de la zone de saisie (x 182 à 476, y 968 et 996, en 1920 × 1080). Vérifié sur les 75 captures du 23/11 : 5 chats ouverts trouvés, tous vrais, aucune erreur. Images de référence : `images/reference-ui/chat/`.
+- Carte « CHAT @GPT » dans l'onglet Bot : case (activée à chaque démarrage) et état.
+- Phrases : celles qui laissaient entendre que c'est un bot sont remplacées (D-055).
+
+### À vérifier au premier essai réel
+- Que le serveur accepte le filtre `timestamp > …` dans l'abonnement.
+- Que la zone de saisie **vide** (juste après Entrée) a bien le même cadre blanc (vu seulement avec du texte dedans).
+- Que le jeu ouvre le chat sur le canal Région (sinon : rien n'est envoyé, alerte « canal pas Région »).
+- Après Échap, le texte tapé reste-t-il dans la zone de saisie ?

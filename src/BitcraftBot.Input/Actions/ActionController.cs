@@ -12,6 +12,9 @@ public interface IInputDevice
     void LeftUp();
     void KeyDown(ushort scanCode);
     void KeyUp(ushort scanCode);
+
+    // Tape un caractère (lettre, accent, ponctuation) sans passer par la position de la touche (chat, v0.4.5).
+    void TypeChar(char c) => throw new NotSupportedException("Frappe de texte non prise en charge.");
 }
 
 // Touches que le bot a le droit d'envoyer au jeu (scancodes = position physique, AZERTY de Julien).
@@ -38,6 +41,23 @@ public static class GameKeys
     };
 
     public static string Name(ushort scanCode) => Allowed.TryGetValue(scanCode, out var name) ? name : $"0x{scanCode:X2}";
+
+    // Entrée et Échap : PAS dans la liste autorisée. Seul l'envoi d'un message dans le chat s'en sert (D-054, ChatAsync).
+    public const ushort Enter = 0x1C;
+    public const ushort Escape = 0x01;
+}
+
+// Ce que l'envoi dans le chat demande à l'écran (v0.4.5). Chaque fonction capture une image neuve du jeu.
+public sealed class ChatProbe
+{
+    // Chat ouvert (zone de saisie visible) ? null = jeu pas visible, image impossible.
+    public required Func<Task<bool?>> IsOpen { get; init; }
+
+    // Canal affiché sur le bouton du chat (« REGION »), tel que lu ; vide si pas lu.
+    public required Func<Task<string>> Channel { get; init; }
+
+    // Le canal lu est-il le bon ?
+    public required Func<string, bool> ChannelOk { get; init; }
 }
 
 public enum ActionOutcome
@@ -309,6 +329,149 @@ public sealed class ActionController
                 }
             }
         });
+    }
+
+    // Écrit un message dans le chat du jeu, comme Julien (D-054, D-055) :
+    // chat fermé vérifié → Entrée → chat ouvert vérifié → canal « Région » vérifié → texte tapé → Entrée →
+    // chat refermé vérifié (sinon Échap). Si quelque chose ne va pas, rien n'est envoyé et le chat est refermé.
+    // Julien qui tape une touche pendant la frappe : arrêt, chat refermé.
+    public async Task<ActionResult> ChatAsync(string label, string text, ChatProbe probe)
+    {
+        if (string.IsNullOrWhiteSpace(text) || text.Length > 250 || text.Any(char.IsControl))
+        {
+            var refused = $"{label} : texte refusé (vide, trop long ou caractère de contrôle)";
+            Log?.Invoke(ActionLogLevel.Erreur, refused);
+            return new ActionResult(ActionOutcome.Refuse, refused);
+        }
+        var startedAt = _context.Now();
+        var opened = false;
+        string? problem = null;
+        var result = await RunAsync(label, $"message de {text.Length} caractères dans le chat", async token =>
+        {
+            try
+            {
+                if (await probe.IsOpen() != false)
+                {
+                    problem = "chat déjà ouvert ou pas vu";
+                    return;
+                }
+                await TapAsync(GameKeys.Enter, token);
+                opened = true;
+                if (!await WaitChatAsync(probe, open: true, token))
+                {
+                    problem = "le chat ne s'est pas ouvert";
+                    return;
+                }
+                var channel = await probe.Channel();
+                if (!probe.ChannelOk(channel))
+                {
+                    problem = $"canal du chat pas « Région » (lu : « {channel} »)";
+                    return;
+                }
+                foreach (var c in text)
+                {
+                    EnsureStillAllowed(token);
+                    EnsureUserQuiet(startedAt);
+                    _device.TypeChar(c);
+                    await _delay(c == ' ' ? 90 + _random.Next(120) : 45 + _random.Next(85), token);
+                }
+                await _delay(250 + _random.Next(350), token);
+                EnsureStillAllowed(token);
+                EnsureUserQuiet(startedAt);
+                await TapAsync(GameKeys.Enter, token);
+                if (await WaitChatAsync(probe, open: false, token))
+                {
+                    opened = false;
+                }
+                else
+                {
+                    problem = "chat encore ouvert après l'envoi";
+                }
+            }
+            finally
+            {
+                if (opened)
+                {
+                    await CloseChatAsync(label, probe);
+                }
+            }
+        });
+        if (result.Done && problem is not null)
+        {
+            Log?.Invoke(ActionLogLevel.Alerte, $"{label} : pas envoyé ({problem}).");
+            return new ActionResult(ActionOutcome.Refuse, problem);
+        }
+        return result;
+    }
+
+    // Échap jusqu'à ce que le chat soit fermé (2 essais). Jamais laissé ouvert sans alerte (D-055).
+    private async Task CloseChatAsync(string label, ChatProbe probe)
+    {
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            var open = await probe.IsOpen();
+            if (open == false)
+            {
+                Log?.Invoke(ActionLogLevel.Info, $"{label} : chat refermé.");
+                return;
+            }
+            if (open is null)
+            {
+                // Écran pas vu : pas d'Échap à l'aveugle (sur le jeu sans chat, Échap ouvre le menu).
+                break;
+            }
+            var game = _context.GameWindow();
+            if (game is not { } handle || !_device.IsForeground(handle))
+            {
+                break;
+            }
+            await TapAsync(GameKeys.Escape, CancellationToken.None);
+            await _delay(400, CancellationToken.None);
+        }
+        if (await probe.IsOpen() == false)
+        {
+            Log?.Invoke(ActionLogLevel.Info, $"{label} : chat refermé (Échap).");
+            return;
+        }
+        Halt("chat peut-être resté ouvert : vérifier le jeu");
+    }
+
+    // Attend que le chat soit ouvert (ou fermé), au plus 1,5 s.
+    private async Task<bool> WaitChatAsync(ChatProbe probe, bool open, CancellationToken token)
+    {
+        for (var i = 0; i < 6; i++)
+        {
+            await _delay(250, token);
+            if (await probe.IsOpen() == open)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Appui court sur une touche (Entrée, Échap), relâchement garanti.
+    private async Task TapAsync(ushort key, CancellationToken token)
+    {
+        _device.KeyDown(key);
+        try
+        {
+            await _delay(40 + _random.Next(60), token);
+        }
+        finally
+        {
+            _device.KeyUp(key);
+        }
+    }
+
+    // Julien a tapé une touche depuis le début de l'envoi : on arrête (il reprend la main).
+    private void EnsureUserQuiet(DateTime since)
+    {
+        if (_context.LastPhysicalKey() > since)
+        {
+            _interruption = "vous avez tapé au clavier";
+            throw new OperationCanceledException();
+        }
     }
 
     private async Task<ActionResult> RunAsync(string label, string what, Func<CancellationToken, Task> body)

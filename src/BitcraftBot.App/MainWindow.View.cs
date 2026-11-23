@@ -10,7 +10,7 @@ namespace BitcraftBot.App;
 public partial class MainWindow
 {
     // Ce que voit le bot en jeu à un instant donné.
-    private sealed record GameView(DateTime At, CameraHeading? Heading, string HeadingWhy, IReadOnlyList<OpenWindow> Windows);
+    private sealed record GameView(DateTime At, CameraHeading? Heading, string HeadingWhy, IReadOnlyList<OpenWindow> Windows, bool ChatOpen = false);
 
     private volatile GameView? _view;
     private double? _loggedHeading;
@@ -39,7 +39,12 @@ public partial class MainWindow
                 ? windows
                 : windows.Select(w => GameWindows.ReadTitleAsync(ocr, frame, w).GetAwaiter().GetResult()).ToList();
         }
-        _view = new GameView(now, heading, why, _windowsWithTitles);
+        var chatOpen = ChatInput.IsOpen(frame);
+        if (_view is { } previous && previous.ChatOpen != chatOpen)
+        {
+            _log.Detail("Écran", chatOpen ? "Chat du jeu ouvert." : "Chat du jeu fermé.");
+        }
+        _view = new GameView(now, heading, why, _windowsWithTitles, chatOpen);
         LogHeading(heading, why);
         LogWindows(key);
         Dispatcher.BeginInvoke(ShowView);

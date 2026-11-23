@@ -67,6 +67,9 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
     public IReadOnlyDictionary<ulong, ServerPosition> BankPositions() => Banks.Positions(_cache);
 
+    // Messages du chat Région reçus (module « @GPT », v0.4.5).
+    public IReadOnlyList<ChatMessage> ChatMessages() => World.ChatMessages.Read(_cache);
+
     // Résultat de la dernière découverte par le module global (null si elle n'a pas été faite).
     public RegionDiscovery? Discovery { get; private set; }
 
@@ -220,8 +223,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 {
                     // D'abord sans la barre d'action, les capacités et les sacs au sol (requêtes ajoutées en v0.4.4).
                     _extrasRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans la barre d'action ni les sacs au sol.");
-                    Subscribe(Queries.FollowPlayer(_identity!, xe, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: false), "suivi sans la barre d'action ni les sacs au sol");
+                    log.Alerte(Category, "Nouvel essai sans la barre d'action, les sacs au sol ni le chat.");
+                    Subscribe(Queries.FollowPlayer(_identity!, xe, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: false), "suivi sans la barre d'action, les sacs au sol ni le chat");
                 }
                 else if (_entityId is { } ie && !_inventoryRefused)
                 {

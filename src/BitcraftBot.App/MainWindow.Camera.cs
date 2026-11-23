@@ -73,6 +73,8 @@ public partial class MainWindow
     }
 
     // Touches de caméra, tapées par Julien ou par le bot (plus tard, R3) : seulement si le jeu est la fenêtre active.
+    private bool _chatKeyLogged;
+
     private void OnCameraKey(int scanCode)
     {
         if (scanCode != GameKeys.W && scanCode != GameKeys.Q && scanCode != GameKeys.D)
@@ -83,6 +85,17 @@ public partial class MainWindow
         {
             return;
         }
+        // v0.4.5 : chat ouvert = la lettre est tapée dans le chat, la caméra ne bouge pas (W du 23/11 à 22:32).
+        if (ChatLikelyOpen(DateTime.Now))
+        {
+            if (!_chatKeyLogged)
+            {
+                _chatKeyLogged = true;
+                _log.Detail("Caméra", "W, Q ou D ignorée : le chat du jeu est ouvert (lettre tapée dans le chat).");
+            }
+            return;
+        }
+        _chatKeyLogged = false;
         if (scanCode == GameKeys.W)
         {
             var was = _camera.State;

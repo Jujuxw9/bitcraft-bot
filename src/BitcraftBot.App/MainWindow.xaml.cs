@@ -141,13 +141,14 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.4 : lecture seule du serveur pour la barre d'action (touches et capacités, temps de recharge), le sprint (prêt, actif, en recharge) et les sacs tombés au sol (contenu, à qui, quand ils deviennent libres) ; « en jeu » reconnu aussi par le personnage au centre de la mini-carte ; après W, le cap du cône est relu 1,5 s plus tard (avec une capture). Aucune nouvelle action : seule action sur le jeu, Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.4.5 : réponses « @GPT » dans le chat Région (une phrase simple au hasard, 1 par minute au plus, écrite au clavier comme Julien, chat refermé et vérifié à l'écran) ; chat ouvert reconnu à l'écran : W, Q, D tapées dans le chat ne comptent plus pour la caméra, et aucune action du bot pendant que Julien écrit. Actions sur le jeu : Maj + E (repas automatique) et les réponses « @GPT ».");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
         InitScreenWatch(_ocr);
         InitOverlay();
         InitMeals();
+        InitGpt();
         InitLayout();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);
         _ = _gameData.StartAsync();
@@ -175,9 +176,14 @@ public partial class MainWindow : Window
         if (!isInjected)
         {
             Dispatcher.BeginInvoke(NotePhysicalKey);
+            if (scanCode is Input.Actions.GameKeys.Enter or Input.Actions.GameKeys.Escape)
+            {
+                Dispatcher.BeginInvoke(() => OnChatKey(scanCode));
+            }
         }
         // W, Q, D : état de la caméra (R1). Tapées par Julien ou, plus tard, par le bot.
-        if (!isExtended)
+        // Pendant que le bot écrit dans le chat, ses lettres (simulées) ne sont pas des touches de caméra (v0.4.5).
+        if (!isExtended && !(isInjected && _gptSending))
         {
             Dispatcher.BeginInvoke(() => OnCameraKey(scanCode));
         }

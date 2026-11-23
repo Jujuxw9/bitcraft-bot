@@ -39,3 +39,6 @@ Ses mots : « je change de décision, c'est utile seulement pour repondre à des
 - Le bot **peut prendre le clavier pendant la récolte** ; il **ne doit pas oublier de fermer le chat** après l'envoi.
 - **Ne pas dire que c'est un bot** (pas de « [GPT] » ni « IA »).
 - **Haiku plus tard** : on commence tranquille, avec des phrases simples sans IA.
+
+## Réponse au point 9 (2026-11-23, 22:45) → D-056
+Pas de mode essai : la v0.4.5 envoie vraiment la réponse dans le chat Région.

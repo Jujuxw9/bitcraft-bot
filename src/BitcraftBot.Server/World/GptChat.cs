@@ -26,6 +26,10 @@ public static class ChatMessages
     // Requête d'abonnement : le canal Région seulement (D-054).
     public static string RegionQuery => $"SELECT * FROM chat_message_state WHERE channel_id = {(int)ChatChannel.Region}";
 
+    // Seulement les messages récents (v0.4.5) : le serveur garde 2 jours de chat, inutile de tout recevoir.
+    public static string RegionQuerySince(long unixSeconds) =>
+        $"SELECT * FROM chat_message_state WHERE channel_id = {(int)ChatChannel.Region} AND timestamp > {unixSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
+
     public static IReadOnlyList<ChatMessage> Read(TableCache cache)
     {
         var result = new List<ChatMessage>();
@@ -122,29 +126,29 @@ public static class CannedReplies
     public static readonly IReadOnlyList<string> French =
     [
         "Bonne question, {0}. Je réfléchis… encore… voilà : coupe plus d'arbres.",
-        "{0}, mes circuits disent oui. Mon chat dit non. Je suis l'avis du chat.",
-        "Je suis une IA de bûcheron, {0} : ma réponse est « écorce ».",
+        "{0}, ma tête dit oui. Mon chat dit non. Je suis l'avis du chat.",
+        "Réponse de bûcheron, {0} : « écorce ».",
         "Désolé {0}, j'étais en train de compter mes troncs. Tu disais ?",
         "{0}, la réponse est 42. Ou une pioche. Souvent une pioche.",
         "Message reçu, {0}. Transmis au conseil des arbres. Ils sont lents.",
         "{0}, je te répondrais bien, mais mon endurance est à 0 %.",
         "Excellente remarque, {0}. Je la note sur une feuille de chêne.",
         "{0}, j'ai consulté les étoiles de Snowrest : elles disent « va manger ».",
-        "Bip boup, {0}. Traduction : bonne journée !",
+        "{0}, je n'ai rien compris, mais bonne journée !",
     ];
 
     public static readonly IReadOnlyList<string> English =
     [
         "Great question, {0}. Thinking… still thinking… done: chop more trees.",
-        "{0}, my circuits say yes. My cat says no. I trust the cat.",
-        "I'm a lumberjack AI, {0}: my answer is \"bark\".",
+        "{0}, my head says yes. My cat says no. I trust the cat.",
+        "Lumberjack answer, {0}: \"bark\".",
         "Sorry {0}, I was counting my logs. You were saying?",
         "{0}, the answer is 42. Or a pickaxe. Usually a pickaxe.",
         "Message received, {0}. Forwarded to the council of trees. They are slow.",
         "{0}, I'd answer, but my stamina is at 0%.",
         "Excellent point, {0}. Writing it down on an oak leaf.",
         "{0}, I asked the stars over Snowrest: they say \"go eat something\".",
-        "Beep boop, {0}. Translation: have a nice day!",
+        "{0}, I didn't get it, but have a nice day!",
     ];
 
     // Phrase au hasard, dans la langue du joueur (français si « fr », anglais sinon). Prefix : marque éventuelle (« [GPT] », Q-027).

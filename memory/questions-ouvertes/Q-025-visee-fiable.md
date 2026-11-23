@@ -1,6 +1,6 @@
 # Q-025 — Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion
 
-- **Statut** : En partie résolue → D-052 (2026-11-22) ; point 4 fait (v0.4.3) ; point 3 précisé le 2026-11-23 : après W, la caméra regarde dans la direction du personnage ; reste : vue plus haute (point 5)
+- **Statut** : En partie résolue → D-052, D-056 ; points 2, 3, 4, 5 traités le 2026-11-23 ; reste : point 1 (survol)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-22
 - **Liens** : D-050, D-049, D-024, analyse `technique/hybride/analyse-visee-2026-11-22.md`
@@ -18,3 +18,8 @@ Une visée fiable a besoin de connaître la direction de la caméra (Q3), et de 
 ## Suite (2026-11-23)
 - **Point 4 fait** : Julien a fait Num 0 sur l'accueil (« PRESS ANY BUTTON TO START ») et la connexion (« WELCOME », « ENTER BITCRAFT », « LOG OUT », annonces). Les mots-clés sont corrigés en v0.4.3 (captures de référence dans `images/reference-ui/ecrans/`, e-mail masqué). L'écran de connexion **sans compte connu** (champ e-mail) n'a pas été vu : ses mots restent supposés.
 - **Point 5** : la capture du 22/11 à 23:46:00 montre une vue **bien plus haute** (personnage petit, prairie entière), prise juste après un coup de molette (journal 23:45:57). La molette éloigne donc la caméra ; mais W remet le zoom (D-050). Reste à savoir s'il existe un réglage pour une vue haute par défaut (À vérifier).
+
+## Captures du menu (2026-11-23, 22:35) → D-056
+- **Point 2** : aucune touche « Interact » dans les raccourcis du jeu (case vide). Pas de récolte sans viser au clavier. A = « Target », Tab = cible suivante (pistes, À vérifier).
+- **Point 5** : aucun réglage de hauteur ni de distance de la caméra dans le menu. Julien est d'accord pour la molette : quand le bot fera W lui-même, il donnera ensuite toujours le même nombre de crans (D-056, nombre À vérifier).
+- Reste : point 1 (le panneau du haut change-t-il au survol ?).

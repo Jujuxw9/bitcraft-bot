@@ -128,6 +128,14 @@
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
+                                <TextBlock Text="CHAT @GPT" Style="{StaticResource CardTitle}" />
+                                <CheckBox x:Name="GptCheck" Content="Répondre à « @GPT » (chat Région)" Click="GptCheck_Click" />
+                                <TextBlock x:Name="GptStatusText" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
                                 <TextBlock Text="ÉCRAN" Style="{StaticResource CardTitle}" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
