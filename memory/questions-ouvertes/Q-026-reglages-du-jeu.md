@@ -24,3 +24,6 @@ Au démarrage : langue anglaise, interface à l'échelle 1, 1920 × 1080, mini-c
 - **Herbe** : 0 (avant : 100) : fait.
 - **Collision de la caméra**, **caméra adoucie**, **ouvrir les coffres proches** : toujours à 1. Soit Julien ne les a pas changés, soit il ne les a pas trouvés dans le menu (noms du menu À vérifier).
 - Aucun réglage de hauteur ou de distance de la caméra dans le registre (seulement ces deux réglages de caméra et la distance des noms, `NameTagsMaxDistance` 400).
+
+## Relecture du 2026-11-23 au soir
+Julien pense que ces réglages sont bons, mais le registre dit toujours 1 pour collision de la caméra, caméra adoucie et ouverture automatique des coffres (herbe à 0). **Incohérence à signaler** : soit le menu les nomme à l'envers (ex. « désactiver la collision »), soit le changement n'a pas été gardé. Demande : une capture Num 0 de la page des réglages de la caméra.
