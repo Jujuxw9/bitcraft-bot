@@ -80,6 +80,43 @@ public sealed class RecipeBook
 
     public string NameOf(string key) => Entries.TryGetValue(key, out var e) ? e.Name : $"objet inconnu ({key})";
 
+    // Les façons d'obtenir un objet, les plus simples d'abord (v0.4.6) : récoltes, puis fabrications avec peu
+    // d'ingrédients et des métiers bas. Les recettes qui consomment l'objet lui-même (convertir) ou un paquet
+    // (« Unpack … Package », catégorie « Package ») en dernier : ce n'est pas une vraie façon de le produire.
+    public IReadOnlyList<Recipe> Simplest(string key, int max = int.MaxValue) =>
+        Producing(key)
+            .OrderBy(r => r.Inputs.Any(i => i.Key == key || (Entries.TryGetValue(i.Key, out var e) && e.Tag == "Package")) ? 1 : 0)
+            .ThenBy(r => r.Kind == "Récolte" ? 0 : 1)
+            .ThenBy(r => r.Inputs.Count)
+            .ThenBy(r => r.Skills.Sum(s => s.Level))
+            .Take(max)
+            .ToList();
+
+    // Une façon d'obtenir un objet, en une ligne (info-bulle des recettes, v0.4.6).
+    // Ex. « Récolte sur « Oak Tree » · Forestry 1 · Axe 1 » ou « Fabrication (Carpentry Station, palier 1 minimum) : 4 × Oak Log · Carpentry 3 ».
+    public string Summary(Recipe r)
+    {
+        var text = r.Kind == "Récolte"
+            ? $"Récolte sur « {r.Place} »"
+            : r.Inputs.Count == 0
+                ? $"Fabrication ({r.Place})"
+                : $"Fabrication ({r.Place}) : {string.Join(", ", r.Inputs.Select(i => $"{i.Quantity} × {NameOf(i.Key)}"))}";
+        if (r.Kind == "Récolte" && r.Inputs.Count > 0)
+        {
+            text += $", consomme {string.Join(", ", r.Inputs.Select(i => $"{i.Quantity} × {NameOf(i.Key)}"))}";
+        }
+        var needs = r.Skills.Select(s => $"{s.Name} {s.Level}").Concat(r.Tools.Select(t => $"{t.Name} {t.Level}")).ToList();
+        if (needs.Count > 0)
+        {
+            text += " · " + string.Join(" · ", needs);
+        }
+        if (r.NeedsKnowledge || r.NeedsClaimTech)
+        {
+            text += " · à débloquer";
+        }
+        return text;
+    }
+
     private void Index()
     {
         if (_producing is not null)

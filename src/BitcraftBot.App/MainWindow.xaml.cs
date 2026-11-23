@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.5 : réponses « @GPT » dans le chat Région (une phrase simple au hasard, 1 par minute au plus, écrite au clavier comme Julien, chat refermé et vérifié à l'écran) ; chat ouvert reconnu à l'écran : W, Q, D tapées dans le chat ne comptent plus pour la caméra, et aucune action du bot pendant que Julien écrit. Actions sur le jeu : Maj + E (repas automatique) et les réponses « @GPT ».");
+        _log.Info("Session", "Version 0.4.6 : onglet Recettes en logigramme (ingrédients → atelier ou ressource → objet), info-bulle « comment l'obtenir » au survol d'un objet, boutons Rechercher, Effacer et Retour.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

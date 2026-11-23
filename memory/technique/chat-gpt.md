@@ -112,3 +112,10 @@ Prochaines étapes : brancher l'abonnement et afficher dans la fenêtre du bot �
 - Que la zone de saisie **vide** (juste après Entrée) a bien le même cadre blanc (vu seulement avec du texte dedans).
 - Que le jeu ouvre le chat sur le canal Région (sinon : rien n'est envoyé, alerte « canal pas Région »).
 - Après Échap, le texte tapé reste-t-il dans la zone de saisie ?
+
+### Résultat du premier essai réel (journal v0.4.5, 23/11 23:02 à 23:07)
+- Le serveur accepte l'abonnement avec `timestamp > …`.
+- 3 messages « @GPT » (joueur TheKrazyTurkey). **2 réponses envoyées** sur Région, chat refermé et vérifié à chaque fois.
+- 1er message : le chat s'est ouvert sur **LOCAL** → rien tapé, chat refermé par Échap, alerte « canal pas Région ». Le jeu ouvre le chat sur le **dernier canal utilisé**. Piste (pas codée, à proposer à Julien) : cliquer sur le bouton du canal pour passer sur Région.
+- La zone de saisie vide (juste après Entrée) est bien reconnue comme chat ouvert.
+- Reste **À vérifier** : le texte reste-t-il dans la zone de saisie après Échap.

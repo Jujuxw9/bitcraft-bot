@@ -24,6 +24,7 @@
 | [19 fin](2026-11-23-session-19-fin.md) | 2026-11-23 | Claude Code | Réponses de Julien (« @GPT », W), D-055, règle « pas de session automatique », passation |
 | [18 bis](2026-11-23-etude-chat-gpt.md) | 2026-11-23 | Claude Code (session parallèle) | Module « @GPT » : étude, Q-027, D-054, logique du chat codée sans envoi |
 | [20](2026-11-23-session-20-v045-chat.md) | 2026-11-23 | Claude Code | v0.4.5 : réponses « @GPT » envoyées au clavier, chat ouvert reconnu, W tapé dans le chat ignoré ; D-056 |
+| [21](2026-11-23-session-21-v046-recettes.md) | 2026-11-23 | Claude Code | Journal v0.4.5 lu (chat marche, W ne tourne pas la caméra, barre d'action) ; v0.4.6 : recettes en logigramme, info-bulles, boutons Rechercher, Effacer, Retour |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 
