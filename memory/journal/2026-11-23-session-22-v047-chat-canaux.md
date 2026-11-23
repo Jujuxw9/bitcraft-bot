@@ -27,3 +27,7 @@ Demandes de Julien : capture du bouton du canal ; 30 phrases de plus et smileys 
 
 ## Suite
 Voir `echanges/2026-11-23-passation-v047.md`.
+
+## Fin de session (minuit)
+- Julien va compacter. Le chatbot passe à **une autre session Claude Code** (prompt : `echanges/2026-11-23-prompt-chatbot.md`, zone de fichiers et règles des versions à deux).
+- Session principale : `echanges/2026-11-23-passation-v047.md`.
