@@ -29,3 +29,8 @@ Lire le journal v0.4.5 (chat, W, barre d'action) ; demandes de Julien : boutons 
 
 ## Suite
 Voir `echanges/2026-11-23-passation-v046.md`.
+
+## Fin de session (23:35)
+- Julien : W remet rotation, hauteur et zoom fixes par rapport à la direction du personnage ; oui au passage automatique du chat sur Région, au lancement du jeu → [D-057](../decisions/D-057-w-camera-canal-region-auto.md).
+- .exe v0.4.6 fabriqué (bot fermé, jeu laissé ouvert), démarrage essayé, journal d'essai effacé.
+- Fin du journal v0.4.5 : Smithing et Tailoring aussi notés « aucun objet gagné » (objets restés dans l'atelier ? À vérifier).
