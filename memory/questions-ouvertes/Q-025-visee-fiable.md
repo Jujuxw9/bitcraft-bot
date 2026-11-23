@@ -1,6 +1,6 @@
 # Q-025 — Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion
 
-- **Statut** : En partie résolue → D-052, D-056 ; points 2, 3, 4, 5 traités le 2026-11-23 ; reste : point 1 (survol)
+- **Statut** : Résolue → D-052, D-056 (2026-11-23) ; à essayer : la touche Interact (M)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-22
 - **Liens** : D-050, D-049, D-024, analyse `technique/hybride/analyse-visee-2026-11-22.md`
@@ -23,3 +23,7 @@ Une visée fiable a besoin de connaître la direction de la caméra (Q3), et de 
 - **Point 2** : aucune touche « Interact » dans les raccourcis du jeu (case vide). Pas de récolte sans viser au clavier. A = « Target », Tab = cible suivante (pistes, À vérifier).
 - **Point 5** : aucun réglage de hauteur ni de distance de la caméra dans le menu. Julien est d'accord pour la molette : quand le bot fera W lui-même, il donnera ensuite toujours le même nombre de crans (D-056, nombre À vérifier).
 - Reste : point 1 (le panneau du haut change-t-il au survol ?).
+
+## Réponses de Julien (2026-11-23, 23:00) : question résolue
+- **Point 1** : le panneau du haut (nom, santé) change **seulement après le clic**, pas au survol. Avant de cliquer, seul le contour vert montre la cible.
+- **Point 2, suite** : Julien a donné la touche **M** à « Interact » (case vide avant). À essayer : que fait Interact (ressource la plus proche ? cible actuelle ?) — **À vérifier**. M n'est pas encore dans les touches autorisées du bot (D-045).

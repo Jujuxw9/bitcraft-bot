@@ -26,5 +26,6 @@ Où : registre de Windows, `HKCU\Software\ClockworkLabs\BitCraft` (réglages Uni
 
 ## Menu du jeu vu le 2026-11-23 (17 captures Num 0, 22:34 à 22:35)
 - Pas de réglage de hauteur ni de distance de la caméra. Commandes : sensibilité caméra 0,5, molette 0,5, axes non inversés.
-- Raccourcis (clavier AZERTY) : W = Reset Camera ; Z Q S D et flèches = tourner la caméra ; bouton du milieu = Camera Pan ; X = cacher les arbres proches ; A = Target ; Tab = cible suivante ; **Interact : aucune touche** ; pas de déplacement au clavier ; Entrée = chat (Maj + Entrée = chat agrandi) ; Maj + E = manger ; I = inventaire ; « . » = carte ; F = escalade rapide.
+- Raccourcis (clavier AZERTY) : W = Reset Camera ; Z Q S D et flèches = tourner la caméra ; bouton du milieu = Camera Pan ; X = cacher les arbres proches ; A = Target ; Tab = cible suivante ; **Interact : M** (donnée par Julien le 23/11 à 23:00, case vide avant) ; pas de déplacement au clavier ; Entrée = chat (Maj + Entrée = chat agrandi) ; Maj + E = manger ; I = inventaire ; « . » = carte ; F = escalade rapide.
 - Le registre dit « raccourcis par défaut » : ce sont donc les touches par défaut du jeu en AZERTY.
+- 2026-11-23, 23:00 : Julien a **changé sa barre d'action** (nouvelles actions) et donné **M à Interact**. Le registre (`BindingOverrides_…`) n'est donc plus vide : à relire (liste blanche, jamais le jeton). Nouvelles actions de la barre : à lire dans le prochain journal (« Exemple brut de action_bar_state / ability_state ») ou sur une capture Num 0.
