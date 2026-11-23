@@ -87,6 +87,7 @@ public partial class MainWindow
         {
             var was = _camera.State;
             _camera.OnReset(DateTime.Now);
+            CheckAfterW();
             if (was != CameraState.Recentree)
             {
                 _log.Detail("Caméra", "W : caméra recentrée, clics droits écoutés.");

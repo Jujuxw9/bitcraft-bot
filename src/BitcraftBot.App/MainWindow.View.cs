@@ -45,6 +45,54 @@ public partial class MainWindow
         Dispatcher.BeginInvoke(ShowView);
     }
 
+    private DateTime _lastWCapture = DateTime.MinValue;
+
+    // Julien (23/11) : « si j'appuie sur W, le cône de la mini-carte ne se met pas à jour ». Pour le vérifier :
+    // cap lu avant W et 1,5 s après, écrit dans le journal, avec une capture du jeu (au plus une toutes les 30 s).
+    private void CheckAfterW()
+    {
+        var before = _view is { Heading: { } h } v && DateTime.Now - v.At < TimeSpan.FromSeconds(2) ? h.Bearing : (double?)null;
+        if (CurrentGame() is not { } game)
+        {
+            return;
+        }
+        var keep = DateTime.Now - _lastWCapture >= TimeSpan.FromSeconds(30);
+        if (keep)
+        {
+            _lastWCapture = DateTime.Now;
+        }
+        Task.Run(async () =>
+        {
+            await Task.Delay(1500);
+            try
+            {
+                // Jamais d'image d'une autre fenêtre de Julien : le jeu doit être visible.
+                if (!GameVisibility.IsUncovered(game))
+                {
+                    return;
+                }
+                var frame = new ScreenCapturer().Capture(GameWindowLocator.GetClientArea(game.Handle));
+                var after = MinimapCone.Read(frame, out var why);
+                var text = $"W : cap du cône avant {(before is { } b ? $"{b:0}°" : "pas lu")}, 1,5 s après {(after is { } a ? $"{a.Bearing:0}°" : $"pas lu ({why})")}";
+                text += before is { } b2 && after is { } a2
+                    ? CameraHeading.Gap(b2, a2.Bearing) <= 10 ? " : le cône n'a pas bougé." : $" : le cône a tourné de {CameraHeading.Gap(b2, a2.Bearing):0}°."
+                    : ".";
+                if (keep)
+                {
+                    var folder = FindAnalysisFolder() ?? System.IO.Path.Combine(AppContext.BaseDirectory, "captures");
+                    var path = System.IO.Path.Combine(folder, $"{DateTime.Now:yyyyMMdd}_analyse_apres-w_{DateTime.Now:HHmmss}.png");
+                    await FrameSaver.SavePngAsync(frame, path);
+                    text += $" Capture : {path}";
+                }
+                _log.Info("Caméra", text);
+            }
+            catch (Exception ex) when (ex is InvalidOperationException or ArgumentException or System.IO.IOException)
+            {
+                _log.Detail("Caméra", $"Vérification après W impossible : {ex.Message}");
+            }
+        });
+    }
+
     private void ClearView()
     {
         if (_view is null)

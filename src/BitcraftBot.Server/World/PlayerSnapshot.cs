@@ -41,6 +41,13 @@ public sealed record PlayerSnapshot
     public int? RegionIndex { get; init; }
 
     public IReadOnlyList<NearbyResource> Resources { get; init; } = [];
+
+    // v0.4.4 : barre d'action (null si pas lue), capacités avec leur recharge, sacs tombés au sol autour.
+    public IReadOnlyList<ActionBarSlot>? ActionBar { get; init; }
+
+    public IReadOnlyList<AbilityInfo> Abilities { get; init; } = [];
+
+    public IReadOnlyList<GroundBag> GroundBags { get; init; } = [];
     public IReadOnlyDictionary<string, int> TableCounts { get; init; } = new Dictionary<string, int>();
 }
 
@@ -144,6 +151,9 @@ public static class SnapshotBuilder
             RegionIndex = regionIndex,
             RegionName = regionName?.Get("player_facing_name")?.ToString(),
             Resources = position is { } p ? NearbyResources(cache, p, describe) : [],
+            ActionBar = ActionBars.Of(cache, entity.Value),
+            Abilities = ActionBars.Abilities(cache, entity.Value),
+            GroundBags = position is { } gp ? World.GroundBags.Near(cache, entity.Value, gp) : [],
             TableCounts = cache.Counts(),
         };
     }

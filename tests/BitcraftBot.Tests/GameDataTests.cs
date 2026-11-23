@@ -35,6 +35,8 @@ public class GameDataTests
             ["building_type_desc"] = "[]",
             ["buff_desc"] = "[]",
             ["buff_type_desc"] = "[]",
+            ["ability_custom_desc"] = "[{\"id\":594765058,\"ability_name\":\"Sprint\",\"cooldown\":120.0}]",
+            ["combat_action_desc"] = "[]",
         };
     }
 
@@ -55,6 +57,7 @@ public class GameDataTests
         var store = GameDataStore.Load(WriteTables(FakeTables()));
 
         Assert.Empty(store.Validate());
+        Assert.Equal("Sprint", store.CustomAbilities[594765058]);
         var oak = store.FindResource("mature oak tree");
         Assert.NotNull(oak);
         Assert.Equal(12000, oak!.MaxHealth);

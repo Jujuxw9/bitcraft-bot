@@ -31,6 +31,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private bool _resourcesRefused;
     private bool _healthRefused;
     private bool _inventoryRefused;
+    // v0.4.4 : barre d'action, capacités et sacs au sol (abandonnés en premier si le serveur refuse).
+    private bool _extrasRefused;
     private bool _inventoryLogged;
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
@@ -81,6 +83,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _resourcesRefused = false;
         _healthRefused = false;
         _inventoryRefused = false;
+        _extrasRefused = false;
         _inventoryLogged = false;
         ResourceAreaUpdated = null;
         Interlocked.Exchange(ref _messages, 0);
@@ -213,19 +216,26 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
             case SubscriptionErrorEvent error:
                 log.Erreur(Category, $"Abonnement refusé par le serveur : {error.Error}");
-                if (_entityId is { } ie && !_inventoryRefused)
+                if (_entityId is { } xe && !_extrasRefused)
+                {
+                    // D'abord sans la barre d'action, les capacités et les sacs au sol (requêtes ajoutées en v0.4.4).
+                    _extrasRefused = true;
+                    log.Alerte(Category, "Nouvel essai sans la barre d'action ni les sacs au sol.");
+                    Subscribe(Queries.FollowPlayer(_identity!, xe, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: false), "suivi sans la barre d'action ni les sacs au sol");
+                }
+                else if (_entityId is { } ie && !_inventoryRefused)
                 {
                     // D'abord sans le sac et les banques (requêtes ajoutées en v0.3.14).
                     _inventoryRefused = true;
                     log.Alerte(Category, "Nouvel essai sans le sac ni les banques.");
-                    Subscribe(Queries.FollowPlayer(_identity!, ie, _area, withHealth: !_healthRefused, withInventory: false), "suivi sans le sac ni les banques");
+                    Subscribe(Queries.FollowPlayer(_identity!, ie, _area, withHealth: !_healthRefused, withInventory: false, withExtras: false), "suivi sans le sac ni les banques");
                 }
                 else if (_area is { } refusedArea && !_healthRefused && _entityId is { } he)
                 {
                     // D'abord sans la santé des ressources (requête ajoutée en v0.3.11), en gardant les ressources.
                     _healthRefused = true;
                     log.Alerte(Category, "Nouvel essai sans la santé des ressources.");
-                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false, withInventory: !_inventoryRefused), "ressources sans la santé");
+                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false, withInventory: !_inventoryRefused, withExtras: !_extrasRefused), "ressources sans la santé");
                 }
                 else if (_area is not null && !_resourcesRefused)
                 {
@@ -235,7 +245,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                     _area = null;
                     if (_entityId is { } e)
                     {
-                        Subscribe(Queries.FollowPlayer(_identity!, e, null, withInventory: !_inventoryRefused), "suivi sans ressources");
+                        Subscribe(Queries.FollowPlayer(_identity!, e, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused), "suivi sans ressources");
                     }
                 }
                 else
@@ -274,6 +284,12 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             var text = row?.ToString() ?? "aucune ligne";
             log.Info(Category, $"Exemple brut de {table} : {(text.Length > 300 ? text[..300] + "…" : text)}");
         }
+        // v0.4.4 : un extrait brut de la barre d'action, d'une capacité et d'un sac au sol (format réel à vérifier).
+        foreach (var table in new[] { "action_bar_state", "ability_state", "dropped_inventory_state", "dropped_inventory_ownership_timer" })
+        {
+            var text = _cache.Rows(table).FirstOrDefault()?.ToString() ?? "aucune ligne";
+            log.Info(Category, $"Exemple brut de {table} : {(text.Length > 300 ? text[..300] + "…" : text)}");
+        }
         var snapshot = Snapshot();
         log.Info(Category, $"Tableau de bord : {snapshot.Skills?.Count.ToString() ?? "?"} métiers lus, action {snapshot.Action?.Type ?? "aucune"}, vie max {snapshot.MaxHealth?.ToString("0") ?? "?"}, endurance max {snapshot.MaxStamina?.ToString("0") ?? "?"}.");
     }
@@ -291,7 +307,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         {
             _entityId = snapshot.EntityId;
             log.Info(Category, $"Personnage trouvé (entité {_entityId}).");
-            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null, withInventory: !_inventoryRefused), "suivi du personnage");
+            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused), "suivi du personnage");
             return;
         }
         SetState(ReaderState.Connecte, "Lecture en direct.");
@@ -321,7 +337,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         var why = previous is { } old
             ? $"ressources autour de {p.ScreenText} : le personnage s'est éloigné de {new ServerPosition(old.CenterX, old.CenterZ).ScreenDistanceTo(p):0.0} cases écran du centre de l'ancienne zone"
             : $"ressources autour de {p.ScreenText}";
-        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused), why);
+        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused), why);
     }
 
     private void Subscribe(IReadOnlyList<string> queries, string why)

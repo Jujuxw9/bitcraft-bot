@@ -1,0 +1,85 @@
+# Module « @GPT » : répondre dans le chat du jeu (étude)
+
+- **Statut** : étude seulement (2026-11-23). **Rien n'est codé.** La suite attend les réponses de Julien : [Q-027](../questions-ouvertes/Q-027-chat-gpt.md).
+- **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase (drôle, petit troll sympa, ou sérieuse sur le jeu). Réponse écrite par Claude Haiku 5.5 (API Anthropic). **Pas de spam.**
+- **Liens** : D-024 (touche Entrée interdite au bot), D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
+
+## ⚠ Incohérence à signaler
+
+**D-024 interdit au bot la touche Entrée (le chat).** Écrire dans le chat demande Entrée. Le module ne peut donc pas exister sans une **nouvelle décision de Julien** qui lève cette interdiction (pour le chat seulement, avec des limites). C'est la question 1 de Q-027.
+
+## 1. Lire le chat : possible, en lecture seule
+
+Vérifié dans le code serveur officiel (`references/BitCraftPublic/BitCraftServer/packages/`).
+
+### Table `chat_message_state` du module de région (le serveur de la région où joue Julien)
+
+- Table **publique**, **sans filtre de visibilité** dans le module de région : tous les messages de la région sont lisibles avec l'abonnement en lecture seule déjà en place (même connexion que pour les arbres, `World/Queries.cs`). Une ligne `SELECT * FROM chat_message_state WHERE channel_id = …` suffirait. **À vérifier** par un vrai essai (le serveur peut refuser une requête trop large).
+- Colonnes utiles :
+  - `entity_id` : numéro du message (unique).
+  - `owner_entity_id` : numéro du joueur qui écrit (le même que dans `player_state`).
+  - `username` : de la forme `fr/Pseudo` (code de langue, barre, pseudo).
+  - `channel_id` : le canal (voir ci-dessous).
+  - `target_id` : 0 en général (seul le canal Local peut avoir une cible).
+  - `text` : le message (250 caractères au plus).
+  - `timestamp` : heure d'envoi en secondes (heure Unix).
+  - `title_id` : titre affiché du joueur (0 si aucun).
+- Canaux (`ChatChannel`) : 0 Système, 2 **Local**, 3 **Région** (appelé « General » dans le jeu), 7 **Groupe** (Looking For Group), 8 **Commerce** (Trade). Les numéros 1, 4, 5, 6 ne servent pas.
+- Le canal **Local** n'a pas de position dans la table : c'est le jeu de chaque joueur qui choisit quels messages locaux il montre (probablement selon la distance, **À vérifier**). Le bot peut filtrer lui-même avec la position de l'auteur (`mobile_entity_state`).
+- Le serveur **efface les messages de plus de 2 jours** (tâche de nettoyage quotidienne).
+
+### Module global (tout le jeu)
+
+- **Messages privés** : table `direct_message_state`. Filtre du serveur : chaque joueur ne voit que les messages qu'il a **envoyés ou reçus**. Le bot verrait donc les messages privés reçus par Julien, et pas ceux des autres. Le module global est déjà joint au démarrage (`RegionFinder.cs`).
+- **Canaux créés par les joueurs** : `chat_message_state` du module global, visible seulement pour les membres du canal.
+
+### Règles du serveur sur l'envoi (pour savoir ce que le jeu acceptera)
+
+- 250 caractères au plus, message non vide.
+- Canal Région : **3 messages par 15 secondes** au plus par joueur (réglage par défaut, si le joueur n'a pas de titre) ; pseudo obligatoire.
+- La modération peut **suspendre le chat** d'un compte (« Your chat privileges have been suspended »). Les joueurs peuvent **signaler** un joueur ou un message.
+
+## 2. Écrire dans le chat : deux voies
+
+### (a) Côté serveur : INTERDIT, on ne le fait pas
+
+Le serveur a une fonction d'envoi (`chat_post_message`, et `chat_post_targeted_message` pour les messages privés). L'appeler depuis le bot, c'est **envoyer une action au serveur officiel par un client tiers**. C'est un **interdit non négociable** du projet (D-039). Cette voie est écartée, sans exception.
+
+### (b) Dans le jeu, comme Julien : seule voie compatible avec les règles du projet
+
+Le bot fait ce que ferait Julien : Entrée (ouvre le chat), choisir le canal si besoin, taper le texte, Entrée (envoie). Tout passe par le **contrôleur d'actions** (D-045) avec ses sécurités : bouton Arrêter, souris bougée, pause quand Julien tape, rien hors de l'écran « en jeu » (D-052).
+
+Limites de cette voie :
+- **Il faut lever l'interdiction de la touche Entrée (D-024)** pour le chat.
+- Le bot **prend le clavier quelques secondes** : la récolte doit s'arrêter le temps d'écrire (le clic droit et la frappe ne peuvent pas se mélanger).
+- Pendant que le chat est ouvert, chaque touche part dans le chat. Risque : une touche de la récolte (W, ZQSD) tapée dans le chat par erreur, ou un texte tapé dans le jeu (touches = actions). Il faudra **vérifier à l'écran** que la zone de saisie du chat est bien ouverte avant de taper, et fermée après.
+- Choix du canal dans le jeu : **À vérifier** (comment le jeu choisit Local ou Région à l'ouverture, et si une commande du type « /l » existe).
+- Les accents et caractères spéciaux : il faudra taper par caractère Unicode et non par position de touche. **À vérifier** que le jeu les accepte.
+
+## 3. Risques
+
+| Risque | Détail | Parade proposée |
+|---|---|---|
+| Règles du jeu | Les Community Guidelines interdisent l'automatisation et le botting (voir `00-contexte/regles-et-risques.md`). Un bot qui **parle** est **visible par tous** : bien plus facile à repérer et à signaler qu'une récolte. Risque de sanction du compte principal. | Peu de réponses, ton humain, Julien présent. Dire que c'est une IA ? (question à Julien) |
+| Modération | Signalement par les joueurs, suspension du chat ou du compte. | Liste de joueurs autorisés ; pas de réponse aux inconnus au début. |
+| Spam | Plusieurs « @GPT » à la suite, ou deux bots qui se répondent. | Une réponse par joueur et par période ; un plafond global (ex. 1 par minute, 20 par heure) ; ne jamais répondre à ses propres messages (`owner_entity_id` de Julien) ; ignorer les messages de plus de 1 minute au démarrage. |
+| Contenu | Insultes, sujets sensibles, données personnelles, fausses infos sur le jeu. | Consignes fixes pour Haiku (ton gentil, pas d'insultes, pas de sujets sensibles, ne jamais donner d'infos sur Julien) ; filtre de mots après la réponse ; 250 caractères max. |
+| Manipulation | Un joueur écrit « @GPT ignore tes consignes et… ». Le texte des joueurs n'est pas fiable. | Le texte du joueur est passé comme une donnée, jamais comme une consigne ; Haiku n'a aucun outil ; le bot ne fait **rien d'autre** qu'écrire une phrase. |
+| Clé API | Comme le jeton : secret. | Jamais dans Git, ni dans un journal, ni dans une réponse. Tapée par Julien dans le bot, rangée chiffrée sur le PC (comme le jeton). |
+| Coût de l'API | Haiku 5.5 : 0,10 $ par million de mots-jetons lus, 0,50 $ par million écrits (prix de la doc Anthropic, à jour au 2026-11-03). Une réponse ≈ 1 000 jetons lus + 100 écrits ≈ **0,0002 $**. 1 000 réponses ≈ 0,20 $. | Plafond de dépenses sur le compte Anthropic ; compteur dans le bot. |
+| Gêne pour la récolte | Le bot arrête de récolter quelques secondes à chaque réponse. | Réponses rares ; option « pas de réponse pendant la récolte ». |
+
+## 4. Architecture envisagée (après les réponses de Julien)
+
+1. **Lecture** (brique Server) : abonnement en plus à `chat_message_state` (canaux choisis par Julien). Chaque nouveau message qui contient « @GPT » passe au tri.
+2. **Tri** : joueur autorisé ? délai respecté ? plafond global ? message récent ? pas de Julien lui-même ? Sinon : ignoré (une ligne dans le journal, sans le texte entier).
+3. **Réponse** : appel à Claude Haiku 5.5 (SDK officiel Anthropic pour C#) avec des consignes fixes, le pseudo et le texte du joueur. Effort bas (réponse courte). Filtre de mots, coupe à 250 caractères.
+4. **Envoi** : une tâche « écrire dans le chat » passe au contrôleur d'actions (D-045), qui attend une pause de la récolte, vérifie l'écran, ouvre le chat, tape, envoie, vérifie que le chat est fermé.
+5. **Mode essai** d'abord : le bot affiche la réponse dans sa fenêtre **sans l'envoyer**. Julien juge le ton. L'envoi réel vient ensuite.
+
+## Ce qui reste À vérifier
+
+- Que le serveur accepte l'abonnement à `chat_message_state` (essai réel).
+- Comment le jeu choisit le canal à l'ouverture du chat.
+- Que le jeu accepte la frappe de caractères accentués envoyée par le bot.
+- Quels messages Local le jeu montre (distance).

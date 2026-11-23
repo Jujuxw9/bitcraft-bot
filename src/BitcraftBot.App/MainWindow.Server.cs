@@ -282,6 +282,7 @@ public partial class MainWindow
         {
             TrackTasks(s, inventories, !reader.InventoryRefused);
             TrackCamera(s);
+            TrackAround(s);
         }
         else
         {

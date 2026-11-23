@@ -209,6 +209,15 @@ public static class MinimapCone
     }
 
     // Goutte du personnage : bleu (21, 86, 126) au centre.
+    // Personnage visible au centre de la mini-carte : preuve qu'on est en jeu (v0.4.4).
+    public static bool PlayerVisible(Frame frame)
+    {
+        var k = frame.Height / (double)HudLayout.ReferenceHeight;
+        var cx = (int)Math.Round(CenterX * frame.Width / (double)HudLayout.ReferenceWidth);
+        var cy = (int)Math.Round(CenterY * k);
+        return cx > 10 && cy > 10 && cx + 10 < frame.Width && cy + 10 < frame.Height && PlayerMarkerVisible(frame, cx, cy, k);
+    }
+
     private static bool PlayerMarkerVisible(Frame frame, int cx, int cy, double k)
     {
         var radius = Math.Max(2, (int)Math.Round(5 * k));

@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -40,12 +40,37 @@ public static class Queries
             list.Add($"SELECT * FROM extract_outcome_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM player_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM teleportation_energy_state WHERE entity_id = {e}");
+            if (withExtras)
+            {
+                // Barre d'action et capacités avec leur temps de recharge (v0.4.4 : sprint).
+                list.Add($"SELECT * FROM action_bar_state WHERE player_entity_id = {e}");
+                list.Add($"SELECT * FROM ability_state WHERE owner_entity_id = {e}");
+            }
         }
         if (area is { } a)
         {
             list.AddRange(Resources(a, withHealth));
+            if (withExtras)
+            {
+                list.AddRange(GroundBags(a));
+            }
         }
         return list;
+    }
+
+    // Sacs tombés au sol dans la zone (v0.4.4) : le sac, sa position, son contenu, ses minuteries (propriétaire, disparition).
+    public static IReadOnlyList<string> GroundBags(Area a)
+    {
+        var where = string.Create(CultureInfo.InvariantCulture,
+            $"l.x >= {a.MinX} AND l.x <= {a.MaxX} AND l.z >= {a.MinZ} AND l.z <= {a.MaxZ}");
+        return
+        [
+            $"SELECT d.* FROM dropped_inventory_state d JOIN location_state l ON d.entity_id = l.entity_id WHERE {where}",
+            $"SELECT l.* FROM location_state l JOIN dropped_inventory_state d ON l.entity_id = d.entity_id WHERE {where}",
+            $"SELECT i.* FROM inventory_state i JOIN dropped_inventory_state d ON i.owner_entity_id = d.entity_id",
+            $"SELECT t.* FROM dropped_inventory_ownership_timer t JOIN location_state l ON t.entity_id = l.entity_id WHERE {where}",
+            $"SELECT t.* FROM dropped_inventory_despawn_timer t JOIN location_state l ON t.entity_id = l.entity_id WHERE {where}",
+        ];
     }
 
     // Ressources (arbres, rochers, buissons…) dans un carré autour du personnage : leur position, leur type

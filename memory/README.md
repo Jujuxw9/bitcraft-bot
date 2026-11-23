@@ -36,7 +36,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [README.md](decisions/README.md) — tableau D-001 à D-053
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-026
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-027
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -62,7 +62,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-passation-recolte-auto.md](echanges/2026-11-19-passation-recolte-auto.md) — **passation** : prompt pour le nouveau chat (R1 à R7)
 - [2026-11-19-essai-v040.md](echanges/2026-11-19-essai-v040.md) — essai v0.4.0 (fait le 22/11 : formule de la caméra pas fiable, voir l'analyse de la visée)
 - [2026-11-22-essai-v041.md](echanges/2026-11-22-essai-v041.md) — essai v0.4.2 (fait le 22/11 : connexion pas reconnue, lectures de texte en même temps → v0.4.3)
-- [2026-11-23-essai-v043.md](echanges/2026-11-23-essai-v043.md) — **essai v0.4.3 à faire** (direction de la caméra, fenêtres du jeu, écran de connexion)
+- [2026-11-23-essai-v043.md](echanges/2026-11-23-essai-v043.md) — essai v0.4.3 (fait le 23/11 : fenêtres OK, cône figé après W, 20 « écran inconnu » en chasse)
+- [2026-11-23-essai-v044.md](echanges/2026-11-23-essai-v044.md) — **essai v0.4.4 à faire** (sprint, barre d'action, sacs au sol, contrôle après W)
 
 ### technique/
 - [README.md](technique/README.md) — index
@@ -70,13 +71,14 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.3
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.4
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [hybride/analyse-visee-2026-11-22.md](technique/hybride/analyse-visee-2026-11-22.md) — **analyse de la visée après l'essai R1** : méthode fiable, prochaines étapes, améliorations
 - [reglages-du-jeu.md](technique/reglages-du-jeu.md) — réglages du jeu lus dans le registre, 4 à changer ? (Q-026)
+- [chat-gpt.md](technique/chat-gpt.md) — **étude du module « @GPT »** (répondre dans le chat avec Claude Haiku) : lecture du chat, envoi, risques (Q-027)
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-01)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-02)

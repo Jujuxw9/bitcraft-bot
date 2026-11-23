@@ -64,3 +64,11 @@ Mise à jour du 2026-11-22 après les réponses de Julien (D-052) : le cône est
 - **Liaison serveur** : le 22/11 à 20:51, le module global **et** la région idc-18 ont refusé la liaison dès l'ouverture ; 70 s plus tard (20:53), tout a marché (global accepté, région sur `bitcraft-release`). Cause inconnue (À vérifier). Pas de reconnexion automatique (règle du projet) : si ça se reproduit, le bot pourrait proposer « Réessayer dans 1 min ».
 - **Overlay** : afficher sur le jeu ce que le bot voit et ce qu'il va faire (aide pour les essais).
 - **Rangement de la mémoire** : agent mémoire (`tools/agent-memoire/`) à lancer de temps en temps.
+
+## 8. Conclusions après la session du 23/11 (19 coupes, 17 clics appris avec la direction)
+
+- **Le cône de la mini-carte ne bouge pas après W** (observation de Julien, confirmée par le journal) : W à 19:57:06 avec un cône à 224°, puis 232° pendant 8 coupes ; W à 20:03:14 avec 211°, puis 213°. Le cône tourne bien avec le bouton du milieu.
+- **Les clics ne collent pas avec le cap lu après W** : avec un cap « nord » (18:58 à 19:01), des arbres **derrière** le personnage (au sud-ouest) sont cliqués en haut de l'écran ; même chose vers 232°. Donc, après W, le cône donne l'ancienne direction, pas la vraie.
+- **Hypothèse** (À vérifier) : W met la caméra derrière le personnage. La pointe de la goutte suit le personnage. Après W, la vraie direction serait donc celle de la **goutte**, et non celle du cône. La v0.4.4 garde une capture 1,5 s après W pour le vérifier.
+- **Conséquence pour la visée** : ne pas se fier au cône après W. Pistes : (a) ne plus utiliser W et tourner la caméra au bouton du milieu (le cône suit) ; (b) après W, un petit mouvement du bouton du milieu pour forcer la mise à jour du cône ; (c) lire la pointe de la goutte. À trancher avec Julien après les captures.
+- Données encore trop peu nombreuses et bruitées pour la formule (v0.4.4 R1 ter reportée) : un clic sur le feuillage peut toucher un autre arbre que celui visé.

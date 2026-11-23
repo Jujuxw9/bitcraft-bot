@@ -34,6 +34,9 @@ public sealed class GameDataStore
         // Repas automatique (v0.3.15) : bonus des aliments (« Food Regen »).
         "buff_desc",
         "buff_type_desc",
+        // Barre d'action (v0.4.4) : noms et temps de recharge des capacités (sprint, attaques…).
+        "ability_custom_desc",
+        "combat_action_desc",
     ];
 
     public required IReadOnlyList<ResourceInfo> Resources { get; init; }
@@ -45,6 +48,11 @@ public sealed class GameDataStore
 
     // Noms des métiers (skill_desc), pour le tableau de bord (v0.3.17).
     public IReadOnlyDictionary<int, string> Skills { get; init; } = new Dictionary<int, string>();
+
+    // Capacités (v0.4.4) : ability_custom_desc (Sprint, Hewing Strikes…) et combat_action_desc (attaques).
+    // Vides si les fichiers ne sont pas encore téléchargés.
+    public IReadOnlyDictionary<int, string> CustomAbilities { get; init; } = new Dictionary<int, string>();
+    public IReadOnlyDictionary<int, string> CombatActions { get; init; } = new Dictionary<int, string>();
     public GameDataVersion? Version { get; init; }
 
     private Dictionary<string, ResourceInfo>? _byName;
@@ -96,6 +104,8 @@ public sealed class GameDataStore
             Cargos = cargos,
             FoodItemIds = foods,
             Skills = ReadArray(folder, "skill_desc").GroupBy(e => Int(e, "id")).ToDictionary(g => g.Key, g => Str(g.First(), "name")),
+            CustomAbilities = Optional(folder, "ability_custom_desc", "ability_name"),
+            CombatActions = Optional(folder, "combat_action_desc", "name"),
             Version = ReadVersion(folder),
         };
     }
@@ -161,6 +171,12 @@ public sealed class GameDataStore
 
     public static void WriteVersion(string folder, GameDataVersion version) =>
         File.WriteAllText(Path.Combine(folder, VersionFile), JsonSerializer.Serialize(version, new JsonSerializerOptions { WriteIndented = true }));
+
+    // Table facultative : id → nom, vide si le fichier manque.
+    private static IReadOnlyDictionary<int, string> Optional(string folder, string table, string nameField) =>
+        File.Exists(Path.Combine(folder, table + ".json"))
+            ? ReadArray(folder, table).GroupBy(e => Int(e, "id")).ToDictionary(g => g.Key, g => Str(g.First(), nameField))
+            : new Dictionary<int, string>();
 
     private static List<JsonElement> ReadArray(string folder, string table)
     {

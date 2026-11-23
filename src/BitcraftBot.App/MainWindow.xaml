@@ -154,6 +154,21 @@
                                 </Grid>
                             </StackPanel>
                         </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="SPRINT ET BARRE D'ACTION" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="SprintText" Text="Sprint : —" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock x:Name="ActionBarText" Text="—" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="SACS AU SOL" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="GroundText" Text="—" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
 

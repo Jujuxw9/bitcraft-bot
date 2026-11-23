@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.3 : en jeu, le bot lit la direction de la caméra sur la mini-carte et voit les fenêtres du jeu ouvertes (inventaire, carte…) : une fenêtre ouverte bloque toute action (D-052) ; écran de connexion reconnu ; caméra : 1 s d'attente après W. Apprentissage de la caméra (R1) toujours actif, en lecture seule, avec la direction notée à chaque clic. Lecture seule du serveur officiel. Seule action sur le jeu : Maj + E (repas automatique).");
+        _log.Info("Session", "Version 0.4.4 : lecture seule du serveur pour la barre d'action (touches et capacités, temps de recharge), le sprint (prêt, actif, en recharge) et les sacs tombés au sol (contenu, à qui, quand ils deviennent libres) ; « en jeu » reconnu aussi par le personnage au centre de la mini-carte ; après W, le cap du cône est relu 1,5 s plus tard (avec une capture). Aucune nouvelle action : seule action sur le jeu, Maj + E (repas automatique).");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

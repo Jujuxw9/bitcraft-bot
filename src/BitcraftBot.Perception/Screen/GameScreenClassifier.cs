@@ -69,6 +69,12 @@ public sealed partial class GameScreenClassifier(OcrReader ocr)
         {
             return new ScreenReading(GameScreen.Chargement, $"mot « {lw} » en bas à gauche");
         }
+        // Personnage (goutte bleue) au centre de la mini-carte (v0.4.4) : les coordonnées sont parfois mal lues
+        // (chasse, bandeaux, discussion), 20 « écran inconnu » en jeu le 23/11.
+        if (MinimapCone.PlayerVisible(frame))
+        {
+            return new ScreenReading(GameScreen.EnJeu, "personnage au centre de la mini-carte");
+        }
         // Tout l'écran : texte clair, puis texte foncé (boutons clairs ?).
         var whole = new ScreenRect(0, 0, frame.Width, frame.Height);
         var bright = await ocr.ReadAsync(frame, whole, TextStyle.BrightText, 200, scale: 1);
