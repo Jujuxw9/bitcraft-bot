@@ -80,12 +80,18 @@ public sealed class RecipeBook
 
     public string NameOf(string key) => Entries.TryGetValue(key, out var e) ? e.Name : $"objet inconnu ({key})";
 
-    // Les façons d'obtenir un objet, les plus simples d'abord (v0.4.6) : récoltes, puis fabrications avec peu
-    // d'ingrédients et des métiers bas. Les recettes qui consomment l'objet lui-même (convertir) ou un paquet
-    // (« Unpack … Package », catégorie « Package ») en dernier : ce n'est pas une vraie façon de le produire.
+    // Recette « paquet » (v0.4.12, demande de Julien : les paquets ne servent à rien) : emballer, déballer,
+    // ou tout ce qui consomme ou produit un objet de catégorie « Package ».
+    public bool IsPackage(Recipe r) =>
+        r.Name.Contains("Package", StringComparison.OrdinalIgnoreCase)
+        || r.Inputs.Concat(r.Outputs).Any(i => Entries.TryGetValue(i.Key, out var e) && e.Tag == "Package");
+
+    // Les façons d'obtenir un objet, les plus simples d'abord : récoltes, puis fabrications avec peu d'ingrédients et des
+    // métiers bas. Les recettes « paquet » et celles qui consomment l'objet lui-même (convertir) sont écartées (v0.4.12).
     public IReadOnlyList<Recipe> Simplest(string key, int max = int.MaxValue) =>
         Producing(key)
-            .OrderBy(r => r.Inputs.Any(i => i.Key == key || (Entries.TryGetValue(i.Key, out var e) && e.Tag == "Package")) ? 1 : 0)
+            .Where(r => !IsPackage(r) && r.Inputs.All(i => i.Key != key))
+            .OrderBy(r => r.NeedsKnowledge || r.NeedsClaimTech ? 1 : 0)
             .ThenBy(r => r.Kind == "Récolte" ? 0 : 1)
             .ThenBy(r => r.Inputs.Count)
             .ThenBy(r => r.Skills.Sum(s => s.Level))

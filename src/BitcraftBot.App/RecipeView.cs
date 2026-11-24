@@ -37,8 +37,12 @@ public sealed class RecipeView
         _open = open;
     }
 
-    public UIElement Build(string key)
+    private readonly HashSet<string> _checked = [];
+
+    // Quantité voulue (v0.4.12) : l'arborescence et le plan d'actions sont calculés pour cette quantité.
+    public UIElement Build(string key, int quantity = 1)
     {
+        quantity = Math.Max(1, quantity);
         var panel = new StackPanel();
         if (!_book.Entries.TryGetValue(key, out var entry))
         {
@@ -48,28 +52,52 @@ public sealed class RecipeView
         panel.Children.Add(Header(entry));
 
         var producing = _book.Simplest(key);
-        panel.Children.Add(Section(producing.Count switch
-        {
-            0 => "COMMENT L'OBTENIR",
-            1 => "COMMENT L'OBTENIR (1 façon)",
-            _ => $"COMMENT L'OBTENIR ({producing.Count} façons, la plus simple en premier)",
-        }));
         if (producing.Count == 0)
         {
+            panel.Children.Add(Section("COMMENT L'OBTENIR"));
             panel.Children.Add(Text("Aucune recette ni récolte connue : objet obtenu autrement (butin, coffre, quête, commerce…).", 13, DimBrush));
         }
-        var number = 1;
-        foreach (var recipe in producing.Take(MaxRecipesShown))
+        else
         {
-            panel.Children.Add(FlowCard(recipe, key, number++));
-        }
-        if (producing.Count > MaxRecipesShown)
-        {
-            panel.Children.Add(Text($"… et {producing.Count - MaxRecipesShown} autres façons.", 13, DimBrush));
+            // La plus simple en premier, puis l'arborescence et le plan d'actions pour la quantité voulue.
+            panel.Children.Add(Section("COMMENT L'OBTENIR (la plus simple)"));
+            panel.Children.Add(FlowCard(producing[0], key, 1));
+
+            var tree = RecipePlanner.Tree(_book, key, quantity);
+            panel.Children.Add(Section($"ARBORESCENCE POUR {quantity} × {_book.NameOf(key).ToUpperInvariant()}"));
+            panel.Children.Add(TreeView(tree, 0));
+
+            var steps = RecipePlanner.Steps(_book, key, quantity);
+            panel.Children.Add(Section($"PLAN D'ACTIONS ({steps.Count} étape{(steps.Count > 1 ? "s" : "")}, dans l'ordre : coche ce qui est fait)"));
+            var number = 1;
+            foreach (var step in steps)
+            {
+                panel.Children.Add(StepRow(step, $"{key}|{quantity}|{step.Key}", number++));
+            }
         }
 
-        // Ce qu'on fabrique avec : une tuile par objet obtenu (sans doublon).
-        var uses = _book.Using(key).SelectMany(r => r.Outputs).Select(o => o.Key).Where(k => k != key).Distinct().ToList();
+        if (producing.Count > 1)
+        {
+            var others = new StackPanel();
+            var n = 2;
+            foreach (var recipe in producing.Skip(1).Take(MaxRecipesShown))
+            {
+                others.Children.Add(FlowCard(recipe, key, n++));
+            }
+            if (producing.Count - 1 > MaxRecipesShown)
+            {
+                others.Children.Add(Text($"… et {producing.Count - 1 - MaxRecipesShown} autres façons.", 13, DimBrush));
+            }
+            panel.Children.Add(new Expander
+            {
+                Header = Text($"AUTRES FAÇONS ({producing.Count - 1})", 12, DimBrush, FontWeights.SemiBold),
+                Margin = new Thickness(0, 14, 0, 0),
+                Content = others,
+            });
+        }
+
+        // Ce qu'on fabrique avec : une tuile par objet obtenu (sans doublon, sans paquets).
+        var uses = _book.Using(key).Where(r => !_book.IsPackage(r)).SelectMany(r => r.Outputs).Select(o => o.Key).Where(k => k != key).Distinct().ToList();
         panel.Children.Add(Section(uses.Count == 0 ? "SERT À FABRIQUER" : $"SERT À FABRIQUER ({uses.Count} objet{(uses.Count > 1 ? "s" : "")})"));
         if (uses.Count == 0)
         {
@@ -86,6 +114,73 @@ public sealed class RecipeView
             panel.Children.Add(Text($"… et {uses.Count - MaxUsesShown} autres.", 13, DimBrush));
         }
         return panel;
+    }
+
+    // Arborescence : chaque ligne = « quantité × objet » et d'où il vient ; ses ingrédients dessous, décalés.
+    private UIElement TreeView(PlanNode node, int depth)
+    {
+        var box = new StackPanel { Margin = new Thickness(depth == 0 ? 0 : 22, 0, 0, 0) };
+        var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 2, 0, 2), Cursor = Cursors.Hand };
+        row.Children.Add(Icon(node.Key, 26));
+        var text = new TextBlock { Margin = new Thickness(6, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, FontSize = 13, Foreground = TitleBrush };
+        text.Inlines.Add(new System.Windows.Documents.Run($"{node.Quantity} × ") { Foreground = AccentBrush, FontWeight = FontWeights.Bold });
+        text.Inlines.Add(new System.Windows.Documents.Run(_book.NameOf(node.Key)));
+        var (how, brush) = Source(node);
+        text.Inlines.Add(new System.Windows.Documents.Run("   " + how) { Foreground = brush, FontSize = 12 });
+        row.Children.Add(text);
+        var key = node.Key;
+        row.MouseLeftButtonUp += (_, e) =>
+        {
+            e.Handled = true;
+            _open(key);
+        };
+        box.Children.Add(row);
+        foreach (var child in node.Children)
+        {
+            box.Children.Add(TreeView(child, depth + 1));
+        }
+        return box;
+    }
+
+    // D'où vient un objet, en un mot : récolte, fabrication, ou source inconnue.
+    private (string, Brush) Source(PlanNode node)
+    {
+        if (node.Recipe is null)
+        {
+            return ("source inconnue (butin, commerce…)", WarnBrush);
+        }
+        var needs = string.Join(", ", node.Recipe.Skills.Select(s => $"{s.Name} {s.Level}").Concat(node.Recipe.Tools.Select(t => $"{t.Name} {t.Level}")));
+        return node.Recipe.Kind == "Récolte"
+            ? ($"← récolte sur « {node.Recipe.Place} »{(needs.Length > 0 ? " · " + needs : "")}", WantedBorder)
+            : ($"← fabriqué ({node.Recipe.Place}){(needs.Length > 0 ? " · " + needs : "")}", DimBrush);
+    }
+
+    // Une action du plan, avec sa case à cocher (rayée quand c'est fait).
+    private UIElement StepRow(PlanStep step, string checkKey, int number)
+    {
+        var name = _book.NameOf(step.Key);
+        var what = step.Recipe is null
+            ? $"Avoir {step.Quantity} × {name} (butin, commerce… : source inconnue)"
+            : step.Recipe.Kind == "Récolte"
+                ? $"Récolter {step.Quantity} × {name} sur « {step.Recipe.Place} » (environ {step.Crafts} coup{(step.Crafts > 1 ? "s" : "")})"
+                : $"Fabriquer {step.Quantity} × {name} : {step.Crafts} fois, {step.Recipe.Place}";
+        var label = new TextBlock { Text = $"{number}. {what}", Foreground = TitleBrush, FontSize = 13, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(4, 0, 0, 0) };
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        row.Children.Add(Icon(step.Key, 24));
+        row.Children.Add(label);
+        var box = new CheckBox { Content = row, Margin = new Thickness(0, 3, 0, 3), IsChecked = _checked.Contains(checkKey), VerticalContentAlignment = VerticalAlignment.Center };
+        void Refresh()
+        {
+            label.TextDecorations = box.IsChecked == true ? TextDecorations.Strikethrough : null;
+            label.Opacity = box.IsChecked == true ? 0.5 : 1;
+        }
+        box.Click += (_, _) =>
+        {
+            if (box.IsChecked == true) _checked.Add(checkKey); else _checked.Remove(checkKey);
+            Refresh();
+        };
+        Refresh();
+        return box;
     }
 
     // En-tête : grande image, nom, palier, catégorie, description.

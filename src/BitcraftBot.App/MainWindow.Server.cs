@@ -309,7 +309,6 @@ public partial class MainWindow
             SrvStamina.Text = s.Stamina is { } st ? $"{st:0.#}" : "—";
             SrvUpdated.Text = reader.LastUpdate is { } at ? $"{at:HH:mm:ss}" : "—";
             ShowInventories(reader, s, inventories);
-            ShowBuffs(s);
         }
         if (tab == TravelerTab)
         {
@@ -317,6 +316,7 @@ public partial class MainWindow
         }
         if (tab == BotTab)
         {
+            ShowBuffs(s);
             UpdateDashboard(reader, s, inventories);
         }
     }

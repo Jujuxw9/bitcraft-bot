@@ -51,28 +51,56 @@ public sealed class ItemIcons
         return path is null ? Task.FromResult<ImageSource?>(null) : _cache.GetOrAdd(path, LoadAsync);
     }
 
+    // Chemins à essayer, dans l'ordre (v0.4.12) : le chemin du jeu, puis les dossiers où le CDN range réellement
+    // certaines images (ex. « Resources/Wildflowers » du jeu est « GeneratedIcons/Other/Wildflowers » sur le CDN).
+    public static IReadOnlyList<string> Candidates(string path)
+    {
+        var name = path[(path.LastIndexOf('/') + 1)..];
+        return new[] { path, "GeneratedIcons/Other/" + name, "GeneratedIcons/Items/" + name, "GeneratedIcons/Cargo/" + name, "Items/" + name }
+            .Distinct().ToList();
+    }
+
+    private static string FileOf(string path) => Path.Combine(Folder, path.Replace('/', Path.DirectorySeparatorChar) + ".webp");
+
     private async Task<ImageSource?> LoadAsync(string path)
     {
-        var file = Path.Combine(Folder, path.Replace('/', Path.DirectorySeparatorChar) + ".webp");
+        string file;
         try
         {
-            if (!File.Exists(file))
+            // Une image déjà sur le disque, sous l'un des chemins possibles ?
+            file = Candidates(path).Select(FileOf).FirstOrDefault(File.Exists) ?? "";
+            if (file.Length == 0)
             {
                 await _downloads.WaitAsync();
                 try
                 {
-                    if (!File.Exists(file))
+                    foreach (var candidate in Candidates(path))
                     {
-                        var bytes = await Http.GetByteArrayAsync(CdnBase + Uri.EscapeDataString(path).Replace("%2F", "/") + ".webp");
-                        Directory.CreateDirectory(Path.GetDirectoryName(file)!);
-                        var temp = file + ".tmp";
-                        await File.WriteAllBytesAsync(temp, bytes);
-                        File.Move(temp, file, overwrite: true);
+                        var target = FileOf(candidate);
+                        try
+                        {
+                            var bytes = await Http.GetByteArrayAsync(CdnBase + Uri.EscapeDataString(candidate).Replace("%2F", "/") + ".webp");
+                            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                            var temp = target + ".tmp";
+                            await File.WriteAllBytesAsync(temp, bytes);
+                            File.Move(temp, target, overwrite: true);
+                            file = target;
+                            break;
+                        }
+                        catch (HttpRequestException)
+                        {
+                            // Introuvable sous ce chemin : suivant.
+                        }
                     }
                 }
                 finally
                 {
                     _downloads.Release();
+                }
+                if (file.Length == 0)
+                {
+                    Interlocked.Increment(ref _failures);
+                    return null;
                 }
             }
             await _decodes.WaitAsync();

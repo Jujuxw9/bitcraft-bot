@@ -31,7 +31,10 @@ public class V046Tests
     public void Facons_les_plus_simples_d_abord()
     {
         var ways = Book().Simplest("I2");
-        Assert.Equal(["Rough Plank", "Rough Plank (lot)", "Unpack Rough Plank Package"], ways.Select(r => r.Name));
+        // v0.4.12 : les paquets (« Unpack … Package ») ne sont plus proposés (demande de Julien).
+        Assert.Equal("Rough Plank", ways[0].Name);
+        Assert.DoesNotContain(ways, r => r.Name.StartsWith("Unpack"));
+        Assert.All(ways, r => Assert.False(Book().IsPackage(r)));
         Assert.Single(Book().Simplest("I2", 1));
     }
 
@@ -86,7 +89,7 @@ public class V046Tests
         Assert.NotEmpty(ways);
         Assert.DoesNotContain(plank.Key, ways[0].Inputs.Select(i => i.Key)); // pas « déballer » en premier
         Assert.StartsWith("Fabrication (", book.Summary(ways[0]));
-        Assert.StartsWith("Unpack", ways[^1].Name); // déballer un paquet : en dernier
+        Assert.All(ways, r => Assert.False(book.IsPackage(r))); // v0.4.12 : aucun paquet
         var log = book.Search("Rough Log")[0];
         Assert.Equal("Récolte", book.Simplest(log.Key)[0].Kind);
     }

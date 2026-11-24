@@ -33,7 +33,7 @@ public partial class MainWindow
         BotScroll.VerticalScrollBarVisibility = narrow ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
         BotGrid.MinHeight = narrow ? 1050 : 0;
         // Personnage : « En direct » et « Bonus » côte à côte, ou l'un sous l'autre.
-        Stack(PersoGrid, PersoLive, PersoBuffs, PersoBag, narrow, 360);
+        Stack(PersoGrid, PersoLive, PersoFilter, PersoBag, narrow, 360);
         // Carte : carte et tableau côte à côte, ou l'un sous l'autre.
         Stack2(MapGrid, MapCard, MapList, narrow, GridLength.Auto);
         // Paramètres : journal à droite, ou sous les réglages.

@@ -287,3 +287,10 @@ Retour de la session de jeu du 23/11 (18:54 à 20:05 : chasse aux Sagi Birds, 19
 - Onglet VOYAGEURS (après PERSONNAGE), redessiné toutes les 2 s s'il est affiché et si quelque chose a changé.
 - Correction : les onglets sont repérés par leur nom, plus par un numéro fixe (l'onglet CHAT de la v0.4.10 avait décalé PERSONNAGE et CARTE).
 
+
+## 41. v0.4.12 — recettes simples, plan d'actions, voyageurs en trois listes (session tâches, 2026-11-24)
+
+- **Recettes** : `RecipeBook.Simplest` écarte les paquets et les recettes qui consomment l'objet. `RecipePlanner` (GameData) : arborescence (`Tree`), liste d'actions dans l'ordre avec quantités fusionnées (`Steps`), effort estimé (`EffortOf` : sources inconnues, fabrications, secondes). Fiche : `RecipeView.Build(clé, quantité)` ; zone Quantité de l'onglet.
+- **Voyageurs** : `TaskCheck.Progress` (part du stock) et `TravelerTaskPlanner.EffortToFinish`. `MainWindow.Travelers.cs` dessine trois sections de cartes (image des objets, portrait ou initiale du voyageur).
+- **Images** : `ItemIcons.Candidates` essaie « GeneratedIcons/Other|Items|Cargo » quand le chemin du jeu est absent du CDN.
+- **Personnage** : trois ListView (sac, ceinture, banques), tri par clic sur l'en-tête (`InventoryHeader_Click`). **Bot** : carte des bonus actifs sous le tableau de bord, carte « Options » (style `SwitchCheck` dans le thème). **Paramètres** : 4 cartes.

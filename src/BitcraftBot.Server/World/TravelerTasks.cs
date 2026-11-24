@@ -45,7 +45,18 @@ public sealed record TaskItemCheck(TaskItem Item, int InBag, IReadOnlyList<(stri
     public int Found => InBag + Elsewhere.Sum(e => e.Quantity);
 }
 
-public sealed record TaskCheck(TravelerTaskInfo Task, TravelerTaskDesc? Desc, TaskVerdict Verdict, IReadOnlyList<TaskItemCheck> Items);
+public sealed record TaskCheck(TravelerTaskInfo Task, TravelerTaskDesc? Desc, TaskVerdict Verdict, IReadOnlyList<TaskItemCheck> Items)
+{
+    // Avancement (v0.4.12) : part des objets demandés déjà en stock (sac, ceinture, banques), de 0 à 1.
+    public double Progress
+    {
+        get
+        {
+            var wanted = Items.Sum(i => (long)i.Item.Quantity);
+            return wanted == 0 ? 0 : Items.Sum(i => (long)Math.Min(i.Found, i.Item.Quantity)) / (double)wanted;
+        }
+    }
+}
 
 // Compare les tâches au stock (sac, ceinture, banques). Le même objet de palier différent a un autre numéro :
 // on compare par numéro d'objet et par type (objet ou cargaison), jamais par nom.
@@ -127,6 +138,11 @@ public static class TravelerTaskPlanner
         }
         return items.Any(i => i.Found > 0) ? TaskVerdict.Partiel : TaskVerdict.Impossible;
     }
+
+    // Effort pour farmer ce qui manque (v0.4.12) : somme, objet par objet, du plan le plus simple (RecipePlanner).
+    public static Effort EffortToFinish(TaskCheck check, RecipeBook book) =>
+        check.Items.Where(i => i.Missing > 0)
+            .Aggregate(Effort.None, (sum, i) => sum + RecipePlanner.EffortOf(book, (i.Item.IsCargo ? "C" : "I") + i.Item.ItemId, i.Missing));
 
     public static string Text(TaskVerdict verdict) => verdict switch
     {

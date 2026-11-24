@@ -1,10 +1,14 @@
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using BitcraftBot.Server;
 using BitcraftBot.Server.World;
 
 namespace BitcraftBot.App;
 
-// Onglet « Personnage », carte « Sac et banques » : ce que le serveur dit de vos inventaires (lecture seule).
+// Onglet « Personnage » : ce que le serveur dit de vos inventaires (lecture seule).
+// v0.4.12 (demande de Julien) : trois listes côte à côte (sac, ceinture d'outils, banques) au lieu d'un choix,
+// et colonnes triables d'un clic sur l'en-tête (alphabétique, quantité, type, palier).
 public partial class MainWindow
 {
     private static readonly TimeSpan InventoryInterval = TimeSpan.FromSeconds(2);
@@ -12,11 +16,23 @@ public partial class MainWindow
     private DateTime _inventoryShownAt = DateTime.MinValue;
     private string _inventorySignature = "";
     private List<(string Where, ItemStackInfo Stack)> _inventoryStacks = [];
-    private bool _updatingPicker;
 
-    private sealed record InventoryRow(string Name, string Quantity, string Kind, string Tier, string Where);
+    // Quantity et TierSort servent au tri (nombres) ; TierText est ce qu'on voit.
+    private sealed record InventoryRow(string Name, int Quantity, string Kind, int TierSort, string TierText, string Where);
 
-    // Appelé par la minuterie de l'onglet (toutes les 500 ms) ; la liste est refaite au plus toutes les 2 s, et seulement si elle a changé.
+    // Tri de chaque liste : colonne (propriété de InventoryRow) et sens. Par défaut : nom, A à Z.
+    private readonly Dictionary<ListView, (string Property, ListSortDirection Direction)> _inventorySort = [];
+
+    private static readonly Dictionary<string, string> InventorySortColumns = new()
+    {
+        ["Objet"] = nameof(InventoryRow.Name),
+        ["Quantité"] = nameof(InventoryRow.Quantity),
+        ["Type"] = nameof(InventoryRow.Kind),
+        ["Palier"] = nameof(InventoryRow.TierSort),
+        ["Où"] = nameof(InventoryRow.Where),
+    };
+
+    // Appelé par la minuterie de l'onglet (toutes les 500 ms) ; les listes sont refaites au plus toutes les 2 s, et seulement si elles ont changé.
     private void ShowInventories(ServerReader reader, PlayerSnapshot s, IReadOnlyList<InventoryInfo> inventories)
     {
         if (DateTime.Now - _inventoryShownAt < InventoryInterval)
@@ -44,14 +60,6 @@ public partial class MainWindow
         _inventorySignature = signature;
         _inventoryStacks = stacks;
 
-        // Choix « où » : tout, ou un inventaire précis (on garde le choix courant).
-        var places = stacks.Select(x => x.Where).Distinct().ToList();
-        var current = InventoryPicker.SelectedItem as string;
-        _updatingPicker = true;
-        InventoryPicker.ItemsSource = new[] { "Tout" }.Concat(places).ToList();
-        InventoryPicker.SelectedItem = current is not null && (current == "Tout" || places.Contains(current)) ? current : "Tout";
-        _updatingPicker = false;
-
         var bankCount = inventories.Count(i => i.Owner != s.EntityId);
         InventorySummary.Text = inventories.Count == 0
             ? "Aucun inventaire reçu pour l'instant."
@@ -59,38 +67,76 @@ public partial class MainWindow
         FillInventoryList();
     }
 
-    private void InventoryPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (!_updatingPicker)
-        {
-            FillInventoryList();
-        }
-    }
-
     private void InventorySearchBox_TextChanged(object sender, TextChangedEventArgs e) => FillInventoryList();
 
-    // Regroupe les piles du même objet au même endroit, filtre, trie par endroit puis par nom.
+    // Les trois listes : sac, ceinture d'outils, et tout le reste (banques, coffres).
     private void FillInventoryList()
     {
-        var place = InventoryPicker.SelectedItem as string ?? "Tout";
         var search = InventorySearchBox.Text.Trim();
-        var store = _gameData.Current;
         var rows = _inventoryStacks
-            .Where(x => place == "Tout" || x.Where == place)
             .GroupBy(x => (x.Where, x.Stack.ItemId, x.Stack.IsCargo))
             .Select(g =>
             {
                 var (where, id, cargo) = g.Key;
                 var key = (cargo ? "C" : "I") + id;
-                var name = ItemName(id, cargo);
-                var tier = _recipes?.Entries.TryGetValue(key, out var e2) == true ? e2.Tier.ToString() : "?";
-                return new InventoryRow(name, g.Sum(x => x.Stack.Quantity).ToString("N0"), cargo ? "Cargaison" : "Objet", tier, where);
+                var tier = _recipes?.Entries.TryGetValue(key, out var e2) == true ? e2.Tier : -1;
+                return new InventoryRow(ItemName(id, cargo), g.Sum(x => x.Stack.Quantity), cargo ? "Cargaison" : "Objet", tier, tier >= 0 ? tier.ToString() : "?", where);
             })
             .Where(r => search.Length == 0 || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-            .OrderBy(r => r.Where)
-            .ThenBy(r => r.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
-        InventoryList.ItemsSource = rows;
+        Show(BagList, BagTitle, "SAC", rows.Where(r => r.Where == "Sac"));
+        Show(BeltList, BeltTitle, "CEINTURE D'OUTILS", rows.Where(r => r.Where == "Ceinture d'outils"));
+        Show(BankList, BankTitle, "BANQUES", rows.Where(r => r.Where != "Sac" && r.Where != "Ceinture d'outils"));
+    }
+
+    private void Show(ListView list, TextBlock title, string name, IEnumerable<InventoryRow> rows)
+    {
+        var items = rows.ToList();
+        title.Text = $"{name}  ·  {items.Count} objet{(items.Count > 1 ? "s" : "")}";
+        list.ItemsSource = items;
+        ApplyInventorySort(list);
+    }
+
+    // Clic sur un en-tête de colonne : tri par cette colonne ; deuxième clic : sens inverse.
+    private void InventoryHeader_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not ListView list || e.OriginalSource is not GridViewColumnHeader { Column: { } column, Role: not GridViewColumnHeaderRole.Padding })
+        {
+            return;
+        }
+        var label = column.Header as string ?? "";
+        label = label.TrimEnd(' ', '▲', '▼');
+        if (!InventorySortColumns.TryGetValue(label, out var property))
+        {
+            return;
+        }
+        var direction = _inventorySort.TryGetValue(list, out var current) && current.Property == property && current.Direction == ListSortDirection.Ascending
+            ? ListSortDirection.Descending
+            : ListSortDirection.Ascending;
+        _inventorySort[list] = (property, direction);
+        ApplyInventorySort(list);
+    }
+
+    private void ApplyInventorySort(ListView list)
+    {
+        var (property, direction) = _inventorySort.TryGetValue(list, out var s) ? s : (nameof(InventoryRow.Name), ListSortDirection.Ascending);
+        list.Items.SortDescriptions.Clear();
+        list.Items.SortDescriptions.Add(new SortDescription(property, direction));
+        if (property != nameof(InventoryRow.Name))
+        {
+            list.Items.SortDescriptions.Add(new SortDescription(nameof(InventoryRow.Name), ListSortDirection.Ascending));
+        }
+        // Flèche sur l'en-tête de la colonne triée.
+        if (list.View is GridView view)
+        {
+            foreach (var column in view.Columns)
+            {
+                var label = (column.Header as string ?? "").TrimEnd(' ', '▲', '▼');
+                column.Header = InventorySortColumns.GetValueOrDefault(label) == property
+                    ? label + (direction == ListSortDirection.Ascending ? " ▲" : " ▼")
+                    : label;
+            }
+        }
     }
 
     // Nom lisible d'un inventaire : sac, ceinture, banque régionale, ou banque d'un bâtiment (avec sa position).
@@ -111,7 +157,7 @@ public partial class MainWindow
         }
         if (banks.TryGetValue(inv.Owner, out var at))
         {
-            // Pas de distance dans le nom : il doit rester stable pendant que vous marchez (choix de la liste).
+            // Pas de distance dans le nom : il doit rester stable pendant que vous marchez.
             return $"Banque à {at.ScreenText}";
         }
         return $"Coffre (bâtiment n° {inv.Owner})";

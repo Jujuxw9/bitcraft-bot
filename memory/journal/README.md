@@ -29,6 +29,7 @@
 | [23](2026-11-24-session-23-chatbot-v048.md) | 2026-11-24 | Claude Code (session chatbot) | Journal v0.4.7 lu ; v0.4.8 : chat vérifié avant chaque lettre, clic = arrêt, réponses par thème (28 thèmes fr/en), fautes volontaires 5 % ; D-059 ; puis v0.4.9 : langue, style relâché, faute corrigée, autres bots ignorés, phrases modifiables ; D-060 |
 | [24](2026-11-24-session-24-chatbot-v0410.md) | 2026-11-24 | Claude Code (session chatbot) | v0.4.10 : plafonds, pause, amis et liste noire, ton selon canal et heure, infos du jeu, onglet CHAT ; messages privés reportés (D-061) |
 | [25](2026-11-24-session-25-taches-voyageurs.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.11 : onglet Voyageurs (tâches comparées au stock), onglets PERSONNAGE et CARTE réparés |
+| [26](2026-11-24-session-26-taches-v0412.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.12 : recettes simples et plan d'actions, voyageurs en trois listes, listes triables, interrupteurs, Paramètres compactés ; D-062 |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

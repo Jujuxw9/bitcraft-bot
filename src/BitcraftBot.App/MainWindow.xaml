@@ -41,6 +41,7 @@
                 <Grid x:Name="BotMain">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" MinHeight="200" />
                     </Grid.RowDefinitions>
                     <UniformGrid x:Name="DashboardGrid" Columns="4">
@@ -88,7 +89,24 @@
                     </UniformGrid>
 
                     <!-- Image du jeu en direct, zones lues en surimpression -->
-                    <Border Grid.Row="1" Background="{StaticResource Track}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+            <Border x:Name="BotBuffs" Grid.Row="1" Style="{StaticResource Card}">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="BONUS ACTIFS" Style="{StaticResource CardTitle}" />
+                    <TextBlock DockPanel.Dock="Top" x:Name="BuffSummary" Text="—" Style="{StaticResource MutedText}" Margin="0,0,0,6" />
+                    <ListView x:Name="BuffList" MinHeight="40" MaxHeight="110">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Bonus" Width="220" DisplayMemberBinding="{Binding Name}" />
+                                <GridViewColumn Header="Type" Width="100" DisplayMemberBinding="{Binding Type}" />
+                                <GridViewColumn Header="Reste" Width="80" DisplayMemberBinding="{Binding Remaining}" />
+                                <GridViewColumn Header="Effets" Width="360" DisplayMemberBinding="{Binding Effects}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </Border>
+
+                    <Border Grid.Row="2" Background="{StaticResource Track}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                             CornerRadius="6" Margin="6">
                         <Grid>
                             <Viewbox Stretch="Uniform" Margin="2">
@@ -119,17 +137,12 @@
 
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
-                                <TextBlock Text="REPAS AUTO" Style="{StaticResource CardTitle}" />
-                                <CheckBox x:Name="AutoEatCheck" Content="Manger (Maj + E)" Click="AutoEatCheck_Click" />
-                                <TextBlock x:Name="AutoEatStatusText" Text="" Margin="0,6,0,0" />
-                                <TextBlock x:Name="AutoEatFoodText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
-                                <TextBlock Text="CHAT @GPT" Style="{StaticResource CardTitle}" />
-                                <CheckBox x:Name="GptCheck" Content="Répondre à « @gpt » et « @chatgpt » (Local, Région, LFG, Trade)" Click="GptCheck_Click" />
+                                <TextBlock Text="OPTIONS" Style="{StaticResource CardTitle}" />
+                                <CheckBox x:Name="AutoEatCheck" Style="{StaticResource SwitchCheck}" Content="Repas auto (Maj + E)" Click="AutoEatCheck_Click" />
+                                <TextBlock x:Name="AutoEatStatusText" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="AutoEatFoodText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" />
+                                <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
+                                <CheckBox x:Name="GptCheck" Style="{StaticResource SwitchCheck}" Content="Chat @gpt / @chatgpt" ToolTip="Répondre à « @gpt » et « @chatgpt » (Local, Région, LFG, Trade)" Click="GptCheck_Click" />
                                 <TextBlock x:Name="GptStatusText" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
                                 <TextBlock x:Name="GptTimerText" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
                             </StackPanel>
@@ -261,79 +274,115 @@
                     </StackPanel>
                 </Border>
 
-                <Border x:Name="PersoBuffs" Grid.Column="1" Style="{StaticResource Card}">
-                    <DockPanel>
-                        <TextBlock DockPanel.Dock="Top" Text="BONUS ACTIFS" Style="{StaticResource CardTitle}" />
-                        <TextBlock DockPanel.Dock="Top" x:Name="BuffSummary" Text="—" Style="{StaticResource MutedText}" Margin="0,0,0,6" />
-                        <ListView x:Name="BuffList" MinHeight="120" MaxHeight="300">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Bonus" Width="220" DisplayMemberBinding="{Binding Name}" />
-                                    <GridViewColumn Header="Type" Width="120" DisplayMemberBinding="{Binding Type}" />
-                                    <GridViewColumn Header="Reste" Width="80" DisplayMemberBinding="{Binding Remaining}" />
-                                    <GridViewColumn Header="Effets" Width="380" DisplayMemberBinding="{Binding Effects}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </DockPanel>
+                <Border x:Name="PersoFilter" Grid.Column="1" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="SAC, CEINTURE ET BANQUES" Style="{StaticResource CardTitle}" />
+                        <TextBlock x:Name="InventorySummary" Text="" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                        <TextBox x:Name="InventorySearchBox" Width="260" HorizontalAlignment="Left" TextChanged="InventorySearchBox_TextChanged" ToolTip="Chercher un objet dans les trois listes" />
+                        <TextBlock Text="Clique sur le titre d'une colonne pour trier (nom, quantité, type, palier)." Style="{StaticResource MutedText}" Margin="0,8,0,0" />
+                    </StackPanel>
                 </Border>
 
-                <Border x:Name="PersoBag" Grid.Row="1" Grid.ColumnSpan="2" Style="{StaticResource Card}">
-                    <DockPanel>
-                        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                            <TextBlock Text="SAC ET BANQUES" Style="{StaticResource CardTitle}" Margin="0,0,20,0" VerticalAlignment="Center" />
-                            <ComboBox x:Name="InventoryPicker" Width="300" Margin="0,0,12,0" SelectionChanged="InventoryPicker_SelectionChanged" />
-                            <TextBox x:Name="InventorySearchBox" Width="200" TextChanged="InventorySearchBox_TextChanged" ToolTip="Chercher" />
-                            <TextBlock x:Name="InventorySummary" Text="" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="12,0,0,0" />
-                        </WrapPanel>
-                        <ListView x:Name="InventoryList" MinHeight="150">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Objet" Width="260" DisplayMemberBinding="{Binding Name}" />
-                                    <GridViewColumn Header="Quantité" Width="90" DisplayMemberBinding="{Binding Quantity}" />
-                                    <GridViewColumn Header="Type" Width="100" DisplayMemberBinding="{Binding Kind}" />
-                                    <GridViewColumn Header="Palier" Width="60" DisplayMemberBinding="{Binding Tier}" />
-                                    <GridViewColumn Header="Où" Width="280" DisplayMemberBinding="{Binding Where}" />
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </DockPanel>
-                </Border>
+                <Grid x:Name="PersoBag" Grid.Row="1" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="1.3*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock x:Name="BagTitle" DockPanel.Dock="Top" Text="" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <ListView x:Name="BagList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Objet" Width="190" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Quantité" Width="75" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
+                                        <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Kind}" />
+                                        <GridViewColumn Header="Palier" Width="62" DisplayMemberBinding="{Binding TierText}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </DockPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock x:Name="BeltTitle" DockPanel.Dock="Top" Text="" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <ListView x:Name="BeltList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Objet" Width="190" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Quantité" Width="75" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
+                                        <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Kind}" />
+                                        <GridViewColumn Header="Palier" Width="62" DisplayMemberBinding="{Binding TierText}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </DockPanel>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock x:Name="BankTitle" DockPanel.Dock="Top" Text="" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <ListView x:Name="BankList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Objet" Width="170" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Quantité" Width="75" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
+                                        <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Kind}" />
+                                        <GridViewColumn Header="Palier" Width="62" DisplayMemberBinding="{Binding TierText}" />
+                                        <GridViewColumn Header="Où" Width="150" DisplayMemberBinding="{Binding Where}" />
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </DockPanel>
+                    </Border>
+                </Grid>
             </Grid>
         </TabItem>
 
         <!-- VOYAGEURS : tâches de voyageur comparées au stock (serveur, v0.4.11) -->
         <TabItem x:Name="TravelerTabItem" Header="VOYAGEURS">
-            <Border Style="{StaticResource Card}">
-                <DockPanel>
-                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                        <TextBlock Text="TÂCHES DE VOYAGEUR" Style="{StaticResource CardTitle}" />
-                        <TextBlock x:Name="TravelerSummary" Text="Serveur non lu : connectez le bot (avant le jeu), onglet PARAMÈTRES." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,0" />
-                        <TextBlock Text="Le voyageur ne prend les objets que dans le sac : ce qui est dans la ceinture ou une banque est à aller chercher." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,0" />
-                    </StackPanel>
-                    <ListView x:Name="TravelerList" MinHeight="150">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Voyageur" Width="100" DisplayMemberBinding="{Binding Traveler}" />
-                                <GridViewColumn Header="Tâche" Width="300">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Task}" TextWrapping="Wrap" />
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Verdict" Width="170" DisplayMemberBinding="{Binding Verdict}" />
-                                <GridViewColumn Header="Objet demandé" Width="240" DisplayMemberBinding="{Binding Item}" />
-                                <GridViewColumn Header="Palier" Width="55" DisplayMemberBinding="{Binding Tier}" />
-                                <GridViewColumn Header="Demandé" Width="75" DisplayMemberBinding="{Binding Wanted}" />
-                                <GridViewColumn Header="Dans le sac" Width="85" DisplayMemberBinding="{Binding InBag}" />
-                                <GridViewColumn Header="Ailleurs (où)" Width="260" DisplayMemberBinding="{Binding Elsewhere}" />
-                                <GridViewColumn Header="Manque" Width="70" DisplayMemberBinding="{Binding Missing}" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
-                </DockPanel>
-            </Border>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <UniformGrid Columns="4">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="À RENDRE MAINTENANT" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="TravelerNowCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Good}" />
+                                <TextBlock Text="tout est dans le sac" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="À ALLER CHERCHER" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="TravelerFetchCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Gold}" />
+                                <TextBlock Text="ceinture ou banque" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="PARTIELLES" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="TravelerPartialCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Warn}" />
+                                <TextBlock Text="une partie du stock" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="À FARMER" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="TravelerImpossibleCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Bad}" />
+                                <TextBlock Text="rien en stock" Style="{StaticResource MutedText}" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+                    <TextBlock x:Name="TravelerSummary" Text="Serveur non lu : connectez le bot (avant le jeu), onglet PARAMÈTRES." Style="{StaticResource MutedText}" Margin="12,0,12,0" TextWrapping="Wrap" />
+                </StackPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="TravelerPanel" Margin="0,0,0,12" />
+                </ScrollViewer>
+            </Grid>
         </TabItem>
 
         <!-- CARTE : ressources autour (serveur) -->
@@ -450,6 +499,9 @@
                                     Click="RecipeClearButton_Click" ToolTip="Vider le champ de recherche (ou touche Échap)" />
                             <Button x:Name="RecipeBackButton" Content="← Retour" Style="{StaticResource SmallButton}" Margin="8,0,0,0" IsEnabled="False"
                                     Click="RecipeBackButton_Click" ToolTip="Aucune fiche précédente" ToolTipService.ShowOnDisabled="True" />
+                            <TextBlock Text="Quantité" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="20,0,6,0" />
+                            <TextBox x:Name="RecipeQuantityBox" Text="1" Width="70" VerticalContentAlignment="Center"
+                                     TextChanged="RecipeQuantityBox_TextChanged" ToolTip="Combien d'exemplaires de l'objet tu veux : l'arborescence et le plan d'actions s'adaptent" />
                         </StackPanel>
                     </DockPanel>
                 </Border>
@@ -493,11 +545,7 @@
                                 <TextBlock x:Name="TokenStatusText" Text="" Margin="0,10,0,0" FontWeight="SemiBold" />
                                 <Button x:Name="ForgetTokenButton" Content="Oublier le jeton" Style="{StaticResource SmallButton}" HorizontalAlignment="Left"
                                         Margin="0,8,0,0" Click="ForgetTokenButton_Click" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
+                                <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
                                 <TextBlock Text="CONNEXION" Style="{StaticResource CardTitle}" />
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Région R" Style="{StaticResource Label}" Margin="0,0,4,0" />
@@ -537,11 +585,7 @@
                                 <TextBlock x:Name="CameraLastText" Text="" Style="{StaticResource MutedText}" TextWrapping="Wrap" />
                                 <Button x:Name="CameraForgetButton" Content="Oublier les clics" Style="{StaticResource SmallButton}" HorizontalAlignment="Left"
                                         Margin="0,8,0,0" Click="CameraForgetButton_Click" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
+                                <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
                                 <TextBlock Text="AFFICHAGE" Style="{StaticResource CardTitle}" />
                                 <CheckBox x:Name="OverlayCheck" Content="Overlay sur le jeu" IsChecked="True" Click="OverlayCheck_Click" />
                                 <CheckBox x:Name="ShowZonesCheck" Content="Zones lues sur l'image" IsChecked="True" Click="ShowZonesCheck_Click" />
@@ -563,11 +607,7 @@
                                 <TextBlock x:Name="SystemCpuText" Text="PC —" Style="{StaticResource MutedText}" />
                                 <TextBlock x:Name="ResourceStateText" Text="Normal" Margin="0,6,0,0" FontWeight="SemiBold" />
                                 <TextBlock x:Name="VersionText" Text="" Style="{StaticResource MutedText}" FontSize="11" Margin="0,6,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
+                                <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
                                 <TextBlock Text="SEUILS" Style="{StaticResource CardTitle}" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>

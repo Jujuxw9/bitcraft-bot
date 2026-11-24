@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.11 : onglet VOYAGEURS : chaque tâche de voyageur comparée au stock (sac, ceinture, banques), avec le verdict faisable maintenant, à aller chercher, partiel ou impossible, et le manque exact ; correction : les onglets PERSONNAGE et CARTE se mettent de nouveau à jour (décalés depuis l'ajout de l'onglet CHAT).");
+        _log.Info("Session", "Version 0.4.12 : onglet VOYAGEURS refait (à rendre sans farmer, les 10 plus avancées, les plus faciles à farmer, images des objets) ; RECETTES : la plus simple d'abord, sans paquets, arborescence, plan d'actions avec cases à cocher pour une quantité choisie ; images manquantes (fleurs…) retrouvées ; PERSONNAGE : sac, ceinture et banques en trois listes triables ; bonus actifs sur l'onglet BOT ; interrupteurs vert / rouge pour le repas auto et le chat ; PARAMÈTRES compactés.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

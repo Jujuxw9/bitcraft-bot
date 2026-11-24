@@ -198,9 +198,25 @@ public partial class MainWindow
         }
         _recipeShown = key;
         RecipeDetails.Children.Clear();
-        RecipeDetails.Children.Add(_recipeView.Build(key));
+        RecipeDetails.Children.Add(_recipeView.Build(key, RecipeQuantity()));
         RecipeDetailsScroll.ScrollToTop();
         ShowRecipeBackState();
+    }
+
+    // Quantité voulue (zone « Quantité ») : entier de 1 à 99 999, 1 si le texte n'est pas un nombre.
+    private int RecipeQuantity() => int.TryParse(RecipeQuantityBox.Text.Trim(), out var n) ? Math.Clamp(n, 1, 99_999) : 1;
+
+    // Quantité changée : la fiche affichée est refaite (sans toucher à l'historique du bouton Retour).
+    private void RecipeQuantityBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (_recipeView is null || _recipeShown is null)
+        {
+            return;
+        }
+        var offset = RecipeDetailsScroll.VerticalOffset;
+        RecipeDetails.Children.Clear();
+        RecipeDetails.Children.Add(_recipeView.Build(_recipeShown, RecipeQuantity()));
+        RecipeDetailsScroll.ScrollToVerticalOffset(offset);
     }
 
     private void ShowRecipeBackState()
