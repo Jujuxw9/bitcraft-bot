@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.10 : chat « @gpt » : plafonds (20 par heure, 100 par jour, 3 par joueur et par heure) ; pause de 5 min quand tu écris toi-même dans le chat ; amis (ton familier) et liste noire (fichiers du dossier « phrases-chat ») ; ton selon le canal, bonjour ou bonsoir selon l'heure ; vraies infos du jeu (région, niveau) ; onglet CHAT (historique, statistiques, test d'une phrase sans envoi).");
+        _log.Info("Session", "Version 0.4.11 : onglet VOYAGEURS : chaque tâche de voyageur comparée au stock (sac, ceinture, banques), avec le verdict faisable maintenant, à aller chercher, partiel ou impossible, et le manque exact ; correction : les onglets PERSONNAGE et CARTE se mettent de nouveau à jour (décalés depuis l'ajout de l'onglet CHAT).");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

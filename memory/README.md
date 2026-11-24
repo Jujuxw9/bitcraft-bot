@@ -69,6 +69,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-23-passation-v046.md](echanges/2026-11-23-passation-v046.md) — **passation** après la v0.4.6 (recettes en logigramme ; chat qui marche ; W à revoir ; prochaines étapes).
 - [2026-11-23-passation-v047.md](echanges/2026-11-23-passation-v047.md) — **passation** après la v0.4.7 (chat dans 4 canaux par les commandes du jeu ; prochaines étapes).
 - [2026-11-23-prompt-chatbot.md](echanges/2026-11-23-prompt-chatbot.md) — **prompt** de la session chatbot (module « @GPT », en parallèle de la session principale : zone de fichiers, versions, règles).
+- [2026-11-24-prompt-session-taches.md](echanges/2026-11-24-prompt-session-taches.md) — **prompt** de la session « tâches » (Sonnet, quota réduit : onglet Voyageurs, bugs Recettes, tâches au fil de l'eau).
 
 ### technique/
 - [README.md](technique/README.md) — index

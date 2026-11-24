@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -40,6 +40,11 @@ public static class Queries
             list.Add($"SELECT * FROM extract_outcome_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM player_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM teleportation_energy_state WHERE entity_id = {e}");
+            if (withTasks)
+            {
+                // Onglet Voyageurs (v0.4.11) : tâches de voyageur du personnage (table publique, lecture seule).
+                list.Add($"SELECT * FROM traveler_task_state WHERE player_entity_id = {e}");
+            }
             if (withExtras)
             {
                 // Barre d'action et capacités avec leur temps de recharge (v0.4.4 : sprint).

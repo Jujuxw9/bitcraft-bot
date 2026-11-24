@@ -37,6 +37,9 @@ public sealed class GameDataStore
         // Barre d'action (v0.4.4) : noms et temps de recharge des capacités (sprint, attaques…).
         "ability_custom_desc",
         "combat_action_desc",
+        // Onglet Voyageurs (v0.4.11) : tâches de voyageur et noms des voyageurs.
+        "traveler_task_desc",
+        "npc_desc",
     ];
 
     public required IReadOnlyList<ResourceInfo> Resources { get; init; }
@@ -53,6 +56,10 @@ public sealed class GameDataStore
     // Vides si les fichiers ne sont pas encore téléchargés.
     public IReadOnlyDictionary<int, string> CustomAbilities { get; init; } = new Dictionary<int, string>();
     public IReadOnlyDictionary<int, string> CombatActions { get; init; } = new Dictionary<int, string>();
+
+    // Tâches de voyageur (v0.4.11) : id → objets demandés ; voyageurs : npc_type → nom. Vides si les fichiers manquent.
+    public IReadOnlyDictionary<int, TravelerTaskDesc> TravelerTasks { get; init; } = new Dictionary<int, TravelerTaskDesc>();
+    public IReadOnlyDictionary<int, string> Travelers { get; init; } = new Dictionary<int, string>();
     public GameDataVersion? Version { get; init; }
 
     private Dictionary<string, ResourceInfo>? _byName;
@@ -106,6 +113,8 @@ public sealed class GameDataStore
             Skills = ReadArray(folder, "skill_desc").GroupBy(e => Int(e, "id")).ToDictionary(g => g.Key, g => Str(g.First(), "name")),
             CustomAbilities = Optional(folder, "ability_custom_desc", "ability_name"),
             CombatActions = Optional(folder, "combat_action_desc", "name"),
+            TravelerTasks = TravelerTaskBook.LoadTasks(folder),
+            Travelers = TravelerTaskBook.LoadTravelers(folder),
             Version = ReadVersion(folder),
         };
     }

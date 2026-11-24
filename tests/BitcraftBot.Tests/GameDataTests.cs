@@ -37,6 +37,8 @@ public class GameDataTests
             ["buff_type_desc"] = "[]",
             ["ability_custom_desc"] = "[{\"id\":594765058,\"ability_name\":\"Sprint\",\"cooldown\":120.0}]",
             ["combat_action_desc"] = "[]",
+            ["traveler_task_desc"] = "[]",
+            ["npc_desc"] = "[]",
         };
     }
 

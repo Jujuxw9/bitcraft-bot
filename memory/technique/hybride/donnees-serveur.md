@@ -38,7 +38,7 @@ Format réel des nouvelles tables v0.3.17 : **vérifié** à l'essai du 2026-11-
 | Bâtiments autour (dont la Banque) | `building_state`, `location_state` | H4 (aller à la Banque) |
 | Véhicules / charrette | `deployable_state` | plus tard |
 | Barre d'action (ce qui est rangé dans chaque case) | `action_bar_state` | plus tard |
-| Tâches de voyageur, quêtes | `traveler_task_state`, `quest_chain_state` | plus tard |
+| Quêtes | `quest_chain_state` | plus tard |
 | Revendications (claims) | `claim_state`, `claim_member_state` | plus tard |
 
 ## 3. Ce que seul l'écran donne
@@ -51,3 +51,9 @@ Format réel des nouvelles tables v0.3.17 : **vérifié** à l'essai du 2026-11-
 | ~~Contrôle croisé de la position~~ | retiré en v0.3.20 (D-048) : le serveur est juste, l'écran décrochait | v0.3.7 |
 
 Vie, endurance, faim et jauge de métier ne sont **plus lues à l'écran** depuis la v0.3.19 ; position, zone et région non plus depuis la v0.3.20 (D-048) (demande de Julien) : le serveur les donne exactement. Passages de niveau et tâches (début, fin) : écrits dans le journal d'après le serveur (`experience_state`, `player_action_state`, `extract_outcome_state`, inventaires).
+
+## Tâches de voyageur (v0.4.11, session tâches, 2026-11-24)
+
+- **`traveler_task_state`** (publique, lue par `SELECT * FROM traveler_task_state WHERE player_entity_id = <personnage>`) : `entity_id`, `player_entity_id`, `traveler_id` (= `npc_desc.npc_type`), `task_id` (= `traveler_task_desc.id`), `completed`. Format tiré du code serveur (`messages/components.rs`) ; **format réel À vérifier** : un extrait brut est écrit au journal à chaque connexion (« Exemple brut de traveler_task_state »).
+- **`traveler_task_desc`** et **`npc_desc`** : données fixes, prises dans BitCraft_GameData (D-033) et **vérifiées** le 2026-11-24 (321 tâches, 7 voyageurs). `required_items` : liste `{item_id, quantity, item_type "Item"/"Cargo", durability}`.
+- Rendu d'une tâche (code serveur `player_complete_task`) : les objets sont pris **dans le sac seulement** (inventaire n° 0 du personnage), pas dans la ceinture ni les banques ; il faut être à 8 cases du voyageur. Une tâche rendue passe à `completed = true`, puis le serveur la remplace par une nouvelle s'il en trouve une.

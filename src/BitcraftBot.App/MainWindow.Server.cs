@@ -236,11 +236,13 @@ public partial class MainWindow
         }
     }
 
-    // Onglets (ordre du XAML) : seul l'onglet affiché est redessiné (v0.3.19, moins de CPU).
-    private const int BotTab = 0;
-    private const int CharacterTab = 1;
-    private const int MapTab = 2;
-    private const int SettingsTab = 4;
+    // Onglets : seul l'onglet affiché est redessiné (v0.3.19, moins de CPU).
+    // v0.4.11 : numéro retrouvé d'après l'onglet lui-même (l'onglet CHAT, ajouté en v0.4.10, avait décalé les numéros fixes).
+    private int BotTab => Tabs.Items.IndexOf(BotTabItem);
+    private int CharacterTab => Tabs.Items.IndexOf(CharacterTabItem);
+    private int MapTab => Tabs.Items.IndexOf(MapTabItem);
+    private int SettingsTab => Tabs.Items.IndexOf(SettingsTabItem);
+    private int TravelerTab => Tabs.Items.IndexOf(TravelerTabItem);
     private static readonly TimeSpan GameRunningInterval = TimeSpan.FromSeconds(3);
 
     private ServerReader? _snapshotReader;
@@ -262,6 +264,7 @@ public partial class MainWindow
         {
             FlushTasks();
             if (tab == BotTab) UpdateDashboard(null, null, []);
+            if (tab == TravelerTab) ShowTravelersOffline();
             return;
         }
         // Instantané et inventaires recalculés seulement si le serveur a envoyé quelque chose depuis le dernier passage.
@@ -307,6 +310,10 @@ public partial class MainWindow
             SrvUpdated.Text = reader.LastUpdate is { } at ? $"{at:HH:mm:ss}" : "—";
             ShowInventories(reader, s, inventories);
             ShowBuffs(s);
+        }
+        if (tab == TravelerTab)
+        {
+            ShowTravelers(reader, s, inventories);
         }
         if (tab == BotTab)
         {

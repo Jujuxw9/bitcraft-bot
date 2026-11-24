@@ -278,3 +278,12 @@ Retour de la session de jeu du 23/11 (18:54 à 20:05 : chasse aux Sagi Birds, 19
 - Lecture seule du serveur, comme toujours (D-039) : la réponse part **au clavier, dans le jeu**. Détail : `technique/chat-gpt.md` section 6.
 - Écran : `ChatInput` (zone de saisie du chat) dans la vue du jeu, une fois par seconde. Chat ouvert : aucune action du bot ; W, Q, D ne comptent plus pour la caméra. Entre deux regards, Entrée et Échap tapées par Julien font foi.
 - Le seul « W » vu en v0.4.4 (22:32:17) avait été tapé dans le chat : il ne dit rien sur la caméra. Vrai essai de W à faire.
+
+## 40. v0.4.11 — onglet Voyageurs (session tâches, 2026-11-24)
+
+- Données : `GameData/TravelerTaskBook` lit `traveler_task_desc` et `npc_desc` (ajoutées aux tables téléchargées).
+- Serveur : abonnement à `traveler_task_state` du personnage ; refusé, le bot réessaie sans (premier essai de la chaîne de repli). `World/TravelerTasks` : lecture et comparaison au stock (`TravelerTaskPlanner`) : objets comparés par numéro et type (un autre palier n'est jamais confondu), stock réparti une seule fois entre les tâches (sac d'abord, dans l'ordre des tâches).
+- Verdicts : faisable maintenant (tout dans le sac), à aller chercher (ceinture ou banque, avec l'endroit), partiel (manque exact), impossible, déjà rendue.
+- Onglet VOYAGEURS (après PERSONNAGE), redessiné toutes les 2 s s'il est affiché et si quelque chose a changé.
+- Correction : les onglets sont repérés par leur nom, plus par un numéro fixe (l'onglet CHAT de la v0.4.10 avait décalé PERSONNAGE et CARTE).
+

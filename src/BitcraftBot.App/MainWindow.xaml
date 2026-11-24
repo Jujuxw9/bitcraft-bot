@@ -25,7 +25,7 @@
     <TabControl x:Name="Tabs">
 
         <!-- BOT : tableau de bord, image du jeu, commandes -->
-        <TabItem Header="BOT">
+        <TabItem x:Name="BotTabItem" Header="BOT">
             <ScrollViewer x:Name="BotScroll" VerticalScrollBarVisibility="Disabled">
             <Grid x:Name="BotGrid">
                 <Grid.RowDefinitions>
@@ -216,7 +216,7 @@
         </TabItem>
 
         <!-- PERSONNAGE : en direct, bonus, sac et banques (serveur) -->
-        <TabItem Header="PERSONNAGE">
+        <TabItem x:Name="CharacterTabItem" Header="PERSONNAGE">
             <Grid x:Name="PersoGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="360" />
@@ -302,8 +302,42 @@
             </Grid>
         </TabItem>
 
+        <!-- VOYAGEURS : tâches de voyageur comparées au stock (serveur, v0.4.11) -->
+        <TabItem x:Name="TravelerTabItem" Header="VOYAGEURS">
+            <Border Style="{StaticResource Card}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <TextBlock Text="TÂCHES DE VOYAGEUR" Style="{StaticResource CardTitle}" />
+                        <TextBlock x:Name="TravelerSummary" Text="Serveur non lu : connectez le bot (avant le jeu), onglet PARAMÈTRES." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,4,0,0" />
+                        <TextBlock Text="Le voyageur ne prend les objets que dans le sac : ce qui est dans la ceinture ou une banque est à aller chercher." Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,2,0,0" />
+                    </StackPanel>
+                    <ListView x:Name="TravelerList" MinHeight="150">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Voyageur" Width="100" DisplayMemberBinding="{Binding Traveler}" />
+                                <GridViewColumn Header="Tâche" Width="300">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Task}" TextWrapping="Wrap" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Verdict" Width="170" DisplayMemberBinding="{Binding Verdict}" />
+                                <GridViewColumn Header="Objet demandé" Width="240" DisplayMemberBinding="{Binding Item}" />
+                                <GridViewColumn Header="Palier" Width="55" DisplayMemberBinding="{Binding Tier}" />
+                                <GridViewColumn Header="Demandé" Width="75" DisplayMemberBinding="{Binding Wanted}" />
+                                <GridViewColumn Header="Dans le sac" Width="85" DisplayMemberBinding="{Binding InBag}" />
+                                <GridViewColumn Header="Ailleurs (où)" Width="260" DisplayMemberBinding="{Binding Elsewhere}" />
+                                <GridViewColumn Header="Manque" Width="70" DisplayMemberBinding="{Binding Missing}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </DockPanel>
+            </Border>
+        </TabItem>
+
         <!-- CARTE : ressources autour (serveur) -->
-        <TabItem Header="CARTE">
+        <TabItem x:Name="MapTabItem" Header="CARTE">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -433,7 +467,7 @@
         </TabItem>
 
         <!-- PARAMÈTRES : réglages à gauche, journal à droite -->
-        <TabItem Header="PARAMÈTRES">
+        <TabItem x:Name="SettingsTabItem" Header="PARAMÈTRES">
             <Grid x:Name="SettingsGrid">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
