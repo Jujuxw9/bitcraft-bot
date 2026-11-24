@@ -35,7 +35,13 @@ public partial class MainWindow
 
     // ReadyAt : fin du temps de lecture (on ne répond pas à la seconde où le message arrive).
     // Correction : « *mot » à envoyer juste après, quand la réponse a une faute volontaire (v0.4.9).
-    private sealed record GptReply(ChatMessage Message, string Text, DateTimeOffset ReadyAt, string? Correction = null);
+    private sealed record GptReply(ChatMessage Message, string Text, DateTimeOffset ReadyAt, string? Correction = null, string Theme = "autre");
+
+    // v0.4.10 : amis et liste noire (fichiers du dossier phrases-chat), historique et statistiques (onglet CHAT),
+    // vraies infos du jeu (région, plus haut niveau) lues sur le serveur.
+    private ChatLists _gptLists = new();
+    private ChatStats _gptStats = new();
+    private ChatInfo? _gptInfo;
 
     // v0.4.8 : dernier vrai clic de Julien (heure en ticks) et dernier moment où le jeu n'était pas au premier plan.
     // Après un retour dans le jeu ou un clic, le bot attend 2 s avant d'ouvrir le chat (journal du 24/11 00:03).
@@ -69,8 +75,55 @@ public partial class MainWindow
         {
             _log.Alerte("Chat", $"Base de phrases : {error}.");
         }
+        _gptLists = ChatLists.Load(folder);
+        _gptStats = new ChatStats(folder);
+        _log.Info("Chat", $"Amis : {_gptLists.Friends.Count} ; liste noire : {_gptLists.Blocked.Count} (fichiers {ChatLists.FriendsFile} et {ChatLists.BlockedFile}). "
+            + $"Plafonds : {ChatQuota.PerHour} réponses par heure, {ChatQuota.PerDay} par jour, {ChatQuota.PerPlayerPerHour} par joueur et par heure. "
+            + $"Pause de {GptChatPicker.PauseAfterOwnMessage.TotalMinutes:0} min quand tu écris toi-même dans le chat.");
+        ShowGptTab();
         ShowGptState("en attente du serveur");
         ShowGptTimer(null);
+    }
+
+    // ── Onglet CHAT (v0.4.10) : historique, statistiques, test sans envoi ──
+    private void AddGptHistory(ChatMessage m, string theme, string reply, string status)
+    {
+        _gptStats.Add(new ChatHistoryEntry(DateTimeOffset.Now, ChatChannels.Name(m.Channel), m.Username, m.Text, theme, reply, status));
+        ShowGptTab();
+    }
+
+    private void ShowGptTab()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var q = _gptPicker?.Quota;
+        ChatTabStatus.Text = (_gptEnabled ? "Chatbot activé." : "Chatbot coupé.")
+            + $" Réponses : {q?.LastHour(now) ?? 0}/{ChatQuota.PerHour} cette heure, {q?.LastDay(now) ?? 0}/{ChatQuota.PerDay} sur 24 h."
+            + (_gptPicker is { } p && now < p.PausedUntil ? $" En pause jusqu'à {p.PausedUntil.ToLocalTime():HH:mm:ss} (tu as écrit dans le chat)." : "");
+        ChatTabStats.Text = _gptStats.Summary();
+        ChatHistoryBox.Text = string.Join(Environment.NewLine, _gptStats.History.Reverse().Select(h =>
+            $"{h.At.LocalDateTime:HH:mm:ss}  [{h.Channel}] {h.User} : « {Short(h.Message)} »"
+            + (h.Reply.Length > 0 ? Environment.NewLine + $"      → {(h.Theme.Length > 0 ? h.Theme + " : " : "")}« {h.Reply} »" : "")
+            + $"  ({h.Status})"));
+    }
+
+    // Bouton « Tester une phrase » : montre le thème et la réponse, sans rien écrire dans le jeu ni compter dans les statistiques.
+    private void ChatTestButton_Click(object sender, RoutedEventArgs e)
+    {
+        var text = ChatTestBox.Text.Trim();
+        if (text.Length == 0)
+        {
+            ChatTestResult.Text = "Écris d'abord un message de joueur (par exemple « @gpt salut, tu coupes des arbres ? »).";
+            return;
+        }
+        var channel = (int)ChatChannel.Region;
+        var message = new ChatMessage(0, 0, "Testeur", "", channel, text, DateTimeOffset.UtcNow);
+        var reply = ChatReplies.For(message, _gptPhrases, _gptRandom, info: _gptInfo, hour: DateTime.Now.Hour);
+        ChatTestResult.Text = $"Thème : {reply.Theme}. Réponse : « {reply.Text} »"
+            + (reply.Typo is { } typo ? $" (faute volontaire : {typo})" : "")
+            + (reply.Correction is { } fix ? $" puis « {fix} »" : "")
+            + ". Rien n'a été envoyé.";
+        _gptStats.Add(new ChatHistoryEntry(DateTimeOffset.Now, "test", "Testeur", text, reply.Theme, reply.Text, "test, rien envoyé"));
+        ShowGptTab();
     }
 
     // Minuteur de la carte CHAT : temps avant la prochaine réponse possible (v0.4.7, demande de Julien).
@@ -88,6 +141,7 @@ public partial class MainWindow
     {
         _gptEnabled = GptCheck.IsChecked == true;
         _gptPending = null;
+        ShowGptTab();
         _log.Info("Chat", _gptEnabled ? "Réponses « @GPT » activées (case cochée)." : "Réponses « @GPT » coupées (case décochée).");
         ShowGptState(_gptEnabled ? "activé" : "coupé");
     }
@@ -109,9 +163,10 @@ public partial class MainWindow
         }
         if (_gptPicker is null || _gptPickerFor != me)
         {
-            _gptPicker = new GptChatPicker(me);
+            _gptPicker = new GptChatPicker(me) { Lists = _gptLists };
             _gptPickerFor = me;
         }
+        _gptInfo = new ChatInfo(string.IsNullOrWhiteSpace(s.RegionName) ? null : s.RegionName, s.Skills is { Count: > 0 } sk ? sk.Max(x => x.Level) : null);
         var now = DateTimeOffset.UtcNow;
         if (!GameIsForeground())
         {
@@ -120,17 +175,40 @@ public partial class MainWindow
         ShowGptTimer(_gptPicker.Cooldown(now));
 
         // 1. Un nouveau message « @gpt » ?
-        var picked = _gptPending is null && !_gptSending ? _gptPicker.Pick(reader.ChatMessages(), now) : null;
+        // Julien écrit lui-même dans le chat : pause (v0.4.10).
+        var chat = reader.ChatMessages();
+        if (!_gptSending)
+        {
+            _gptPicker.ObserveOwn(chat);
+            if (_gptPending is { } waiting && now < _gptPicker.PausedUntil)
+            {
+                _log.Info("Chat", $"Réponse à {waiting.Message.Username} abandonnée : tu as écrit dans le chat, le chatbot fait une pause.");
+                AddGptHistory(waiting.Message, waiting.Theme, waiting.Text, "abandonnée (pause : tu as écrit)");
+                _gptPending = null;
+            }
+        }
+        var picked = _gptPending is null && !_gptSending ? _gptPicker.Pick(chat, now) : null;
+        foreach (var (skipped, reason) in _gptPicker.TakeSkipped())
+        {
+            _log.Info("Chat", $"« @gpt » de {skipped.Username} ({ChatChannels.Name(skipped.Channel)}) sans réponse : {reason}.");
+            if (skipped.OwnerEntityId != me)
+            {
+                AddGptHistory(skipped, "", "", "sans réponse : " + reason);
+            }
+        }
         foreach (var bot in _gptPicker.TakeIgnored())
         {
             _log.Info("Chat", $"« @gpt » de {bot.Username} ignoré : ressemble à un autre bot (« {Short(bot.Text)} »).");
         }
         if (picked is { } m)
         {
-            var reply = ChatReplies.For(m, _gptPhrases, _gptRandom);
+            var friend = _gptLists.IsFriend(m.Username);
+            var reply = ChatReplies.For(m, _gptPhrases, _gptRandom, info: _gptInfo, hour: DateTime.Now.Hour, friend: friend);
             var text = reply.Text;
-            _gptPending = new GptReply(m, text, now + GptChatPicker.ReadingTime(m.Text, _gptRandom), reply.Correction);
-            _log.Info("Chat", $"« @gpt » de {m.Username} ({ChatChannels.Name(m.Channel)}) : « {Short(m.Text)} ». Thème : {reply.Theme}. Réponse prévue dans {ChatChannels.Name(m.Channel)} ({ChatChannels.Command(m.Channel)}) : « {text} »."
+            _gptPending = new GptReply(m, text, now + GptChatPicker.ReadingTime(m.Text, _gptRandom), reply.Correction, reply.Theme);
+            _gptStats.Count(new ChatHistoryEntry(DateTimeOffset.Now, ChatChannels.Name(m.Channel), m.Username, m.Text, reply.Theme, text, "reçu"));
+            ShowGptTab();
+            _log.Info("Chat", $"« @gpt » de {m.Username} ({ChatChannels.Name(m.Channel)}) : « {Short(m.Text)} ». Thème : {reply.Theme}.{(friend ? " Ami : ton familier." : "")} Réponse prévue dans {ChatChannels.Name(m.Channel)} ({ChatChannels.Command(m.Channel)}) : « {text} »."
                 + (reply.Typo is { } typo ? $" Faute volontaire : {typo}." : "")
                 + (reply.Correction is { } fix ? $" Correction prévue juste après : « {fix} »." : ""));
             ShowGptTimer(_gptPicker.Cooldown(now));
@@ -145,6 +223,7 @@ public partial class MainWindow
         if (now - p.Message.SentAt > GptChatPicker.MaxAge)
         {
             _log.Info("Chat", $"Réponse à {p.Message.Username} abandonnée : pas pu l'écrire à temps ({_gptLastState}).");
+            AddGptHistory(p.Message, p.Theme, p.Text, "abandonnée (pas écrite à temps)");
             _gptPending = null;
             return;
         }
@@ -184,6 +263,7 @@ public partial class MainWindow
                 _gptSent++;
                 _gptPicker?.NoteSent(reply.Text);
                 _log.Info("Chat", $"Réponse envoyée à {reply.Message.Username} dans {ChatChannels.Name(channel)} : « {reply.Text} ».");
+                AddGptHistory(reply.Message, reply.Theme, reply.Text, "envoyée");
                 if (reply.Correction is { } fix)
                 {
                     await SendGptCorrectionAsync(reply.Message.Username, fix, channel);
@@ -192,6 +272,7 @@ public partial class MainWindow
             else
             {
                 _log.Alerte("Chat", $"Réponse à {reply.Message.Username} pas envoyée : {result.Detail}.");
+                AddGptHistory(reply.Message, reply.Theme, reply.Text, "pas envoyée : " + result.Detail);
             }
         }
         finally

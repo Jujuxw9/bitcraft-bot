@@ -27,6 +27,7 @@
 | [21](2026-11-23-session-21-v046-recettes.md) | 2026-11-23 | Claude Code | Journal v0.4.5 lu (chat marche, W ne tourne pas la caméra, barre d'action) ; v0.4.6 : recettes en logigramme, info-bulles, boutons Rechercher, Effacer, Retour |
 | [22](2026-11-23-session-22-v047-chat-canaux.md) | 2026-11-23 | Claude Code | v0.4.7 : « @gpt » / « @chatgpt » dans 4 canaux, réponse par les commandes du jeu, 40 phrases, smiley 30 %, frappe humaine, minuteur ; D-058 |
 | [23](2026-11-24-session-23-chatbot-v048.md) | 2026-11-24 | Claude Code (session chatbot) | Journal v0.4.7 lu ; v0.4.8 : chat vérifié avant chaque lettre, clic = arrêt, réponses par thème (28 thèmes fr/en), fautes volontaires 5 % ; D-059 ; puis v0.4.9 : langue, style relâché, faute corrigée, autres bots ignorés, phrases modifiables ; D-060 |
+| [24](2026-11-24-session-24-chatbot-v0410.md) | 2026-11-24 | Claude Code (session chatbot) | v0.4.10 : plafonds, pause, amis et liste noire, ton selon canal et heure, infos du jeu, onglet CHAT ; messages privés reportés (D-061) |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

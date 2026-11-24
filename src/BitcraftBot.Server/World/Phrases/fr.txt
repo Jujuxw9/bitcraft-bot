@@ -194,6 +194,8 @@ mots: groupe, lfg, equipe, ensemble, rejoin*, guilde*, recrut*, empire*, claim*,
 
 [niveau]
 mots: niveau*, level*, lvl, xp, exp, experience, grind*, competence*, skill*, monter
+- Mon meilleur métier est niveau {niveau}, {nom}. Ça se travaille !
+- Je suis niveau {niveau} dans mon meilleur métier, {nom}. Et toi ?
 - {nom}, monter de niveau, c'est une question de patience.
 - Je grind tranquille, une bûche à la fois.
 - {nom}, l'XP vient toute seule quand on s'amuse.
@@ -207,6 +209,8 @@ mots: niveau*, level*, lvl, xp, exp, experience, grind*, competence*, skill*, mo
 
 [ou]
 mots: ou est, ou sont, ou se trouve, ou trouver, ou acheter, trouver, chemin, direction, coordonn*, coords, carte, localis*, perdu*
+- Moi je suis du côté de {region}, {nom}.
+- {nom}, je traîne dans la région {region} en ce moment.
 - {nom}, aucune idée exacte, mais la carte aide pas mal.
 - Je me perds moi-même, {nom}, alors je ne suis pas le meilleur guide.
 - {nom}, demande sur Région, quelqu'un saura sûrement.
@@ -349,6 +353,7 @@ mots: good night, gn, see you, see ya, cya, later, gotta go, farewell
 
 [salutation]
 mots: salut, bonjour, coucou, bonsoir, slt, cc, wesh, bjr, kikou, re, yo, hello, hi, hey, hola, sup, hiya, howdy, good morning
+- Salut {nom} ! Je suis du côté de {region}.
 - Salut {nom} !
 - Coucou {nom} !
 - Hey {nom}, ça va ?

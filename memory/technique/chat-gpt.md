@@ -1,6 +1,6 @@
 # Module « @GPT » : répondre dans le chat du jeu (étude)
 
-- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6) ; v0.4.7 tous les canaux (section 7) ; v0.4.9 langue, style, correction, autres bots, fichiers modifiables (D-060, section 9) ; **v0.4.8 réponses par thème, frappe vérifiée lettre par lettre, fautes 5 % (D-059, section 8)**. Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
+- **Statut** : branché et envoi réel en v0.4.5 (D-056, section 6) ; v0.4.7 tous les canaux (section 7) ; v0.4.9 langue, style, correction, autres bots, fichiers modifiables (D-060, section 9) ; v0.4.10 plafonds, pause, amis, infos du jeu, onglet CHAT (D-061, section 10) ; **v0.4.8 réponses par thème, frappe vérifiée lettre par lettre, fautes 5 % (D-059, section 8)**. Règles validées par Julien le 2026-11-23 ([D-054](../decisions/D-054-chat-gpt-reponses.md)) : canal Région, « @GPT » en majuscules, tout le monde, 1 réponse par minute (au plus récent), même sans question, **phrases toutes faites** (pas de clé API pour le moment, Haiku plus tard). Restent dans [Q-027](../questions-ouvertes/Q-027-chat-gpt.md) : clavier pendant la récolte, marque « [GPT] », mode essai.
 - **But** : quand un joueur écrit « @GPT » dans le chat, le bot répond une phrase courte. **Pas de spam.**
 - **Liens** : D-054, D-024, D-039 (lecture seule), D-045 (contrôleur d'actions), D-052 (aucune action avec une fenêtre du jeu ouverte), D-047 (sécurités).
 
@@ -185,3 +185,15 @@ Voir la liste de 10 idées du message de fin de session 23 (aussi recopiée ici)
 8. Claude Haiku avec une clé API de Julien (D-054), phrases toutes faites en secours.
 9. Liste de joueurs « amis » (réponses plus familières) et liste noire (jamais de réponse).
 10. Statistiques : thèmes les plus demandés, messages tombés dans [autre] (pour ajouter des thèmes).
+
+## 10. v0.4.10 (2026-11-24, D-061) : plafonds, pause, amis, ton, infos du jeu, onglet CHAT
+
+Code : `World/ChatGuard.cs` (ChatQuota, ChatLists, ChatTone, ChatStats), `GptChatPicker` (Quota, Lists, ObserveOwn, TakeSkipped), `MainWindow.Chat.cs` (onglet CHAT).
+- **Plafonds** : 20/h, 100/jour, 3 par joueur et par heure (en mémoire, remis à zéro au démarrage).
+- **Pause 5 min** quand Julien écrit : un message de Julien dans le chat que le bot n'a pas écrit (texte connu, ou envoi du bot à ±6 s). Réponse en attente abandonnée.
+- **Amis / liste noire** : `amis.txt`, `liste-noire.txt` dans `phrases-chat` ; ami d'office « The Krazy Turkey » (K).
+- **Ton** : par canal (Trade sérieux, Local détendu), ami très familier ; Bonjour / Bonsoir selon l'heure.
+- **Infos du jeu** : `{region}`, `{niveau}` dans les phrases (thèmes niveau, ou, salutation), seulement si l'info est connue.
+- **Onglet CHAT** : historique (200 lignes), état, statistiques (`stats.txt`, `messages-sans-theme.txt`), « Tester une phrase » sans envoi.
+- **Pas fait** : messages privés (module global, `direct_message_state`, commande de réponse non vérifiée, voir D-061). Idées 1 refusée, 8 plus tard.
+- Tests : `V0410Tests` (9 groupes). À vérifier dans le jeu : pause, plafonds, `{region}`, onglet.

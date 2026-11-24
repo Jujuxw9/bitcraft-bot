@@ -178,6 +178,8 @@ mots: group, lfg, team, together, join*, guild*, recruit*, empire*, claim*, coop
 
 [niveau]
 mots: level*, lvl, xp, exp, experience, grind*, skill*, leveling
+- My best skill is level {niveau}, {nom}. It takes time!
+- I'm level {niveau} in my best skill, {nom}. How about you?
 - {nom}, leveling up is a matter of patience.
 - I'm grinding slowly, one log at a time.
 - {nom}, XP comes on its own when you're having fun.
@@ -191,6 +193,8 @@ mots: level*, lvl, xp, exp, experience, grind*, skill*, leveling
 
 [ou]
 mots: where, where is, where are, find, location, coords, coordinates, map, lost, direction*, way to
+- I'm around {region} right now, {nom}.
+- {nom}, I'm hanging out in {region} these days.
 - {nom}, no exact idea, but the map helps a lot.
 - I get lost myself, {nom}, so I'm not the best guide.
 - {nom}, ask in Region chat, someone will know.
@@ -331,6 +335,7 @@ mots: bye, byebye, ciao, good night, gn, see you, see ya, cya, later, gotta go, 
 
 [salutation]
 mots: hello, hi, hey, yo, hola, sup, hiya, howdy, greetings, good morning, good evening, heya
+- Hey {nom}! I am over in {region}.
 - Hi {nom}!
 - Hey {nom}!
 - Hey {nom}, how's it going?

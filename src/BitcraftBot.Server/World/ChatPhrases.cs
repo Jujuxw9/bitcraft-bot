@@ -186,7 +186,7 @@ public sealed class ChatPhraseBook
             if (line.StartsWith("- ", StringComparison.Ordinal))
             {
                 var phrase = line[2..].Trim();
-                if (phrase.Length == 0 || phrase.Replace("{nom}", "").Contains('{') || phrase.Replace("{nom}", "").Contains('}'))
+                if (phrase.Length == 0 || StripKnown(phrase).Contains('{') || StripKnown(phrase).Contains('}'))
                 {
                     _errors.Add($"{language}.txt ligne {number} : phrase vide ou accolade inconnue");
                     continue;
@@ -296,9 +296,13 @@ public sealed class ChatPhraseBook
 
     // Phrase au hasard du thème, dans la langue voulue (sinon anglais, sinon thème [autre]).
     // Une phrase dite parmi les dernières n'est pas reprise tant qu'il en reste d'autres.
-    public string? Pick(string themeName, string language, Random random)
+    public static string StripKnown(string phrase) =>
+        phrase.Replace("{nom}", "").Replace("{region}", "").Replace("{niveau}", "");
+
+    // info : vraies infos du jeu (v0.4.10) ; une phrase avec {region} ou {niveau} n'est choisie que si l'info est connue.
+    public string? Pick(string themeName, string language, Random random, ChatInfo? info = null)
     {
-        var list = Candidates(themeName, language) ?? Candidates(DefaultTheme, language);
+        var list = Usable(Candidates(themeName, language), info) ?? Usable(Candidates(DefaultTheme, language), info);
         if (list is null || list.Count == 0)
         {
             return null;
@@ -311,6 +315,13 @@ public sealed class ChatPhraseBook
             _recent.Dequeue();
         }
         return choice;
+    }
+
+    private static List<string>? Usable(List<string>? list, ChatInfo? info)
+    {
+        var ok = list?.Where(p => (info?.Region is not null || !p.Contains("{region}", StringComparison.Ordinal))
+            && (info?.Level is not null || !p.Contains("{niveau}", StringComparison.Ordinal))).ToList();
+        return ok is { Count: > 0 } ? ok : null;
     }
 
     private List<string>? Candidates(string themeName, string language)
@@ -340,15 +351,24 @@ public static class ChatReplies
     // Langue de la réponse (v0.4.9) : « fr/ » devant le pseudo, ou message écrit en français.
     public static string LanguageOf(ChatMessage message) => ChatStyle.LanguageOf(message);
 
+    // v0.4.10 : smiley et style relâché selon le canal et selon l'ami (null = valeur du canal) ;
+    // info : vraies infos du jeu ; hour : heure locale (bonjour / bonsoir), -1 = ne rien changer.
     public static ChatReply For(ChatMessage message, ChatPhraseBook book, Random random,
-        double smileyChance = CannedReplies.SmileyChance, double typoChance = TypoChance, double casualChance = ChatStyle.CasualChance)
+        double? smileyChance = null, double typoChance = TypoChance, double? casualChance = null,
+        ChatInfo? info = null, int hour = -1, bool friend = false)
     {
+        var tone = ChatTone.For(message.Channel, friend);
+        var smiley = smileyChance ?? tone.Smiley;
+        var casual = casualChance ?? tone.Casual;
         var theme = book.DetectTheme(message.Text);
         var language = LanguageOf(message);
         var name = CannedReplies.CleanName(message.Username);
-        var phrase = book.Pick(theme, language, random) ?? (language == "fr" ? "Coucou {nom} !" : "Hey {nom}!");
-        var text = phrase.Replace("{nom}", name, StringComparison.Ordinal);
-        if (casualChance > 0 && random.NextDouble() < casualChance)
+        var phrase = book.Pick(theme, language, random, info) ?? (language == "fr" ? "Coucou {nom} !" : "Hey {nom}!");
+        var text = phrase.Replace("{nom}", name, StringComparison.Ordinal)
+            .Replace("{region}", info?.Region ?? "", StringComparison.Ordinal)
+            .Replace("{niveau}", info?.Level?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "", StringComparison.Ordinal);
+        text = ChatTone.AdaptToTime(text, language, hour);
+        if (casual > 0 && random.NextDouble() < casual)
         {
             text = ChatStyle.Casual(text, language, name, random);
         }
@@ -363,10 +383,13 @@ public static class ChatReplies
                 correction = "*" + faulty.Right;
             }
         }
-        if (smileyChance > 0 && random.NextDouble() < smileyChance)
+        if (smiley > 0 && random.NextDouble() < smiley)
         {
             text += " " + CannedReplies.Smileys[random.Next(CannedReplies.Smileys.Count)];
         }
         return new ChatReply(text.Length <= CannedReplies.MaxLength ? text : text[..CannedReplies.MaxLength], theme, typo, correction, language);
     }
 }
+
+// Vraies infos du jeu que le bot peut dire (v0.4.10) : région et plus haut niveau de métier. Rien de privé.
+public sealed record ChatInfo(string? Region, int? Level);

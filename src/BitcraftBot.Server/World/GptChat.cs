@@ -143,15 +143,56 @@ public sealed class GptChatPicker
                 && !_handled.Contains(m.EntityId) && now - m.SentAt <= MaxAge)
             .OrderBy(m => m.SentAt).ThenBy(m => m.EntityId).ToList();
 
+    // v0.4.10 : plafonds, amis et liste noire, pause quand Julien écrit lui-même.
+    public ChatQuota Quota { get; } = new();
+    public ChatLists Lists { get; set; } = new();
+
+    // Pause quand Julien écrit lui-même dans le chat : 5 minutes après son dernier message.
+    public static readonly TimeSpan PauseAfterOwnMessage = TimeSpan.FromMinutes(5);
+    private DateTimeOffset _pausedUntil = DateTimeOffset.MinValue;
+    private DateTimeOffset _lastSentAt = DateTimeOffset.MinValue;
+    private readonly HashSet<ulong> _ownSeen = [];
+
+    public DateTimeOffset PausedUntil => _pausedUntil;
+
+    // Messages de Julien dans le chat : ceux que le bot n'a pas écrits lui-même mettent le bot en pause.
+    // Un message du bot se reconnaît à son texte (réponses notées par NoteSent) ou à l'heure d'un envoi du bot.
+    public void ObserveOwn(IEnumerable<ChatMessage> messages)
+    {
+        foreach (var m in messages.Where(m => m.OwnerEntityId == _me && !_ownSeen.Contains(m.EntityId)))
+        {
+            _ownSeen.Add(m.EntityId);
+            var text = Normalize(m.Text);
+            var byBot = _sent.Contains(text) || Math.Abs((m.SentAt - _lastSentAt).TotalSeconds) <= 6;
+            if (!byBot && m.SentAt + PauseAfterOwnMessage > _pausedUntil)
+            {
+                _pausedUntil = m.SentAt + PauseAfterOwnMessage;
+                _skipped.Add((m, "Julien écrit dans le chat : pause"));
+            }
+        }
+    }
+
+    private readonly List<(ChatMessage Message, string Reason)> _skipped = [];
+
+    // Messages laissés sans réponse (liste noire, plafond, pause) depuis le dernier appel, avec la raison (journal).
+    public IReadOnlyList<(ChatMessage Message, string Reason)> TakeSkipped()
+    {
+        var list = _skipped.ToList();
+        _skipped.Clear();
+        return list;
+    }
+
     // Le message auquel répondre maintenant, ou null (rien en attente, ou moins d'une minute depuis la dernière réponse).
     // Plusieurs en attente : le plus récent seulement, les autres sont oubliés.
     public ChatMessage? Pick(IEnumerable<ChatMessage> messages, DateTimeOffset now)
     {
+        var list = messages as IReadOnlyList<ChatMessage> ?? messages.ToList();
+        ObserveOwn(list);
         if (Cooldown(now) > TimeSpan.Zero)
         {
             return null;
         }
-        var all = Pending(messages, now);
+        var all = Pending(list, now);
         // v0.4.9 : un message qui ressemble à un autre bot est oublié (pas de boucle entre deux bots).
         foreach (var m in all.Where(LooksAutomated))
         {
@@ -163,12 +204,41 @@ public sealed class GptChatPicker
         {
             return null;
         }
+        // Pause : les messages reçus pendant la pause sont oubliés (ils seraient trop vieux ensuite).
+        if (now < _pausedUntil)
+        {
+            foreach (var m in pending)
+            {
+                _handled.Add(m.EntityId);
+                _skipped.Add((m, $"pause (Julien a écrit, reprise dans {Math.Ceiling((_pausedUntil - now).TotalSeconds):0} s)"));
+            }
+            return null;
+        }
+        // Liste noire : jamais de réponse.
+        foreach (var m in pending.Where(m => Lists.IsBlocked(m.Username)).ToList())
+        {
+            _handled.Add(m.EntityId);
+            _skipped.Add((m, "joueur sur la liste noire"));
+            pending.Remove(m);
+        }
+        if (pending.Count == 0)
+        {
+            return null;
+        }
         foreach (var m in pending)
         {
             _handled.Add(m.EntityId);
         }
+        var chosen = pending[^1];
+        // Plafonds : au plafond, le message est laissé sans réponse.
+        if (Quota.Why(chosen.Username, now) is { } why)
+        {
+            _skipped.Add((chosen, why));
+            return null;
+        }
+        Quota.Record(chosen.Username, now);
         _lastReply = now;
-        return pending[^1];
+        return chosen;
     }
 
     private readonly List<ChatMessage> _ignored = [];
@@ -186,6 +256,7 @@ public sealed class GptChatPicker
 
     public void NoteSent(string text)
     {
+        _lastSentAt = DateTimeOffset.UtcNow;
         _sent.Enqueue(Normalize(text));
         while (_sent.Count > 10)
         {

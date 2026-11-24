@@ -194,6 +194,27 @@
             </ScrollViewer>
         </TabItem>
 
+        <!-- CHAT : historique, statistiques, test d'une phrase sans envoi (v0.4.10) -->
+        <TabItem Header="CHAT">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="ChatTabStatus" Grid.Row="0" TextWrapping="Wrap" />
+                <TextBlock x:Name="ChatTabStats" Grid.Row="1" Margin="0,4,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBox x:Name="ChatTestBox" Width="420" VerticalContentAlignment="Center" ToolTip="Écris un message de joueur, par exemple : @gpt salut, tu coupes des arbres ?" />
+                    <Button x:Name="ChatTestButton" Content="Tester une phrase (rien n'est envoyé)" Style="{StaticResource SmallButton}" Margin="8,0,0,0" Click="ChatTestButton_Click" />
+                </StackPanel>
+                <TextBlock x:Name="ChatTestResult" Grid.Row="3" Margin="0,6,0,0" TextWrapping="Wrap" />
+                <TextBox x:Name="ChatHistoryBox" Grid.Row="4" Margin="0,10,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
+            </Grid>
+        </TabItem>
+
         <!-- PERSONNAGE : en direct, bonus, sac et banques (serveur) -->
         <TabItem Header="PERSONNAGE">
             <Grid x:Name="PersoGrid">
