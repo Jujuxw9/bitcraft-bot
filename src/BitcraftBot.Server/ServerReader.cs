@@ -73,6 +73,9 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
     public IReadOnlyDictionary<ulong, ServerPosition> BankPositions() => Banks.Positions(_cache);
 
+    // Colonies de la région (v0.4.13) : lues pour préparer l'intégration de la ville (pas encore affichées).
+    public IReadOnlyList<ClaimInfo> Claims() => World.Claims.Of(_cache);
+
     // Messages du chat Région reçus (module « @GPT », v0.4.5).
     public IReadOnlyList<ChatMessage> ChatMessages() => World.ChatMessages.Read(_cache);
 
@@ -302,7 +305,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             log.Info(Category, $"Exemple brut de {table} : {(text.Length > 300 ? text[..300] + "…" : text)}");
         }
         // v0.4.4 : un extrait brut de la barre d'action, d'une capacité et d'un sac au sol (format réel à vérifier).
-        foreach (var table in new[] { "action_bar_state", "ability_state", "dropped_inventory_state", "dropped_inventory_ownership_timer", "traveler_task_state" })
+        foreach (var table in new[] { "action_bar_state", "ability_state", "dropped_inventory_state", "dropped_inventory_ownership_timer", "traveler_task_state", "claim_state", "claim_local_state" })
         {
             var text = _cache.Rows(table).FirstOrDefault()?.ToString() ?? "aucune ligne";
             log.Info(Category, $"Exemple brut de {table} : {(text.Length > 300 ? text[..300] + "…" : text)}");

@@ -76,37 +76,18 @@
                                 <TextBlock x:Name="DashBestTreeText" Text="Arbre —" Style="{StaticResource MutedText}" Margin="0,6,0,0" />
                             </StackPanel>
                         </Border>
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
-                                <TextBlock Text="LE BOT" Style="{StaticResource CardTitle}" />
-                                <TextBlock x:Name="DashServerText" Text="○ Serveur" Margin="0,0,0,4" />
-                                <TextBlock x:Name="DashScreenText" Text="○ Écran" Margin="0,0,0,4" />
-                                <TextBlock x:Name="DashMealText" Text="○ Repas auto" Margin="0,0,0,4" />
-                                <TextBlock x:Name="GameWindowText" Text="○ Jeu" Margin="0,0,0,4" />
-                                <TextBlock x:Name="DashAlertText" Text="" Foreground="{StaticResource Warn}" FontWeight="SemiBold" Margin="0,4,0,0" />
-                            </StackPanel>
-                        </Border>
                     </UniformGrid>
 
                     <!-- Image du jeu en direct, zones lues en surimpression -->
             <Border x:Name="BotBuffs" Grid.Row="1" Style="{StaticResource Card}">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" Text="BONUS ACTIFS" Style="{StaticResource CardTitle}" />
-                    <TextBlock DockPanel.Dock="Top" x:Name="BuffSummary" Text="—" Style="{StaticResource MutedText}" Margin="0,0,0,6" />
-                    <ListView x:Name="BuffList" MinHeight="40" MaxHeight="110">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Header="Bonus" Width="220" DisplayMemberBinding="{Binding Name}" />
-                                <GridViewColumn Header="Type" Width="100" DisplayMemberBinding="{Binding Type}" />
-                                <GridViewColumn Header="Reste" Width="80" DisplayMemberBinding="{Binding Remaining}" />
-                                <GridViewColumn Header="Effets" Width="360" DisplayMemberBinding="{Binding Effects}" />
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                    <TextBlock DockPanel.Dock="Top" Visibility="Collapsed" x:Name="BuffSummary" Text="—" Style="{StaticResource MutedText}" Margin="0,0,0,6" />
+                    <WrapPanel x:Name="BuffPanel" />
                 </DockPanel>
             </Border>
 
-                    <Border Grid.Row="2" Background="{StaticResource Track}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                    <Border x:Name="GameImageCard" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="{StaticResource Track}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
                             CornerRadius="6" Margin="6">
                         <Grid>
                             <Viewbox Stretch="Uniform" Margin="2">
@@ -139,12 +120,12 @@
                             <StackPanel>
                                 <TextBlock Text="OPTIONS" Style="{StaticResource CardTitle}" />
                                 <CheckBox x:Name="AutoEatCheck" Style="{StaticResource SwitchCheck}" Content="Repas auto (Maj + E)" Click="AutoEatCheck_Click" />
-                                <TextBlock x:Name="AutoEatStatusText" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
-                                <TextBlock x:Name="AutoEatFoodText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="AutoEatStatusText" Visibility="Collapsed" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="AutoEatFoodText" Visibility="Collapsed" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" />
                                 <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
                                 <CheckBox x:Name="GptCheck" Style="{StaticResource SwitchCheck}" Content="Chat @gpt / @chatgpt" ToolTip="Répondre à « @gpt » et « @chatgpt » (Local, Région, LFG, Trade)" Click="GptCheck_Click" />
-                                <TextBlock x:Name="GptStatusText" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
-                                <TextBlock x:Name="GptTimerText" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
+                                <TextBlock x:Name="GptStatusText" Visibility="Collapsed" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
+                                <TextBlock x:Name="GptTimerText" Visibility="Collapsed" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
                             </StackPanel>
                         </Border>
 
@@ -177,69 +158,9 @@
                             </StackPanel>
                         </Border>
 
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
-                                <TextBlock Text="SPRINT ET BARRE D'ACTION" Style="{StaticResource CardTitle}" />
-                                <TextBlock x:Name="SprintText" Text="Sprint : —" FontWeight="SemiBold" TextWrapping="Wrap" />
-                                <TextBlock x:Name="ActionBarText" Text="—" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0" />
-                            </StackPanel>
-                        </Border>
 
-                        <Border Style="{StaticResource Card}">
-                            <StackPanel>
-                                <TextBlock Text="SACS AU SOL" Style="{StaticResource CardTitle}" />
-                                <TextBlock x:Name="GroundText" Text="—" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
-
-                <!-- Dernier événement du journal -->
-                <Border Grid.Row="2" Grid.ColumnSpan="2" Background="{StaticResource Surface}" BorderBrush="{StaticResource CardBorder}"
-                        BorderThickness="1" CornerRadius="4" Margin="6,4,6,0" Padding="10,5">
-                    <DockPanel>
-                        <TextBlock x:Name="AlertCounters" DockPanel.Dock="Right" Style="{StaticResource MutedText}" Margin="12,0,0,0" TextWrapping="NoWrap" />
-                        <TextBlock x:Name="LastEventText" Text="—" FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap"
-                                   TextTrimming="CharacterEllipsis" />
-                    </DockPanel>
-                </Border>
-            </Grid>
-            </ScrollViewer>
-        </TabItem>
-
-        <!-- CHAT : historique, statistiques, test d'une phrase sans envoi (v0.4.10) -->
-        <TabItem Header="CHAT">
-            <Grid Margin="12">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="ChatTabStatus" Grid.Row="0" TextWrapping="Wrap" />
-                <TextBlock x:Name="ChatTabStats" Grid.Row="1" Margin="0,4,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
-                    <TextBox x:Name="ChatTestBox" Width="420" VerticalContentAlignment="Center" ToolTip="Écris un message de joueur, par exemple : @gpt salut, tu coupes des arbres ?" />
-                    <Button x:Name="ChatTestButton" Content="Tester une phrase (rien n'est envoyé)" Style="{StaticResource SmallButton}" Margin="8,0,0,0" Click="ChatTestButton_Click" />
-                </StackPanel>
-                <TextBlock x:Name="ChatTestResult" Grid.Row="3" Margin="0,6,0,0" TextWrapping="Wrap" />
-                <TextBox x:Name="ChatHistoryBox" Grid.Row="4" Margin="0,10,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
-            </Grid>
-        </TabItem>
-
-        <!-- PERSONNAGE : en direct, bonus, sac et banques (serveur) -->
-        <TabItem x:Name="CharacterTabItem" Header="PERSONNAGE">
-            <Grid x:Name="PersoGrid">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="360" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
+                        <!-- Éléments retirés de l'écran (v0.4.13) mais toujours remplis par le code : cachés. -->
+                        <StackPanel x:Name="Parking" Visibility="Collapsed">
                 <Border x:Name="PersoLive" Style="{StaticResource Card}">
                     <StackPanel>
                         <TextBlock Text="EN DIRECT" Style="{StaticResource CardTitle}" />
@@ -273,17 +194,86 @@
                                 Margin="0,10,0,0" IsEnabled="False" Click="ServerSnapshotButton_Click" />
                     </StackPanel>
                 </Border>
-
-                <Border x:Name="PersoFilter" Grid.Column="1" Style="{StaticResource Card}">
-                    <StackPanel>
-                        <TextBlock Text="SAC, CEINTURE ET BANQUES" Style="{StaticResource CardTitle}" />
-                        <TextBlock x:Name="InventorySummary" Text="" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,0,0,8" />
-                        <TextBox x:Name="InventorySearchBox" Width="260" HorizontalAlignment="Left" TextChanged="InventorySearchBox_TextChanged" ToolTip="Chercher un objet dans les trois listes" />
-                        <TextBlock Text="Clique sur le titre d'une colonne pour trier (nom, quantité, type, palier)." Style="{StaticResource MutedText}" Margin="0,8,0,0" />
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="LE BOT" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="DashServerText" Text="○ Serveur" Margin="0,0,0,4" />
+                                <TextBlock x:Name="DashScreenText" Text="○ Écran" Margin="0,0,0,4" />
+                                <TextBlock x:Name="DashMealText" Text="○ Repas auto" Margin="0,0,0,4" />
+                                <TextBlock x:Name="GameWindowText" Text="○ Jeu" Margin="0,0,0,4" />
+                                <TextBlock x:Name="DashAlertText" Text="" Foreground="{StaticResource Warn}" FontWeight="SemiBold" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="SPRINT ET BARRE D'ACTION" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="SprintText" Text="Sprint : —" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <TextBlock x:Name="ActionBarText" Text="—" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="SACS AU SOL" Style="{StaticResource CardTitle}" />
+                                <TextBlock x:Name="GroundText" Text="—" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                        </StackPanel>
                     </StackPanel>
+                </ScrollViewer>
+
+                <!-- Dernier événement du journal -->
+                <Border Grid.Row="2" Grid.ColumnSpan="2" Background="{StaticResource Surface}" BorderBrush="{StaticResource CardBorder}"
+                        BorderThickness="1" CornerRadius="4" Margin="6,4,6,0" Padding="10,5">
+                    <DockPanel>
+                        <TextBlock x:Name="AlertCounters" DockPanel.Dock="Right" Style="{StaticResource MutedText}" Margin="12,0,0,0" TextWrapping="NoWrap" />
+                        <TextBlock x:Name="LastEventText" Text="—" FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                </Border>
+            </Grid>
+            </ScrollViewer>
+        </TabItem>
+
+        <!-- CHAT : historique, statistiques, test d'une phrase sans envoi (v0.4.10) -->
+        <TabItem Header="CHAT" Visibility="Collapsed">
+            <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="ChatTabStatus" Grid.Row="0" TextWrapping="Wrap" />
+                <TextBlock x:Name="ChatTabStats" Grid.Row="1" Margin="0,4,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBox x:Name="ChatTestBox" Width="420" VerticalContentAlignment="Center" ToolTip="Écris un message de joueur, par exemple : @gpt salut, tu coupes des arbres ?" />
+                    <Button x:Name="ChatTestButton" Content="Tester une phrase (rien n'est envoyé)" Style="{StaticResource SmallButton}" Margin="8,0,0,0" Click="ChatTestButton_Click" />
+                </StackPanel>
+                <TextBlock x:Name="ChatTestResult" Grid.Row="3" Margin="0,6,0,0" TextWrapping="Wrap" />
+                <TextBox x:Name="ChatHistoryBox" Grid.Row="4" Margin="0,10,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
+            </Grid>
+        </TabItem>
+
+        <!-- PERSONNAGE : en direct, bonus, sac et banques (serveur) -->
+        <TabItem x:Name="CharacterTabItem" Header="PERSONNAGE">
+            <Grid x:Name="PersoGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+
+                <Border x:Name="PersoFilter" Style="{StaticResource Card}">
+                    <WrapPanel VerticalAlignment="Center">
+                        <TextBlock Text="SAC, CEINTURE ET BANQUES" Style="{StaticResource CardTitle}" Margin="0,0,16,0" VerticalAlignment="Center" />
+                        <TextBox x:Name="InventorySearchBox" Width="260" TextChanged="InventorySearchBox_TextChanged" ToolTip="Chercher un objet dans les trois listes" Margin="0,0,16,0" />
+                        <TextBlock x:Name="InventorySummary" Text="" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                        <TextBlock Text="Clique sur le titre d'une colonne pour trier." Style="{StaticResource MutedText}" VerticalAlignment="Center" />
+                    </WrapPanel>
                 </Border>
 
-                <Grid x:Name="PersoBag" Grid.Row="1" Grid.ColumnSpan="2">
+                <Grid x:Name="PersoBag" Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -291,7 +281,7 @@
                     </Grid.ColumnDefinitions>
                     <Border Grid.Column="0" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock x:Name="BagTitle" DockPanel.Dock="Top" Text="" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <TextBlock x:Name="BagTitle" DockPanel.Dock="Top" Text="SAC" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
                             <ListView x:Name="BagList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
@@ -306,7 +296,7 @@
                     </Border>
                     <Border Grid.Column="1" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock x:Name="BeltTitle" DockPanel.Dock="Top" Text="" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <TextBlock x:Name="BeltTitle" DockPanel.Dock="Top" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
                             <ListView x:Name="BeltList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
@@ -321,7 +311,7 @@
                     </Border>
                     <Border Grid.Column="2" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock x:Name="BankTitle" DockPanel.Dock="Top" Text="" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <TextBlock x:Name="BankTitle" DockPanel.Dock="Top" Text="BANQUES" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
                             <ListView x:Name="BankList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
@@ -547,7 +537,7 @@
                                         Margin="0,8,0,0" Click="ForgetTokenButton_Click" />
                                 <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
                                 <TextBlock Text="CONNEXION" Style="{StaticResource CardTitle}" />
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Horizontal" Visibility="Collapsed">
                                     <TextBlock Text="Région R" Style="{StaticResource Label}" Margin="0,0,4,0" />
                                     <TextBox x:Name="ServerRegionBox" Text="18" Width="48" />
                                 </StackPanel>
@@ -603,11 +593,11 @@
                                 <Canvas x:Name="BotCpuGraph" Height="40" Margin="0,4,0,8" Background="{StaticResource Track}" ClipToBounds="True" />
                                 <TextBlock x:Name="BotRamText" Text="RAM —" />
                                 <Canvas x:Name="BotRamGraph" Height="40" Margin="0,4,0,8" Background="{StaticResource Track}" ClipToBounds="True" />
-                                <TextBlock x:Name="GameCpuText" Text="Jeu —" Style="{StaticResource MutedText}" />
-                                <TextBlock x:Name="SystemCpuText" Text="PC —" Style="{StaticResource MutedText}" />
-                                <TextBlock x:Name="ResourceStateText" Text="Normal" Margin="0,6,0,0" FontWeight="SemiBold" />
-                                <TextBlock x:Name="VersionText" Text="" Style="{StaticResource MutedText}" FontSize="11" Margin="0,6,0,0" />
-                                <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
+                                <TextBlock x:Name="GameCpuText" Visibility="Collapsed" Text="Jeu —" Style="{StaticResource MutedText}" />
+                                <TextBlock x:Name="SystemCpuText" Visibility="Collapsed" Text="PC —" Style="{StaticResource MutedText}" />
+                                <TextBlock x:Name="ResourceStateText" Visibility="Collapsed" Text="Normal" Margin="0,6,0,0" FontWeight="SemiBold" />
+                                <TextBlock x:Name="VersionText" Visibility="Collapsed" Text="" Style="{StaticResource MutedText}" FontSize="11" Margin="0,6,0,0" />
+                                <StackPanel Visibility="Collapsed">
                                 <TextBlock Text="SEUILS" Style="{StaticResource CardTitle}" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -626,6 +616,7 @@
                                     <TextBlock Grid.Row="3" Text="RAM libre PC (%)" Style="{StaticResource Label}" />
                                     <TextBox Grid.Row="3" Grid.Column="1" x:Name="SystemRamWarningBox" Margin="0,2" LostFocus="LimitBox_LostFocus" />
                                 </Grid>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </UniformGrid>

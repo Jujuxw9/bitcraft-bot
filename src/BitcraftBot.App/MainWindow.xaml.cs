@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.12 : onglet VOYAGEURS refait (à rendre sans farmer, les 10 plus avancées, les plus faciles à farmer, images des objets) ; RECETTES : la plus simple d'abord, sans paquets, arborescence, plan d'actions avec cases à cocher pour une quantité choisie ; images manquantes (fleurs…) retrouvées ; PERSONNAGE : sac, ceinture et banques en trois listes triables ; bonus actifs sur l'onglet BOT ; interrupteurs vert / rouge pour le repas auto et le chat ; PARAMÈTRES compactés.");
+        _log.Info("Session", "Version 0.4.13 : écran BOT épuré (bonus actifs en pastilles avec logos, image du jeu réduite en bas à gauche, cartes et textes d'état retirés, interrupteurs) ; onglet CHAT masqué ; PERSONNAGE : « En direct » retiré, listes remontées ; PARAMÈTRES : région R18 fixe, système et seuils masqués ; RECETTES : arborescence complète en rectangles, conversions d'objets lues, toutes les images téléchargées une fois (introuvables notées) ; overlay en pastille au-dessus de la barre d'action ; colonies (claims) lues pour préparer la ville.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

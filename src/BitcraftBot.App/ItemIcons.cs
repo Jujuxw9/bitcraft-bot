@@ -62,46 +62,125 @@ public sealed class ItemIcons
 
     private static string FileOf(string path) => Path.Combine(Folder, path.Replace('/', Path.DirectorySeparatorChar) + ".webp");
 
-    private async Task<ImageSource?> LoadAsync(string path)
+    // Images introuvables (v0.4.13) : notées dans « introuvables.txt » pour ne plus les redemander au site à chaque lancement.
+    private static string MissingFile => Path.Combine(Folder, "introuvables.txt");
+
+    private readonly Lazy<HashSet<string>> _missing = new(() =>
     {
-        string file;
         try
         {
-            // Une image déjà sur le disque, sous l'un des chemins possibles ?
-            file = Candidates(path).Select(FileOf).FirstOrDefault(File.Exists) ?? "";
-            if (file.Length == 0)
+            return File.Exists(MissingFile) ? File.ReadAllLines(MissingFile).Where(l => l.Length > 0).ToHashSet() : [];
+        }
+        catch (IOException)
+        {
+            return [];
+        }
+    });
+
+    private void NoteMissing(string path)
+    {
+        lock (_missing.Value)
+        {
+            if (!_missing.Value.Add(path))
             {
-                await _downloads.WaitAsync();
+                return;
+            }
+            try
+            {
+                Directory.CreateDirectory(Folder);
+                File.AppendAllText(MissingFile, path + Environment.NewLine);
+            }
+            catch (IOException)
+            {
+                // Sans gravité : l'image sera simplement redemandée au prochain lancement.
+            }
+        }
+    }
+
+    // Marqueur du téléchargement complet (v0.4.13) : une fois fait, on ne le refait pas (supprimer le fichier pour le refaire).
+    public static string DoneMarker => Path.Combine(Folder, "tout-telecharge.txt");
+
+    public int MissingCount => _missing.Value.Count;
+
+    // Garantit que l'image est sur le disque (essaie les chemins possibles). Renvoie son fichier, ou null si elle n'existe pas.
+    private async Task<string?> EnsureFileAsync(string path)
+    {
+        var onDisk = Candidates(path).Select(FileOf).FirstOrDefault(File.Exists);
+        if (onDisk is not null)
+        {
+            return onDisk;
+        }
+        if (_missing.Value.Contains(path))
+        {
+            return null;
+        }
+        await _downloads.WaitAsync();
+        try
+        {
+            foreach (var candidate in Candidates(path))
+            {
+                var target = FileOf(candidate);
                 try
                 {
-                    foreach (var candidate in Candidates(path))
-                    {
-                        var target = FileOf(candidate);
-                        try
-                        {
-                            var bytes = await Http.GetByteArrayAsync(CdnBase + Uri.EscapeDataString(candidate).Replace("%2F", "/") + ".webp");
-                            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-                            var temp = target + ".tmp";
-                            await File.WriteAllBytesAsync(temp, bytes);
-                            File.Move(temp, target, overwrite: true);
-                            file = target;
-                            break;
-                        }
-                        catch (HttpRequestException)
-                        {
-                            // Introuvable sous ce chemin : suivant.
-                        }
-                    }
+                    var bytes = await Http.GetByteArrayAsync(CdnBase + Uri.EscapeDataString(candidate).Replace("%2F", "/") + ".webp");
+                    Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                    var temp = target + ".tmp";
+                    await File.WriteAllBytesAsync(temp, bytes);
+                    File.Move(temp, target, overwrite: true);
+                    return target;
                 }
-                finally
+                catch (HttpRequestException ex) when (ex.StatusCode is System.Net.HttpStatusCode.NotFound or System.Net.HttpStatusCode.Forbidden)
                 {
-                    _downloads.Release();
+                    // Introuvable sous ce chemin : suivant.
                 }
-                if (file.Length == 0)
+            }
+        }
+        finally
+        {
+            _downloads.Release();
+        }
+        NoteMissing(path);
+        return null;
+    }
+
+    // Télécharge toutes les images de la liste (v0.4.13, demande de Julien : tout garder en local). Progression tous les 500.
+    public async Task<(int Done, int Missing, int Errors)> DownloadAllAsync(IEnumerable<string> icons, Action<int, int> progress, CancellationToken token)
+    {
+        var paths = icons.Select(Normalize).Where(p => p is not null).Select(p => p!).Distinct().ToList();
+        var done = 0;
+        var missing = 0;
+        var errors = 0;
+        await Parallel.ForEachAsync(paths, new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = token }, async (path, _) =>
+        {
+            try
+            {
+                if (await EnsureFileAsync(path) is null)
                 {
-                    Interlocked.Increment(ref _failures);
-                    return null;
+                    Interlocked.Increment(ref missing);
                 }
+            }
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or IOException)
+            {
+                Interlocked.Increment(ref errors); // réseau coupé ou lent : reprise au prochain essai
+            }
+            var n = Interlocked.Increment(ref done);
+            if (n % 500 == 0)
+            {
+                progress(n, paths.Count);
+            }
+        });
+        return (done, missing, errors);
+    }
+
+    private async Task<ImageSource?> LoadAsync(string path)
+    {
+        try
+        {
+            var file = await EnsureFileAsync(path);
+            if (file is null)
+            {
+                Interlocked.Increment(ref _failures);
+                return null;
             }
             await _decodes.WaitAsync();
             try

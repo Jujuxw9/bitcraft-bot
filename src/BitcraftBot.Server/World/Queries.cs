@@ -47,6 +47,9 @@ public static class Queries
             }
             if (withExtras)
             {
+                // Colonies de la région (v0.4.13, préparation de la ville) : tables publiques, lecture seule.
+                list.Add("SELECT * FROM claim_state");
+                list.Add("SELECT * FROM claim_local_state");
                 // Barre d'action et capacités avec leur temps de recharge (v0.4.4 : sprint).
                 list.Add($"SELECT * FROM action_bar_state WHERE player_entity_id = {e}");
                 list.Add($"SELECT * FROM ability_state WHERE owner_entity_id = {e}");

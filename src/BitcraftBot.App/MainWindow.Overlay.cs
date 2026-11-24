@@ -45,21 +45,21 @@ public partial class MainWindow
         var state = _serverReader?.State ?? ReaderState.Deconnecte;
         var (server, serverColor) = state switch
         {
-            ReaderState.Connecte => ("● Bot connecté au serveur (lecture)", OnBrush),
-            ReaderState.Connexion => ("◌ Bot : connexion au serveur…", WaitBrush),
-            _ => ("○ Bot pas connecté au serveur", OffBrush),
+            ReaderState.Connecte => ("● Serveur", OnBrush),
+            ReaderState.Connexion => ("◌ Serveur", WaitBrush),
+            _ => ("○ Serveur", OffBrush),
         };
         var (screen, screenColor) = _safety.IsRunning
-            ? (_gameVisible ? ("● Lecture de l'écran en cours", OnBrush) : ("◌ Lecture de l'écran en pause (jeu caché)", WaitBrush))
-            : ("○ Lecture de l'écran arrêtée", OffBrush);
+            ? (_gameVisible ? ("● Écran", OnBrush) : ("◌ Écran", WaitBrush))
+            : ("○ Écran", OffBrush);
         _overlay.Show(server, serverColor, screen, screenColor);
         // Toujours affiché (demande de Julien, v0.3.16) : repas automatique activé ou non.
-        _overlay.ShowMeal(_settings.AutoEatEnabled ? MealOverlayText : "○ Repas auto : désactivé", _settings.AutoEatEnabled ? _mealOverlayBrush : OffBrush);
+        _overlay.ShowMeal(_settings.AutoEatEnabled ? "● Repas" : "○ Repas", _settings.AutoEatEnabled ? _mealOverlayBrush : OffBrush);
         if (!_overlay.IsVisible)
         {
             _overlay.Show();
         }
-        _overlay.PlaceAt(game!.ClientArea.X, game.ClientArea.Y);
+        _overlay.PlaceBottomCenter(game!.ClientArea.X, game.ClientArea.Y, game.ClientArea.Width, game.ClientArea.Height);
     }
 
     private void CloseOverlay()

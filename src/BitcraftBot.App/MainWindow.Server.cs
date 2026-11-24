@@ -28,7 +28,7 @@ public partial class MainWindow
     private void InitServerTab()
     {
         ServerEmailBox.Text = _settings.ServerEmail;
-        ServerRegionBox.Text = _settings.ServerRegion.ToString();
+        ServerRegionBox.Text = "18"; // v0.4.13 : toujours la région R18 (Keldan), réglage retiré de l'écran
         _gameData.Loaded += store => Dispatcher.BeginInvoke(() =>
             _resourceLabels = store.Resources.GroupBy(r => r.Id)
                 .ToDictionary(g => g.Key, g => new ResourceLabel(g.First().Name, g.First().Tier, g.First().Tag, g.First().MaxHealth)));

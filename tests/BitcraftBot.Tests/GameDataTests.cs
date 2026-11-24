@@ -39,6 +39,7 @@ public class GameDataTests
             ["combat_action_desc"] = "[]",
             ["traveler_task_desc"] = "[]",
             ["npc_desc"] = "[]",
+            ["item_conversion_recipe_desc"] = "[]",
         };
     }
 

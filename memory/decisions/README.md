@@ -66,6 +66,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-060](D-060-v049-chat-langue-style-correction-bots-fichiers.md) | v0.4.9 : langue du message, style relâché, faute corrigée « *mot », autres bots ignorés, phrases modifiables dans « phrases-chat » | Validée | 2026-11-24 |
 | [D-061](D-061-v0410-chat-plafonds-pause-amis-infos-onglet.md) | v0.4.10 : plafonds, pause quand Julien écrit, amis et liste noire, ton selon canal et heure, infos du jeu, onglet CHAT | Validée |
 | [D-062](D-062-v0412-recettes-simples-voyageurs-listes.md) | v0.4.12 : recettes simples sans paquets, plan d'actions, voyageurs en trois listes, interrupteurs | Validée |
+| [D-063](D-063-v0413-ecran-epure-recettes-images-claims.md) | v0.4.13 : écrans épurés, arbre de recettes en rectangles, images en local, overlay déplacé, colonies lues | Validée |
 
 ## Gabarit
 

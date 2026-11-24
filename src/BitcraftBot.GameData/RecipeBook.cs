@@ -215,6 +215,27 @@ public sealed class RecipeBook
                 0, Dbl(e, "time_requirement"), Dbl(e, "stamina_requirement"),
                 Array(e, "required_knowledges").Any(), false, Bool(e, "allow_use_hands")));
         }
+        // Conversions d'objets (v0.4.13) : un objet transformé en un autre (« Fill Bucket Of Water »…). Les lignes
+        // « Resolve Item » (l'objet se transforme en lui-même) ne sont pas de vraies recettes.
+        if (File.Exists(Path.Combine(folder, "item_conversion_recipe_desc.json")))
+        {
+            foreach (var e in Read(folder, "item_conversion_recipe_desc"))
+            {
+                if (!e.TryGetProperty("output_item", out var o) || o.ValueKind != JsonValueKind.Object)
+                {
+                    continue;
+                }
+                var output = Stack(o);
+                var inputs = Array(e, "input_items").Select(s => Stack(s)).ToList();
+                if (output.Quantity <= 0 || inputs.Count == 0 || inputs.Any(i => i.Key == output.Key) || Str(e, "name").StartsWith("Resolve Item", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                var context = Str(e, "string_context");
+                recipes.Add(new Recipe("Fabrication", Str(e, "name"), context.Length > 0 ? context : "conversion", [], [], inputs, [output],
+                    0, Dbl(e, "time_cost"), Dbl(e, "stamina_cost"), false, false, Bool(e, "allow_use_hands")));
+            }
+        }
         return new RecipeBook { Entries = entries, Recipes = recipes };
     }
 

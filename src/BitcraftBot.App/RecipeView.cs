@@ -60,12 +60,24 @@ public sealed class RecipeView
         else
         {
             // La plus simple en premier, puis l'arborescence et le plan d'actions pour la quantité voulue.
-            panel.Children.Add(Section("COMMENT L'OBTENIR (la plus simple)"));
-            panel.Children.Add(FlowCard(producing[0], key, 1));
-
+            // Toute l'arborescence en petits rectangles : [ingrédients…] → [atelier ou ressource] → [objet], jusqu'aux ressources de base.
             var tree = RecipePlanner.Tree(_book, key, quantity);
-            panel.Children.Add(Section($"ARBORESCENCE POUR {quantity} × {_book.NameOf(key).ToUpperInvariant()}"));
-            panel.Children.Add(TreeView(tree, 0));
+            panel.Children.Add(Section($"COMMENT L'OBTENIR {quantity} × {_book.NameOf(key).ToUpperInvariant()} (la façon la plus simple, jusqu'aux ressources de base)"));
+            panel.Children.Add(new Border
+            {
+                Background = CardBrush,
+                BorderBrush = TileBorder,
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(12, 8, 12, 10),
+                Margin = new Thickness(0, 5, 0, 5),
+                Child = new ScrollViewer
+                {
+                    Content = FlowTree(tree, 0),
+                    HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                },
+            });
 
             var steps = RecipePlanner.Steps(_book, key, quantity);
             panel.Children.Add(Section($"PLAN D'ACTIONS ({steps.Count} étape{(steps.Count > 1 ? "s" : "")}, dans l'ordre : coche ce qui est fait)"));
@@ -116,7 +128,35 @@ public sealed class RecipeView
         return panel;
     }
 
-    // Arborescence : chaque ligne = « quantité × objet » et d'où il vient ; ses ingrédients dessous, décalés.
+    // Arborescence en rectangles : les ingrédients (chacun avec sa propre arborescence) à gauche, puis la boîte
+    // « atelier ou ressource », puis l'objet obtenu. Un objet sans source connue reste une simple tuile marquée.
+    private UIElement FlowTree(PlanNode node, int depth)
+    {
+        var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 3, 0, 3) };
+        var tile = Tile(new EntryAmount(node.Key, node.Quantity), wanted: depth == 0, small: false);
+        if (node.Recipe is null)
+        {
+            row.Children.Add(tile);
+            row.Children.Add(Text("source inconnue", 11, WarnBrush));
+            return row;
+        }
+        if (node.Children.Count > 0)
+        {
+            var inputs = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+            foreach (var child in node.Children)
+            {
+                inputs.Children.Add(FlowTree(child, depth + 1));
+            }
+            row.Children.Add(inputs);
+            row.Children.Add(Arrow());
+        }
+        row.Children.Add(Station(node.Recipe, node.Crafts));
+        row.Children.Add(Arrow());
+        row.Children.Add(tile);
+        return row;
+    }
+
+    // Ancienne arborescence en lignes (gardée pour mémoire, plus affichée depuis la v0.4.13).
     private UIElement TreeView(PlanNode node, int depth)
     {
         var box = new StackPanel { Margin = new Thickness(depth == 0 ? 0 : 22, 0, 0, 0) };
@@ -265,7 +305,7 @@ public sealed class RecipeView
     }
 
     // Boîte du milieu : où (atelier ou ressource), avec quel métier, quel outil, combien de temps.
-    private static Border Station(Recipe r)
+    private static Border Station(Recipe r, int crafts = 0)
     {
         var harvest = r.Kind == "Récolte";
         var box = new StackPanel();
@@ -284,6 +324,10 @@ public sealed class RecipeView
         if (r.StaminaPerAction > 0)
         {
             box.Children.Add(Line("Endurance", $"{r.StaminaPerAction:0.##} par {(r.Actions > 0 ? "action" : "coup")}"));
+        }
+        if (crafts > 1)
+        {
+            box.Children.Add(Line(harvest ? "Coups" : "Fois", crafts.ToString()));
         }
         if (r.NeedsKnowledge)
         {

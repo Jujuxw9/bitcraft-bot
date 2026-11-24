@@ -30,6 +30,7 @@
 | [24](2026-11-24-session-24-chatbot-v0410.md) | 2026-11-24 | Claude Code (session chatbot) | v0.4.10 : plafonds, pause, amis et liste noire, ton selon canal et heure, infos du jeu, onglet CHAT ; messages privés reportés (D-061) |
 | [25](2026-11-24-session-25-taches-voyageurs.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.11 : onglet Voyageurs (tâches comparées au stock), onglets PERSONNAGE et CARTE réparés |
 | [26](2026-11-24-session-26-taches-v0412.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.12 : recettes simples et plan d'actions, voyageurs en trois listes, listes triables, interrupteurs, Paramètres compactés ; D-062 |
+| [27](2026-11-24-session-27-taches-v0413.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.13 : écrans épurés, arbre de recettes en rectangles, toutes les images en local, overlay au-dessus de la barre d'action, colonies lues ; D-063 |
 
 Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 

@@ -54,6 +54,10 @@ Vie, endurance, faim et jauge de métier ne sont **plus lues à l'écran** depui
 
 ## Tâches de voyageur (v0.4.11, session tâches, 2026-11-24)
 
-- **`traveler_task_state`** (publique, lue par `SELECT * FROM traveler_task_state WHERE player_entity_id = <personnage>`) : `entity_id`, `player_entity_id`, `traveler_id` (= `npc_desc.npc_type`), `task_id` (= `traveler_task_desc.id`), `completed`. Format tiré du code serveur (`messages/components.rs`) ; **format réel À vérifier** : un extrait brut est écrit au journal à chaque connexion (« Exemple brut de traveler_task_state »).
+- **`traveler_task_state`** (publique, lue par `SELECT * FROM traveler_task_state WHERE player_entity_id = <personnage>`) : `entity_id`, `player_entity_id`, `traveler_id` (= `npc_desc.npc_type`), `task_id` (= `traveler_task_desc.id`), `completed`. Format tiré du code serveur (`messages/components.rs`) ; **format réel vérifié le 2026-11-24** (24 lignes reçues, `{entity_id, player_entity_id, traveler_id, task_id, completed}`).
 - **`traveler_task_desc`** et **`npc_desc`** : données fixes, prises dans BitCraft_GameData (D-033) et **vérifiées** le 2026-11-24 (321 tâches, 7 voyageurs). `required_items` : liste `{item_id, quantity, item_type "Item"/"Cargo", durability}`.
 - Rendu d'une tâche (code serveur `player_complete_task`) : les objets sont pris **dans le sac seulement** (inventaire n° 0 du personnage), pas dans la ceinture ni les banques ; il faut être à 8 cases du voyageur. Une tâche rendue passe à `completed = true`, puis le serveur la remplace par une nouvelle s'il en trouve une.
+
+## Colonies (v0.4.13)
+
+- `claim_state` (nom, propriétaire, neutre) et `claim_local_state` (nombre de cases, réserves, `location` en option) : lues sans filtre de zone, **format réel À vérifier** au prochain journal (« Exemple brut de claim_state / claim_local_state »).

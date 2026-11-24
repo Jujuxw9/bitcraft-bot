@@ -5,6 +5,7 @@ Principe (D-039) : le bot **lit** l'état du jeu sur le serveur, **agit** au cla
 - [constats.md](constats.md) — ce qui est vérifié sur la connexion, le jeton, les tables
 - [analyse-visee-2026-11-22.md](analyse-visee-2026-11-22.md) — **après l'essai R1** : pourquoi la formule ne marche pas, méthode fiable « viser, vérifier, cliquer, vérifier », prochaines étapes
 - [architecture-serveur.md](architecture-serveur.md) — brique Server, versions v0.3.5 à v0.4.3 (R1 : caméra, section 34 ; ce que voit le bot, section 35 ; réglages du jeu, section 36 ; direction de la caméra et fenêtres, section 37)
+- [architecture-serveur-suite.md](architecture-serveur-suite.md) — suite : sections 40 à 42 (v0.4.11 à v0.4.13 : onglet Voyageurs, recettes simples et plan d'actions, écrans épurés, arbre en rectangles, images, overlay, colonies).
 
 ## Schéma
 

@@ -32,8 +32,8 @@ public partial class MainWindow
         // Étroit : l'onglet défile, avec une hauteur minimale pour que rien ne se chevauche.
         BotScroll.VerticalScrollBarVisibility = narrow ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
         BotGrid.MinHeight = narrow ? 1050 : 0;
-        // Personnage : « En direct » et « Bonus » côte à côte, ou l'un sous l'autre.
-        Stack(PersoGrid, PersoLive, PersoFilter, PersoBag, narrow, 360);
+        // Image du jeu (v0.4.13) : un quart de la fenêtre (la moitié en largeur et en hauteur), en bas à gauche.
+        GameImageCard.Width = Math.Max(260, Math.Min(width * 0.5, width - (narrow ? 40 : 340)));
         // Carte : carte et tableau côte à côte, ou l'un sous l'autre.
         Stack2(MapGrid, MapCard, MapList, narrow, GridLength.Auto);
         // Paramètres : journal à droite, ou sous les réglages.

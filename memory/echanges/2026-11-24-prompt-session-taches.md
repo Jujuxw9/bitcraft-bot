@@ -14,7 +14,7 @@ Session Claude Code lancée **par Julien**, sur **Sonnet 5.5, effort moyen**. Ju
 - Priorité 2 : **corriger des bugs dans l'onglet Recettes** (v0.4.6). Julien donnera la liste des bugs dans le chat : **la lui demander avant de coder**.
 - Ensuite : d'autres tâches, données au fil de l'eau. Chaque tâche = un livrable testé, puis on attend la suivante.
 - Rappel : cette discussion est notée ici ; la mettre à jour dans ce fichier si le cadre change.
-- **État (2026-11-24, session 25)** : tâche 1 livrée en v0.4.11 (essai réel à faire par Julien). Suite : tâche 2 (demander la liste des bugs).
+- **État (2026-11-24, session 27)** : tâche 1 livrée (v0.4.11 à 0.4.13), retours de Julien appliqués (D-062, D-063). Suite : retour d'essai de la v0.4.13. Reprise : `reprise-apres-compact.md`.
 
 ## Économie de quota (priorité)
 

@@ -40,6 +40,8 @@ public sealed class GameDataStore
         // Onglet Voyageurs (v0.4.11) : tâches de voyageur et noms des voyageurs.
         "traveler_task_desc",
         "npc_desc",
+        // Recettes (v0.4.13) : conversions d'objets (ex. remplir un seau), pour réduire les objets sans source connue.
+        "item_conversion_recipe_desc",
     ];
 
     public required IReadOnlyList<ResourceInfo> Resources { get; init; }

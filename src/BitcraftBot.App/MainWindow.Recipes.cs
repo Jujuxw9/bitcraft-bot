@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -43,6 +44,7 @@ public partial class MainWindow
                     _log.Info("Données", $"Recettes chargées : {book.Entries.Count} objets et cargaisons, {book.Recipes.Count} recettes (fabrication et récolte).");
                     RecipeSearchInfo.Text = $"{book.Entries.Count} objets";
                     RunRecipeSearch();
+                    StartIconDownload(book);
                 });
             }
             catch (Exception ex)
@@ -52,6 +54,42 @@ public partial class MainWindow
             finally
             {
                 _recipesLoading = false;
+            }
+        });
+    }
+
+    // Téléchargement complet des images, une seule fois (v0.4.13, demande de Julien : tout avoir en local).
+    // Fait en tâche de fond, 4 à la fois ; le marqueur « tout-telecharge.txt » évite de le refaire (le supprimer pour le refaire).
+    private bool _iconDownloadStarted;
+
+    private void StartIconDownload(RecipeBook book)
+    {
+        if (_iconDownloadStarted || File.Exists(ItemIcons.DoneMarker))
+        {
+            return;
+        }
+        _iconDownloadStarted = true;
+        var icons = book.Entries.Values.Select(e => e.Icon).Where(i => i.Length > 0).ToList();
+        _log.Info("Images", $"Téléchargement de toutes les images du jeu (une seule fois) : {icons.Count} à vérifier, dans {ItemIcons.Folder}.");
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var (done, missing, errors) = await _icons.DownloadAllAsync(icons, (n, total) => _log.Info("Images", $"Images : {n} / {total} vérifiées."), CancellationToken.None);
+                _log.Info("Images", $"Images terminées : {done} vérifiées, {missing} introuvables sur le site (notées dans introuvables.txt), {errors} erreurs réseau.");
+                if (errors == 0)
+                {
+                    Directory.CreateDirectory(ItemIcons.Folder);
+                    File.WriteAllText(ItemIcons.DoneMarker, $"Terminé le {DateTime.Now:yyyy-MM-dd HH:mm}, {done} vérifiées, {missing} introuvables.");
+                }
+                else
+                {
+                    _log.Alerte("Images", "Quelques images n'ont pas pu être téléchargées (réseau) : nouvel essai au prochain lancement.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _log.Erreur("Images", $"Téléchargement des images interrompu : {ex.Message}");
             }
         });
     }
