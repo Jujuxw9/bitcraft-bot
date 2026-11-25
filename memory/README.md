@@ -24,6 +24,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 | `echanges/` | Détail des conversations + résumé global à jour |
 | `technique/` | Architecture, analyses de code, sources |
 | `tests/` | Comptes rendus de tests (`T-AAAAMMJJ-NN`) |
+| `taches-planifiees/` | Tâches planifiées (sessions lancées seules) : règles, prompts, état (D-067) |
 
 ## Liste des fichiers
 
@@ -88,6 +89,11 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [analyse-captures-2026-11-16.md](technique/analyse-captures-2026-11-16.md) — analyse des captures (lots 1 à 4)
 - [interface-du-jeu.md](technique/interface-du-jeu.md) — fenêtres internes du jeu (déplaçables, superposées)
 - [analyse-lot5-2026-11-16.md](technique/analyse-lot5-2026-11-16.md) — journaux v0.2.2, patch 1.0, lot 5 et vidéos
+
+### taches-planifiees/
+- [README.md](taches-planifiees/README.md) — **règles communes** des tâches planifiées, heures, prompts
+- [etat.md](taches-planifiees/etat.md) — état de chaque tâche (démarrée, finie, questions pour Julien)
+- [T-01-v0416-archive-chat.md](taches-planifiees/T-01-v0416-archive-chat.md), [T-02-v0417-capacites.md](taches-planifiees/T-02-v0417-capacites.md), [T-03-v0418-carte.md](taches-planifiees/T-03-v0418-carte.md) — prompts des trois tâches
 
 ### tests/
 - [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-02)
