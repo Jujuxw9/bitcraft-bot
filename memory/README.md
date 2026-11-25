@@ -93,7 +93,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 ### taches-planifiees/
 - [README.md](taches-planifiees/README.md) — **règles communes** des tâches planifiées, heures, prompts
 - [etat.md](taches-planifiees/etat.md) — état de chaque tâche (démarrée, finie, questions pour Julien)
-- [T-01-v0416-archive-chat.md](taches-planifiees/T-01-v0416-archive-chat.md), [T-02-v0417-capacites.md](taches-planifiees/T-02-v0417-capacites.md), [T-03-v0418-carte.md](taches-planifiees/T-03-v0418-carte.md) — prompts des trois tâches
+- [T-01-v0416-archive-chat.md](taches-planifiees/T-01-v0416-archive-chat.md), [T-02-v0417-capacites.md](taches-planifiees/T-02-v0417-capacites.md), [T-03-v0418-carte.md](taches-planifiees/T-03-v0418-carte.md), [T-04-verification-memoire.md](taches-planifiees/T-04-verification-memoire.md) — prompts des quatre tâches (T-04 : vérification de la mémoire en lecture seule)
 
 ### tests/
 - [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-02)
