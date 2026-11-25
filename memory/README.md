@@ -70,6 +70,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-23-passation-v047.md](echanges/2026-11-23-passation-v047.md) — **passation** après la v0.4.7 (chat dans 4 canaux par les commandes du jeu ; prochaines étapes).
 - [2026-11-23-prompt-chatbot.md](echanges/2026-11-23-prompt-chatbot.md) — **prompt** de la session chatbot (module « @GPT », en parallèle de la session principale : zone de fichiers, versions, règles).
 - [2026-11-25-prompt-reprise-opus.md](echanges/2026-11-25-prompt-reprise-opus.md) — **prompt** de reprise pour une session Opus 5.5 : analyser les journaux de la v0.4.10, faire le bilan, puis demander les nouvelles fonctionnalités.
+- [2026-11-25-demandes-julien-session-28.md](echanges/2026-11-25-demandes-julien-session-28.md) — **demandes de Julien** du 25/11 (fenêtre du bot, capacités, archive du chat, site des recettes), bilan des journaux et plan en 4 lots (en attente du go).
 - [2026-11-24-prompt-session-taches.md](echanges/2026-11-24-prompt-session-taches.md) — **prompt** de la session « tâches » (Sonnet, quota réduit : onglet Voyageurs, bugs Recettes, tâches au fil de l'eau).
 - [2026-11-24-reprise-apres-compact.md](echanges/2026-11-24-reprise-apres-compact.md) — phrase de reprise après le /compact de la session « tâches » et état de la v0.4.13.
 
