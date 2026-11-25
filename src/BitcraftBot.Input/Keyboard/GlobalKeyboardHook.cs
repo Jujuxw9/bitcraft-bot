@@ -11,6 +11,8 @@ public sealed class GlobalKeyboardHook : IDisposable
     private const int WH_KEYBOARD_LL = 13;
     private const int WM_KEYDOWN = 0x0100;
     private const int WM_SYSKEYDOWN = 0x0104;
+    private const int WM_KEYUP = 0x0101;
+    private const int WM_SYSKEYUP = 0x0105;
     private const uint LLKHF_EXTENDED = 0x01;
     private const uint LLKHF_INJECTED = 0x10;
 
@@ -42,6 +44,9 @@ public sealed class GlobalKeyboardHook : IDisposable
     private readonly LowLevelKeyboardProc _callback;
     private IntPtr _hook;
 
+    // v0.4.14 : seul le premier appui d'une touche tenue est signalé (voir KeyRepeatFilter).
+    private readonly KeyRepeatFilter _repeat = new();
+
     // Touche enfoncée : scancode, touche étendue, touche simulée par un programme.
     public event Action<int, bool, bool>? KeyDown;
 
@@ -58,10 +63,19 @@ public sealed class GlobalKeyboardHook : IDisposable
 
     private IntPtr OnHook(int nCode, IntPtr wParam, IntPtr lParam)
     {
-        if (nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN))
+        if (nCode >= 0 && (wParam == WM_KEYUP || wParam == WM_SYSKEYUP))
+        {
+            var up = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
+            _repeat.Release(up.scanCode, (up.flags & LLKHF_EXTENDED) != 0);
+        }
+        else if (nCode >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN))
         {
             var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
             var extended = (data.flags & LLKHF_EXTENDED) != 0;
+            if (!_repeat.IsFirstPress(data.scanCode, extended, Environment.TickCount64))
+            {
+                return CallNextHookEx(_hook, nCode, wParam, lParam);
+            }
             var injected = (data.flags & LLKHF_INJECTED) != 0;
             try
             {

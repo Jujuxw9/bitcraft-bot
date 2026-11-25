@@ -49,12 +49,12 @@ public partial class MainWindow
         {
             var progress = action.Progress(nowUtc);
             DashActionText.Text = $"{action.French} · {progress:P0}";
-            DashActionBar.Value = progress;
+            DashActionBar.Smooth(progress);
         }
         else
         {
             DashActionText.Text = s.Walking == true ? "En marche" : "Aucune action";
-            DashActionBar.Value = 0;
+            DashActionBar.Smooth(0);
         }
         var skillNames = _gameData.Current?.Skills;
         string SkillName(int id) => skillNames?.GetValueOrDefault(id) ?? $"métier {id}";
@@ -64,12 +64,12 @@ public partial class MainWindow
         if (activeSkill is not null)
         {
             DashSkillText.Text = $"{SkillName(activeSkill.SkillId)} niv. {activeSkill.Level} · {activeSkill.Progress:P0}";
-            DashSkillBar.Value = activeSkill.Progress;
+            DashSkillBar.Smooth(activeSkill.Progress);
         }
         else
         {
             DashSkillText.Text = "Métier : —";
-            DashSkillBar.Value = 0;
+            DashSkillBar.Smooth(0);
         }
         var hit = s.LastExtract is { } extract ? s.Resources.FirstOrDefault(r => r.EntityId == extract.Target) : null;
         DashHitText.Text = hit is not null
@@ -82,12 +82,12 @@ public partial class MainWindow
         {
             var full = sac.Stacks.Count >= sac.PocketCount;
             DashSacText.Text = $"Sac {sac.Stacks.Count} / {sac.PocketCount}{(full ? " · PLEIN" : "")}";
-            DashSacBar.Value = sac.Stacks.Count / (double)sac.PocketCount;
+            DashSacBar.Smooth(sac.Stacks.Count / (double)sac.PocketCount);
         }
         else
         {
             DashSacText.Text = "Sac —";
-            DashSacBar.Value = 0;
+            DashSacBar.Smooth(0);
         }
         DashPositionText.Text = s.Position is { } p ? $"{p.ScreenText} · {s.RegionName ?? "?"}" : "Position —";
         var best = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
@@ -109,11 +109,11 @@ public partial class MainWindow
         if (value is not { } v)
         {
             text.Text = $"{label} —";
-            bar.Value = 0;
+            bar.Smooth(0);
             return;
         }
         var m = max is > 0 ? max.Value : 100;
         text.Text = $"{label} {v:0} / {m:0}";
-        bar.Value = Math.Clamp(v / m, 0, 1);
+        bar.Smooth(Math.Clamp(v / m, 0, 1));
     }
 }

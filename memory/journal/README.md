@@ -48,3 +48,4 @@ Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 ## Questions ouvertes créées (liens Q-NNN)
 ## Prochaines étapes
 ```
+| [28](2026-11-25-session-28-opus-v0414.md) | 2026-11-25 | Claude Code (Opus 5.5) | Bilan des journaux, plan en 4 lots (D-064), v0.4.14 : fenêtre du bot (D-065) |

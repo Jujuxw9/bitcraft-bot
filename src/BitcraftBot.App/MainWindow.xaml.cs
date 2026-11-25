@@ -141,12 +141,13 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.13 : écran BOT épuré (bonus actifs en pastilles avec logos, image du jeu réduite en bas à gauche, cartes et textes d'état retirés, interrupteurs) ; onglet CHAT masqué ; PERSONNAGE : « En direct » retiré, listes remontées ; PARAMÈTRES : région R18 fixe, système et seuils masqués ; RECETTES : arborescence complète en rectangles, conversions d'objets lues, toutes les images téléchargées une fois (introuvables notées) ; overlay en pastille au-dessus de la barre d'action ; colonies (claims) lues pour préparer la ville.");
+        _log.Info("Session", "Version 0.4.14 : barres animées en douceur ; PERSONNAGE : colonne « Où » retirée (lieux des banques au survol), flèches de tri visibles, colonne Objet ajustée ; curseur main seulement sur ce qui se clique ; CARTE : filtre par palier ; PARAMÈTRES refait (connexion en grand, caméra, petites cartes à interrupteurs, compte replié) ; overlay collé en bas au centre ; touche tenue (W) notée une seule fois.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
         InitScreenWatch(_ocr);
         InitOverlay();
+        InitInventoryColumns();
         InitMeals();
         InitGpt();
         InitLayout();

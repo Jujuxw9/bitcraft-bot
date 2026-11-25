@@ -84,3 +84,4 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 ## Conséquences
 ```
 | [D-064](D-064-plan-lots-v0414-v0416-site-recettes.md) | Plan : v0.4.14 fenêtre, v0.4.15 archive du chat, v0.4.16 capacités ; overlay sans touche ; site des recettes sur Unraid, même dépôt | Validée | 2026-11-25 |
+| [D-065](D-065-v0414-fenetre-barres-parametres-overlay.md) | v0.4.14 : barres animées, PERSONNAGE (Où au survol), curseur main, filtre par palier, PARAMÈTRES refait, overlay en bas, touche tenue | Validée | 2026-11-25 |

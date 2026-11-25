@@ -29,7 +29,6 @@ public partial class MainWindow
         ["Quantité"] = nameof(InventoryRow.Quantity),
         ["Type"] = nameof(InventoryRow.Kind),
         ["Palier"] = nameof(InventoryRow.TierSort),
-        ["Où"] = nameof(InventoryRow.Where),
     };
 
     // Appelé par la minuterie de l'onglet (toutes les 500 ms) ; les listes sont refaites au plus toutes les 2 s, et seulement si elles ont changé.
@@ -67,6 +66,39 @@ public partial class MainWindow
         FillInventoryList();
     }
 
+    // v0.4.14 : la colonne « Objet » prend toute la largeur libre ; les autres gardent une largeur fixe, assez large
+    // pour la flèche de tri (Julien : flèches cachées sur Palier et Quantité, à moitié sur Type).
+    private void InitInventoryColumns()
+    {
+        foreach (var list in new[] { BagList, BeltList, BankList })
+        {
+            list.SizeChanged += (_, _) => FitNameColumn(list);
+            // Titres de colonne cliquables (tri) : curseur main dessus, et seulement dessus.
+            if (list.View is GridView view)
+            {
+                view.ColumnHeaderContainerStyle = new Style(typeof(GridViewColumnHeader), (Style)FindResource(typeof(GridViewColumnHeader)))
+                {
+                    Setters = { new Setter(CursorProperty, System.Windows.Input.Cursors.Hand) },
+                };
+            }
+        }
+        // Lieu des banques au survol d'une ligne (la colonne « Où » est retirée).
+        BankList.ItemContainerStyle = new Style(typeof(ListViewItem), (Style)FindResource(typeof(ListViewItem)))
+        {
+            Setters = { new Setter(ToolTipProperty, new System.Windows.Data.Binding(nameof(InventoryRow.Where))) },
+        };
+    }
+
+    private static void FitNameColumn(ListView list)
+    {
+        if (list.View is not GridView { Columns.Count: > 1 } view)
+        {
+            return;
+        }
+        var others = view.Columns.Skip(1).Sum(c => c.Width);
+        view.Columns[0].Width = Math.Max(110, list.ActualWidth - others - 14);
+    }
+
     private void InventorySearchBox_TextChanged(object sender, TextChangedEventArgs e) => FillInventoryList();
 
     // Les trois listes : sac, ceinture d'outils, et tout le reste (banques, coffres).
@@ -86,7 +118,13 @@ public partial class MainWindow
             .ToList();
         Show(BagList, BagTitle, "SAC", rows.Where(r => r.Where == "Sac"));
         Show(BeltList, BeltTitle, "CEINTURE D'OUTILS", rows.Where(r => r.Where == "Ceinture d'outils"));
-        Show(BankList, BankTitle, "BANQUES", rows.Where(r => r.Where != "Sac" && r.Where != "Ceinture d'outils"));
+        // Banques : un objet présent dans plusieurs banques = une seule ligne (total) ; les lieux sont au survol.
+        var banks = rows
+            .Where(r => r.Where != "Sac" && r.Where != "Ceinture d'outils")
+            .GroupBy(r => (r.Name, r.Kind, r.TierSort, r.TierText))
+            .Select(g => new InventoryRow(g.Key.Name, g.Sum(r => r.Quantity), g.Key.Kind, g.Key.TierSort, g.Key.TierText,
+                string.Join(Environment.NewLine, g.OrderByDescending(r => r.Quantity).Select(r => $"{r.Where} : {r.Quantity:N0}"))));
+        Show(BankList, BankTitle, "BANQUES", banks);
     }
 
     private void Show(ListView list, TextBlock title, string name, IEnumerable<InventoryRow> rows)

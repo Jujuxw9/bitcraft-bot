@@ -316,11 +316,10 @@
         <Setter Property="Foreground" Value="{StaticResource Muted}" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TabItem">
-                    <Grid Background="Transparent">
+                    <Grid Background="Transparent" Cursor="Hand">
                         <ContentPresenter ContentSource="Header" Margin="16,12,16,10" HorizontalAlignment="Center" />
                         <Border x:Name="Line" Height="3" VerticalAlignment="Bottom" Background="{StaticResource Gold}" Visibility="Hidden" CornerRadius="1.5" Margin="10,0" />
                     </Grid>

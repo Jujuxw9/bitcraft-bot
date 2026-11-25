@@ -6,8 +6,9 @@ using System.Windows.Media;
 
 namespace BitcraftBot.App;
 
-// Petite pastille posée sur l'écran du jeu, en bas au centre, juste au-dessus de la barre d'action (v0.4.13, demande de Julien) :
-// trois voyants (serveur, écran, repas auto), sans texte long. Plus haut elle cachait des informations du jeu.
+// Petite pastille posée sur l'écran du jeu, collée au bord bas, au centre, par-dessus la barre d'action
+// (v0.4.14, demande de Julien : « comme la barre des tâches Windows ») : trois voyants (serveur, écran, repas auto).
+// Plus de touche pour la masquer : seulement l'interrupteur « Overlay sur le jeu » (Paramètres, D-064).
 // Ce n'est pas une modification du jeu : c'est une fenêtre à part, au-dessus, qui :
 // - laisse passer les clics et ne prend jamais le clavier (le jeu reste la fenêtre active) ;
 // - est exclue des captures d'écran (le bot ne la lit pas, elle n'apparaît pas dans les images).
@@ -46,8 +47,8 @@ public sealed class OverlayWindow : Window
         {
             Background = new SolidColorBrush(Color.FromArgb(190, 11, 24, 40)),
             BorderBrush = new SolidColorBrush(Color.FromArgb(200, 210, 182, 93)),
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(13),
+            CornerRadius = new CornerRadius(10, 10, 0, 0),
+            BorderThickness = new Thickness(1, 1, 1, 0),
             Padding = new Thickness(14, 4, 14, 5),
             Child = new StackPanel { Orientation = Orientation.Horizontal, Children = { _server, _screen, _meal } },
         };
@@ -80,11 +81,10 @@ public sealed class OverlayWindow : Window
         _meal.Foreground = color;
     }
 
-    // Place la pastille en bas au centre de la zone du jeu, juste au-dessus de la barre d'action et du panneau de cible
-    // (environ 76 % de la hauteur), pour ne cacher ni la vie, ni l'endurance, ni les icônes de la barre (zone en pixels écran).
+    // Place la pastille au centre du bord bas de la zone du jeu (zone en pixels écran), collée au bord.
     public void PlaceBottomCenter(int areaX, int areaY, int areaWidth, int areaHeight)
     {
-        _anchor = (areaX + areaWidth / 2, areaY + (int)(areaHeight * 0.76));
+        _anchor = (areaX + areaWidth / 2, areaY + areaHeight);
         Replace();
     }
 

@@ -15,6 +15,11 @@ public partial class MainWindow
     private readonly ObservableCollection<ResourceRow> _resourceRows = [];
     private readonly Dictionary<string, CheckBox> _familyChecks = [];
     private readonly HashSet<string> _shownFamilies = [ResourceFamilies.Trees];
+    // v0.4.14 (demande de Julien) : filtre par palier, pour trouver les ressources d'un palier donné autour de soi.
+    // Paliers masqués (vide = tous affichés) ; une case par palier présent dans la zone lue, avec le nombre.
+    private readonly HashSet<int> _hiddenTiers = [];
+    private readonly Dictionary<int, CheckBox> _tierChecks = [];
+    private const int UnknownTier = -1;
     private readonly ScreenTargetMatcher _targetMatcher = new();
     private TargetReading? _lastHudTarget;
     private DateTime _lastHudTargetAt;
@@ -72,6 +77,44 @@ public partial class MainWindow
         foreach (var family in ResourceFamilies.All) SetFamily(family, family == ResourceFamilies.Trees);
     }
 
+    private void TierAll_Click(object sender, RoutedEventArgs e)
+    {
+        _hiddenTiers.Clear();
+        foreach (var check in _tierChecks.Values) check.IsChecked = true;
+        _resourceRows.Clear();
+    }
+
+    private static int TierOf(NearbyResource r) => r.Tier ?? UnknownTier;
+
+    // Cases des paliers : refaites seulement quand la liste des paliers présents change ; le nombre suit les familles cochées.
+    private void ShowTierChecks(IReadOnlyList<NearbyResource> resources)
+    {
+        var counts = resources.Where(r => _shownFamilies.Contains(r.Family)).GroupBy(TierOf).ToDictionary(g => g.Key, g => g.Count());
+        var tiers = resources.Select(TierOf).Distinct().Order().ToList();
+        if (!tiers.SequenceEqual(_tierChecks.Keys.Order()))
+        {
+            _tierChecks.Clear();
+            TierChecks.Children.Clear();
+            foreach (var tier in tiers)
+            {
+                var check = new CheckBox { IsChecked = !_hiddenTiers.Contains(tier), Margin = new Thickness(0, 2, 14, 2) };
+                check.Click += (_, _) =>
+                {
+                    if (check.IsChecked == true) _hiddenTiers.Remove(tier);
+                    else _hiddenTiers.Add(tier);
+                    _resourceRows.Clear();
+                };
+                _tierChecks[tier] = check;
+                TierChecks.Children.Add(check);
+            }
+        }
+        foreach (var (tier, check) in _tierChecks)
+        {
+            check.Content = $"{(tier == UnknownTier ? "?" : $"T{tier}")} ({counts.GetValueOrDefault(tier)})";
+            check.Opacity = counts.GetValueOrDefault(tier) == 0 ? 0.5 : 1;
+        }
+    }
+
     private void SrvResourceList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_updatingRows)
@@ -101,7 +144,8 @@ public partial class MainWindow
             check.Content = $"{family} ({counts.GetValueOrDefault(family)})";
         }
 
-        bool Shown(NearbyResource r) => _shownFamilies.Contains(r.Family);
+        ShowTierChecks(s.Resources);
+        bool Shown(NearbyResource r) => _shownFamilies.Contains(r.Family) && !_hiddenTiers.Contains(TierOf(r));
         var shown = s.Resources.Where(Shown).ToList();
         SrvResourceCount.Text = $"{shown.Count} / {s.Resources.Count} ressources · {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs";
 

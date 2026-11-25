@@ -7,7 +7,6 @@ namespace BitcraftBot.App;
 // Mise en page adaptative (v0.3.18, demande de Julien) : la fenêtre se réorganise selon sa largeur.
 public partial class MainWindow
 {
-    private const double WideWidth = 1500;
     private const double MediumWidth = 1050;
 
     private void InitLayout()
@@ -38,7 +37,9 @@ public partial class MainWindow
         Stack2(MapGrid, MapCard, MapList, narrow, GridLength.Auto);
         // Paramètres : journal à droite, ou sous les réglages.
         Stack2(SettingsGrid, SettingsLeft, SettingsLog, narrow, new GridLength(1, GridUnitType.Star));
-        SettingsCards.Columns = width >= WideWidth ? 2 : 1;
+        // v0.4.14 : petites cartes (sécurité, affichage, système) sur 3 colonnes si la place le permet.
+        var settingsWidth = narrow ? width : width / 2;
+        SettingsCards.Columns = settingsWidth >= 800 ? 3 : settingsWidth >= 540 ? 2 : 1;
     }
 
     private void SideBySide(ColumnDefinition sideColumn, FrameworkElement side, FrameworkElement main, bool beside, double sideWidth)

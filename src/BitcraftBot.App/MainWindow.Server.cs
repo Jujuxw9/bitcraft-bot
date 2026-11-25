@@ -53,6 +53,8 @@ public partial class MainWindow
         {
             TokenStatusText.Text = "Pas de jeton : e-mail → code → Valider.";
             TokenStatusText.Foreground = Theme("Warn");
+            AccountPanel.Visibility = Visibility.Visible;
+            AccountToggleButton.Content = "Masquer";
             ForgetTokenButton.IsEnabled = false;
             return;
         }
@@ -63,6 +65,14 @@ public partial class MainWindow
             ? Theme("Bad")
             : Theme("Good");
         ForgetTokenButton.IsEnabled = true;
+    }
+
+    // v0.4.14 : la partie « Compte » est repliée (elle ne change plus) ; ce bouton l'ouvre ou la referme.
+    private void AccountToggleButton_Click(object sender, RoutedEventArgs e)
+    {
+        var open = AccountPanel.Visibility != Visibility.Visible;
+        AccountPanel.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+        AccountToggleButton.Content = open ? "Masquer" : "Afficher";
     }
 
     private async void RequestCodeButton_Click(object sender, RoutedEventArgs e)

@@ -282,3 +282,12 @@ Rappel : si une fenêtre (inventaire…) recouvre la jauge, elle n'est pas lue. 
 ## 17 et suivantes : brique Server (voie hybride)
 
 Déplacées dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) : brique Server, H1 (lecture du serveur), v0.3.5 à v0.3.20, puis la récolte automatique (v0.4.x, section 34 et suivantes : écoute de la souris `Input/Mouse`, formule de la caméra `Server/Aim`), et le module « @GPT » (v0.4.5, section 39 : lecture du chat Région, réponse tapée au clavier par le contrôleur d'actions, chat ouvert reconnu à l'écran).
+
+## 18. v0.4.14 : fenêtre du bot (D-065)
+
+- Barres : une petite aide d'animation (`App/BarAnimation.cs`) fait glisser chaque barre vers sa nouvelle valeur.
+- Clavier : `Input/Keyboard/KeyRepeatFilter.cs` ne laisse passer que le premier appui d'une touche tenue ; l'écoute du clavier l'utilise pour tout le bot.
+- PERSONNAGE : les banques sont regroupées par objet, les lieux sont dans l'info-bulle de la ligne ; la colonne Objet s'ajuste à la largeur.
+- CARTE : filtre par palier en plus des familles (cases recréées quand les paliers présents changent).
+- PARAMÈTRES : connexion, caméra, petites cartes (sécurité, affichage, système), compte replié.
+- Overlay : ancré au bord bas de la zone du jeu, au centre.
