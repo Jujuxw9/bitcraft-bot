@@ -50,3 +50,19 @@ Réponses de Julien (25/11 soir) :
 7. Ordre : lot 1, test ; lot 2, test ; lot 3. Une version par lot.
 
 Décision : [D-064](../decisions/D-064-plan-lots-v0414-v0416-site-recettes.md).
+
+## 5. Retours de Julien sur la v0.4.14 et nouvelles demandes (2026-11-26)
+
+Journal v0.4.14 (25/11 23:45 → 00:00, 14 min) : aucune erreur ; connexion avant le jeu respectée ; module global refusé (normal, jeu pas lancé depuis 1 h) ; 14,9 images/s avec l'image affichée ; zone de ressources relue toutes les ~10 s en marchant (21 Mo reçus en 14 min) ; « sortie d'un véhicule » au milieu d'une récolte (à vérifier) ; cône pas lu après W à 23:50:57 ; le bot a lu le texte du bureau Windows au lancement du jeu (« écran inconnu ») : à ne plus écrire dans le journal.
+
+Demandes :
+1. **Overlay** : entre les icônes en bas à gauche (chat, amis…) et la barre d'action, centré dans cet espace, en bas (capture de Julien).
+2. **CARTE** : beaucoup plus simple et « stylée » : filtres par rang (palier) faciles (pas de cases à cocher partout), catégories refaites ; meilleur visuel de la carte (zones) ; voir plus loin (charger plus de données). Julien enverra le lien du site de Bija (carte) : analyse complète à faire.
+3. **PARAMÈTRES** : ne rien changer, sauf « Jeton enregistré » déplacé dans Compte.
+4. **Démarrage automatique** : au lancement du bot, connexion au serveur automatique et lecture de l'écran (image du jeu) automatique. Plus de bouton « Se connecter » ni « Démarrer » : seulement « Se déconnecter » et « Arrêter ». Message d'erreur gardé si la connexion échoue.
+5. **Caméra** : rappeler à Julien de reprendre l'amélioration de la caméra.
+6. **VOYAGEURS** : beaucoup moins de texte ; portraits de tous les voyageurs (Rumbagh, The Twins = Ramparte et Alesi, Heimlich, Brico ; Svim marche déjà) ; pour chaque tâche, comparer au sac et à la banque et lister les **matières premières** à récupérer (le plus bas de l'arbre des recettes).
+7. **PERSONNAGE** : image à gauche de chaque objet ; petit logo à côté de « Sac », « Ceinture d'outils », « Banques » ; colonne « Palier » renommée « Tier » ; tri par défaut : sac par quantité, ceinture par ordre alphabétique, banques par quantité.
+8. **Exploration automatique** (très important) : interrupteur de mode dans BOT (Normal = repas auto, chat… / Exploration). En exploration, le bot oublie le reste et explore en spirale inversée autour de Julien pour découvrir les zones pas encore découvertes ; attention à l'escalade (F ou clic), à l'eau, aux ennemis (s'éloigner, fuir en courant si un ennemi le prend pour cible) ; zones denses en objets.
+
+Vérifié sur le serveur (copie du code officiel) : `exploration_chunks_state` (carte des zones découvertes, une case par morceau de carte), `terrain_chunk_state` (relief, niveau de l'eau), `enemy_state` et `threat_state` (ennemi qui cible quelqu'un) sont publiques. Portraits des voyageurs : seul Svim est trouvé sur le site d'images (cdn.brico.app) ; les autres sont « introuvables » sous le nom actuel : à rechercher.
