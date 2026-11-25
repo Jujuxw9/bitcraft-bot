@@ -258,6 +258,15 @@
         <!-- PERSONNAGE : en direct, bonus, sac et banques (serveur) -->
         <TabItem x:Name="CharacterTabItem" Header="PERSONNAGE">
             <Grid x:Name="PersoGrid">
+                <Grid.Resources>
+                    <!-- v0.4.15 : image de l'objet à gauche de son nom. -->
+                    <DataTemplate x:Key="ItemNameCell">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Icon}" Width="22" Height="22" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Grid.Resources>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -280,14 +289,17 @@
                     </Grid.ColumnDefinitions>
                     <Border Grid.Column="0" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock x:Name="BagTitle" DockPanel.Dock="Top" Text="SAC" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                                <Image x:Name="BagLogo" Width="26" Height="26" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <TextBlock x:Name="BagTitle" Text="SAC" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
+                            </StackPanel>
                             <ListView x:Name="BagList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Objet" Width="160" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Objet" Width="160" CellTemplate="{StaticResource ItemNameCell}" />
                                         <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
                                         <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
-                                        <GridViewColumn Header="Palier" Width="76" DisplayMemberBinding="{Binding TierText}" />
+                                        <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -295,14 +307,17 @@
                     </Border>
                     <Border Grid.Column="1" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock x:Name="BeltTitle" DockPanel.Dock="Top" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                                <Image x:Name="BeltLogo" Width="26" Height="26" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <TextBlock x:Name="BeltTitle" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
+                            </StackPanel>
                             <ListView x:Name="BeltList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Objet" Width="160" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Objet" Width="160" CellTemplate="{StaticResource ItemNameCell}" />
                                         <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
                                         <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
-                                        <GridViewColumn Header="Palier" Width="76" DisplayMemberBinding="{Binding TierText}" />
+                                        <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -310,14 +325,17 @@
                     </Border>
                     <Border Grid.Column="2" Style="{StaticResource Card}">
                         <DockPanel>
-                            <TextBlock x:Name="BankTitle" DockPanel.Dock="Top" Text="BANQUES" Style="{StaticResource CardTitle}" Margin="0,0,0,6" />
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                                <Image x:Name="BankLogo" Width="26" Height="26" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <TextBlock x:Name="BankTitle" Text="BANQUES" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
+                            </StackPanel>
                             <ListView x:Name="BankList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Objet" Width="160" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Objet" Width="160" CellTemplate="{StaticResource ItemNameCell}" />
                                         <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
                                         <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
-                                        <GridViewColumn Header="Palier" Width="76" DisplayMemberBinding="{Binding TierText}" />
+                                        <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>
@@ -340,32 +358,28 @@
                             <StackPanel>
                                 <TextBlock Text="À RENDRE MAINTENANT" Style="{StaticResource CardTitle}" />
                                 <TextBlock x:Name="TravelerNowCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Good}" />
-                                <TextBlock Text="tout est dans le sac" Style="{StaticResource MutedText}" />
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="À ALLER CHERCHER" Style="{StaticResource CardTitle}" />
                                 <TextBlock x:Name="TravelerFetchCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Gold}" />
-                                <TextBlock Text="ceinture ou banque" Style="{StaticResource MutedText}" />
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="PARTIELLES" Style="{StaticResource CardTitle}" />
                                 <TextBlock x:Name="TravelerPartialCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Warn}" />
-                                <TextBlock Text="une partie du stock" Style="{StaticResource MutedText}" />
                             </StackPanel>
                         </Border>
                         <Border Style="{StaticResource Card}">
                             <StackPanel>
                                 <TextBlock Text="À FARMER" Style="{StaticResource CardTitle}" />
                                 <TextBlock x:Name="TravelerImpossibleCount" Text="—" FontSize="30" FontWeight="Bold" Foreground="{StaticResource Bad}" />
-                                <TextBlock Text="rien en stock" Style="{StaticResource MutedText}" />
                             </StackPanel>
                         </Border>
                     </UniformGrid>
-                    <TextBlock x:Name="TravelerSummary" Text="Serveur non lu : connectez le bot (avant le jeu), onglet PARAMÈTRES." Style="{StaticResource MutedText}" Margin="12,0,12,0" TextWrapping="Wrap" />
+                    <TextBlock x:Name="TravelerSummary" Text="Serveur pas encore lu." Style="{StaticResource MutedText}" Margin="12,0,12,0" TextWrapping="Wrap" />
                 </StackPanel>
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel x:Name="TravelerPanel" Margin="0,0,0,12" />
@@ -529,10 +543,7 @@
                     <StackPanel>
                         <Border Style="{StaticResource Card}" Background="#1F2F45" BorderBrush="{StaticResource GoldDim}">
                             <StackPanel>
-                                <DockPanel>
-                                    <TextBlock x:Name="TokenStatusText" DockPanel.Dock="Right" Text="" FontSize="11" VerticalAlignment="Center" Margin="12,0,0,0" />
-                                    <TextBlock Text="CONNEXION AU SERVEUR" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
-                                </DockPanel>
+                                <TextBlock Text="CONNEXION AU SERVEUR" Style="{StaticResource CardTitle}" Margin="0" />
                                 <TextBlock x:Name="ServerStateText" Text="Pas connecté." FontSize="18" FontWeight="Bold" Margin="0,8,0,0" />
                                 <TextBlock x:Name="ServerGameRunningText" Text="Jeu —" Style="{StaticResource MutedText}" Margin="0,2,0,0" />
                                 <WrapPanel Margin="0,10,0,0">
@@ -603,7 +614,7 @@
                                 <DockPanel>
                                     <Button x:Name="AccountToggleButton" DockPanel.Dock="Right" Content="Afficher" Style="{StaticResource SmallButton}" Margin="0" Click="AccountToggleButton_Click" />
                                     <TextBlock Text="COMPTE" Style="{StaticResource CardTitle}" Margin="0,0,10,0" VerticalAlignment="Center" />
-                                    <TextBlock Text="e-mail et jeton" Style="{StaticResource MutedText}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="TokenStatusText" Text="" FontSize="12" VerticalAlignment="Center" />
                                 </DockPanel>
                                 <StackPanel x:Name="AccountPanel" Visibility="Collapsed" Margin="0,10,0,0">
                                     <TextBlock Text="E-mail" Style="{StaticResource Label}" />

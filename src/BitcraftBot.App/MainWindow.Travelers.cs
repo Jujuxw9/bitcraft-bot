@@ -18,13 +18,15 @@ public partial class MainWindow
     private DateTime _travelerShownAt = DateTime.MinValue;
     private string _travelerSignature = "";
 
+    private readonly TravelerPortraits _portraits = new();
+
     private Brush TravBrush(string key) => (Brush)FindResource(key);
 
     // Bot pas relié au serveur : rien à comparer.
     private void ShowTravelersOffline()
     {
         _travelerSignature = "";
-        TravelerMessage("Serveur non lu : connectez le bot (avant le jeu), onglet PARAMÈTRES.");
+        TravelerMessage("Serveur pas encore lu.");
     }
 
     private void TravelerMessage(string text)
@@ -83,10 +85,11 @@ public partial class MainWindow
             return;
         }
         var checks = TravelerTaskPlanner.Check(tasks, store.TravelerTasks, stock);
-        RenderTravelers(checks, store);
+        var totals = stock.GroupBy(x => (x.Stack.IsCargo ? "C" : "I") + x.Stack.ItemId).ToDictionary(g => g.Key, g => g.Sum(x => x.Stack.Quantity));
+        RenderTravelers(checks, store, totals);
     }
 
-    private void RenderTravelers(IReadOnlyList<TaskCheck> checks, GameDataStore store)
+    private void RenderTravelers(IReadOnlyList<TaskCheck> checks, GameDataStore store, IReadOnlyDictionary<string, int> totals)
     {
         var active = checks.Where(c => c.Verdict is not (TaskVerdict.DejaRendue or TaskVerdict.Inconnue)).ToList();
         int Count(TaskVerdict v) => active.Count(c => c.Verdict == v);
@@ -94,7 +97,7 @@ public partial class MainWindow
         TravelerFetchCount.Text = Count(TaskVerdict.FaisableApresBanque).ToString();
         TravelerPartialCount.Text = Count(TaskVerdict.Partiel).ToString();
         TravelerImpossibleCount.Text = Count(TaskVerdict.Impossible).ToString();
-        TravelerSummary.Text = $"{active.Count} tâches actives sur {checks.Count}. Mis à jour à {DateTime.Now:HH:mm:ss}.";
+        TravelerSummary.Text = $"{active.Count} tâches · {DateTime.Now:HH:mm}";
 
         var effort = new Dictionary<TaskCheck, Effort>();
         foreach (var c in active.Where(c => c.Items.Any(i => i.Missing > 0)))
@@ -107,38 +110,35 @@ public partial class MainWindow
 
         var now = active.Where(c => c.Verdict is TaskVerdict.FaisableMaintenant or TaskVerdict.FaisableApresBanque)
             .OrderBy(c => c.Verdict).ThenBy(c => c.Task.TravelerId).ToList();
-        AddTravelerSection(panel, "À RENDRE SANS FARMER", "Tout est déjà dans ton stock. « À aller chercher » : une partie est dans la ceinture ou une banque (le voyageur ne prend que dans le sac).", now.Count);
+        AddTravelerSection(panel, "À RENDRE SANS FARMER", now.Count);
         foreach (var c in now)
         {
-            panel.Children.Add(TaskCard(c, store, null));
+            panel.Children.Add(TaskCard(c, store, null, totals));
         }
 
         var top = active.Where(c => c.Progress is > 0 and < 1).OrderByDescending(c => c.Progress)
             .ThenBy(c => effort.GetValueOrDefault(c, Effort.None).SortKey).Take(TravelerTopCount).ToList();
-        AddTravelerSection(panel, $"LES {TravelerTopCount} PLUS AVANCÉES", "Les tâches dont tu as déjà le plus d'objets (en pourcentage), pour finir au plus vite.", top.Count);
+        AddTravelerSection(panel, $"LES {TravelerTopCount} PLUS AVANCÉES", top.Count);
         foreach (var c in top)
         {
-            panel.Children.Add(TaskCard(c, store, effort.GetValueOrDefault(c)));
+            panel.Children.Add(TaskCard(c, store, effort.GetValueOrDefault(c), totals));
         }
 
         var easy = effort.Keys.OrderBy(c => effort[c].SortKey).ThenByDescending(c => c.Progress).ToList();
-        AddTravelerSection(panel, "LES PLUS FACILES À FARMER", _recipes is null
-            ? "Recettes en cours de chargement : l'ordre sera précisé dans un instant."
-            : "Du plus simple au plus dur : récolte seulement, puis une fabrication, puis plus. Sources par la recette la plus simple (sans paquets).", easy.Count);
+        AddTravelerSection(panel, "LES PLUS FACILES À FARMER", easy.Count);
         foreach (var c in easy)
         {
-            panel.Children.Add(TaskCard(c, store, effort[c]));
+            panel.Children.Add(TaskCard(c, store, effort[c], totals));
         }
     }
 
-    private void AddTravelerSection(Panel panel, string title, string help, int count)
+    private void AddTravelerSection(Panel panel, string title, int count)
     {
         var head = new StackPanel { Margin = new Thickness(8, 14, 8, 2) };
         var line = new StackPanel { Orientation = Orientation.Horizontal };
         line.Children.Add(new TextBlock { Text = title, Style = (Style)FindResource("CardTitle"), Margin = new Thickness(0, 0, 10, 0) });
         line.Children.Add(new TextBlock { Text = $"{count} tâche{(count > 1 ? "s" : "")}", Foreground = TravBrush("Muted"), VerticalAlignment = VerticalAlignment.Center });
         head.Children.Add(line);
-        head.Children.Add(new TextBlock { Text = help, Foreground = TravBrush("Muted"), TextWrapping = TextWrapping.Wrap, FontSize = 12 });
         panel.Children.Add(head);
         if (count == 0)
         {
@@ -146,13 +146,14 @@ public partial class MainWindow
         }
     }
 
-    // Une tâche : portrait du voyageur, texte, objets demandés avec leur image (quantité en stock / demandée), avancement.
-    private Border TaskCard(TaskCheck c, GameDataStore store, Effort? effort)
+    // Une tâche (v0.4.15 : moins de texte) : portrait, nom du voyageur (la phrase de la tâche est au survol),
+    // objets demandés avec leur image, matières premières à récolter, avancement.
+    private Border TaskCard(TaskCheck c, GameDataStore store, Effort? effort, IReadOnlyDictionary<string, int> totals)
     {
         var traveler = store.Travelers.GetValueOrDefault(c.Task.TravelerId) ?? $"Voyageur n° {c.Task.TravelerId}";
-        var card = new Border { Style = (Style)FindResource("Card") };
+        var card = new Border { Style = (Style)FindResource("Card"), Padding = new Thickness(12, 8, 12, 8) };
         var grid = new Grid();
-        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(60) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(64) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
         card.Child = grid;
@@ -160,25 +161,37 @@ public partial class MainWindow
         grid.Children.Add(Portrait(traveler));
 
         var middle = new StackPanel { Margin = new Thickness(0, 0, 12, 0) };
-        middle.Children.Add(new TextBlock { Text = traveler, FontWeight = FontWeights.Bold, FontSize = 14, Foreground = TravBrush("Gold") });
-        var description = c.Desc?.Description is { Length: > 0 } d ? d : $"Tâche n° {c.Task.TaskId}";
-        middle.Children.Add(new TextBlock { Text = description, Foreground = TravBrush("Muted"), FontSize = 12, TextWrapping = TextWrapping.Wrap });
-        var items = new WrapPanel { Margin = new Thickness(0, 6, 0, 0) };
+        middle.Children.Add(new TextBlock
+        {
+            Text = traveler, FontWeight = FontWeights.Bold, FontSize = 14, Foreground = TravBrush("Gold"),
+            ToolTip = c.Desc?.Description is { Length: > 0 } d ? d : $"Tâche n° {c.Task.TaskId}",
+        });
+        var items = new WrapPanel { Margin = new Thickness(0, 4, 0, 0) };
         foreach (var i in c.Items)
         {
             items.Children.Add(ItemChip(i));
         }
         middle.Children.Add(items);
-        var fetch = c.Items.Where(i => i.Elsewhere.Count > 0).ToList();
-        if (fetch.Count > 0)
+        // Matières premières (D-066) : le bas de l'arbre des recettes pour ce qui manque, stock déduit à chaque niveau.
+        var missing = c.Items.Where(i => i.Missing > 0).Select(i => ((i.Item.IsCargo ? "C" : "I") + i.Item.ItemId, i.Missing)).ToList();
+        if (missing.Count > 0 && _recipes is { } book)
         {
-            var text = string.Join(" ; ", fetch.Select(i => string.Join(", ", i.Elsewhere.Select(e => $"{e.Quantity:N0} × {ItemName(i.Item.ItemId, i.Item.IsCargo)} : {e.Where}"))));
-            middle.Children.Add(new TextBlock { Text = "À aller chercher : " + text, Foreground = TravBrush("Warn"), FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) });
+            var raw = RawMaterials.For(book, missing, totals);
+            if (raw.Count > 0)
+            {
+                var line = new WrapPanel { Margin = new Thickness(0, 2, 0, 0) };
+                line.Children.Add(new TextBlock { Text = "À récolter", Foreground = TravBrush("Muted"), FontSize = 12, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 8, 4) });
+                foreach (var r in raw)
+                {
+                    line.Children.Add(RawChip(r, book));
+                }
+                middle.Children.Add(line);
+            }
         }
         Grid.SetColumn(middle, 1);
         grid.Children.Add(middle);
 
-        var right = new StackPanel { Width = 170, VerticalAlignment = VerticalAlignment.Center };
+        var right = new StackPanel { Width = 130, VerticalAlignment = VerticalAlignment.Center };
         var verdictBrush = c.Verdict switch
         {
             TaskVerdict.FaisableMaintenant => TravBrush("Good"),
@@ -186,31 +199,63 @@ public partial class MainWindow
             TaskVerdict.Partiel => TravBrush("Warn"),
             _ => TravBrush("Bad"),
         };
-        right.Children.Add(new TextBlock { Text = TravelerTaskPlanner.Text(c.Verdict), Foreground = verdictBrush, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
-        right.Children.Add(new TextBlock { Text = $"{c.Progress:P0} du stock", FontSize = 18, FontWeight = FontWeights.Bold });
+        right.Children.Add(new TextBlock { Text = $"{c.Progress:P0}", FontSize = 20, FontWeight = FontWeights.Bold, Foreground = verdictBrush, ToolTip = TravelerTaskPlanner.Text(c.Verdict) });
         right.Children.Add(new ProgressBar { Value = c.Progress * 100, Maximum = 100, Height = 8, Foreground = verdictBrush, Margin = new Thickness(0, 2, 0, 4) });
-        if (effort is { } e)
+        if (effort is { } e && e != Effort.None)
         {
-            right.Children.Add(new TextBlock { Text = e.Text, Foreground = TravBrush("Muted"), FontSize = 12, TextWrapping = TextWrapping.Wrap });
+            right.Children.Add(new TextBlock { Text = e.Text, Foreground = TravBrush("Muted"), FontSize = 11, TextWrapping = TextWrapping.Wrap });
         }
         Grid.SetColumn(right, 2);
         grid.Children.Add(right);
         return card;
     }
 
-    // Portrait du voyageur : l'image du jeu si le CDN l'a (essai), sinon un rond doré avec l'initiale.
+    // Une matière première : image, quantité, nom ; au survol, où la récolter.
+    private Border RawChip(RawNeed r, RecipeBook book)
+    {
+        var row = new StackPanel { Orientation = Orientation.Horizontal };
+        row.Children.Add(IconImage(r.Key, 22));
+        var text = new TextBlock { VerticalAlignment = VerticalAlignment.Center, FontSize = 12 };
+        text.Inlines.Add(new System.Windows.Documents.Run($"{r.Quantity:N0}  ") { FontWeight = FontWeights.Bold, Foreground = TravBrush("Warn") });
+        text.Inlines.Add(new System.Windows.Documents.Run(book.NameOf(r.Key)));
+        row.Children.Add(text);
+        return new Border
+        {
+            Background = TravBrush("Track"), CornerRadius = new CornerRadius(5), Padding = new Thickness(3, 1, 8, 1), Margin = new Thickness(0, 0, 6, 4),
+            Child = row, ToolTip = r.Harvest is { } h ? $"Récolte sur « {h.Place} »" : "Source inconnue (butin, commerce…)",
+        };
+    }
+
+    // Portrait du voyageur : wiki du jeu (TravelerPortraits) ou image du jeu (Svim) ; sinon un rond doré avec l'initiale.
     private UIElement Portrait(string traveler)
     {
-        var holder = new Grid { Width = 48, Height = 48, VerticalAlignment = VerticalAlignment.Top, HorizontalAlignment = HorizontalAlignment.Left };
+        var holder = new Grid { Width = 52, Height = 52, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Left };
         holder.Children.Add(new Border
         {
-            CornerRadius = new CornerRadius(24), Background = TravBrush("GoldDim"),
+            CornerRadius = new CornerRadius(26), Background = TravBrush("GoldDim"),
             Child = new TextBlock { Text = traveler[..1], FontSize = 24, FontWeight = FontWeights.Bold, Foreground = TravBrush("Bg"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         });
-        var image = new Image { Stretch = Stretch.UniformToFill, Clip = new EllipseGeometry(new Point(24, 24), 24, 24) };
+        var image = new Image { Stretch = Stretch.UniformToFill, Clip = new EllipseGeometry(new Point(26, 26), 26, 26) };
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
         holder.Children.Add(image);
-        _ = SetIconAsync(image, "UI/TravelerTasks" + traveler.Replace(" ", "") + "Portrait");
+        holder.Children.Add(new Border { CornerRadius = new CornerRadius(26), BorderBrush = TravBrush("GoldDim"), BorderThickness = new Thickness(2) });
+        if (TravelerPortraits.Has(traveler))
+        {
+            _ = SetPortraitAsync(image, traveler);
+        }
+        else
+        {
+            _ = SetIconAsync(image, "UI/TravelerTasks" + traveler.Replace(" ", "") + "Portrait");
+        }
         return holder;
+    }
+
+    private async Task SetPortraitAsync(Image image, string traveler)
+    {
+        if (await _portraits.GetAsync(traveler) is { } source)
+        {
+            image.Source = source;
+        }
     }
 
     // Un objet demandé : image, « en stock / demandé », nom. Vert : complet ; jaune : partiel ; rouge : rien.

@@ -18,7 +18,23 @@ public partial class MainWindow
     private List<(string Where, ItemStackInfo Stack)> _inventoryStacks = [];
 
     // Quantity et TierSort servent au tri (nombres) ; TierText est ce qu'on voit.
-    private sealed record InventoryRow(string Name, int Quantity, string Kind, int TierSort, string TierText, string Where);
+    // v0.4.15 : Key (objet ou cargaison) et Icon (image de l'objet, chargée après coup, d'où l'avis de changement).
+    private sealed record InventoryRow(string Name, int Quantity, string Kind, int TierSort, string TierText, string Where, string Key) : INotifyPropertyChanged
+    {
+        private System.Windows.Media.ImageSource? _icon;
+
+        public System.Windows.Media.ImageSource? Icon
+        {
+            get => _icon;
+            set
+            {
+                _icon = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Icon)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
 
     // Tri de chaque liste : colonne (propriété de InventoryRow) et sens. Par défaut : nom, A à Z.
     private readonly Dictionary<ListView, (string Property, ListSortDirection Direction)> _inventorySort = [];
@@ -28,7 +44,7 @@ public partial class MainWindow
         ["Objet"] = nameof(InventoryRow.Name),
         ["Quantité"] = nameof(InventoryRow.Quantity),
         ["Type"] = nameof(InventoryRow.Kind),
-        ["Palier"] = nameof(InventoryRow.TierSort),
+        ["Tier"] = nameof(InventoryRow.TierSort),
     };
 
     // Appelé par la minuterie de l'onglet (toutes les 500 ms) ; les listes sont refaites au plus toutes les 2 s, et seulement si elles ont changé.
@@ -70,6 +86,14 @@ public partial class MainWindow
     // pour la flèche de tri (Julien : flèches cachées sur Palier et Quantité, à moitié sur Type).
     private void InitInventoryColumns()
     {
+        // v0.4.15 (demande de Julien) : tri par défaut, sac et banques par quantité (la plus grande d'abord), ceinture par nom.
+        _inventorySort[BagList] = (nameof(InventoryRow.Quantity), ListSortDirection.Descending);
+        _inventorySort[BankList] = (nameof(InventoryRow.Quantity), ListSortDirection.Descending);
+        _inventorySort[BeltList] = (nameof(InventoryRow.Name), ListSortDirection.Ascending);
+        // Logos des trois listes : images du jeu (sac en cuir, ceinture, banque).
+        _ = SetLogoAsync(BagLogo, "GeneratedIcons/Items/SimpleLeatherBag");
+        _ = SetLogoAsync(BeltLogo, "GeneratedIcons/Other/Cosmetics/Belt/ClothBeltT1");
+        _ = SetLogoAsync(BankLogo, "GeneratedIcons/Other/GeneratedIcons/Other/Buildings/Crafting/Bank");
         foreach (var list in new[] { BagList, BeltList, BankList })
         {
             list.SizeChanged += (_, _) => FitNameColumn(list);
@@ -87,6 +111,11 @@ public partial class MainWindow
         {
             Setters = { new Setter(ToolTipProperty, new System.Windows.Data.Binding(nameof(InventoryRow.Where))) },
         };
+    }
+
+    private async Task SetLogoAsync(System.Windows.Controls.Image image, string icon)
+    {
+        image.Source = await _icons.GetAsync(icon);
     }
 
     private static void FitNameColumn(ListView list)
@@ -112,7 +141,7 @@ public partial class MainWindow
                 var (where, id, cargo) = g.Key;
                 var key = (cargo ? "C" : "I") + id;
                 var tier = _recipes?.Entries.TryGetValue(key, out var e2) == true ? e2.Tier : -1;
-                return new InventoryRow(ItemName(id, cargo), g.Sum(x => x.Stack.Quantity), cargo ? "Cargaison" : "Objet", tier, tier >= 0 ? tier.ToString() : "?", where);
+                return new InventoryRow(ItemName(id, cargo), g.Sum(x => x.Stack.Quantity), cargo ? "Cargaison" : "Objet", tier, tier >= 0 ? tier.ToString() : "?", where, key);
             })
             .Where(r => search.Length == 0 || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
             .ToList();
@@ -121,9 +150,9 @@ public partial class MainWindow
         // Banques : un objet présent dans plusieurs banques = une seule ligne (total) ; les lieux sont au survol.
         var banks = rows
             .Where(r => r.Where != "Sac" && r.Where != "Ceinture d'outils")
-            .GroupBy(r => (r.Name, r.Kind, r.TierSort, r.TierText))
+            .GroupBy(r => (r.Name, r.Kind, r.TierSort, r.TierText, r.Key))
             .Select(g => new InventoryRow(g.Key.Name, g.Sum(r => r.Quantity), g.Key.Kind, g.Key.TierSort, g.Key.TierText,
-                string.Join(Environment.NewLine, g.OrderByDescending(r => r.Quantity).Select(r => $"{r.Where} : {r.Quantity:N0}"))));
+                string.Join(Environment.NewLine, g.OrderByDescending(r => r.Quantity).Select(r => $"{r.Where} : {r.Quantity:N0}")), g.Key.Key));
         Show(BankList, BankTitle, "BANQUES", banks);
     }
 
@@ -133,6 +162,18 @@ public partial class MainWindow
         title.Text = $"{name}  ·  {items.Count} objet{(items.Count > 1 ? "s" : "")}";
         list.ItemsSource = items;
         ApplyInventorySort(list);
+        foreach (var row in items)
+        {
+            _ = SetRowIconAsync(row);
+        }
+    }
+
+    private async Task SetRowIconAsync(InventoryRow row)
+    {
+        if (_recipes?.Entries.TryGetValue(row.Key, out var entry) == true && entry.Icon.Length > 0)
+        {
+            row.Icon = await _icons.GetAsync(entry.Icon);
+        }
     }
 
     // Clic sur un en-tête de colonne : tri par cette colonne ; deuxième clic : sens inverse.

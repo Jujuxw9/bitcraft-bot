@@ -139,11 +139,26 @@ public partial class MainWindow
             return;
         }
         _situation = s;
-        var text = s.Place == Place.Jeu && s.Game == GameScreen.Inconnu && _lastReading?.Text is { Length: > 0 } t
+        // v0.4.15 : pas de texte dans les 30 s qui suivent le lancement du jeu : sa fenêtre est encore vide et laisse voir le
+        // bureau de Windows (le 25/11, le texte des icônes du bureau a été écrit dans le journal).
+        var text = s.Place == Place.Jeu && s.Game == GameScreen.Inconnu && !GameJustStarted() && _lastReading?.Text is { Length: > 0 } t
             ? $"{s.Describe()} ({s.Evidence}). Texte lu : « {t} »"
             : $"{s.Describe()} ({s.Evidence}).";
         _log.Info("Écran", text);
         Dispatcher.BeginInvoke(ShowSituation);
+    }
+
+    // Jeu lancé il y a moins de 30 s (fenêtre encore vide, transparente).
+    private static bool GameJustStarted()
+    {
+        try
+        {
+            return System.Diagnostics.Process.GetProcessesByName("BitCraft").Any(p => DateTime.Now - p.StartTime < TimeSpan.FromSeconds(30));
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception or NotSupportedException)
+        {
+            return false;
+        }
     }
 
     private void ShowSituation()
@@ -167,7 +182,7 @@ public partial class MainWindow
                 _ => "ecran-chargement",
             };
         }
-        else if (reading.Screen == GameScreen.Inconnu && DateTime.Now - _lastUnknownCapture >= UnknownCaptureInterval && reading.Text != _lastUnknownText)
+        else if (reading.Screen == GameScreen.Inconnu && !GameJustStarted() && DateTime.Now - _lastUnknownCapture >= UnknownCaptureInterval && reading.Text != _lastUnknownText)
         {
             _lastUnknownCapture = DateTime.Now;
             _lastUnknownText = reading.Text;

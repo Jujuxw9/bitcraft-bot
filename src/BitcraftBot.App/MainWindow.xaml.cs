@@ -141,13 +141,14 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.14 : barres animées en douceur ; PERSONNAGE : colonne « Où » retirée (lieux des banques au survol), flèches de tri visibles, colonne Objet ajustée ; curseur main seulement sur ce qui se clique ; CARTE : filtre par palier ; PARAMÈTRES refait (connexion en grand, caméra, petites cartes à interrupteurs, compte replié) ; overlay collé en bas au centre ; touche tenue (W) notée une seule fois.");
+        _log.Info("Session", "Version 0.4.15 : démarrage automatique en séquence (serveur, puis lecture de l'écran, puis jeu lancé par Steam ; boutons Se connecter et Démarrer cachés quand tout tourne) ; overlay entre les icônes de gauche et la barre d'action ; PERSONNAGE : images des objets, logos Sac, Ceinture, Banques, colonne Tier, tris par défaut ; VOYAGEURS : portraits, moins de texte, matières premières à récolter ; jeton dans Compte ; zone de ressources lue sur 20 cases ; texte du bureau plus écrit au lancement du jeu.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
         InitScreenWatch(_ocr);
         InitOverlay();
         InitInventoryColumns();
+        InitStartupButtons();
         InitMeals();
         InitGpt();
         InitLayout();
@@ -170,6 +171,7 @@ public partial class MainWindow : Window
         {
             _log.Erreur("Sécurité", $"Écoute du clavier impossible : {ex.Message}. Le bouton « Arrêter » reste disponible.");
         }
+        _ = RunStartupAsync();
     }
 
     private void OnGlobalKeyDown(int scanCode, bool isExtended, bool isInjected)

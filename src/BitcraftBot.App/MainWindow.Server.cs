@@ -166,7 +166,10 @@ public partial class MainWindow
 
     private static bool IsGameRunning() => Process.GetProcessesByName("BitCraft").Length > 0;
 
-    private async void ServerConnectButton_Click(object sender, RoutedEventArgs e)
+    private async void ServerConnectButton_Click(object sender, RoutedEventArgs e) => await ConnectServerAsync();
+
+    // Connexion en lecture seule (bouton, ou démarrage automatique v0.4.15).
+    private async Task ConnectServerAsync()
     {
         if (_serverReader is { State: ReaderState.Connexion or ReaderState.Connecte })
         {
@@ -203,8 +206,8 @@ public partial class MainWindow
         {
             await _serverReader.DisposeAsync();
         }
-        var labels = _resourceLabels;
-        _serverReader = new ServerReader(_log, id => labels.GetValueOrDefault(id));
+        // v0.4.15 : noms des ressources lus au moment voulu (les données du jeu peuvent arriver après la connexion automatique).
+        _serverReader = new ServerReader(_log, id => _resourceLabels.GetValueOrDefault(id));
         _serverReader.StateChanged += () => Dispatcher.BeginInvoke(ShowServerState);
         ServerConnectButton.IsEnabled = false;
         ServerDisconnectButton.IsEnabled = true;

@@ -161,7 +161,7 @@ public partial class MainWindow
                 : $"{Describe(match.Resource)}{(match.Sure ? " — c'est bien elle (même santé)" : " — probable (même nom)")}";
         // La zone est relue quand le personnage s'éloigne de la moitié du rayon (20 petites cases ≈ 7 cases du jeu).
         SrvArea.Text = reader.ResourceArea is { } a && reader.ResourceAreaUpdated is { } at
-            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d'environ 7 cases)"
+            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d’environ 10 cases)"
               + (reader.HealthRefused ? " — santé refusée par le serveur" : "")
             : "—";
 

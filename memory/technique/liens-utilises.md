@@ -52,3 +52,7 @@ Liens consultés par Claude pour récupérer des données, comprendre le jeu ou 
 | https://github.com/BitCraftToolBox/cereal | Code de cereal.brico.app : adresse du CDN des images (`src/lib/constants.ts`) |
 | https://cdn.brico.app/sprites/ | Images des objets (webp), utilisées par l'onglet Recettes (v0.3.15) |
 | https://raw.githubusercontent.com/BitCraftToolBox/BitCraft_GameData/cereal/cs/static/buff_desc.json | Bonus du jeu (« Food Regen » pour le repas automatique) |
+| https://bitjita.com/map | Analyse de la carte (requêtes, données) pour la v0.4.18 |
+| https://mapdata.bitjita.com/v1/manifest.json | Description des tuiles de la carte de bitjita |
+| https://bitcraft.wiki.gg/images/thumb/ | Portraits des voyageurs (v0.4.15) |
+| https://brico.app/database/traveler-task | Vérifié : pas de portraits de voyageurs sur brico.app |

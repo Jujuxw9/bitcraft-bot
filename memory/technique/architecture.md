@@ -291,3 +291,11 @@ Déplacées dans [hybride/architecture-serveur.md](hybride/architecture-serveur.
 - CARTE : filtre par palier en plus des familles (cases recréées quand les paliers présents changent).
 - PARAMÈTRES : connexion, caméra, petites cartes (sécurité, affichage, système), compte replié.
 - Overlay : ancré au bord bas de la zone du jeu, au centre.
+
+## 19. v0.4.15 : démarrage en séquence, voyageurs, personnage (D-066)
+
+- Démarrage : `App/MainWindow.Startup.cs` enchaîne connexion au serveur → attente du personnage et des inventaires → lecture de l'écran → lancement du jeu par Steam (`steam://rungameid/3454650`). Jeu déjà lancé : rien ne démarre. Les boutons désactivés sont cachés. Options d'essai : `--sans-demarrage-auto`, `--sans-lancer-jeu`.
+- Matières premières : `GameData/RawMaterials.cs` descend l'arbre des recettes jusqu'à la récolte, en déduisant le stock à chaque niveau.
+- Portraits des voyageurs : `App/TravelerPortraits.cs` (wiki du jeu, gardés dans `donnees-jeu/icones/voyageurs`).
+- Personnage : lignes avec image (chargée après coup), logos des trois listes, tris par défaut.
+- Serveur : rayon des ressources 60 petites cases (≈ 20 cases du jeu).

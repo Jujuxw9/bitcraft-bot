@@ -14,8 +14,9 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 {
     private const string Category = "Serveur";
 
-    // Rayon de lecture des ressources, en petites cases du serveur.
-    public const int ResourceRadius = 40;
+    // Rayon de lecture des ressources, en petites cases du serveur (3 petites cases = 1 case du jeu).
+    // v0.4.15 (D-066) : 40 → 60, soit environ 13 → 20 cases ; à augmenter petit à petit en surveillant la charge du PC.
+    public const int ResourceRadius = 60;
 
     // On relance l'abonnement aux ressources quand le personnage s'est éloigné de plus de ce nombre de cases.
     private const double ResubscribeDistance = ResourceRadius / 2.0;
