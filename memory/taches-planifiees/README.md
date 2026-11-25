@@ -9,7 +9,7 @@ Créé le 2026-11-26 (session 28) à la demande de Julien (D-067). Chaque tâche
 | T-01 | 03:30 | [T-01-v0416-archive-chat.md](T-01-v0416-archive-chat.md) | v0.4.16 |
 | T-02 | 08:45 | [T-02-v0417-capacites.md](T-02-v0417-capacites.md) | v0.4.17 |
 | T-03 | 13:15 | [T-03-v0418-carte.md](T-03-v0418-carte.md) | v0.4.18 |
-| T-04 | 14:00 | [T-04-verification-memoire.md](T-04-verification-memoire.md) | aucune : vérification de la mémoire **en lecture seule**, rapport dans `artifactsapports` (ignoré par Git) |
+| T-04 | 14:00 | [T-04-verification-memoire.md](T-04-verification-memoire.md) | aucune : vérification de la mémoire **en lecture seule**, rapport dans `artifacts/rapports/` (ignoré par Git) |
 
 État de chaque passage : [etat.md](etat.md) (à remplir par chaque tâche, au début et à la fin).
 
