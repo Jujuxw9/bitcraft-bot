@@ -1,6 +1,6 @@
 # Demandes de Julien et plan d'action (session 28, 2026-11-25, Opus 5.5)
 
-Statut : **plan proposé, en attente du go de Julien.** Rien n'est codé.
+Statut : **plan validé par Julien (D-064)**, lot 1 en cours.
 
 ## 1. Bilan des journaux (fait en début de session)
 
@@ -40,4 +40,13 @@ Journaux lus : v0.4.9 (24/11 18:51), v0.4.11 (24/11 19:48 et 19:56), v0.4.12 (24
 
 ## 4. Questions posées à Julien (réponses à reporter ici)
 
-Voir le message de la session 28. Réponses : *en attente*.
+Réponses de Julien (25/11 soir) :
+1. Serveur : **Unraid** (petit PC chez lui), pas Node. Code du site dans le même dépôt GitHub, dossier à part. Hébergement à réfléchir dans la session du site.
+2. Overlay : **pas de touche**, seulement l’interrupteur dans le bot.
+3. Endurance : réserve de **30 %**.
+4. Capacités : **seulement pendant que Julien fait l’action** ; récolte automatique plus tard. Interrupteur activé/désactivé comme le repas automatique.
+5. Archive du chat : OK (SQLite + tableau dans CHAT).
+6. Voyageurs : rien à faire, il doit relancer.
+7. Ordre : lot 1, test ; lot 2, test ; lot 3. Une version par lot.
+
+Décision : [D-064](../decisions/D-064-plan-lots-v0414-v0416-site-recettes.md).
