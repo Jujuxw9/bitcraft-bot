@@ -1,0 +1,23 @@
+# Session 29 — 2026-11-26 — Reprise, méthode du site des recettes
+
+- **Agent** : Claude Code (Opus 5.5)
+- **Durée / poste** : 00:30 → 00:40, PC de Julien
+
+## Objectif
+Reprendre après la passation 28 et répondre à Julien sur la méthode du site des recettes.
+
+## Réalisé
+- Passation 28 suivie : dépôt à jour ; à 00:32, aucune tâche planifiée n'avait encore tourné (T-01 à 03:30). Pas de journal v0.4.15 (jamais lancée).
+- Incohérence vue : T-04 sans modèle fixé (les autres en Opus 5.5). Julien veut Opus 5.5 : à régler par lui dans l'app.
+- Méthode du site des recettes proposée : `echanges/2026-11-26-methode-site-recettes.md`.
+
+## Décisions prises (liens D-NNN)
+Aucune (méthode du site proposée, pas encore validée).
+
+## Questions ouvertes créées (liens Q-NNN)
+Aucune. Question posée : le site est pour qui ?
+
+## Prochaines étapes
+- Après 14:00 : bilan des tâches T-01 à T-04 (`taches-planifiees/etat.md`), rapport de la mémoire.
+- Julien teste la dernière version sortie.
+- 27/11 ou après : caméra, exploration automatique, cadrage du site des recettes.

@@ -73,6 +73,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-25-prompt-reprise-opus.md](echanges/2026-11-25-prompt-reprise-opus.md) — **prompt** de reprise pour une session Opus 5.5 : analyser les journaux de la v0.4.10, faire le bilan, puis demander les nouvelles fonctionnalités.
 - [2026-11-25-demandes-julien-session-28.md](echanges/2026-11-25-demandes-julien-session-28.md) — **demandes de Julien** du 25/11 et du 26/11 (fenêtre du bot, capacités, archive du chat, carte, démarrage automatique, voyageurs, exploration automatique), bilans des journaux, plan validé (D-064, D-066).
 - [2026-11-26-passation-session-28.md](echanges/2026-11-26-passation-session-28.md) — **passation de la session 28** : phrase de reprise, état (v0.4.15, tâches planifiées du 26/11), à vérifier, plus tard (caméra, exploration).
+- [2026-11-26-methode-site-recettes.md](echanges/2026-11-26-methode-site-recettes.md) — **site des recettes** : méthode proposée (cadrage, données du bot, site statique, maquette d'abord), réponses de Julien du 26/11 00:34.
 - [2026-11-24-prompt-session-taches.md](echanges/2026-11-24-prompt-session-taches.md) — **prompt** de la session « tâches » (Sonnet, quota réduit : onglet Voyageurs, bugs Recettes, tâches au fil de l'eau).
 - [2026-11-24-reprise-apres-compact.md](echanges/2026-11-24-reprise-apres-compact.md) — phrase de reprise après le /compact de la session « tâches » et état de la v0.4.13.
 
