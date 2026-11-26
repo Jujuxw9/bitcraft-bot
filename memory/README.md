@@ -34,7 +34,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-074
+- [README.md](decisions/README.md) — tableau D-001 à D-075
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-027
@@ -75,6 +75,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-26-passation-session-28.md](echanges/2026-11-26-passation-session-28.md) — **passation de la session 28** : phrase de reprise, état (v0.4.15, tâches planifiées du 26/11), à vérifier, plus tard (caméra, exploration).
 - [2026-11-26-methode-site-recettes.md](echanges/2026-11-26-methode-site-recettes.md) — **site des recettes** : méthode proposée (cadrage, données du bot, site statique, maquette d'abord), réponses de Julien du 26/11 00:34.
 - [2026-11-26-prompt-site-recettes.md](echanges/2026-11-26-prompt-site-recettes.md) — **prompt de la session « site des recettes »** (à coller dans un nouveau chat) : contexte, méthode, questions de départ, règles.
+- [2026-11-26-demande-deplacement-carte.md](echanges/2026-11-26-demande-deplacement-carte.md) — **demande de Julien (plus tard)** : clic droit sur la carte du bot, « Se déplacer ici » ou « Aller à cette ressource », chemin sans escalade.
 - [2026-11-24-prompt-session-taches.md](echanges/2026-11-24-prompt-session-taches.md) — **prompt** de la session « tâches » (Sonnet, quota réduit : onglet Voyageurs, bugs Recettes, tâches au fil de l'eau).
 - [2026-11-24-reprise-apres-compact.md](echanges/2026-11-24-reprise-apres-compact.md) — phrase de reprise après le /compact de la session « tâches » et état de la v0.4.13.
 

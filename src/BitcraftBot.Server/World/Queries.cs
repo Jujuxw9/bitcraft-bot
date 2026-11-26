@@ -72,8 +72,8 @@ public static class Queries
         return list;
     }
 
-    // Rayon couvert par le fond de carte, en cases du jeu (la carte montre 21 cases, un peu de marge).
-    public const double TerrainRadius = 24;
+    // Rayon couvert par le fond de carte, en cases du jeu (la carte montre 25 cases depuis la v0.4.21, un peu de marge).
+    public const double TerrainRadius = 29; // v0.4.21 : zone lue de 25 cases
 
     // Fond de carte (v0.4.18) : seulement les morceaux de terrain autour de la zone lue (4 à 9 morceaux, jamais toute
     // la région), un par requête sur la clé primaire ; et les zones découvertes du personnage.

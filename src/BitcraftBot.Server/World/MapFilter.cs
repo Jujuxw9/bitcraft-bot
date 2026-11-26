@@ -52,10 +52,22 @@ public sealed class MapFilter
         _categories = shown is null ? known : shown.Where(known.Contains).ToHashSet();
         // v0.4.20 : plus de bouton « palier inconnu » : ces ressources sont toujours montrées.
         _hiddenTiers = hiddenTiers?.Where(t => t is >= 1 and <= MaxTier).ToHashSet() ?? [];
+        // v0.4.21 : un tier sans bouton (T6 et plus) masqué à la main avant reste masqué pour toujours : on le réaffiche,
+        // sauf en mode « ce tier seul » (tous masqués sauf un).
+        if (_hiddenTiers.Count != MaxTier - 1)
+        {
+            _hiddenTiers.RemoveWhere(t => t > MaxTierPill);
+        }
     }
 
     // Paliers montrés en boutons : T1 à T10 (v0.4.20 : plus de « ? »).
     public static IReadOnlyList<int> Tiers { get; } = [.. Enumerable.Range(1, MaxTier)];
+
+    // v0.4.21 : boutons montrés seulement pour T1 à T5 (Julien ne dépasse pas T4-T5 pour l'instant). Les tiers au-dessus
+    // n'ont pas de bouton : jamais masqués, sauf par « ce tier seul » (clic droit).
+    public const int MaxTierPill = 5;
+
+    public static IReadOnlyList<int> TierPills { get; } = [.. Enumerable.Range(1, MaxTierPill)];
 
     public static int TierOf(NearbyResource r) => r.Tier is { } t && t >= 1 && t <= MaxTier ? t : UnknownTier;
 

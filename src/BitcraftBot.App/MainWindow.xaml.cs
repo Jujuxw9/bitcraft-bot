@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.20 : retours de Julien sur la v0.4.19 : fond de carte en hexagones (une grande case du jeu = un hexagone), pierre et minerai séparés, tiers d’une seule couleur, boutons Tout, Bois seul, Tous et « ? » retirés ; images de PERSONNAGE agrandies ; CHAT en direct, le plus récent en bas ; activité sans clignotement entre deux coups.");
+        _log.Info("Session", "Version 0.4.21 : zone lue et carte à 25 cases, boutons de tier T1 à T5 seulement. Reprend la 0.4.20 : fond de carte en hexagones (une grande case du jeu = un hexagone), pierre et minerai séparés, tiers d’une seule couleur, boutons Tout, Bois seul, Tous et « ? » retirés ; images de PERSONNAGE agrandies ; CHAT en direct, le plus récent en bas ; activité sans clignotement entre deux coups.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

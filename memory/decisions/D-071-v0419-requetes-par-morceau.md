@@ -18,4 +18,4 @@ Essai de la v0.4.18 par Julien (26/11, 18:53) : carte, voyageurs, personnage, ch
 
 ## Conséquences
 - Essai réel (jeu fermé, 26/11 19:27) : tout accepté en une fois (1 848 ressources, 24 tâches de voyageur, sac et banques, chat, 6 morceaux de fond de carte). Tests 626/626.
-- À vérifier par Julien : la v0.4.19 en jeu.
+- Vérifié par Julien (26/11, 19:33 → 19:52) : la v0.4.19 en jeu, tous les onglets se remplissent, aucune erreur au journal.

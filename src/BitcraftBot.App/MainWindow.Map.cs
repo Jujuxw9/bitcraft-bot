@@ -57,7 +57,7 @@ public partial class MainWindow
             FamilyChecks.Children.Add(pill);
         }
         // Une pastille par palier, T1 à T10, toutes de la même couleur (v0.4.20 : plus simple). Clic : allumer ou éteindre ; clic droit : ce palier seul.
-        foreach (var tier in MapFilter.Tiers)
+        foreach (var tier in MapFilter.TierPills)
         {
 
             var pill = new MapPill(TierColors.Pill, $"Tier {tier}. Clic : afficher ou masquer. Clic droit : ce tier seul (ou tout).");

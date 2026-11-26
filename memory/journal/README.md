@@ -49,7 +49,7 @@ Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 ## Prochaines étapes
 ```
 | [28](2026-11-25-session-28-opus-v0414.md) | 2026-11-25 | Claude Code (Opus 5.5) | Bilan des journaux, plan (D-064), v0.4.14 fenêtre (D-065), v0.4.15 démarrage en séquence, voyageurs, personnage (D-066), analyse de bitjita, tâches planifiées (D-067), passation |
-| [29](2026-11-26-session-29-reprise-site-recettes.md) | 2026-11-26 | Claude Code (Opus 5.5) | Reprise, bilan des tâches T-01 à T-04, prompt du site des recettes, v0.4.19 : ressources par morceau de carte (D-071) |
+| [29](2026-11-26-session-29-reprise-site-recettes.md) | 2026-11-26 | Claude Code (Opus 5.5) | Reprise, bilan des tâches T-01 à T-04, prompt du site des recettes, v0.4.19 (requêtes par morceau, D-071), v0.4.20 (hexagones, D-073), v0.4.21 (25 cases, Release, D-075) |
 | [T-01](2026-11-26-tache-T01-v0416-archive-chat.md) | 2026-11-26 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.16 : archive du chat en local (SQLite), messages privés à la découverte, onglet CHAT avec tableau, recherche, filtre ; D-068 |
 | [T-02](2026-11-26-tache-T02-v0417-capacites.md) | 2026-11-26 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.17 : capacités automatiques de la barre d'action pendant les récoltes de Julien (réserve d'endurance 30 %, un interrupteur par capacité) ; D-069 |
 | [T-03](2026-11-26-tache-T03-v0418-carte.md) | 2026-11-26 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.18 : onglet CARTE refait (fond de carte lu sur le serveur : biomes, relief, eau, zones découvertes ; filtres en pastilles par catégorie et tier) ; D-070 |

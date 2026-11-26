@@ -11,3 +11,6 @@
 
 ## Conséquences
 - D-010 : le principe du .exe unique reste ; la publication en GitHub Releases est abandonnée.
+
+## Exception
+- v0.4.21 : Release GitHub faite à la demande de Julien (26/11), pour télécharger le bot sur un autre PC (D-075). La règle reste valable pour les autres versions.

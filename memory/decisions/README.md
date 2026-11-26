@@ -94,3 +94,4 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-072](D-072-reponses-consignes-sessions-ennemis.md) | Consignes dans un onglet Exploration, sessions aléatoires de 30 min à 4 h, le bot fuit toujours les ennemis | Validée | 2026-11-26 |
 | [D-073](D-073-v0420-retours-v0419.md) | v0.4.20 : fond de carte en hexagones, pierre et minerai séparés, tiers d’une couleur, boutons retirés, images agrandies, chat en direct (récent en bas), activité sans clignotement | Validée | 2026-11-26 |
 | [D-074](D-074-deplacements-set-destination.md) | Déplacements : « Set destination » par défaut, marche visée pour les petits trajets | Validée | 2026-11-26 |
+| [D-075](D-075-v0421-zone-25-release.md) | v0.4.21 : zone lue et carte à 25 cases, boutons de tier T1 à T5, Release GitHub de la v0.4.21 (exception à D-051) | Validée | 2026-11-26 |

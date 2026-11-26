@@ -12,7 +12,7 @@ namespace BitcraftBot.App;
 public sealed class ResourceMap : FrameworkElement
 {
     // Rayon montré, en unités de l'écran (N, E). Les ressources sont lues sur environ 13 unités.
-    public const double RadiusUnits = 21; // v0.4.15 : zone lue d’environ 20 cases
+    public const double RadiusUnits = 26; // v0.4.15 : zone lue d’environ 20 cases ; v0.4.21 : 25 cases
 
     private static readonly Brush Background = Frozen(Color.FromRgb(10, 21, 36));
     private static readonly Pen RingPen = FrozenPen(Color.FromRgb(43, 76, 112), 1);
@@ -173,7 +173,7 @@ public sealed class ResourceMap : FrameworkElement
         // Repères : axes, cercles à 5 et 10 cases, points cardinaux.
         dc.DrawLine(AxisPen, new Point(c.X, c.Y - RadiusUnits * scale), new Point(c.X, c.Y + RadiusUnits * scale));
         dc.DrawLine(AxisPen, new Point(c.X - RadiusUnits * scale, c.Y), new Point(c.X + RadiusUnits * scale, c.Y));
-        foreach (var ring in new[] { 5, 10, 15, 20 })
+        foreach (var ring in new[] { 5, 10, 15, 20, 25 })
         {
             dc.DrawEllipse(null, RingPen, c, ring * scale, ring * scale);
             Text(dc, $"{ring}", new Point(c.X + ring * scale * 0.71 + 2, c.Y - ring * scale * 0.71 - 14), 11);

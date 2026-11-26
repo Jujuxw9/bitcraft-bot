@@ -55,3 +55,8 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - **Filtres** : 8 catégories (pierre et minerai séparés), tiers T1 à T10 d'une couleur ; les ressources sans tier ne sont cachées que si un tier est masqué ; les anciens réglages sont convertis au chargement.
 - **Chat** : tableau tenu à jour par ajout en bas (pas refait à chaque fois), relu toutes les secondes quand l'onglet est ouvert ; refait seulement si le filtre change.
 - **Activité** : dernière action gardée 2,5 s après sa fin.
+
+## 25. v0.4.21 : zone de 25 cases (D-075)
+
+- Ressources lues sur 75 petites cases autour du personnage (9 morceaux de carte au plus), fond de carte sur 29 cases, carte du bot à 26 cases de rayon avec un cercle « 25 ».
+- Boutons de tier T1 à T5 ; un tier plus haut masqué dans d'anciens réglages est réaffiché au chargement, sauf en mode « ce tier seul ».

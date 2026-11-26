@@ -240,4 +240,18 @@ public class V0418Tests
         all.OnlyTier(3);
         Assert.False(all.Shows(Res("Rock", null)));
     }
+
+    // v0.4.21 : boutons T1 à T5 seulement ; un tier sans bouton masqué avant est réaffiché, sauf en « ce tier seul ».
+    [Fact]
+    public void TierPillsStopAtFive()
+    {
+        Assert.Equal([1, 2, 3, 4, 5], MapFilter.TierPills);
+        var restored = new MapFilter(null, [2, 7]);
+        Assert.Equal([2], restored.HiddenTiers);
+        var only = new MapFilter();
+        only.OnlyTier(3);
+        var reloaded = new MapFilter(null, only.HiddenTiers);
+        Assert.True(reloaded.IsShown(3));
+        Assert.False(reloaded.IsShown(7));
+    }
 }

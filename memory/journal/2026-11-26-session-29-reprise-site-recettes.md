@@ -33,9 +33,16 @@ Reprendre après la passation 28 et répondre à Julien sur la méthode du site 
 - v0.4.20 (D-073) : fond de carte en hexagones, filtres simplifiés, images × 1,75, chat récent en bas et en direct, activité tenue 2,5 s. Tests 627/627, hexagones vérifiés hors ligne. Essai réel impossible (Julien joue). Publication en attente de la fermeture du bot.
 - D-074 : déplacements par « Set destination », marche visée pour les petits trajets (Q-002). Messages privés : on reste en lecture au démarrage (D-068).
 
+### Suite (26/11, vers 20:00 → 20:30) : v0.4.20 et v0.4.21, contrôles, Release
+- v0.4.20 fabriquée (bot fermé). Journal v0.4.19 : aucune erreur, Hewing Strikes lancée 10 fois.
+- v0.4.21 (D-075) : zone lue et carte à 25 cases, boutons de tier T1 à T5. Tests 628/628. Essai serveur pas fait (jeu ouvert).
+- Lint : compilation sans avertissement ; `dotnet format` ne signale que la mise en page (94 remarques d'espaces, anciennes, non corrigées pour ne pas toucher tout le code). Contrôle de la mémoire : 0 erreur, numéros D-001 à D-075 complets et indexés.
+- Release GitHub v0.4.21 à la demande de Julien (exception à D-051, notée dans CLAUDE.md).
+- Demande notée pour plus tard : « Se déplacer ici » depuis la carte (`echanges/2026-11-26-demande-deplacement-carte.md`).
+
 ## Décisions prises (liens D-NNN)
 - [D-071](../decisions/D-071-v0419-requetes-par-morceau.md) : requêtes de zone par morceau de carte, repli corrigé.
-- [D-072](../decisions/D-072-reponses-consignes-sessions-ennemis.md), [D-073](../decisions/D-073-v0420-retours-v0419.md), [D-074](../decisions/D-074-deplacements-set-destination.md).
+- [D-072](../decisions/D-072-reponses-consignes-sessions-ennemis.md), [D-073](../decisions/D-073-v0420-retours-v0419.md), [D-074](../decisions/D-074-deplacements-set-destination.md), [D-075](../decisions/D-075-v0421-zone-25-release.md).
 
 ## Questions ouvertes créées (liens Q-NNN)
 Aucune. Question posée : le site est pour qui ?
