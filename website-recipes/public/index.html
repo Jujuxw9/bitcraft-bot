@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Riverwood Recipes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="#/">
+      <span class="brand-mark">⚒</span>
+      <span class="brand-text"><b>Riverwood</b> Recipes</span>
+    </a>
+    <div class="searchbar">
+      <input id="search" type="search" autocomplete="off" spellcheck="false" placeholder="Loading recipes…" disabled
+             aria-label="Search an item">
+      <div id="results" class="results" hidden></div>
+    </div>
+    <nav class="nav">
+      <a href="#/supplies">Supplies</a>
+      <a href="#/tools">Tools</a>
+    </nav>
+  </header>
+  <main id="app"><p class="muted loading">Loading…</p></main>
+  <footer class="foot muted small">
+    <span id="version"></span> · Fan-made for the Riverwood guild · Not affiliated with Clockwork Labs · Icons: brico.app
+  </footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

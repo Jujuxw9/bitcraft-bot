@@ -61,3 +61,5 @@ Liens consultés par Claude pour récupérer des données, comprendre le jeu ou 
 | https://bitjita.com/items/1091320674 | Fiche d'objet et adresses des images de bitjita (site des recettes) |
 | https://brico.app | Brico's Toolbox, base de données communautaire (site des recettes) |
 | https://raw.githubusercontent.com/BitCraftToolBox/BitCraft_GameData/30316dd6731214624987803e5cf848a6203bcd9a/static/building_repairs_desc.json | Table des supplies du claim |
+| https://bitjita.com/GeneratedIcons/ | Images manquantes sur brico.app (site des recettes, 2026-11-26) |
+| https://raw.githubusercontent.com/BitCraftToolBox/BitCraft_GameData/30316dd6731214624987803e5cf848a6203bcd9a/static/item_list_desc.json | Objets « Output » du jeu (site des recettes) |
