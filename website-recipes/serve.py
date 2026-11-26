@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlsplit
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+_GZ_CACHE = {}   # fichier → (date de modification, contenu compressé) : on ne recompresse pas à chaque visite
 PUBLIC = os.path.join(HERE, "public")
 BUILD = os.path.join(HERE, "build")
 TYPES = {".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".html": "text/html; charset=utf-8",
@@ -30,6 +31,14 @@ HEADERS = {
 }
 
 
+def version():
+    try:
+        with open(os.path.join(HERE, "VERSION"), encoding="utf-8") as f:
+            return f.read().strip()
+    except OSError:
+        return "?"
+
+
 def resolve(url_path):
     """Chemin demandé → fichier sur le disque, ou None. Refuse toute sortie des dossiers servis."""
     path = posixpath.normpath(unquote(urlsplit(url_path).path))
@@ -37,6 +46,8 @@ def resolve(url_path):
         return os.path.join(PUBLIC, "index.html")
     if path == "/robots.txt":
         return "robots"
+    if path == "/version.txt":
+        return "version"
     rel = path.lstrip("/")
     if rel == "data.json":
         base, rel = BUILD, "data.json"
@@ -59,11 +70,18 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):   # journal court, sans adresse de visiteur
         pass
 
-    def send(self, code, body, ctype, cache="no-cache"):
+    def send(self, code, body, ctype, cache="no-cache", source=None):
         gz = "gzip" in (self.headers.get("Accept-Encoding") or "") and ctype.split(";")[0] in (
             "application/json", "text/javascript", "text/css", "text/html") and len(body) > 1024
         if gz:
-            body = gzip.compress(body, 6)
+            stamp = os.path.getmtime(source) if source else None
+            cached = _GZ_CACHE.get(source)
+            if source and cached and cached[0] == stamp:
+                body = cached[1]
+            else:
+                body = gzip.compress(body, 6)
+                if source:
+                    _GZ_CACHE[source] = (stamp, body)
         self.send_response(code)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
@@ -81,15 +99,26 @@ class Handler(BaseHTTPRequestHandler):
         f = resolve(self.path)
         if f == "robots":
             return self.send(200, b"User-agent: *\nDisallow: /\n", TYPES[".txt"])
+        if f == "version":
+            return self.send(200, version().encode(), TYPES[".txt"])
         if not f:
             return self.send(404, b"Not found", TYPES[".txt"])
         ext = os.path.splitext(f)[1]
         with open(f, "rb") as fh:
             body = fh.read()
         cache = "public, max-age=604800" if ext == ".webp" else "no-cache"
-        self.send(200, body, TYPES.get(ext) or mimetypes.guess_type(f)[0] or "application/octet-stream", cache)
+        self.send(200, body, TYPES.get(ext) or mimetypes.guess_type(f)[0] or "application/octet-stream", cache, f)
 
     do_HEAD = do_GET
+
+
+class Server(ThreadingHTTPServer):
+    daemon_threads = True
+    request_queue_size = 64
+
+
+def make_server(host, port):
+    return Server((host, port), Handler)
 
 
 def main():
@@ -99,7 +128,7 @@ def main():
     args = ap.parse_args()
     if not os.path.exists(os.path.join(BUILD, "data.json")):
         print("Données absentes : lancer d'abord tools/build_data.py")
-    srv = ThreadingHTTPServer((args.host, args.port), Handler)
+    srv = make_server(args.host, args.port)
     print(f"Site des recettes : http://{args.host}:{args.port}")
     srv.serve_forever()
 

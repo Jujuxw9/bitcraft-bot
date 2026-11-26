@@ -66,6 +66,11 @@ def download(commit, updated_at):
             os.replace(path + ".part", path)
     with open(os.path.join(RAW, "current.json"), "w", encoding="utf-8") as f:
         json.dump({"commit": commit, "updatedAt": updated_at}, f)
+    # Seule la dernière version des tables est gardée (le disque du serveur ne grossit pas chaque jour).
+    for old in os.listdir(RAW):
+        path = os.path.join(RAW, old)
+        if old != commit and os.path.isdir(path):
+            shutil.rmtree(path, ignore_errors=True)
     return folder
 
 

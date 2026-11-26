@@ -30,5 +30,7 @@ Explication du fonctionnement, sans lignes de code (D-023). Code : dossier `webs
 - `node --test website-recipes/tests/test_calc.mjs` : 18 tests (arbre, coches, « have », totaux mis en commun, ordre de fabrication, autre recette, boucles, stacks, recherche, cas réels de Julien).
 - `py -3 -B -m unittest discover -s website-recipes/tests -p "test_*.py"` : 15 tests (règles de D-077 sur des tables inventées, cas réels).
 
-## Pas encore fait (étape 4)
-- Conteneur Docker sur Unraid, mise à jour quotidienne automatique des données, déploiement, sous-domaine `bitcraft-riverwood`, Nginx Proxy Manager.
+## Sur le serveur Unraid (étape 4, voir [mise-en-ligne.md](mise-en-ligne.md))
+- `container.py` : lanceur du conteneur (image officielle python:3.13-slim) : droits root abandonnés, données fabriquées au premier démarrage puis vérifiées chaque nuit à 5 h, relance seule après un déploiement (repère `.redemarrer`).
+- `tools/deploy.py` : copie depuis le PC par le partage réseau, sauvegarde de l'ancienne version, attente de `/version.txt`, retour arrière. Adresses dans `deploy.local.json` (ignoré par Git).
+- Version du site : fichier `VERSION` (0.1.0), affichée par `/version.txt`.
