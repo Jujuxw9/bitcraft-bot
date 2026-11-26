@@ -23,9 +23,18 @@ Démarrée le 2026-11-26. Julien valide chaque étape avant la suivante. Adresse
 | 3 | Julien | Unraid : créer le conteneur (valeurs données par Claude) | Fait (26/11 20:52) ; Claude a vérifié depuis le PC : version, page, données (533 Ko compressé), images, chemins interdits refusés |
 | 4 | Julien + Claude | Test chez soi : `http://<serveur>:8790` | Fait (26/11, Julien : « fonctionne très bien ») |
 | 5 | Julien | OVH : entrée DNS de type A, sous-domaine `bitcraft-riverwood`, même cible que les autres sous-domaines | Fait (26/11) : entrée corrigée par Julien vers l'adresse actuelle de la box ; vérifié par Claude chez OVH, Google et Cloudflare ; ports 80 et 443 de la box joignables |
-| 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | En cours |
-| 7 | Julien | Test depuis le téléphone en 4G (Wi-Fi coupé) | — |
+| 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | Fait (26/11) : certificat Let's Encrypt valable jusqu'au 24/02/2027 (renouvelé seul par NPM), site joignable en HTTPS (vérifié par Claude). **Force SSL et HSTS pas actifs** (le site répond aussi en http) : à cocher |
+| 7 | Julien | Test depuis le téléphone en 4G (Wi-Fi coupé) | En cours |
 | 8 | Julien | Envoyer l'adresse aux amis et à la guilde | — |
+
+## DynHost OVH : à faire un jour par Julien — **ne plus lui reposer la question** (Julien, 26/11)
+- Constat du 26/11 : l'adresse publique de la box a changé au moins une fois (ancienne adresse encore écrite dans `MISE-EN-LIGNE.txt` de DOGGO-ESPORT). Si elle rechange, **tous** les sous-domaines tombent d'un coup (site des recettes, doggo, minecraft, satisfactory) jusqu'à la mise à jour à la main des entrées A chez OVH.
+- Solution : DynHost d'OVH (mise à jour automatique des entrées quand l'adresse change).
+  1. OVH → Web Cloud → Noms de domaine → le domaine → onglet **DynHost** → « Gérer les accès » → créer un identifiant DynHost (suffixe, sous-domaine `*` pour tous, mot de passe).
+  2. Dans le même onglet, « Ajouter un DynHost » pour chaque sous-domaine (les entrées A actuelles doivent d'abord être supprimées, OVH refuse un DynHost sur une entrée A existante — « À vérifier »).
+  3. Un client qui prévient OVH à chaque changement d'adresse : soit la box Bouygues (rubrique DynDNS, si elle propose OVH — « À vérifier »), soit un petit conteneur Unraid (ex. ddclient ou « OVH DynHost updater »), réglé avec l'identifiant DynHost.
+  4. Mettre aussi à jour l'adresse écrite dans `MISE-EN-LIGNE.txt` de DOGGO-ESPORT (avec l'accord de Julien : autre dépôt).
+- En attendant : si un site ne répond plus de l'extérieur, comparer l'adresse publique (vue depuis le PC) avec la cible des entrées A chez OVH.
 
 ## Après la mise en ligne
 - Phase « user-friendly » demandée par Julien (26/11) : petites améliorations graphiques et réglages, d'après ses retours et ceux de ses amis.
