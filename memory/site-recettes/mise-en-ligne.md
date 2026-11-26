@@ -23,7 +23,7 @@ Démarrée le 2026-11-26. Julien valide chaque étape avant la suivante. Adresse
 | 3 | Julien | Unraid : créer le conteneur (valeurs données par Claude) | Fait (26/11 20:52) ; Claude a vérifié depuis le PC : version, page, données (533 Ko compressé), images, chemins interdits refusés |
 | 4 | Julien + Claude | Test chez soi : `http://<serveur>:8790` | Fait (26/11, Julien : « fonctionne très bien ») |
 | 5 | Julien | OVH : entrée DNS de type A, sous-domaine `bitcraft-riverwood`, même cible que les autres sous-domaines | Fait (26/11) : entrée corrigée par Julien vers l'adresse actuelle de la box ; vérifié par Claude chez OVH, Google et Cloudflare ; ports 80 et 443 de la box joignables |
-| 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | Fait (26/11) : certificat Let's Encrypt valable jusqu'au 24/02/2027 (renouvelé seul par NPM), site joignable en HTTPS (vérifié par Claude). **Force SSL et HSTS pas actifs** (le site répond aussi en http) : à cocher |
+| 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | Fait (26/11) : certificat Let's Encrypt valable jusqu'au 24/02/2027 (renouvelé seul par NPM), site joignable en HTTPS (vérifié par Claude). Force SSL et HSTS cochés ensuite par Julien : http renvoie vers https (vérifié) |
 | 7 | Julien | Test depuis le téléphone en 4G (Wi-Fi coupé) | En cours |
 | 8 | Julien | Envoyer l'adresse aux amis et à la guilde | — |
 
@@ -38,3 +38,4 @@ Démarrée le 2026-11-26. Julien valide chaque étape avant la suivante. Adresse
 
 ## Après la mise en ligne
 - Phase « user-friendly » demandée par Julien (26/11) : petites améliorations graphiques et réglages, d'après ses retours et ceux de ses amis.
+- v0.1.1 (26/11, retours de Julien) : glisser l'arbre ne sélectionne plus de texte ; quantité = champ qui s'élargit + boutons −50 −5 −1 +1 +5 +50 (plus de petites flèches) ; boutons Tree / List mis à jour à chaque clic ; Reset en rouge.

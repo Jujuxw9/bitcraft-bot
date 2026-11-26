@@ -226,23 +226,42 @@ function craftSection(key, st) {
   st.collapsed = st.collapsed || {};
   st.view = st.view || (window.matchMedia("(max-width: 760px)").matches ? "list" : "tree");
 
-  const qty = h("input", { type: "number", min: 1, max: 100000, value: st.qty, class: "qty", "aria-label": "Quantity" });
+  // Quantité : champ qui s'élargit avec le nombre, et boutons -50 -5 -1 / +1 +5 +50 (demande de Julien, 26/11).
+  const qty = h("input", { type: "text", inputmode: "numeric", value: st.qty, class: "qty", "aria-label": "Quantity" });
+  const fitQty = () => { qty.style.width = (String(qty.value).length + 2) + "ch"; };
+  const setQty = (v) => {
+    st.qty = Math.max(1, Math.min(100000, Math.floor(Number(v) || 1)));
+    qty.value = st.qty;
+    fitQty();
+    save();
+    draw();
+  };
+  const step = (d) => h("button", { type: "button", class: "step" + (d < 0 ? " minus" : ""), title: (d > 0 ? "+" : "") + d,
+    onclick: () => setQty(st.qty + d) }, (d > 0 ? "+" : "−") + Math.abs(d));
+  const qtyBox = h("div", { class: "qty-box" }, step(-50), step(-5), step(-1), qty, step(1), step(5), step(50));
+  fitQty();
   const rid = recipeFor(data, key, st.recipe);
   const alts = [data.best[key], ...(data.alts[key] || [])].filter(Boolean);
   const sel = h("select", { class: "recipe-select", "aria-label": "Recipe" },
     alts.slice(0, 12).map((r, i) => h("option", { value: r, selected: r === rid }, recipeLabel(r, i === 0))));
+  // Bascule Arbre / Liste : le bouton actif est remis à jour à chaque dessin (il ne l'était pas, 26/11).
+  const viewButton = (v, label) => h("button", { type: "button", "data-view": v, onclick: () => { st.view = v; save(); draw(); } }, label);
+  const seg = h("div", { class: "seg" }, viewButton("tree", "Tree"), viewButton("list", "List"));
   const bar = h("div", { class: "toolbar" },
-    h("label", {}, "Quantity ", qty),
+    h("div", { class: "qty-wrap" }, h("span", {}, "Quantity"), qtyBox),
     alts.length > 1 ? h("label", {}, "Recipe ", sel) : h("span", { class: "muted" }, recipeLabel(rid, true)),
-    h("div", { class: "seg" },
-      h("button", { type: "button", class: st.view === "tree" ? "on" : "", onclick: () => { st.view = "tree"; save(); draw(); } }, "Tree"),
-      h("button", { type: "button", class: st.view === "list" ? "on" : "", onclick: () => { st.view = "list"; save(); draw(); } }, "List")),
-    h("button", { type: "button", class: "btn ghost", onclick: () => {
+    seg,
+    h("button", { type: "button", class: "btn danger", title: "Untick everything and clear the numbers", onclick: () => {
       st.owned = {}; st.checked = {}; save(); draw();
     } }, "Reset"),
     info("Tick an item when you have it (or already crafted it): its whole branch turns grey. Or type how many you already have. Everything is saved in this browser only."));
 
-  qty.addEventListener("change", () => { st.qty = Math.max(1, Math.min(100000, Math.floor(Number(qty.value) || 1))); qty.value = st.qty; save(); draw(); });
+  qty.addEventListener("input", () => { qty.value = qty.value.replace(/[^0-9]/g, "").slice(0, 6); fitQty(); });
+  qty.addEventListener("change", () => setQty(qty.value));
+  qty.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") qty.blur();
+    else if (e.key === "ArrowUp" || e.key === "ArrowDown") { e.preventDefault(); setQty(st.qty + (e.key === "ArrowUp" ? 1 : -1)); }
+  });
   sel.addEventListener("change", () => { st.recipe[key] = sel.value; save(); draw(); });
 
   const progressBar = h("div", { class: "progress" }, h("div", { class: "fill" }), h("span", {}));
@@ -252,6 +271,7 @@ function craftSection(key, st) {
   let view = null;   // vue de l'arbre gardée entre deux dessins (zoom et position)
 
   function draw() {
+    seg.querySelectorAll("button").forEach((b) => b.classList.toggle("on", b.dataset.view === st.view));
     const tree = buildTree(data, key, st.qty, st);
     const p = progress(data, key, st.qty, st);
     progressBar.querySelector(".fill").style.width = Math.round(p * 100) + "%";
@@ -395,6 +415,8 @@ function treeView(tree, st, save, draw, previous) {
   let drag = null;
   viewport.addEventListener("pointerdown", (e) => {
     if (e.target.closest("input,button,a,select")) return;
+    e.preventDefault();
+    window.getSelection()?.removeAllRanges();
     drag = { x: e.clientX - v.x, y: e.clientY - v.y };
     viewport.setPointerCapture(e.pointerId);
     viewport.classList.add("dragging");
