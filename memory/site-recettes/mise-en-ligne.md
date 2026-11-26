@@ -16,8 +16,8 @@ Démarrée le 2026-11-26. Julien valide chaque étape avant la suivante. Adresse
 | # | Qui | Étape | État |
 |---|---|---|---|
 | 1 | Claude | Préparer le site pour Unraid (lanceur, mise à jour quotidienne, script de déploiement) et le tester sur le PC | Fait (26/11) |
-| 2 | Claude, accord de Julien | Copier le site dans `appdata/riverwood-recipes` (9 fichiers, 1 604 images, données) | À valider |
-| 3 | Julien | Unraid : créer le conteneur (valeurs données par Claude) | — |
+| 2 | Claude, accord de Julien | Copier le site dans `appdata/riverwood-recipes` (9 fichiers, 1 604 images, données) | Fait (26/11, accord de Julien, 51,5 Mo) |
+| 3 | Julien | Unraid : créer le conteneur (valeurs données par Claude) | En cours |
 | 4 | Julien + Claude | Test chez soi : `http://<serveur>:8790` | — |
 | 5 | Julien | OVH : entrée DNS de type A, sous-domaine `bitcraft-riverwood`, même cible que les autres sous-domaines | — |
 | 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | — |

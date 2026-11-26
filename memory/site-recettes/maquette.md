@@ -40,4 +40,4 @@ Hache T3 (Emarium Axe), Emarium Pickaxe, Luminite Machete, Sturdy Timber, Sturdy
 - Elle couvre **tout le jeu** (6 122 objets, 2 153 fabricables), pas seulement 20 objets : même effort, plus utile. Les 20 objets cibles sont mis en avant sur l'accueil.
 - Corrections trouvées pendant les essais : objets « Output » du jeu, paquets en boucle, butin rare (arme de pirate) choisi à tort, troncs donnés par l'arbre abattu, achats chez Rumbagh, totaux comptés deux fois, chemin d'image dangereux.
 - **Pas testé** : navigateur Brave (essai fait dans le navigateur intégré de Claude), vrai téléphone, stacks en jeu.
-- **À vérifier par Julien** : taille d'un stack (planche : 10 par case ?) ; recettes proposées pour ses objets habituels.
+- Stacks confirmés par Julien (planches : 10 par case, 26/11). Recettes : Julien ne peut pas juger lui-même ; retours attendus de ses amis.

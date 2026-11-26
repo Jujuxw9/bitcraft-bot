@@ -22,7 +22,7 @@ Explication du fonctionnement, sans lignes de code (D-023). Code : dossier `webs
 ## Ce que calcule la page
 - **Arbre** : chaque case = un objet, la quantité, les stacks, la machine, le métier, le nombre de fabrications. Une case cochée grise toute sa branche. Un nombre « have » réduit la branche. Zoom (molette, boutons), déplacement (glisser), « Fit », branches repliables.
 - **Still needed** et **Craft order** : totaux **mis en commun** sur tout l'arbre (un même objet demandé par deux branches est fabriqué en une fois, sans double arrondi).
-- **Stacks** : 6 000 ÷ volume de l'objet (case d'inventaire du joueur, code serveur `player_create.rs`) ; 1 cargo par case. « À vérifier » en jeu.
+- **Stacks** : 6 000 ÷ volume de l'objet (case d'inventaire du joueur, code serveur `player_create.rs`) ; 1 cargo par case. Confirmé par Julien le 2026-11-26 (planches : 10 par case).
 - **Where to get it** : ressources qui donnent l'objet (outil, niveau du métier, chance par action, ou « when fully harvested » pour un arbre abattu), puis un lien vers la carte de bitjita.
 - Coches, nombres, quantité, recette choisie, vue : gardés **dans le navigateur** (pas de compte).
 

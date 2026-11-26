@@ -41,6 +41,10 @@ def drop_root():
         return
     uid, gid = int(os.environ.get("PUID", "99")), int(os.environ.get("PGID", "100"))
     os.makedirs(BUILD, exist_ok=True)
+    try:
+        os.chown(APP, uid, gid)   # le dossier du site : pour effacer le repère .redemarrer après un déploiement
+    except OSError:
+        pass
     for root, dirs, files in os.walk(BUILD):
         for name in [root] + [os.path.join(root, f) for f in files]:
             try:
