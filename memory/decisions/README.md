@@ -99,3 +99,4 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-077](D-077-site-recettes-proposition.md) | Site des recettes : proposition validée (session « site des recettes ») | Validée | 2026-11-26 |
 | [D-078](D-078-v0422-carte-memoire-craft-ram.md) | v0.4.22 : carte à 30 cases, un cercle, zoom, mémoire de la carte ; vraie progression des fabrications ; ceinture en vignettes ; seuils RAM 1000 / 1600 Mo | Validée | 2026-11-26 |
 | [D-079](D-079-v0423-carte-recherche-ceinture-overlay.md) | v0.4.23 : zoom 10 à 100 cases (+ et − remis), carte coupée au cadre, vraies proportions des hexagones, zones découvertes gardées ; ressource recherchée ; ceinture réparée ; overlay CPU / RAM | Validée | 2026-11-26 |
+| [D-080](D-080-v0424-reprise-recoltes.md) | v0.4.24 : reprise automatique des récoltes (Tab vérifié par le serveur, puis M) ; ceinture en bandeau, banque plus grande | Validée | 2026-11-26 |

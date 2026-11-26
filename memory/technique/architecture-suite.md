@@ -76,3 +76,9 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - **Mémoire du terrain** : numéro de version (`TerrainStore.Version`) ; la carte se redessine quand il change.
 - **Ressource recherchée** (`MainWindow.Sought.cs`) : liste des ressources des données du jeu filtrée sur les mots tapés ; choix gardé dans les réglages (`MapSoughtResource`) ; la plus proche parmi la zone lue et la mémoire.
 - **Overlay** : ligne système (`SystemSummary`, dans Core) reprise de la dernière mesure CPU/RAM.
+
+## 28. v0.4.24 : reprise des récoltes (D-080)
+
+- `HarvestResume` (Server/World, sans écran) : machine à états récolte → attente de l'endurance → sélection (Tab) → confirmation. Entrées : action en cours, dernier coup, position, endurance, cible sélectionnée (`target_state`, nouvel abonnement), ressources lues.
+- `MainWindow.Resume.cs` : appel toutes les 500 ms ; touches envoyées par le contrôleur d'actions (mêmes sécurités que les capacités). Touches ajoutées à la liste blanche : Tab (0x0F) et Interact = M AZERTY (0x27).
+- Journal : catégorie « Reprise » (états, cible sélectionnée dans le jeu, alertes).

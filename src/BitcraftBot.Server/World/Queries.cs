@@ -40,6 +40,8 @@ public static class Queries
             // v0.4.22 : progression des fabrications du personnage (table publique, index sur le propriétaire).
             list.Add($"SELECT * FROM progressive_action_state WHERE owner_entity_id = {e}");
             list.Add($"SELECT * FROM extract_outcome_state WHERE entity_id = {e}");
+            // v0.4.24 : cible sélectionnée dans le jeu (table publique), pour la reprise automatique des récoltes.
+            list.Add($"SELECT * FROM target_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM player_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM teleportation_energy_state WHERE entity_id = {e}");
             if (withTasks)

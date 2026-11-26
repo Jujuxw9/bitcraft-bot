@@ -36,6 +36,9 @@ public sealed record PlayerSnapshot
 
     public ExtractInfo? LastExtract { get; init; }
 
+    // v0.4.24 : cible sélectionnée dans le jeu (target_state), null si aucune ou pas lue.
+    public ulong? Target { get; init; }
+
     public int? TimePlayedSeconds { get; init; }
 
     public double? TeleportEnergy { get; init; }
@@ -150,6 +153,7 @@ public static class SnapshotBuilder
             Action = PlayerActivity.CurrentAction(cache, entity.Value),
             Crafts = PlayerActivity.Crafts(cache, entity.Value),
             LastExtract = PlayerActivity.LastExtract(cache, entity.Value),
+            Target = Of("target_state")?.U64("target_entity_id") is { } target and > 0 ? target : null,
             TimePlayedSeconds = Of("player_state")?.I32("time_played"),
             TeleportEnergy = Of("teleportation_energy_state")?.F64("energy"),
             RegionIndex = regionIndex,

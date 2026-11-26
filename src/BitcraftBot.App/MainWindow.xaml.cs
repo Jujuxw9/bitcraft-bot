@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.23 : carte : boutons + et − remis dans le bon sens, zoom de 10 à 100 cases, rien ne dépasse du cadre, hexagones aux vraies proportions du jeu, zones déjà découvertes lues une fois et gardées ; « ressource recherchée » (choisie par son nom) à la place du meilleur arbre ; ceinture d'outils réparée ; overlay avec CPU et RAM.");
+        _log.Info("Session", "Version 0.4.24 : reprise automatique des récoltes arrêtées faute d'endurance (Tab jusqu'à la bonne cible, vérifiée par le serveur, puis M) ; onglet Personnage : ceinture en bandeau, sac et banques plus grands.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
@@ -159,6 +159,7 @@ public partial class MainWindow : Window
         InitMeals();
         InitGpt();
         InitAbilities();
+        InitResume();
         InitChatArchive();
         InitLayout();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);

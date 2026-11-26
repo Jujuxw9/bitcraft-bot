@@ -127,6 +127,8 @@
                                 <TextBlock x:Name="GptStatusText" Visibility="Collapsed" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
                                 <TextBlock x:Name="GptTimerText" Visibility="Collapsed" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
                                 <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
+                                <CheckBox x:Name="ResumeCheck" Style="{StaticResource SwitchCheck}" Content="Reprise des récoltes" ToolTip="Quand une récolte s'arrête faute d'endurance : attend l'endurance, resélectionne la ressource (Tab) et relance (M), sans bouger" Click="ResumeCheck_Click" />
+                                <TextBlock x:Name="ResumeStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,8" TextWrapping="Wrap" />
                                 <CheckBox x:Name="AbilitiesCheck" Style="{StaticResource SwitchCheck}" Content="Capacités auto" ToolTip="Pendant que vous récoltez : lance la capacité de la barre d'action qui va avec (endurance gardée au-dessus de 30 %)" Click="AbilitiesCheck_Click" />
                                 <TextBlock x:Name="AbilitiesStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" />
                                 <StackPanel x:Name="AbilityList" Margin="16,4,0,0" />
@@ -324,13 +326,17 @@
                     </WrapPanel>
                 </Border>
 
+                <!-- v0.4.24 (Julien) : ceinture en bandeau sur toute la largeur, peu haute ; sac et banques dessous, la banque plus large. -->
                 <Grid x:Name="PersoBag" Grid.Row="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="3*" />
                     </Grid.ColumnDefinitions>
-                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource Card}">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
                                 <Image x:Name="BagLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
@@ -348,14 +354,14 @@
                             </ListView>
                         </DockPanel>
                     </Border>
-                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                    <Border Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource Card}">
                         <DockPanel>
-                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                                <Image x:Name="BeltLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
-                                <TextBlock x:Name="BeltTitle" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
+                            <StackPanel DockPanel.Dock="Left" Orientation="Vertical" Margin="0,0,12,0" Width="120">
+                                <Image x:Name="BeltLogo" Width="40" Height="40" Margin="0,0,0,6" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <TextBlock x:Name="BeltTitle" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0" TextWrapping="Wrap" />
                             </StackPanel>
                             <!-- v0.4.22 : ceinture en vignettes (image, tier en bas à droite, nom dessous), pas en tableau -->
-                            <ListView x:Name="BeltList" MinHeight="150" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="Transparent">
+                            <ListView x:Name="BeltList" MaxHeight="200" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="Transparent">
                                 <ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel />
@@ -411,7 +417,7 @@
                             </ListView>
                         </DockPanel>
                     </Border>
-                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
                                 <Image x:Name="BankLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />

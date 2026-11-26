@@ -64,3 +64,9 @@ Aucune. Question posée : le site est pour qui ?
 - Cause de la ceinture vide : modèle des lignes de tableau du thème (rien sans colonnes).
 - **v0.4.23** (D-079) publiée en local, tests 635/635, pas d'essai serveur (jeu ouvert).
 - Prochaine étape demandée par Julien : **« Se déplacer ici »** (Set destination sur la grande carte du jeu, touche « . »).
+
+### Suite (26/11, 21:00 → 21:30) : v0.4.24
+- Journal v0.4.23 : 48 morceaux de carte gardés (zones découvertes lues), RAM 600 Mo ; la cible lue à l'écran ne marche plus (« cible aucune » tout le temps) : à revoir.
+- Julien : carte et ressource recherchée validées ; demande la reprise automatique des récoltes et la ceinture en bandeau.
+- Raccourcis du jeu relus (captures du 16/11) : pas de touche « répéter » ; Target (A), Target Cycling (Tab), Interact (M). Le serveur publie la cible sélectionnée (`target_state`).
+- **v0.4.24** (D-080) publiée, tests 640/640, essai sans le jeu : abonnement accepté.

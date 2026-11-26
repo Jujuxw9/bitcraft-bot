@@ -44,6 +44,9 @@ public sealed class LocalSettings
     // Capacités automatiques (v0.4.17, D-069). Coupées tant que Julien ne les allume pas (nouveauté, jamais essayée en jeu).
     public bool AutoAbilitiesEnabled { get; set; }
 
+    // Reprise automatique des récoltes arrêtées faute d'endurance (v0.4.24, demande de Julien). Allumée par défaut.
+    public bool AutoResumeEnabled { get; set; } = true;
+
     // Choix de Julien par capacité (id de ability_custom_desc → allumée ou non). Absente = choix par défaut.
     public Dictionary<int, bool> AbilityChoices { get; set; } = [];
 
