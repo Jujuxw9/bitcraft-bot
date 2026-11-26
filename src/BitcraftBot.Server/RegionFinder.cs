@@ -1,5 +1,6 @@
 using System.Globalization;
 using BitcraftBot.Server.Protocol;
+using BitcraftBot.Server.World;
 
 namespace BitcraftBot.Server;
 
@@ -28,6 +29,10 @@ public static class RegionFinder
         }
 
         var done = new TaskCompletionSource<RegionDiscovery>(TaskCreationOptions.RunContinuationsAsynchronously);
+        // v0.4.16 (archive du chat) : une fois la région trouvée, même liaison, un 2e abonnement pour les messages privés.
+        // Pas de liaison de plus : rien ne change pour le jeu. Refus ou silence = découverte gardée, sans messages privés.
+        var withDms = new TaskCompletionSource<RegionDiscovery>(TaskCreationOptions.RunContinuationsAsynchronously);
+        RegionDiscovery? found = null;
         var identity = Row.Normalize(hexIdentity);
         var messages = 0;
         await using var connection = new SpacetimeConnection();
@@ -55,26 +60,68 @@ public static class RegionFinder
                     case SubscriptionEvent sub:
                         var cache = new TableCache();
                         cache.Reset(sub.Tables);
-                        done.TrySetResult(Read(cache, identity!));
+                        if (Volatile.Read(ref found) is { } first)
+                        {
+                            var dms = DirectMessages.Read(cache);
+                            withDms.TrySetResult(first with { DirectMessages = dms, DirectMessagesNote = $"{dms.Count} message(s) privé(s) lu(s)" });
+                            break;
+                        }
+                        var result = Read(cache, identity!);
+                        if (result.Success)
+                        {
+                            Volatile.Write(ref found, result);
+                            _ = connection.SubscribeAsync(Queries(identity!).Append(DirectMessages.Query), 2, CancellationToken.None);
+                        }
+                        done.TrySetResult(result);
                         break;
                     case SubscriptionErrorEvent error:
+                        if (Volatile.Read(ref found) is { } kept)
+                        {
+                            withDms.TrySetResult(kept with { DirectMessagesNote = $"messages privés refusés par le serveur : {error.Error}" });
+                            break;
+                        }
                         done.TrySetResult(RegionDiscovery.Fail($"requête refusée : {error.Error}"));
                         break;
                 }
             }
             catch (Exception ex) when (ex is System.Text.Json.JsonException or InvalidOperationException or KeyNotFoundException)
             {
+                if (Volatile.Read(ref found) is { } kept)
+                {
+                    withDms.TrySetResult(kept with { DirectMessagesNote = $"messages privés illisibles : {ex.Message}" });
+                    return;
+                }
                 done.TrySetResult(RegionDiscovery.Fail($"réponse illisible : {ex.Message}"));
             }
         };
-        connection.Closed += reason => done.TrySetResult(RegionDiscovery.Fail(Volatile.Read(ref messages) == 0
-            ? "le module global a refusé la liaison dès l'ouverture (normal si le jeu n'a pas été lancé depuis plus d'une heure : ce module exige une connexion au jeu de moins d'1 h)"
-            : $"liaison terminée ({reason})"));
+        connection.Closed += reason =>
+        {
+            if (Volatile.Read(ref found) is { } kept)
+            {
+                withDms.TrySetResult(kept with { DirectMessagesNote = $"liaison terminée avant les messages privés ({reason})" });
+            }
+            done.TrySetResult(RegionDiscovery.Fail(Volatile.Read(ref messages) == 0
+                ? "le module global a refusé la liaison dès l'ouverture (normal si le jeu n'a pas été lancé depuis plus d'une heure : ce module exige une connexion au jeu de moins d'1 h)"
+                : $"liaison terminée ({reason})"));
+        };
 
         await connection.ConnectAsync(ServerEndpoints.SubscribeUri(ServerEndpoints.Host, GlobalModule), token, cancel);
         var finished = await Task.WhenAny(done.Task, Task.Delay(timeout, cancel));
-        return finished == done.Task ? done.Task.Result : RegionDiscovery.Fail("pas de réponse du module global à temps");
+        if (finished != done.Task)
+        {
+            return RegionDiscovery.Fail("pas de réponse du module global à temps");
+        }
+        var discovery = done.Task.Result;
+        if (!discovery.Success)
+        {
+            return discovery;
+        }
+        // Messages privés : 5 s au plus de plus ; sinon, la découverte est gardée sans eux.
+        var dmFinished = await Task.WhenAny(withDms.Task, Task.Delay(DirectMessagesWait, cancel));
+        return dmFinished == withDms.Task ? withDms.Task.Result : discovery with { DirectMessagesNote = "pas de réponse à temps pour les messages privés" };
     }
+
+    public static readonly TimeSpan DirectMessagesWait = TimeSpan.FromSeconds(5);
 
     // Lit le résultat : compte connu ? région du personnage ? adresse du module de cette région ?
     public static RegionDiscovery Read(TableCache cache, string hexIdentity)
@@ -120,4 +167,9 @@ public static class RegionFinder
 public sealed record RegionDiscovery(bool Success, string? Error, bool AccountKnown, ulong? EntityId, int? RegionId, string? RegionName, string? Host, string? Module)
 {
     public static RegionDiscovery Fail(string error) => new(false, error, false, null, null, null, null, null);
+
+    // v0.4.16 : messages privés de Julien (reçus et envoyés) lus pendant la découverte, et ce qui s'est passé.
+    public IReadOnlyList<DirectMessage> DirectMessages { get; init; } = [];
+
+    public string DirectMessagesNote { get; init; } = "messages privés pas demandés";
 }

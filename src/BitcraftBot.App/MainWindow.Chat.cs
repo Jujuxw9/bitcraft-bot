@@ -126,6 +126,14 @@ public partial class MainWindow
         ShowGptTab();
     }
 
+    // v0.4.16 : le chatbot (statistiques, test, historique) est replié sous l'archive du chat.
+    private void ChatBotToggle_Click(object sender, RoutedEventArgs e)
+    {
+        var show = ChatBotPanel.Visibility != Visibility.Visible;
+        ChatBotPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+        ChatBotToggle.Content = show ? "Masquer le chatbot @gpt" : "Afficher le chatbot @gpt";
+    }
+
     // Minuteur de la carte CHAT : temps avant la prochaine réponse possible (v0.4.7, demande de Julien).
     private void ShowGptTimer(TimeSpan? cooldown)
     {

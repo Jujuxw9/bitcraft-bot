@@ -162,8 +162,7 @@ public sealed class GptChatPicker
         foreach (var m in messages.Where(m => m.OwnerEntityId == _me && !_ownSeen.Contains(m.EntityId)))
         {
             _ownSeen.Add(m.EntityId);
-            var text = Normalize(m.Text);
-            var byBot = _sent.Contains(text) || Math.Abs((m.SentAt - _lastSentAt).TotalSeconds) <= 6;
+            var byBot = WrittenByBot(m);
             if (!byBot && m.SentAt + PauseAfterOwnMessage > _pausedUntil)
             {
                 _pausedUntil = m.SentAt + PauseAfterOwnMessage;
@@ -171,6 +170,11 @@ public sealed class GptChatPicker
             }
         }
     }
+
+    // Message de Julien écrit par le bot (réponse @gpt) : même texte qu'une réponse envoyée, ou à moins de 6 s d'un envoi.
+    // Sert aussi à l'archive du chat (v0.4.16).
+    public bool WrittenByBot(ChatMessage m) =>
+        m.OwnerEntityId == _me && (_sent.Contains(Normalize(m.Text)) || Math.Abs((m.SentAt - _lastSentAt).TotalSeconds) <= 6);
 
     private readonly List<(ChatMessage Message, string Reason)> _skipped = [];
 

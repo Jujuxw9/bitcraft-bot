@@ -513,3 +513,8 @@ models/large/
 # Copie du code serveur officiel (Apache 2.0) : versionnée telle quelle,
 # malgré les règles .NET ci-dessus (ex. « packages/ »).
 !references/**
+
+# Archive du chat en local (v0.4.16) : base SQLite à côté du .exe, jamais dans Git
+archive-chat/
+*.db
+*.db-journal

@@ -283,19 +283,6 @@ Rappel : si une fenêtre (inventaire…) recouvre la jauge, elle n'est pas lue. 
 
 Déplacées dans [hybride/architecture-serveur.md](hybride/architecture-serveur.md) : brique Server, H1 (lecture du serveur), v0.3.5 à v0.3.20, puis la récolte automatique (v0.4.x, section 34 et suivantes : écoute de la souris `Input/Mouse`, formule de la caméra `Server/Aim`), et le module « @GPT » (v0.4.5, section 39 : lecture du chat Région, réponse tapée au clavier par le contrôleur d'actions, chat ouvert reconnu à l'écran).
 
-## 18. v0.4.14 : fenêtre du bot (D-065)
+## 18 et suivantes : fenêtre, démarrage, archive du chat (v0.4.14 et après)
 
-- Barres : une petite aide d'animation (`App/BarAnimation.cs`) fait glisser chaque barre vers sa nouvelle valeur.
-- Clavier : `Input/Keyboard/KeyRepeatFilter.cs` ne laisse passer que le premier appui d'une touche tenue ; l'écoute du clavier l'utilise pour tout le bot.
-- PERSONNAGE : les banques sont regroupées par objet, les lieux sont dans l'info-bulle de la ligne ; la colonne Objet s'ajuste à la largeur.
-- CARTE : filtre par palier en plus des familles (cases recréées quand les paliers présents changent).
-- PARAMÈTRES : connexion, caméra, petites cartes (sécurité, affichage, système), compte replié.
-- Overlay : ancré au bord bas de la zone du jeu, au centre.
-
-## 19. v0.4.15 : démarrage en séquence, voyageurs, personnage (D-066)
-
-- Démarrage : `App/MainWindow.Startup.cs` enchaîne connexion au serveur → attente du personnage et des inventaires → lecture de l'écran → lancement du jeu par Steam (`steam://rungameid/3454650`). Jeu déjà lancé : rien ne démarre. Les boutons désactivés sont cachés. Options d'essai : `--sans-demarrage-auto`, `--sans-lancer-jeu`.
-- Matières premières : `GameData/RawMaterials.cs` descend l'arbre des recettes jusqu'à la récolte, en déduisant le stock à chaque niveau.
-- Portraits des voyageurs : `App/TravelerPortraits.cs` (wiki du jeu, gardés dans `donnees-jeu/icones/voyageurs`).
-- Personnage : lignes avec image (chargée après coup), logos des trois listes, tris par défaut.
-- Serveur : rayon des ressources 60 petites cases (≈ 20 cases du jeu).
+Déplacées dans [architecture-suite.md](architecture-suite.md) : v0.4.14 (section 18), v0.4.15 (section 19), v0.4.16 archive du chat (section 20).

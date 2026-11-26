@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.15 : démarrage automatique en séquence (serveur, puis lecture de l'écran, puis jeu lancé par Steam ; boutons Se connecter et Démarrer cachés quand tout tourne) ; overlay entre les icônes de gauche et la barre d'action ; PERSONNAGE : images des objets, logos Sac, Ceinture, Banques, colonne Tier, tris par défaut ; VOYAGEURS : portraits, moins de texte, matières premières à récolter ; jeton dans Compte ; zone de ressources lue sur 20 cases ; texte du bureau plus écrit au lancement du jeu.");
+        _log.Info("Session", "Version 0.4.16 : archive du chat en local (Local, Région, LFG, Trade, et messages privés quand le module global les donne) dans archive-chat/chat.db à côté du .exe ; onglet CHAT de retour : tableau des messages, recherche par joueur, filtre par canal ; chatbot @gpt replié en dessous.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
@@ -151,6 +151,7 @@ public partial class MainWindow : Window
         InitStartupButtons();
         InitMeals();
         InitGpt();
+        InitChatArchive();
         InitLayout();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);
         _ = _gameData.StartAsync();
@@ -865,6 +866,7 @@ public partial class MainWindow : Window
             return;
         }
         _keyboardHook?.Dispose();
+        CloseChatArchive();
         CloseCamera();
         CloseScreenWatch();
         _resourceTimer.Stop();

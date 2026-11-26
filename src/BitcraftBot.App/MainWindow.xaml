@@ -22,7 +22,7 @@
         <StaticResource ResourceKey="Text" />
     </Window.Foreground>
 
-    <TabControl x:Name="Tabs">
+    <TabControl x:Name="Tabs" SelectionChanged="Tabs_SelectionChangedForChat">
 
         <!-- BOT : tableau de bord, image du jeu, commandes -->
         <TabItem x:Name="BotTabItem" Header="BOT">
@@ -234,24 +234,57 @@
             </ScrollViewer>
         </TabItem>
 
-        <!-- CHAT : historique, statistiques, test d'une phrase sans envoi (v0.4.10) -->
-        <TabItem Header="CHAT" Visibility="Collapsed">
-            <Grid Margin="12">
+        <!-- CHAT : archive du chat en local (v0.4.16) ; chatbot @gpt (historique, statistiques, test) en dessous, replié -->
+        <TabItem x:Name="ChatTabItem" Header="CHAT">
+            <Grid Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="ChatTabStatus" Grid.Row="0" TextWrapping="Wrap" />
-                <TextBlock x:Name="ChatTabStats" Grid.Row="1" Margin="0,4,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
-                    <TextBox x:Name="ChatTestBox" Width="420" VerticalContentAlignment="Center" ToolTip="Écris un message de joueur, par exemple : @gpt salut, tu coupes des arbres ?" />
-                    <Button x:Name="ChatTestButton" Content="Tester une phrase (rien n'est envoyé)" Style="{StaticResource SmallButton}" Margin="8,0,0,0" Click="ChatTestButton_Click" />
-                </StackPanel>
-                <TextBlock x:Name="ChatTestResult" Grid.Row="3" Margin="0,6,0,0" TextWrapping="Wrap" />
-                <TextBox x:Name="ChatHistoryBox" Grid.Row="4" Margin="0,10,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
+                <Border Grid.Row="0" Style="{StaticResource Card}">
+                    <WrapPanel VerticalAlignment="Center">
+                        <TextBlock Text="ARCHIVE DU CHAT" Style="{StaticResource CardTitle}" Margin="0,0,16,0" VerticalAlignment="Center" />
+                        <TextBlock Text="Joueur" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                        <TextBox x:Name="ChatArchivePlayerBox" Width="200" TextChanged="ChatArchiveFilter_Changed" ToolTip="Chercher un joueur (une partie du nom suffit)" Margin="0,0,16,0" />
+                        <ComboBox x:Name="ChatArchiveChannelBox" Width="170" SelectionChanged="ChatArchiveFilter_Changed" ToolTip="Filtrer par canal" Margin="0,0,16,0" />
+                        <TextBlock x:Name="ChatArchiveCount" Text="Archive en cours d'ouverture…" Style="{StaticResource MutedText}" VerticalAlignment="Center" />
+                    </WrapPanel>
+                </Border>
+                <Border Grid.Row="1" Style="{StaticResource Card}">
+                    <ListView x:Name="ChatArchiveList">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                                <Setter Property="ToolTip" Value="{Binding Tip}" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Heure" Width="110" DisplayMemberBinding="{Binding Time}" />
+                                <GridViewColumn Header="Canal" Width="120" DisplayMemberBinding="{Binding Channel}" />
+                                <GridViewColumn Header="Joueur" Width="150" DisplayMemberBinding="{Binding Player}" />
+                                <GridViewColumn Header="Texte" Width="700" DisplayMemberBinding="{Binding Text}" />
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Border>
+                <Border Grid.Row="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Button x:Name="ChatBotToggle" DockPanel.Dock="Right" Content="Afficher le chatbot @gpt" Style="{StaticResource SmallButton}" Click="ChatBotToggle_Click" />
+                            <TextBlock x:Name="ChatTabStatus" TextWrapping="Wrap" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <StackPanel x:Name="ChatBotPanel" Visibility="Collapsed">
+                            <TextBlock x:Name="ChatTabStats" Margin="0,4,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <TextBox x:Name="ChatTestBox" Width="420" VerticalContentAlignment="Center" ToolTip="Écris un message de joueur, par exemple : @gpt salut, tu coupes des arbres ?" />
+                                <Button x:Name="ChatTestButton" Content="Tester une phrase (rien n'est envoyé)" Style="{StaticResource SmallButton}" Margin="8,0,0,0" Click="ChatTestButton_Click" />
+                            </StackPanel>
+                            <TextBlock x:Name="ChatTestResult" Margin="0,6,0,0" TextWrapping="Wrap" />
+                            <TextBox x:Name="ChatHistoryBox" Height="160" Margin="0,8,0,0" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
             </Grid>
         </TabItem>
 

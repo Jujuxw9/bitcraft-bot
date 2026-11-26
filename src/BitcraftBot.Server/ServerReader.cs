@@ -117,6 +117,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 if (Discovery.Success)
                 {
                     log.Info(Category, $"Découverte : {RegionFinder.Describe(Discovery)}.");
+                    log.Info(Category, $"Messages privés (archive du chat) : {Discovery.DirectMessagesNote}.");
                     host = Discovery.Host!;
                     module = Discovery.Module!;
                     if (Discovery.RegionId != region)

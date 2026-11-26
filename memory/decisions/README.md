@@ -87,3 +87,4 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-065](D-065-v0414-fenetre-barres-parametres-overlay.md) | v0.4.14 : barres animées, PERSONNAGE (Où au survol), curseur main, filtre par palier, PARAMÈTRES refait, overlay en bas, touche tenue | Validée | 2026-11-25 |
 | [D-066](D-066-v0415-demarrage-sequence-voyageurs-personnage.md) | v0.4.15 : démarrage en séquence (serveur → écran → jeu par Steam), voyageurs, personnage, overlay ; suite en tâches planifiées | Validée | 2026-11-26 |
 | [D-067](D-067-taches-planifiees.md) | Trois tâches planifiées le 26/11 (03:30 v0.4.16, 08:45 v0.4.17, 13:15 v0.4.18), sessions indépendantes, règles dans `taches-planifiees/` | Validée | 2026-11-26 |
+| [D-068](D-068-v0416-archive-chat.md) | v0.4.16 : archive du chat en local (SQLite à côté du .exe), messages privés lus à la découverte, onglet CHAT avec tableau, recherche, filtre | Validée | 2026-11-26 |

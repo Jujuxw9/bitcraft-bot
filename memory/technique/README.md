@@ -1,6 +1,6 @@
 # Technique — index
 
-- [architecture.md](architecture.md) — architecture logicielle et projets .NET (sections 1 à 16) ; suite : [hybride/architecture-serveur.md](hybride/architecture-serveur.md)
+- [architecture.md](architecture.md) — architecture logicielle et projets .NET (sections 1 à 16) ; suite : [hybride/architecture-serveur.md](hybride/architecture-serveur.md) ; v0.4.14 et après (archive du chat v0.4.16) : [architecture-suite.md](architecture-suite.md)
 - [analyse-bitcraftpublic.md](analyse-bitcraftpublic.md) — analyse du code serveur open source
 - [sources.md](sources.md) — liens analysés et leur utilité
 - [liens-utilises.md](liens-utilises.md) — tous les liens utilisés par Claude, classés (règles, serveur, communauté, patchs)

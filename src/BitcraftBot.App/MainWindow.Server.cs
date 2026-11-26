@@ -306,6 +306,7 @@ public partial class MainWindow
         }
         RunMeals(reader, s, inventories);
         RunGpt(reader, s);
+        ArchiveChat(reader, s);
         ShowResources(reader, s, tab == MapTab);
 
         if (tab == CharacterTab)
