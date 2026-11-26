@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.17 : capacités automatiques (interrupteur « Capacités auto » dans OPTIONS, coupé au départ) : pendant vos récoltes, le bot lance la capacité de la barre d'action qui va avec le métier (ex. Hewing Strikes en coupant du bois) dès que sa recharge est finie, sans passer sous 30 % d'endurance ; une case par capacité.");
+        _log.Info("Session", "Version 0.4.18 : onglet CARTE refait : vrai fond de carte lu sur le serveur du jeu (biomes, relief ombré, eau, zones non découvertes assombries), filtres en pastilles cliquables (7 catégories de ressources, tiers T1 à T10 ; clic droit sur un tier = ce tier seul), filtres retenus d’une fois sur l’autre.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

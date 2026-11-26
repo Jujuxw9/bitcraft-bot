@@ -47,6 +47,11 @@ public sealed class LocalSettings
     // Choix de Julien par capacité (id de ability_custom_desc → allumée ou non). Absente = choix par défaut.
     public Dictionary<int, bool> AbilityChoices { get; set; } = [];
 
+    // Filtres de la carte (v0.4.18, D-070) : catégories affichées (null = toutes) et paliers masqués.
+    public List<string>? MapShownCategories { get; set; }
+
+    public List<int> MapHiddenTiers { get; set; } = [];
+
     // Arrêt d'urgence si la souris bouge pendant un geste du bot (contrôleur d'actions, v0.3.18).
     public bool StopOnMouseMove { get; set; } = true;
 

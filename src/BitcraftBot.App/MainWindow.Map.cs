@@ -1,25 +1,24 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using BitcraftBot.Perception.Hud;
 using BitcraftBot.Server;
 using BitcraftBot.Server.World;
 
 namespace BitcraftBot.App;
 
-// Onglet « Carte (H2) » : carte, filtres par famille et tableau des ressources proches.
+// Onglet « Carte » : fond de carte (terrain lu sur le serveur, v0.4.18), filtres en pastilles et tableau des ressources proches.
 public partial class MainWindow
 {
     private const int MaxRowsShown = 80;
 
     private readonly ObservableCollection<ResourceRow> _resourceRows = [];
-    private readonly Dictionary<string, CheckBox> _familyChecks = [];
-    private readonly HashSet<string> _shownFamilies = [ResourceFamilies.Trees];
-    // v0.4.14 (demande de Julien) : filtre par palier, pour trouver les ressources d'un palier donné autour de soi.
-    // Paliers masqués (vide = tous affichés) ; une case par palier présent dans la zone lue, avec le nombre.
-    private readonly HashSet<int> _hiddenTiers = [];
-    private readonly Dictionary<int, CheckBox> _tierChecks = [];
-    private const int UnknownTier = -1;
+    // v0.4.18 (D-070) : filtres en pastilles cliquables, retenus dans les réglages (catégories et paliers).
+    private MapFilter _mapFilter = new();
+    private readonly Dictionary<string, MapPill> _categoryPills = [];
+    private readonly Dictionary<int, MapPill> _tierPills = [];
     private readonly ScreenTargetMatcher _targetMatcher = new();
     private TargetReading? _lastHudTarget;
     private DateTime _lastHudTargetAt;
@@ -28,6 +27,7 @@ public partial class MainWindow
     private bool _loggedScreenTargetSure;
     private ulong? _loggedBest;
     private bool _updatingRows;
+    private bool _terrainShownLogged;
 
     private void InitResourceMap()
     {
@@ -42,76 +42,82 @@ public partial class MainWindow
                 SrvResourceList.ScrollIntoView(row);
             }
         };
-        // Une case par famille, dans l'ordre, avec sa couleur. Le nombre lu s'ajoute à la connexion.
-        foreach (var family in ResourceFamilies.All)
+        _mapFilter = new MapFilter(_settings.MapShownCategories, _settings.MapHiddenTiers);
+
+        // Une pastille par catégorie (couleur des points de la carte) ; le nombre lu s'ajoute à la connexion.
+        foreach (var category in MapCategories.All)
         {
-            var check = new CheckBox
+            var pill = new MapPill(FamilyColors.Of(category.Families[0]), $"{category.Name} : {category.Hint}. Clic : afficher ou masquer.");
+            pill.Clicked += right =>
             {
-                Content = family,
-                IsChecked = _shownFamilies.Contains(family),
-                Foreground = FamilyColors.Of(family),
-                Margin = new Thickness(0, 2, 16, 2),
-                Tag = family,
+                _mapFilter.ToggleCategory(category.Name);
+                MapFilterChanged();
             };
-            check.Click += (_, _) => SetFamily(family, check.IsChecked == true);
-            _familyChecks[family] = check;
-            FamilyChecks.Children.Add(check);
+            _categoryPills[category.Name] = pill;
+            FamilyChecks.Children.Add(pill);
         }
+        // Une pastille par palier, T1 à T10 puis « ? ». Clic : allumer ou éteindre ; clic droit : ce palier seul.
+        foreach (var tier in MapFilter.Tiers)
+        {
+            var name = tier == MapFilter.UnknownTier ? "?" : $"T{tier}";
+            var pill = new MapPill(TierColors.Of(tier), $"{(tier == MapFilter.UnknownTier ? "Palier inconnu" : $"Palier {tier}")}. Clic : afficher ou masquer. Clic droit : ce palier seul (ou tout).");
+            pill.Clicked += right =>
+            {
+                if (right) _mapFilter.OnlyTier(tier);
+                else _mapFilter.ToggleTier(tier);
+                MapFilterChanged();
+            };
+            _tierPills[tier] = pill;
+            TierChecks.Children.Add(pill);
+        }
+        ShowPills([]);
     }
 
-    private void SetFamily(string family, bool shown)
+    private void MapFilterChanged()
     {
-        if (shown) _shownFamilies.Add(family);
-        else _shownFamilies.Remove(family);
-        _familyChecks[family].IsChecked = shown;
+        _settings.MapShownCategories = [.. _mapFilter.ShownCategories];
+        _settings.MapHiddenTiers = [.. _mapFilter.HiddenTiers];
+        _settings.Save(LocalSettings.DefaultPath);
         _resourceRows.Clear();
+        ShowPills(_lastMapResources);
     }
 
     private void FamilyAll_Click(object sender, RoutedEventArgs e)
     {
-        foreach (var family in ResourceFamilies.All) SetFamily(family, true);
+        _mapFilter.ShowAll();
+        MapFilterChanged();
     }
 
     private void FamilyTrees_Click(object sender, RoutedEventArgs e)
     {
-        foreach (var family in ResourceFamilies.All) SetFamily(family, family == ResourceFamilies.Trees);
+        foreach (var c in MapCategories.All)
+        {
+            if (_mapFilter.IsShown(c.Name) != (c.Name == MapCategories.Wood)) _mapFilter.ToggleCategory(c.Name);
+        }
+        MapFilterChanged();
     }
 
     private void TierAll_Click(object sender, RoutedEventArgs e)
     {
-        _hiddenTiers.Clear();
-        foreach (var check in _tierChecks.Values) check.IsChecked = true;
-        _resourceRows.Clear();
+        foreach (var tier in MapFilter.Tiers.Where(t => !_mapFilter.IsShown(t))) _mapFilter.ToggleTier(tier);
+        MapFilterChanged();
     }
 
-    private static int TierOf(NearbyResource r) => r.Tier ?? UnknownTier;
+    private IReadOnlyList<NearbyResource> _lastMapResources = [];
 
-    // Cases des paliers : refaites seulement quand la liste des paliers présents change ; le nombre suit les familles cochées.
-    private void ShowTierChecks(IReadOnlyList<NearbyResource> resources)
+    // Pastilles : allumées ou éteintes selon le filtre, avec le nombre de ressources de la zone lue.
+    private void ShowPills(IReadOnlyList<NearbyResource> resources)
     {
-        var counts = resources.Where(r => _shownFamilies.Contains(r.Family)).GroupBy(TierOf).ToDictionary(g => g.Key, g => g.Count());
-        var tiers = resources.Select(TierOf).Distinct().Order().ToList();
-        if (!tiers.SequenceEqual(_tierChecks.Keys.Order()))
+        _lastMapResources = resources;
+        var byCategory = _mapFilter.CategoryCounts(resources);
+        foreach (var (name, pill) in _categoryPills)
         {
-            _tierChecks.Clear();
-            TierChecks.Children.Clear();
-            foreach (var tier in tiers)
-            {
-                var check = new CheckBox { IsChecked = !_hiddenTiers.Contains(tier), Margin = new Thickness(0, 2, 14, 2) };
-                check.Click += (_, _) =>
-                {
-                    if (check.IsChecked == true) _hiddenTiers.Remove(tier);
-                    else _hiddenTiers.Add(tier);
-                    _resourceRows.Clear();
-                };
-                _tierChecks[tier] = check;
-                TierChecks.Children.Add(check);
-            }
+            pill.Set(name, byCategory.GetValueOrDefault(name), _mapFilter.IsShown(name));
         }
-        foreach (var (tier, check) in _tierChecks)
+        var byTier = _mapFilter.TierCounts(resources);
+        foreach (var (tier, pill) in _tierPills)
         {
-            check.Content = $"{(tier == UnknownTier ? "?" : $"T{tier}")} ({counts.GetValueOrDefault(tier)})";
-            check.Opacity = counts.GetValueOrDefault(tier) == 0 ? 0.5 : 1;
+            pill.Set(tier == MapFilter.UnknownTier ? "?" : $"T{tier}", byTier.GetValueOrDefault(tier), _mapFilter.IsShown(tier));
         }
     }
 
@@ -137,16 +143,11 @@ public partial class MainWindow
             ? $"Vous : {me.ScreenText} (±1){(s.Walking == true ? ", en marche" : "")} — vie {s.Health:0}, endurance {s.Stamina:0}, satiété {s.Satiation:0} — {s.RegionName ?? "région ?"}"
             : "En attente de la position du personnage…";
 
-        // Nombre de ressources lues par famille, sur chaque case.
-        var counts = s.Resources.GroupBy(r => r.Family).ToDictionary(g => g.Key, g => g.Count());
-        foreach (var (family, check) in _familyChecks)
-        {
-            check.Content = $"{family} ({counts.GetValueOrDefault(family)})";
-        }
-
-        ShowTierChecks(s.Resources);
-        bool Shown(NearbyResource r) => _shownFamilies.Contains(r.Family) && !_hiddenTiers.Contains(TierOf(r));
+        ShowPills(s.Resources);
+        var filter = _mapFilter;
+        bool Shown(NearbyResource r) => filter.Shows(r);
         var shown = s.Resources.Where(Shown).ToList();
+        ShowTerrain(reader);
         SrvResourceCount.Text = $"{shown.Count} / {s.Resources.Count} ressources · {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs";
 
         var best = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
@@ -163,6 +164,7 @@ public partial class MainWindow
         SrvArea.Text = reader.ResourceArea is { } a && reader.ResourceAreaUpdated is { } at
             ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d’environ 10 cases)"
               + (reader.HealthRefused ? " — santé refusée par le serveur" : "")
+              + (reader.TerrainRefused ? " — fond de carte refusé par le serveur" : SrvMap.TerrainText is { } t ? $" — {t}" : "")
             : "—";
 
         UpdateRows(shown.Take(MaxRowsShown).ToList(), best?.EntityId, match?.Resource.EntityId);
@@ -226,5 +228,135 @@ public partial class MainWindow
             _log.Detail("Serveur", $"Meilleur arbre : {Describe(best)}.");
         }
         _loggedBest = best?.EntityId;
+    }
+}
+
+// Fond de carte et pastilles des filtres (v0.4.18, D-070).
+public partial class MainWindow
+{
+    // Fond de carte : refait seulement quand les morceaux reçus (ou les zones découvertes) changent.
+    private void ShowTerrain(ServerReader reader)
+    {
+        var chunks = reader.TerrainChunks();
+        var explored = reader.Explored();
+        if (SrvMap.SetTerrain(chunks, explored) && !_terrainShownLogged && chunks.Count > 0)
+        {
+            _terrainShownLogged = true;
+            _log.Info("Carte", $"Fond de carte dessiné : {chunks.Count} morceaux de terrain, zones découvertes {(explored is null ? "pas lues" : $"lues ({explored.Count} morceaux découverts)")}.");
+            if (Environment.GetCommandLineArgs().Any(a => a.Equals("--sans-lancer-jeu", StringComparison.OrdinalIgnoreCase)))
+            {
+                // Essai de Claude (jeu jamais lancé) : image de la fenêtre enregistrée par le bot lui-même,
+                // car la capture de l'écran sort blanche quand la session Windows est verrouillée.
+                Dispatcher.BeginInvoke(SaveTestCapture, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+            }
+        }
+    }
+
+    private void SaveTestCapture()
+    {
+        try
+        {
+            if (Content is not FrameworkElement root || root.ActualWidth < 10)
+            {
+                return;
+            }
+            var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)root.ActualWidth, (int)root.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+            var visual = new DrawingVisual();
+            using (var dc = visual.RenderOpen())
+            {
+                dc.DrawRectangle(new VisualBrush(root), null, new Rect(0, 0, root.ActualWidth, root.ActualHeight));
+            }
+            bitmap.Render(visual);
+            var folder = System.IO.Path.Combine(AppContext.BaseDirectory, "captures-essai");
+            System.IO.Directory.CreateDirectory(folder);
+            var file = System.IO.Path.Combine(folder, $"carte-{DateTime.Now:HHmmss}.png");
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
+            using var stream = System.IO.File.Create(file);
+            encoder.Save(stream);
+            _log.Info("Carte", $"Essai : image de la fenêtre enregistrée ({file}).");
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            _log.Info("Carte", $"Essai : image de la fenêtre impossible ({ex.Message}).");
+        }
+    }
+}
+
+// Couleur de chaque palier (tier) : pastilles de la carte.
+public static class TierColors
+{
+    private static readonly Color[] Colors =
+    [
+        Color.FromRgb(176, 176, 176), // T1
+        Color.FromRgb(129, 199, 132), // T2
+        Color.FromRgb(79, 195, 247),  // T3
+        Color.FromRgb(92, 142, 246),  // T4
+        Color.FromRgb(186, 104, 200), // T5
+        Color.FromRgb(240, 98, 146),  // T6
+        Color.FromRgb(255, 138, 101), // T7
+        Color.FromRgb(255, 202, 40),  // T8
+        Color.FromRgb(239, 83, 80),   // T9
+        Color.FromRgb(240, 240, 240), // T10
+    ];
+
+    private static readonly Color UnknownColor = Color.FromRgb(120, 144, 156);
+
+    public static Brush Of(int tier)
+    {
+        var brush = new SolidColorBrush(tier is >= 1 and <= 10 ? Colors[tier - 1] : UnknownColor);
+        brush.Freeze();
+        return brush;
+    }
+}
+
+// Pastille cliquable (filtre de la carte) : allumée = fond coloré ; éteinte = contour seul, texte pâle.
+public sealed class MapPill : Border
+{
+    private readonly Brush _color;
+    private readonly TextBlock _dot = new() { Text = "●", Margin = new Thickness(0, 0, 5, 0), VerticalAlignment = VerticalAlignment.Center };
+    private readonly TextBlock _label = new() { VerticalAlignment = VerticalAlignment.Center, FontWeight = FontWeights.SemiBold };
+    private readonly TextBlock _count = new() { Margin = new Thickness(6, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center, Opacity = 0.85 };
+    private static readonly Brush OffBackground = Frozen(Color.FromArgb(40, 255, 255, 255));
+    private static readonly Brush DarkText = Frozen(Color.FromRgb(16, 24, 36));
+    private static readonly Brush OffText = Frozen(Color.FromRgb(120, 136, 156));
+
+    // true = clic droit.
+    public event Action<bool>? Clicked;
+
+    public MapPill(Brush color, string tip)
+    {
+        _color = color;
+        CornerRadius = new CornerRadius(12);
+        BorderThickness = new Thickness(1.5);
+        Padding = new Thickness(10, 3, 10, 3);
+        Margin = new Thickness(0, 3, 6, 3);
+        Cursor = Cursors.Hand;
+        ToolTip = tip;
+        Child = new StackPanel { Orientation = Orientation.Horizontal, Children = { _dot, _label, _count } };
+        MouseLeftButtonUp += (_, e) => { Clicked?.Invoke(false); e.Handled = true; };
+        MouseRightButtonUp += (_, e) => { Clicked?.Invoke(true); e.Handled = true; };
+    }
+
+    public bool On { get; private set; }
+
+    public void Set(string label, int count, bool on)
+    {
+        On = on;
+        _label.Text = label;
+        _count.Text = count.ToString(System.Globalization.CultureInfo.CurrentCulture);
+        BorderBrush = _color;
+        Background = on ? _color : OffBackground;
+        _label.Foreground = on ? DarkText : OffText;
+        _count.Foreground = on ? DarkText : OffText;
+        _dot.Foreground = on ? DarkText : _color;
+        Opacity = count == 0 && on ? 0.55 : 1;
+    }
+
+    private static Brush Frozen(Color c)
+    {
+        var b = new SolidColorBrush(c);
+        b.Freeze();
+        return b;
     }
 }

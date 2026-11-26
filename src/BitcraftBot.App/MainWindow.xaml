@@ -435,17 +435,21 @@
                     <StackPanel>
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                <Button Content="Tout" Style="{StaticResource SmallButton}" Click="FamilyAll_Click" />
-                                <Button Content="Arbres" Style="{StaticResource SmallButton}" Click="FamilyTrees_Click" Margin="0" />
+                                <Button Content="Tout" Style="{StaticResource SmallButton}" Click="FamilyAll_Click" ToolTip="Tout afficher : toutes les ressources, tous les tiers" />
+                                <Button Content="Bois seul" Style="{StaticResource SmallButton}" Click="FamilyTrees_Click" Margin="0" ToolTip="Seulement le bois (arbres)" />
                             </StackPanel>
                             <TextBlock x:Name="MapPlayerText" Text="Pas connecté." FontWeight="SemiBold" VerticalAlignment="Center" />
                         </DockPanel>
-                        <WrapPanel x:Name="FamilyChecks" Margin="0,8,0,0" />
-                        <WrapPanel Margin="0,4,0,0">
-                            <TextBlock Text="Palier" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" />
+                        <DockPanel Margin="0,8,0,0">
+                            <TextBlock Text="Ressources" Width="80" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" DockPanel.Dock="Left" />
+                            <WrapPanel x:Name="FamilyChecks" VerticalAlignment="Center" />
+                        </DockPanel>
+                        <DockPanel Margin="0,2,0,0">
+                            <TextBlock Text="Tier" Width="80" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" DockPanel.Dock="Left"
+                                       ToolTip="Clic sur un tier : l'afficher ou le masquer. Clic droit : ce tier seul." />
+                            <Button Content="Tous" Style="{StaticResource SmallButton}" Click="TierAll_Click" Margin="4,0,0,0" DockPanel.Dock="Right" VerticalAlignment="Center" ToolTip="Afficher tous les tiers" />
                             <WrapPanel x:Name="TierChecks" VerticalAlignment="Center" />
-                            <Button Content="Tous" Style="{StaticResource SmallButton}" Click="TierAll_Click" Margin="4,0,0,0" ToolTip="Afficher tous les paliers" />
-                        </WrapPanel>
+                        </DockPanel>
                         <TextBlock x:Name="SrvResourceCount" Text="" Style="{StaticResource MutedText}" />
                     </StackPanel>
                 </Border>
@@ -508,7 +512,7 @@
                                         <GridViewColumn Header="Dist." Width="60" DisplayMemberBinding="{Binding Distance}" />
                                         <GridViewColumn Header="Dir." Width="50" DisplayMemberBinding="{Binding Direction}" />
                                         <GridViewColumn Header="Position" Width="120" DisplayMemberBinding="{Binding Position}" />
-                                        <GridViewColumn Header="Palier" Width="55" DisplayMemberBinding="{Binding Tier}" />
+                                        <GridViewColumn Header="Tier" Width="55" DisplayMemberBinding="{Binding Tier}" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using BitcraftBot.Server.World;
 
 namespace BitcraftBot.App;
@@ -36,6 +37,11 @@ public sealed class ResourceMap : FrameworkElement
     private ulong? _best;
     private ulong? _screenTarget;
     private ulong? _selected;
+    private BitmapSource? _terrain;
+    private TerrainImage? _terrainImage;
+    private string? _terrainSignature;
+    private static readonly Pen DotOutline = FrozenPen(Color.FromArgb(200, 10, 16, 26), 1);
+    private static readonly Brush TerrainVeil = Frozen(Color.FromArgb(70, 10, 21, 36));
 
     // Clic sur la carte : la ressource la plus proche du clic (null si rien autour).
     public event Action<ulong?>? ResourceClicked;
@@ -51,6 +57,35 @@ public sealed class ResourceMap : FrameworkElement
         _screenTarget = screenTarget;
         _selected = selected;
         InvalidateVisual();
+    }
+
+    // Fond de carte (v0.4.18) : texte pour l'écran (null si aucun morceau).
+    public string? TerrainText { get; private set; }
+
+    // Refait l'image du fond seulement si les morceaux reçus ont changé. Renvoie true si l'image a été refaite.
+    public bool SetTerrain(IReadOnlyCollection<TerrainChunk> chunks, ExploredChunks? explored)
+    {
+        var signature = TerrainImage.SignatureOf(chunks, explored);
+        if (signature == _terrainSignature)
+        {
+            return false;
+        }
+        _terrainSignature = signature;
+        _terrainImage = TerrainImage.Build(chunks, explored);
+        if (_terrainImage is { } image)
+        {
+            var bitmap = BitmapSource.Create(image.Width, image.Height, 96, 96, PixelFormats.Bgra32, null, image.Pixels, image.Width * 4);
+            bitmap.Freeze();
+            _terrain = bitmap;
+            TerrainText = $"fond de carte : {image.ChunkCount} morceaux de terrain" + (explored is null ? "" : ", zones non découvertes assombries");
+        }
+        else
+        {
+            _terrain = null;
+            TerrainText = null;
+        }
+        InvalidateVisual();
+        return true;
     }
 
     private double Scale => (Math.Min(ActualWidth, ActualHeight) / 2 - 18) / RadiusUnits;
@@ -69,6 +104,17 @@ public sealed class ResourceMap : FrameworkElement
         if (scale <= 0)
         {
             return;
+        }
+
+        // Fond de carte (v0.4.18) : une case du jeu = un point de l'image, nord en haut, légèrement voilé pour que les points restent lisibles.
+        if (_terrain is { } bitmap && _terrainImage is { } image && _player is { } at)
+        {
+            dc.PushClip(new RectangleGeometry(size));
+            var left = c.X + (image.WestCell - 0.5 - at.ScreenEast) * scale;
+            var top = c.Y - (image.NorthCell + 0.5 - at.ScreenNorth) * scale;
+            dc.DrawImage(bitmap, new Rect(left, top, image.Width * scale, image.Height * scale));
+            dc.DrawRectangle(TerrainVeil, null, size);
+            dc.Pop();
         }
 
         // Repères : axes, cercles à 5 et 10 cases, points cardinaux.
@@ -95,7 +141,7 @@ public sealed class ResourceMap : FrameworkElement
         {
             if (!r.IsTree && _shown(r) && Visible(r))
             {
-                dc.DrawEllipse(FamilyColors.Of(r.Family), null, ToPoint(r.Position, player), 3.5, 3.5);
+                dc.DrawEllipse(FamilyColors.Of(r.Family), DotOutline, ToPoint(r.Position, player), 3.5, 3.5);
             }
         }
         foreach (var r in _resources.Where(r => r.IsTree && _shown(r) && Visible(r)))
@@ -108,7 +154,7 @@ public sealed class ResourceMap : FrameworkElement
                 "Mort" => (DeadBrush, 4.0),
                 _ => (OtherTreeBrush, 4.0),
             };
-            dc.DrawEllipse(brush, r.Health < r.MaxHealth ? DamagedPen : null, p, radius, radius);
+            dc.DrawEllipse(brush, r.Health < r.MaxHealth ? DamagedPen : DotOutline, p, radius, radius);
         }
         foreach (var (id, pen, radius) in new[] { (_best, BestPen, 11.0), (_screenTarget, ScreenTargetPen, 14.0), (_selected, SelectedPen, 9.5) })
         {

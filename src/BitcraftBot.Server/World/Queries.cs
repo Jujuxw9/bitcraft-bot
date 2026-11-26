@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -64,7 +64,25 @@ public static class Queries
             {
                 list.AddRange(GroundBags(a));
             }
+            if (withTerrain)
+            {
+                list.AddRange(Terrain(a, entityId));
+            }
         }
+        return list;
+    }
+
+    // Rayon couvert par le fond de carte, en cases du jeu (la carte montre 21 cases, un peu de marge).
+    public const double TerrainRadius = 24;
+
+    // Fond de carte (v0.4.18) : seulement les morceaux de terrain autour de la zone lue (4 à 9 morceaux, jamais toute
+    // la région), un par requête sur la clé primaire ; et les zones découvertes du personnage.
+    public static IReadOnlyList<string> Terrain(Area a, ulong entityId)
+    {
+        var list = TerrainChunk.ChunksAround(a.CenterX / 3.0, a.CenterZ / 3.0, TerrainRadius)
+            .Select(c => string.Create(CultureInfo.InvariantCulture, $"SELECT * FROM terrain_chunk_state WHERE chunk_index = {TerrainChunk.IndexOf(c.X, c.Z)}"))
+            .ToList();
+        list.Add(string.Create(CultureInfo.InvariantCulture, $"SELECT * FROM exploration_chunks_state_v2 WHERE entity_id = {entityId}"));
         return list;
     }
 

@@ -35,6 +35,12 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private bool _tasksRefused;
     // v0.4.4 : barre d'action, capacités et sacs au sol (abandonnés en premier si le serveur refuse).
     private bool _extrasRefused;
+    // v0.4.18 : fond de carte (morceaux de terrain, zones découvertes), abandonné en tout premier si refusé.
+    private bool _terrainRefused;
+    private bool _terrainLogged;
+    private readonly Dictionary<ulong, (Row Row, TerrainChunk? Chunk)> _terrainChunks = [];
+    private (Row? Row, ExploredChunks? Explored) _explored;
+    private readonly object _terrainLock = new();
     private bool _inventoryLogged;
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
@@ -80,6 +86,56 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     // Messages du chat Région reçus (module « @GPT », v0.4.5).
     public IReadOnlyList<ChatMessage> ChatMessages() => World.ChatMessages.Read(_cache);
 
+    // Fond de carte (v0.4.18) : refusé par le serveur ?
+    public bool TerrainRefused => _terrainRefused;
+
+    // Morceaux de terrain reçus (chaque ligne n'est convertie qu'une fois, tant qu'elle ne change pas).
+    public IReadOnlyList<TerrainChunk> TerrainChunks()
+    {
+        var rows = _cache.Rows("terrain_chunk_state");
+        lock (_terrainLock)
+        {
+            var result = new List<TerrainChunk>();
+            var seen = new HashSet<ulong>();
+            foreach (var row in rows)
+            {
+                if (row.U64("chunk_index") is not { } index)
+                {
+                    continue;
+                }
+                seen.Add(index);
+                if (!_terrainChunks.TryGetValue(index, out var known) || !ReferenceEquals(known.Row, row))
+                {
+                    known = (row, TerrainChunk.FromRow(row));
+                    _terrainChunks[index] = known;
+                }
+                if (known.Chunk is { } chunk)
+                {
+                    result.Add(chunk);
+                }
+            }
+            foreach (var gone in _terrainChunks.Keys.Where(k => !seen.Contains(k)).ToList())
+            {
+                _terrainChunks.Remove(gone);
+            }
+            return result;
+        }
+    }
+
+    // Zones découvertes par le personnage (null si la table n'est pas lisible).
+    public ExploredChunks? Explored()
+    {
+        var row = _entityId is { } e ? _cache.Rows("exploration_chunks_state_v2").FirstOrDefault(r => r.U64("entity_id") == e) : null;
+        lock (_terrainLock)
+        {
+            if (!ReferenceEquals(_explored.Row, row))
+            {
+                _explored = (row, ExploredChunks.FromRow(row, ExploredChunks.WorldWidth(_cache.Rows("world_region_state").FirstOrDefault())));
+            }
+            return _explored.Explored;
+        }
+    }
+
     // Résultat de la dernière découverte par le module global (null si elle n'a pas été faite).
     public RegionDiscovery? Discovery { get; private set; }
 
@@ -98,6 +154,13 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _inventoryRefused = false;
         _tasksRefused = false;
         _extrasRefused = false;
+        _terrainRefused = false;
+        _terrainLogged = false;
+        lock (_terrainLock)
+        {
+            _terrainChunks.Clear();
+            _explored = (null, null);
+        }
         _inventoryLogged = false;
         ResourceAreaUpdated = null;
         Interlocked.Exchange(ref _messages, 0);
@@ -211,8 +274,9 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             case SubscriptionEvent subscription:
                 _cache.Reset(subscription.Tables);
                 LastUpdate = DateTime.Now;
-                log.Info(Category, "Abonnement accepté : " + DescribeCounts());
+                log.Info(Category, $"Abonnement accepté ({json.Length / 1024.0:0} Ko reçus) : " + DescribeCounts());
                 LogFirstInventory();
+                LogFirstTerrain();
                 OnSubscriptionApplied();
                 break;
 
@@ -231,33 +295,40 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
             case SubscriptionErrorEvent error:
                 log.Erreur(Category, $"Abonnement refusé par le serveur : {error.Error}");
-                if (_entityId is { } te && !_tasksRefused)
+                if (_entityId is { } ge && _area is not null && !_terrainRefused)
+                {
+                    // D'abord sans le fond de carte (requêtes ajoutées en v0.4.18) : la carte garde son fond uni.
+                    _terrainRefused = true;
+                    log.Alerte(Category, "Nouvel essai sans le fond de carte (terrain et zones découvertes).");
+                    Subscribe(Queries.FollowPlayer(_identity!, ge, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: false), "suivi sans le fond de carte");
+                }
+                else if (_entityId is { } te && !_tasksRefused)
                 {
                     // D'abord sans les tâches de voyageur (requête ajoutée en v0.4.11).
                     _tasksRefused = true;
                     log.Alerte(Category, "Nouvel essai sans les tâches de voyageur.");
-                    Subscribe(Queries.FollowPlayer(_identity!, te, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: false), "suivi sans les tâches de voyageur");
+                    Subscribe(Queries.FollowPlayer(_identity!, te, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: false, withTerrain: !_terrainRefused), "suivi sans les tâches de voyageur");
                 }
                 else if (_entityId is { } xe && !_extrasRefused)
                 {
                     // D'abord sans la barre d'action, les capacités et les sacs au sol (requêtes ajoutées en v0.4.4).
                     _extrasRefused = true;
                     log.Alerte(Category, "Nouvel essai sans la barre d'action, les sacs au sol ni le chat.");
-                    Subscribe(Queries.FollowPlayer(_identity!, xe, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: false, withTasks: !_tasksRefused), "suivi sans la barre d'action, les sacs au sol ni le chat");
+                    Subscribe(Queries.FollowPlayer(_identity!, xe, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: false, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi sans la barre d'action, les sacs au sol ni le chat");
                 }
                 else if (_entityId is { } ie && !_inventoryRefused)
                 {
                     // D'abord sans le sac et les banques (requêtes ajoutées en v0.3.14).
                     _inventoryRefused = true;
                     log.Alerte(Category, "Nouvel essai sans le sac ni les banques.");
-                    Subscribe(Queries.FollowPlayer(_identity!, ie, _area, withHealth: !_healthRefused, withInventory: false, withExtras: false, withTasks: !_tasksRefused), "suivi sans le sac ni les banques");
+                    Subscribe(Queries.FollowPlayer(_identity!, ie, _area, withHealth: !_healthRefused, withInventory: false, withExtras: false, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi sans le sac ni les banques");
                 }
                 else if (_area is { } refusedArea && !_healthRefused && _entityId is { } he)
                 {
                     // D'abord sans la santé des ressources (requête ajoutée en v0.3.11), en gardant les ressources.
                     _healthRefused = true;
                     log.Alerte(Category, "Nouvel essai sans la santé des ressources.");
-                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused), "ressources sans la santé");
+                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "ressources sans la santé");
                 }
                 else if (_area is not null && !_resourcesRefused)
                 {
@@ -267,7 +338,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                     _area = null;
                     if (_entityId is { } e)
                     {
-                        Subscribe(Queries.FollowPlayer(_identity!, e, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused), "suivi sans ressources");
+                        Subscribe(Queries.FollowPlayer(_identity!, e, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi sans ressources");
                     }
                 }
                 else
@@ -316,6 +387,31 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         log.Info(Category, $"Tableau de bord : {snapshot.Skills?.Count.ToString() ?? "?"} métiers lus, action {snapshot.Action?.Type ?? "aucune"}, vie max {snapshot.MaxHealth?.ToString("0") ?? "?"}, endurance max {snapshot.MaxStamina?.ToString("0") ?? "?"}.");
     }
 
+    // Une fois par connexion (v0.4.18) : un extrait brut d'un morceau de terrain et des zones découvertes, avec le poids.
+    private void LogFirstTerrain()
+    {
+        var rows = _cache.Rows("terrain_chunk_state");
+        if (_terrainLogged || rows.Count == 0)
+        {
+            return;
+        }
+        _terrainLogged = true;
+        var raw = rows[0].ToString();
+        var weight = rows.Sum(r => (long)r.ToString().Length);
+        var chunks = TerrainChunks();
+        var sample = chunks.FirstOrDefault();
+        var detail = sample is null
+            ? "format inattendu : aucun morceau lisible"
+            : $"morceau ({sample.ChunkX}, {sample.ChunkZ}), hauteurs {sample.Elevations.Min()} à {sample.Elevations.Max()}, eau {sample.WaterLevels.Min()} à {sample.WaterLevels.Max()}, " +
+              $"biome principal {TerrainColors.BiomeName(sample.Biomes[TerrainChunk.Cells / 2])}";
+        log.Info(Category, $"Fond de carte : {rows.Count} morceaux reçus ({chunks.Count} lisibles, ≈ {weight / 1024.0:0} Ko en texte), {detail}. Exemple brut : {(raw.Length > 300 ? raw[..300] + "…" : raw)}");
+        var explored = Explored();
+        var exploredRaw = _cache.Rows("exploration_chunks_state_v2").FirstOrDefault()?.ToString() ?? "aucune ligne";
+        log.Info(Category, explored is null
+            ? $"Zones découvertes : pas lisibles ({(exploredRaw.Length > 200 ? exploredRaw[..200] + "…" : exploredRaw)})."
+            : $"Zones découvertes : {explored.Count} morceaux découverts (monde de {explored.WorldWidthChunks} morceaux de large).");
+    }
+
     private void OnSubscriptionApplied()
     {
         var snapshot = Snapshot();
@@ -329,7 +425,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         {
             _entityId = snapshot.EntityId;
             log.Info(Category, $"Personnage trouvé (entité {_entityId}).");
-            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused), "suivi du personnage");
+            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi du personnage");
             return;
         }
         SetState(ReaderState.Connecte, "Lecture en direct.");
@@ -359,7 +455,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         var why = previous is { } old
             ? $"ressources autour de {p.ScreenText} : le personnage s'est éloigné de {new ServerPosition(old.CenterX, old.CenterZ).ScreenDistanceTo(p):0.0} cases écran du centre de l'ancienne zone"
             : $"ressources autour de {p.ScreenText}";
-        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused), why);
+        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), why);
     }
 
     private void Subscribe(IReadOnlyList<string> queries, string why)
