@@ -35,6 +35,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private bool _tasksRefused;
     // v0.4.4 : barre d'action, capacités et sacs au sol (abandonnés en premier si le serveur refuse).
     private bool _extrasRefused;
+    // v0.4.19 : sacs au sol, retirés à part (avant, ils partaient avec la barre d'action et le chat).
+    private bool _bagsRefused;
     // v0.4.18 : fond de carte (morceaux de terrain, zones découvertes), abandonné en tout premier si refusé.
     private bool _terrainRefused;
     private bool _terrainLogged;
@@ -155,6 +157,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _tasksRefused = false;
         _extrasRefused = false;
         _terrainRefused = false;
+        _bagsRefused = false;
         _terrainLogged = false;
         lock (_terrainLock)
         {
@@ -295,56 +298,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
 
             case SubscriptionErrorEvent error:
                 log.Erreur(Category, $"Abonnement refusé par le serveur : {error.Error}");
-                if (_entityId is { } ge && _area is not null && !_terrainRefused)
-                {
-                    // D'abord sans le fond de carte (requêtes ajoutées en v0.4.18) : la carte garde son fond uni.
-                    _terrainRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans le fond de carte (terrain et zones découvertes).");
-                    Subscribe(Queries.FollowPlayer(_identity!, ge, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: false), "suivi sans le fond de carte");
-                }
-                else if (_entityId is { } te && !_tasksRefused)
-                {
-                    // D'abord sans les tâches de voyageur (requête ajoutée en v0.4.11).
-                    _tasksRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans les tâches de voyageur.");
-                    Subscribe(Queries.FollowPlayer(_identity!, te, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: false, withTerrain: !_terrainRefused), "suivi sans les tâches de voyageur");
-                }
-                else if (_entityId is { } xe && !_extrasRefused)
-                {
-                    // D'abord sans la barre d'action, les capacités et les sacs au sol (requêtes ajoutées en v0.4.4).
-                    _extrasRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans la barre d'action, les sacs au sol ni le chat.");
-                    Subscribe(Queries.FollowPlayer(_identity!, xe, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: false, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi sans la barre d'action, les sacs au sol ni le chat");
-                }
-                else if (_entityId is { } ie && !_inventoryRefused)
-                {
-                    // D'abord sans le sac et les banques (requêtes ajoutées en v0.3.14).
-                    _inventoryRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans le sac ni les banques.");
-                    Subscribe(Queries.FollowPlayer(_identity!, ie, _area, withHealth: !_healthRefused, withInventory: false, withExtras: false, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi sans le sac ni les banques");
-                }
-                else if (_area is { } refusedArea && !_healthRefused && _entityId is { } he)
-                {
-                    // D'abord sans la santé des ressources (requête ajoutée en v0.3.11), en gardant les ressources.
-                    _healthRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans la santé des ressources.");
-                    Subscribe(Queries.FollowPlayer(_identity!, he, refusedArea, withHealth: false, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "ressources sans la santé");
-                }
-                else if (_area is not null && !_resourcesRefused)
-                {
-                    // Les requêtes des ressources (avec jointure) sont les plus fragiles : on continue sans elles.
-                    _resourcesRefused = true;
-                    log.Alerte(Category, "Nouvel essai sans la liste des ressources proches.");
-                    _area = null;
-                    if (_entityId is { } e)
-                    {
-                        Subscribe(Queries.FollowPlayer(_identity!, e, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi sans ressources");
-                    }
-                }
-                else
-                {
-                    SetState(ReaderState.Erreur, $"Abonnement refusé : {error.Error}");
-                }
+                OnSubscriptionRefused(error.Error);
                 break;
 
             case UnknownEvent unknown:
@@ -352,6 +306,69 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 break;
         }
     }
+
+    // Abonnement refusé (v0.4.19) : on retire une seule partie à la fois, en commençant par les plus lourdes
+    // (celles qui dépendent de la zone autour du personnage). Le sac, les banques, le chat, la barre d'action et
+    // les voyageurs ne demandent qu'une petite lecture : ils ne sont retirés qu'en tout dernier.
+    // Avant la v0.4.19, l'ordre était inverse : le 26/11 au soir, un refus causé par les ressources a fait
+    // retirer tout le reste (onglets vides).
+    private void OnSubscriptionRefused(string reason)
+    {
+        if (_entityId is not { } entity || _identity is null)
+        {
+            SetState(ReaderState.Erreur, $"Abonnement refusé : {reason}");
+            return;
+        }
+        string what;
+        if (_area is not null && !_terrainRefused)
+        {
+            _terrainRefused = true;
+            what = "le fond de carte (terrain et zones découvertes)";
+        }
+        else if (_area is not null && !_bagsRefused)
+        {
+            _bagsRefused = true;
+            what = "les sacs au sol";
+        }
+        else if (_area is not null && !_healthRefused)
+        {
+            _healthRefused = true;
+            what = "la santé des ressources";
+        }
+        else if (_area is not null && !_resourcesRefused)
+        {
+            _resourcesRefused = true;
+            _area = null;
+            what = "la liste des ressources proches";
+        }
+        else if (!_tasksRefused)
+        {
+            _tasksRefused = true;
+            what = "les tâches de voyageur";
+        }
+        else if (!_extrasRefused)
+        {
+            _extrasRefused = true;
+            what = "la barre d'action, les colonies ni le chat";
+        }
+        else if (!_inventoryRefused)
+        {
+            _inventoryRefused = true;
+            what = "le sac ni les banques";
+        }
+        else
+        {
+            SetState(ReaderState.Erreur, $"Abonnement refusé : {reason}");
+            return;
+        }
+        log.Alerte(Category, $"Nouvel essai sans {what}.");
+        Subscribe(FollowQueries(entity, _area), $"suivi sans {what}");
+    }
+
+    // Requêtes de suivi du personnage, sans les parties déjà refusées par le serveur.
+    private IReadOnlyList<string> FollowQueries(ulong entity, Area? area) =>
+        Queries.FollowPlayer(_identity!, entity, area, withHealth: !_healthRefused, withInventory: !_inventoryRefused,
+            withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused, withBags: !_bagsRefused);
 
     // Une fois par connexion : un extrait brut d'un inventaire, pour vérifier le format réel des poches (v0.3.14).
     private void LogFirstInventory()
@@ -425,7 +442,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         {
             _entityId = snapshot.EntityId;
             log.Info(Category, $"Personnage trouvé (entité {_entityId}).");
-            Subscribe(Queries.FollowPlayer(_identity!, _entityId.Value, null, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), "suivi du personnage");
+            Subscribe(FollowQueries(_entityId.Value, null), "suivi du personnage");
             return;
         }
         SetState(ReaderState.Connecte, "Lecture en direct.");
@@ -455,7 +472,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         var why = previous is { } old
             ? $"ressources autour de {p.ScreenText} : le personnage s'est éloigné de {new ServerPosition(old.CenterX, old.CenterZ).ScreenDistanceTo(p):0.0} cases écran du centre de l'ancienne zone"
             : $"ressources autour de {p.ScreenText}";
-        Subscribe(Queries.FollowPlayer(_identity, entity, _area, withHealth: !_healthRefused, withInventory: !_inventoryRefused, withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused), why);
+        Subscribe(FollowQueries(entity, _area), why);
     }
 
     private void Subscribe(IReadOnlyList<string> queries, string why)

@@ -42,3 +42,9 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - **Filtres** (testés) : `Server/World/MapFilter.cs` : `MapCategories` (12 familles → 7 catégories), `MapFilter` (catégories affichées, tiers masqués, ce tier seul, nombres croisés : un bouton de tier compte selon les catégories allumées et inversement).
 - **Fenêtre** : `MainWindow.Map.cs` : pastilles `MapPill` (fond coloré allumée, contour éteinte, nombre), couleurs `TierColors` ; filtres gardés dans `config.local.json` (`MapShownCategories`, `MapHiddenTiers`). `ResourceMap.SetTerrain` dessine l'image sous les cercles, les points ont un contour sombre.
 - **Essai de Claude** : avec `--sans-lancer-jeu`, le bot enregistre une image de sa fenêtre dans `captures-essai\` à côté du .exe au premier dessin du fond (la capture de l'écran sort blanche quand la session Windows est verrouillée).
+
+## 23. v0.4.19 : requêtes de zone par morceau de carte (D-071)
+
+- **Pourquoi** : depuis le 26/11 au soir, le serveur refuse un abonnement dont l'estimation dépasse 20 millions de lignes ; un carré de coordonnées seul sur `location_state` est estimé trop large.
+- **Comment** : chaque requête de zone (ressources, santé, sacs au sol) porte `chunk_index = N` (colonne indexée) en plus du carré ; une requête par morceau de 32 × 32 cases touché par la zone. Les morceaux du fond de carte restent ceux de la v0.4.18.
+- **Repli** : en cas de refus, une seule partie est retirée à la fois, des plus lourdes (zone autour du personnage) aux plus légères (sac, banques). Sac, banques, chat, barre d'action et voyageurs ne partent qu'en dernier.

@@ -90,3 +90,4 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-068](D-068-v0416-archive-chat.md) | v0.4.16 : archive du chat en local (SQLite à côté du .exe), messages privés lus à la découverte, onglet CHAT avec tableau, recherche, filtre | Validée | 2026-11-26 |
 | [D-069](D-069-v0417-capacites-auto.md) | v0.4.17 : capacités automatiques de la barre d'action pendant les récoltes (métier déduit des bonus, réserve d'endurance 30 %, une touche / 2 s, interrupteur par capacité) | Validée | 2026-11-26 |
 | [D-070](D-070-v0418-carte-fond-filtres.md) | v0.4.18 : onglet CARTE refait (fond de carte lu sur le serveur : biomes, relief, eau, zones découvertes ; filtres en pastilles par catégorie et tier, retenus) | Validée | 2026-11-26 |
+| [D-071](D-071-v0419-requetes-par-morceau.md) | v0.4.19 : ressources demandées par morceau de carte (nouvelle limite du serveur), repli qui ne retire que la partie en trop | Validée | 2026-11-26 |

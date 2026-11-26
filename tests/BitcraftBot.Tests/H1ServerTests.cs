@@ -200,7 +200,7 @@ public class H1ServerTests
         var queries = Queries.FollowPlayer("abcd", 7, area);
         Assert.Contains("SELECT * FROM user_state WHERE identity = 0xabcd", queries);
         Assert.Contains("SELECT * FROM mobile_entity_state WHERE entity_id = 7", queries);
-        Assert.Contains(queries, q => q.StartsWith("SELECT l.* FROM location_state l JOIN resource_state r ON l.entity_id = r.entity_id WHERE l.x >= 60 AND l.x <= 141", StringComparison.Ordinal));
+        Assert.Contains(queries, q => q.StartsWith("SELECT l.* FROM location_state l JOIN resource_state r ON l.entity_id = r.entity_id WHERE l.chunk_index = 1001 AND l.x >= 60 AND l.x <= 141", StringComparison.Ordinal));
         Assert.All(queries, q => Assert.StartsWith("SELECT ", q));
         Assert.DoesNotContain(Queries.FollowPlayer("abcd", 7, null), q => q.Contains("resource_state", StringComparison.Ordinal));
 

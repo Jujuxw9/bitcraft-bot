@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false, bool withBags = true)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -60,7 +60,7 @@ public static class Queries
         if (area is { } a)
         {
             list.AddRange(Resources(a, withHealth));
-            if (withExtras)
+            if (withExtras && withBags)
             {
                 list.AddRange(GroundBags(a));
             }
@@ -89,35 +89,43 @@ public static class Queries
     // Sacs tombés au sol dans la zone (v0.4.4) : le sac, sa position, son contenu, ses minuteries (propriétaire, disparition).
     public static IReadOnlyList<string> GroundBags(Area a)
     {
-        var where = string.Create(CultureInfo.InvariantCulture,
-            $"l.x >= {a.MinX} AND l.x <= {a.MaxX} AND l.z >= {a.MinZ} AND l.z <= {a.MaxZ}");
-        return
-        [
-            $"SELECT d.* FROM dropped_inventory_state d JOIN location_state l ON d.entity_id = l.entity_id WHERE {where}",
-            $"SELECT l.* FROM location_state l JOIN dropped_inventory_state d ON l.entity_id = d.entity_id WHERE {where}",
-            $"SELECT i.* FROM inventory_state i JOIN dropped_inventory_state d ON i.owner_entity_id = d.entity_id",
-            $"SELECT t.* FROM dropped_inventory_ownership_timer t JOIN location_state l ON t.entity_id = l.entity_id WHERE {where}",
-            $"SELECT t.* FROM dropped_inventory_despawn_timer t JOIN location_state l ON t.entity_id = l.entity_id WHERE {where}",
-        ];
+        var list = new List<string>();
+        foreach (var where in AreaFilters(a))
+        {
+            list.Add($"SELECT d.* FROM dropped_inventory_state d JOIN location_state l ON d.entity_id = l.entity_id WHERE {where}");
+            list.Add($"SELECT l.* FROM location_state l JOIN dropped_inventory_state d ON l.entity_id = d.entity_id WHERE {where}");
+            list.Add($"SELECT t.* FROM dropped_inventory_ownership_timer t JOIN location_state l ON t.entity_id = l.entity_id WHERE {where}");
+            list.Add($"SELECT t.* FROM dropped_inventory_despawn_timer t JOIN location_state l ON t.entity_id = l.entity_id WHERE {where}");
+        }
+        list.Add("SELECT i.* FROM inventory_state i JOIN dropped_inventory_state d ON i.owner_entity_id = d.entity_id");
+        return list;
     }
 
     // Ressources (arbres, rochers, buissons…) dans un carré autour du personnage : leur position, leur type
     // et, si demandé, leur santé actuelle (resource_health_state, une ligne par ressource dès son apparition).
     public static IReadOnlyList<string> Resources(Area a, bool withHealth = true)
     {
-        var where = string.Create(CultureInfo.InvariantCulture,
-            $"l.x >= {a.MinX} AND l.x <= {a.MaxX} AND l.z >= {a.MinZ} AND l.z <= {a.MaxZ}");
-        var list = new List<string>
+        var list = new List<string>();
+        foreach (var where in AreaFilters(a))
         {
-            $"SELECT l.* FROM location_state l JOIN resource_state r ON l.entity_id = r.entity_id WHERE {where}",
-            $"SELECT r.* FROM resource_state r JOIN location_state l ON r.entity_id = l.entity_id WHERE {where}",
-        };
-        if (withHealth)
-        {
-            list.Add($"SELECT h.* FROM resource_health_state h JOIN location_state l ON h.entity_id = l.entity_id WHERE {where}");
+            list.Add($"SELECT l.* FROM location_state l JOIN resource_state r ON l.entity_id = r.entity_id WHERE {where}");
+            list.Add($"SELECT r.* FROM resource_state r JOIN location_state l ON r.entity_id = l.entity_id WHERE {where}");
+            if (withHealth)
+            {
+                list.Add($"SELECT h.* FROM resource_health_state h JOIN location_state l ON h.entity_id = l.entity_id WHERE {where}");
+            }
         }
         return list;
     }
+
+    // v0.4.19 : depuis le 26/11 au soir, le serveur refuse un carré de coordonnées seul (« Estimated cardinality …
+    // exceeds limit »). On ajoute le numéro du morceau de carte (colonne indexée) : une requête par morceau touché
+    // par le carré (1 à 4 en général). Mêmes lignes reçues qu'avant, estimation acceptée.
+    public static IReadOnlyList<string> AreaFilters(Area a) =>
+        a.ChunkIndexes()
+            .Select(c => string.Create(CultureInfo.InvariantCulture,
+                $"l.chunk_index = {c} AND l.x >= {a.MinX} AND l.x <= {a.MaxX} AND l.z >= {a.MinZ} AND l.z <= {a.MaxZ}"))
+            .ToList();
 }
 
 // Carré de cases (petites cases hexagonales du serveur), bornes incluses.
@@ -129,4 +137,23 @@ public readonly record struct Area(int MinX, int MaxX, int MinZ, int MaxZ)
     public double CenterX => (MinX + MaxX) / 2.0;
 
     public double CenterZ => (MinZ + MaxZ) / 2.0;
+
+    // Petites cases par côté d'un morceau de carte (32 grandes cases × 3).
+    public const int ChunkSmallCells = TerrainChunk.Size * 3;
+
+    // Numéros des morceaux de carte (chunk_index du serveur) touchés par le carré.
+    public IReadOnlyList<ulong> ChunkIndexes()
+    {
+        var list = new List<ulong>();
+        for (var z = FloorDiv(MinZ); z <= FloorDiv(MaxZ); z++)
+        {
+            for (var x = FloorDiv(MinX); x <= FloorDiv(MaxX); x++)
+            {
+                list.Add(TerrainChunk.IndexOf(x, z));
+            }
+        }
+        return list;
+    }
+
+    private static int FloorDiv(int value) => (int)Math.Floor(value / (double)ChunkSmallCells);
 }

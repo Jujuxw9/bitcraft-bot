@@ -15,3 +15,6 @@
 ## À vérifier
 - Format réel des messages privés (jamais reçus : module global refusé pendant l'essai du 26/11 à 03:38).
 - Choix prudent de la tâche : pas de liaison permanente au module global (risque d'éjecter le jeu) ; les messages privés reçus pendant la partie ne sont donc archivés qu'au démarrage suivant, s'ils sont encore sur le serveur.
+
+## Complément (2026-11-26 au soir)
+Julien : **ne jamais effacer** les vieux messages de l'archive, le but est de tout garder.

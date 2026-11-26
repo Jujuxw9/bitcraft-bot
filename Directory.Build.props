@@ -2,7 +2,7 @@
   <!-- Réglages communs à tous les projets de la solution -->
   <PropertyGroup>
     <!-- Version du bot : à changer à chaque nouvelle version (D-010) -->
-    <Version>0.4.18</Version>
+    <Version>0.4.19</Version>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>

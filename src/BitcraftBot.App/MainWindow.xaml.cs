@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.18 : onglet CARTE refait : vrai fond de carte lu sur le serveur du jeu (biomes, relief ombré, eau, zones non découvertes assombries), filtres en pastilles cliquables (7 catégories de ressources, tiers T1 à T10 ; clic droit sur un tier = ce tier seul), filtres retenus d’une fois sur l’autre.");
+        _log.Info("Session", "Version 0.4.19 : correction du soir du 26/11 : le serveur refusait les ressources autour du personnage (nouvelle limite) ; elles sont demandées par morceau de carte. En cas de refus, le bot ne retire plus que la partie en trop (fond de carte, sacs au sol, ressources), jamais le sac, les banques, le chat, la barre d’action ni les voyageurs.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

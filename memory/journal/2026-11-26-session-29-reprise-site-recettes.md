@@ -16,8 +16,15 @@ Reprendre après la passation 28 et répondre à Julien sur la méthode du site 
 - Rapport T-04 : corrections sûres appliquées (index racine D-070 et architecture-suite, résumé global raccourci, note dans `tests/README.md`, couverture de `architecture-serveur.md`). À trancher par Julien : T-04 dans D-067, Q-002/Q-003/Q-008/Q-014, exemption de longueur des archives, tri des vieilles questions.
 - Julien : le site des recettes est pour lui, ses amis et sa guilde (pas public). Prompt de la session « site des recettes » écrit : `echanges/2026-11-26-prompt-site-recettes.md` (lien du dépôt Dogo eSport à donner par Julien).
 
+### Suite (26/11, 19:00 → 19:35) : essai de la v0.4.18, v0.4.19
+- Essai de Julien (18:53) : démarrage en séquence OK (bot → écran → jeu par Steam). Mais carte, voyageurs, personnage, chat et activité vides.
+- Cause (journal) : le serveur refuse les ressources autour du personnage (« Estimated cardinality … exceeds limit »). Les mêmes requêtes passaient à 13:27. Le repli du bot retirait d'abord tout le reste (sac, chat, voyageurs) : onglets vides.
+- Sonde de lecture (hors dépôt, jeu fermé) : carré seul refusé ; morceau de carte + carré accepté ; OR refusé ; abonnement complet accepté.
+- v0.4.19 (D-071) : requêtes par morceau, repli dans le bon ordre. Tests 626/626. Essai réel (jeu fermé, 19:27) : tout accepté, 1 848 ressources, 24 tâches, 6 morceaux de fond. .exe publié.
+- Réponses de Julien : archive du chat, tout garder (complément de D-068) ; plus de 300 lignes permis mais place réduite ; caméra et exploration plus tard ; lien Dogo eSport annoncé mais pas reçu.
+
 ## Décisions prises (liens D-NNN)
-Aucune (méthode du site proposée, pas encore validée).
+- [D-071](../decisions/D-071-v0419-requetes-par-morceau.md) : requêtes de zone par morceau de carte, repli corrigé.
 
 ## Questions ouvertes créées (liens Q-NNN)
 Aucune. Question posée : le site est pour qui ?

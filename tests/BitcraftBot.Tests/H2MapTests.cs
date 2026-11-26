@@ -99,6 +99,25 @@ public class H2MapTests
         Assert.Contains(with, q => q.StartsWith("SELECT h.* FROM resource_health_state h JOIN location_state l ON h.entity_id = l.entity_id WHERE", StringComparison.Ordinal));
         Assert.All(with, q => Assert.StartsWith("SELECT ", q));
         Assert.DoesNotContain(Queries.Resources(area, withHealth: false), q => q.Contains("resource_health_state", StringComparison.Ordinal));
-        Assert.Equal(2, Queries.Resources(area, withHealth: false).Count);
+        // v0.4.19 : une requête par morceau de carte touché (ici 2 × 2 morceaux).
+        Assert.Equal(8, Queries.Resources(area, withHealth: false).Count);
+    }
+
+    // v0.4.19 : le serveur refuse un carré de coordonnées seul ; chaque requête de zone porte le numéro du morceau.
+    [Fact]
+    public void Requetes_de_zone_par_morceau_de_carte()
+    {
+        // Zone de l'essai du 26/11 au soir (N 9155, E 6903) : 4 morceaux, celui du personnage (286216) compris.
+        var area = new Area(20649, 20770, 27406, 27527);
+        Assert.Equal(new ulong[] { 285216, 285217, 286216, 286217 }, area.ChunkIndexes());
+        var queries = Queries.FollowPlayer("abcd", 7, area, withTerrain: true);
+        Assert.All(queries.Where(q => q.Contains("JOIN location_state", StringComparison.Ordinal)),
+            q => Assert.Contains("l.chunk_index = ", q));
+        Assert.Contains("SELECT r.* FROM resource_state r JOIN location_state l ON r.entity_id = l.entity_id WHERE l.chunk_index = 286216 AND l.x >= 20649 AND l.x <= 20770 AND l.z >= 27406 AND l.z <= 27527", queries);
+        // Sacs au sol retirables seuls, sans toucher au chat ni à la barre d'action.
+        var noBags = Queries.FollowPlayer("abcd", 7, area, withBags: false);
+        Assert.DoesNotContain(noBags, q => q.Contains("dropped_inventory", StringComparison.Ordinal));
+        Assert.Contains(noBags, q => q.Contains("action_bar_state", StringComparison.Ordinal));
+        Assert.Contains(noBags, q => q.Contains("chat_message_state", StringComparison.Ordinal));
     }
 }
