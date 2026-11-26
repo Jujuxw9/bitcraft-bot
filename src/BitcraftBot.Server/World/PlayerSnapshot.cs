@@ -31,6 +31,9 @@ public sealed record PlayerSnapshot
 
     public ActionInfo? Action { get; init; }
 
+    // v0.4.22 : fabrications en cours du personnage (vraie progression).
+    public IReadOnlyList<CraftProgress> Crafts { get; init; } = [];
+
     public ExtractInfo? LastExtract { get; init; }
 
     public int? TimePlayedSeconds { get; init; }
@@ -145,6 +148,7 @@ public static class SnapshotBuilder
             Buffs = PlayerBuffs.Of(cache, entity.Value),
             Skills = PlayerActivity.Skills(cache, entity.Value),
             Action = PlayerActivity.CurrentAction(cache, entity.Value),
+            Crafts = PlayerActivity.Crafts(cache, entity.Value),
             LastExtract = PlayerActivity.LastExtract(cache, entity.Value),
             TimePlayedSeconds = Of("player_state")?.I32("time_played"),
             TeleportEnergy = Of("teleportation_energy_state")?.F64("energy"),

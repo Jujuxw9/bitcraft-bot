@@ -26,7 +26,7 @@
 ## Versions et fichiers (D-040)
 
 - Nouvelle version : changer `<Version>` dans `Directory.Build.props` et le message de version (`MainWindow.xaml.cs`), puis lancer `tools/publier-version.ps1`. La dernière version est toujours dans `artifacts/release/`, les anciennes dans `artifacts/old/vX.Y.Z/`.
-- **Chaque nouvelle version : toujours fabriquer le .exe en local (`artifacts/release`), mais pas de Release ni de tag GitHub** (demande de Julien, 2026-11-19). Commit, push et sync seulement. Exception : une Release seulement quand Julien la demande pour une version précise (v0.4.21, D-075).
+- **Chaque nouvelle version : toujours fabriquer le .exe en local (`artifacts/release`), puis commit, push et sync.** **Release GitHub (tag + .exe) seulement aux grandes étapes, une par palier** : 0.4 faite (v0.4.21), la prochaine en 0.5.x (D-076). En cas de doute, demander à Julien.
 - Julien lance toujours `artifacts\release\BitcraftBot-vX.Y.Z.exe` (nom avec la version, depuis la v0.3.15). Ses journaux sont dans `artifacts/release/journaux/vX.Y.Z/AAAA-MM-JJ/`.
 - `references/BitCraftPublic/` : copie du code serveur officiel. Vérifier de temps en temps s'il a changé (voir `references/README.md`).
 

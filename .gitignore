@@ -518,3 +518,6 @@ models/large/
 archive-chat/
 *.db
 *.db-journal
+
+# Mémoire du fond de carte (v0.4.22) : morceaux de terrain gardés à côté du .exe, jamais dans Git
+carte/

@@ -41,6 +41,10 @@ public sealed class RecipeBook
     public required IReadOnlyDictionary<string, GameEntry> Entries { get; init; }
     public required IReadOnlyList<Recipe> Recipes { get; init; }
 
+    // v0.4.22 : nombre de gestes de chaque recette de fabrication (par numéro de recette du serveur), pour la vraie
+    // progression d'une fabrication (progress ÷ (gestes × nombre d'objets)).
+    public IReadOnlyDictionary<int, int> CraftActions { get; init; } = new Dictionary<int, int>();
+
     private Dictionary<string, List<Recipe>>? _producing;
     private Dictionary<string, List<Recipe>>? _using;
 
@@ -179,8 +183,10 @@ public sealed class RecipeBook
             new((Str(s, "item_type") == "Cargo" ? "C" : "I") + Int(s, "item_id"), Int(s, "quantity"), probability);
 
         var recipes = new List<Recipe>();
+        var craftActions = new Dictionary<int, int>();
         foreach (var e in Read(folder, "crafting_recipe_desc"))
         {
+            craftActions[Int(e, "id")] = Int(e, "actions_required");
             var outputs = Array(e, "crafted_item_stacks").Select(s => Stack(s)).ToList();
             var name = Str(e, "name");
             if (name.Contains("{0}") && outputs.Count > 0)
@@ -236,7 +242,7 @@ public sealed class RecipeBook
                     0, Dbl(e, "time_cost"), Dbl(e, "stamina_cost"), false, false, Bool(e, "allow_use_hands")));
             }
         }
-        return new RecipeBook { Entries = entries, Recipes = recipes };
+        return new RecipeBook { Entries = entries, Recipes = recipes, CraftActions = craftActions };
     }
 
     private static List<JsonElement> Read(string folder, string table)

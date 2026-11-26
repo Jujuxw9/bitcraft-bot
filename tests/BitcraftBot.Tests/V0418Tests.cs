@@ -44,11 +44,11 @@ public class V0418Tests
     [Fact]
     public void ChunksAroundCoverTheMap()
     {
-        // Personnage au milieu d'un morceau : 21 + 3 cases de chaque côté tiennent dans 3 × 3 morceaux au plus.
+        // v0.4.22 : 30 + 4 cases de chaque côté tiennent dans 4 × 4 morceaux au plus.
         var chunks = TerrainChunk.ChunksAround(3216, 7392, Queries.TerrainRadius);
-        Assert.InRange(chunks.Count, 4, 9);
+        Assert.InRange(chunks.Count, 4, 16);
         Assert.Contains((3216 / 32, 7392 / 32), chunks);
-        Assert.All(chunks, c => Assert.InRange(c.X, 3216 / 32 - 1, 3216 / 32 + 1));
+        Assert.All(chunks, c => Assert.InRange(c.X, 3216 / 32 - 2, 3216 / 32 + 2));
         // Au bord du monde, pas de morceau négatif.
         Assert.All(TerrainChunk.ChunksAround(5, 5, 24), c => Assert.True(c.X >= 0 && c.Z >= 0));
     }
@@ -58,7 +58,7 @@ public class V0418Tests
     {
         var area = Area.Around(3216 * 3, 7392 * 3, 60);
         var queries = Queries.Terrain(area, 42);
-        Assert.InRange(queries.Count, 5, 10);
+        Assert.InRange(queries.Count, 5, 17);
         Assert.All(queries, q => Assert.StartsWith("SELECT * FROM ", q));
         Assert.Contains(queries, q => q == "SELECT * FROM exploration_chunks_state_v2 WHERE entity_id = 42");
         Assert.DoesNotContain(Queries.FollowPlayer("ab", 42, area), q => q.Contains("terrain_chunk_state"));

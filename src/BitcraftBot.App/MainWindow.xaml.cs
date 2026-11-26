@@ -88,6 +88,13 @@ public partial class MainWindow : Window
         VersionText.Text = $"Version {_version}";
 
         _settings = LocalSettings.Load(LocalSettings.DefaultPath);
+        // v0.4.22 : seuils RAM relevés (le bot tourne vers 550-600 Mo) ; 1000 / 1600 Mo au minimum, même si un réglage plus bas était enregistré.
+        if (_settings.Limits.BotRamWarningMb < BitcraftBot.Core.Monitoring.ResourceLimits.DefaultRamWarningMb || _settings.Limits.BotRamCriticalMb < BitcraftBot.Core.Monitoring.ResourceLimits.DefaultRamCriticalMb)
+        {
+            _settings.Limits.BotRamWarningMb = Math.Max(_settings.Limits.BotRamWarningMb, BitcraftBot.Core.Monitoring.ResourceLimits.DefaultRamWarningMb);
+            _settings.Limits.BotRamCriticalMb = Math.Max(_settings.Limits.BotRamCriticalMb, BitcraftBot.Core.Monitoring.ResourceLimits.DefaultRamCriticalMb);
+            _settings.Save(LocalSettings.DefaultPath);
+        }
         _settings.TargetFps = Math.Clamp(_settings.TargetFps, 1, 15);
         ApplyWindowSettings();
 
@@ -141,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.21 : zone lue et carte à 25 cases, boutons de tier T1 à T5 seulement. Reprend la 0.4.20 : fond de carte en hexagones (une grande case du jeu = un hexagone), pierre et minerai séparés, tiers d’une seule couleur, boutons Tout, Bois seul, Tous et « ? » retirés ; images de PERSONNAGE agrandies ; CHAT en direct, le plus récent en bas ; activité sans clignotement entre deux coups.");
+        _log.Info("Session", "Version 0.4.22 : carte à 30 cases avec un seul cercle, zoom + et −, mémoire de la carte (terrain gardé sur le disque, ressources déjà vues en pâle) ; vraie progression des fabrications ; ceinture en vignettes ; seuils RAM 1000 / 1600 Mo, pics brefs ignorés, mémoire rendue après les gros envois.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

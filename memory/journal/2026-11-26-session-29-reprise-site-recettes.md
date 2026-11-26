@@ -40,9 +40,15 @@ Reprendre après la passation 28 et répondre à Julien sur la méthode du site 
 - Release GitHub v0.4.21 à la demande de Julien (exception à D-051, notée dans CLAUDE.md).
 - Demande notée pour plus tard : « Se déplacer ici » depuis la carte (`echanges/2026-11-26-demande-deplacement-carte.md`).
 
+### Suite (26/11, vers 20:30 → 21:15) : retours sur la v0.4.21, v0.4.22 préparée
+- Règle des Releases changée : une Release par palier (0.4 faite, prochaine en 0.5.x) : D-076, CLAUDE.md, mémoire automatique.
+- Retours v0.4.21 : hexagones et chat en direct OK, fond à 25 cases OK ; barre de fabrication qui retombe ; alertes RAM (pic d'environ 900 Mo au démarrage, puis 520-600 Mo).
+- v0.4.22 (D-078) : carte à 30 cases, un cercle, zoom, mémoire du terrain sur le disque et des ressources vues ; vraie progression des fabrications ; ceinture en vignettes ; seuils RAM relevés, pics brefs ignorés. Tests 632/632. Publication en attente (bot ouvert).
+- Riverwood (`/c1`) : salon du module global, à suivre en direct par une liaison permanente, à essayer avec Julien (prochaine version).
+
 ## Décisions prises (liens D-NNN)
 - [D-071](../decisions/D-071-v0419-requetes-par-morceau.md) : requêtes de zone par morceau de carte, repli corrigé.
-- [D-072](../decisions/D-072-reponses-consignes-sessions-ennemis.md), [D-073](../decisions/D-073-v0420-retours-v0419.md), [D-074](../decisions/D-074-deplacements-set-destination.md), [D-075](../decisions/D-075-v0421-zone-25-release.md).
+- [D-072](../decisions/D-072-reponses-consignes-sessions-ennemis.md), [D-073](../decisions/D-073-v0420-retours-v0419.md), [D-074](../decisions/D-074-deplacements-set-destination.md), [D-075](../decisions/D-075-v0421-zone-25-release.md), [D-076](../decisions/D-076-releases-aux-grandes-etapes.md), [D-078](../decisions/D-078-v0422-carte-memoire-craft-ram.md).
 
 ## Questions ouvertes créées (liens Q-NNN)
 Aucune. Question posée : le site est pour qui ?

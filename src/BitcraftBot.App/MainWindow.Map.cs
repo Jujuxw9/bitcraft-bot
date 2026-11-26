@@ -71,6 +71,7 @@ public partial class MainWindow
             TierChecks.Children.Add(pill);
         }
         ShowPills([]);
+        InitMapMemory();
     }
 
     private void MapFilterChanged()
@@ -127,7 +128,7 @@ public partial class MainWindow
         var filter = _mapFilter;
         bool Shown(NearbyResource r) => filter.Shows(r);
         var shown = s.Resources.Where(Shown).ToList();
-        ShowTerrain(reader);
+        ShowTerrain(reader, s.Position);
         SrvResourceCount.Text = $"{shown.Count} / {s.Resources.Count} ressources · {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs";
 
         var best = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
@@ -142,13 +143,14 @@ public partial class MainWindow
                 : $"{Describe(match.Resource)}{(match.Sure ? " — c'est bien elle (même santé)" : " — probable (même nom)")}";
         // La zone est relue quand le personnage s'éloigne de la moitié du rayon (20 petites cases ≈ 7 cases du jeu).
         SrvArea.Text = reader.ResourceArea is { } a && reader.ResourceAreaUpdated is { } at
-            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d’environ 10 cases)"
+            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d’environ 15 cases)"
               + (reader.HealthRefused ? " — santé refusée par le serveur" : "")
               + (reader.TerrainRefused ? " — fond de carte refusé par le serveur" : SrvMap.TerrainText is { } t ? $" — {t}" : "")
             : "—";
 
         UpdateRows(shown.Take(MaxRowsShown).ToList(), best?.EntityId, match?.Resource.EntityId);
-        SrvMap.Update(s.Position, s.Walking == true ? s.Destination : null, s.Resources, Shown, best?.EntityId, match?.Resource.EntityId, _selectedResource);
+        var remembered = _resourceMemory.Update(s.Resources, reader.ResourceArea);
+        SrvMap.Update(s.Position, s.Walking == true ? s.Destination : null, s.Resources, Shown, best?.EntityId, match?.Resource.EntityId, _selectedResource, remembered);
         LogMatches(best, match, target);
     }
 
@@ -214,11 +216,55 @@ public partial class MainWindow
 // Fond de carte et pastilles des filtres (v0.4.18, D-070).
 public partial class MainWindow
 {
-    // Fond de carte : refait seulement quand les morceaux reçus (ou les zones découvertes) changent.
-    private void ShowTerrain(ServerReader reader)
+    // v0.4.22 : mémoire du fond de carte (sur le disque, à côté du .exe) et des ressources déjà vues.
+    private TerrainStore? _terrainStore;
+    private readonly ResourceMemory _resourceMemory = new();
+
+    private void InitMapMemory()
     {
-        var chunks = reader.TerrainChunks();
+        var store = new TerrainStore(System.IO.Path.Combine(AppContext.BaseDirectory, TerrainStore.FolderName));
+        _ = Task.Run(() =>
+        {
+            var read = store.LoadAll();
+            _terrainStore = store;
+            _log.Info("Carte", $"Mémoire de la carte : {read} morceaux de terrain gardés (dossier « {TerrainStore.FolderName} » à côté du .exe).");
+        });
+        SrvMap.ZoomChanged += () =>
+        {
+            MapZoomText.Text = $"vue : {SrvMap.ViewRadius - 1:0} cases";
+            _terrainArea = null;
+        };
+    }
+
+    private void MapZoomIn_Click(object sender, RoutedEventArgs e) => SrvMap.ZoomBy(-1);
+
+    private void MapZoomOut_Click(object sender, RoutedEventArgs e) => SrvMap.ZoomBy(1);
+
+    // Morceau de carte et vue du dernier fond dessiné : on ne recalcule que si l'un change.
+    private (int X, int Z, double View)? _terrainArea;
+
+    // Fond de carte : refait seulement quand les morceaux à montrer (ou les zones découvertes) changent.
+    // Les morceaux reçus en direct vont dans la mémoire ; on dessine ceux de la mémoire autour du personnage.
+    private void ShowTerrain(ServerReader reader, ServerPosition? position)
+    {
+        var live = reader.TerrainChunks();
         var explored = reader.Explored();
+        IReadOnlyCollection<TerrainChunk> chunks = live;
+        if (_terrainStore is { } store && position is { } p)
+        {
+            var changed = false;
+            foreach (var chunk in live)
+            {
+                changed |= store.Put(chunk);
+            }
+            var area = (TerrainChunk.ChunkOf(p.ScreenEast, p.ScreenNorth).X, TerrainChunk.ChunkOf(p.ScreenEast, p.ScreenNorth).Z, SrvMap.ViewRadius);
+            if (!changed && _terrainArea == area)
+            {
+                return;
+            }
+            _terrainArea = area;
+            chunks = store.Around(p.ScreenEast, p.ScreenNorth, SrvMap.ViewRadius + 4);
+        }
         if (SrvMap.SetTerrain(chunks, explored) && !_terrainShownLogged && chunks.Count > 0)
         {
             _terrainShownLogged = true;

@@ -4,8 +4,15 @@ namespace BitcraftBot.Core.Monitoring;
 public sealed class ResourceLimits
 {
     // RAM du bot : alerte, puis arrêt de la session si le seuil critique est dépassé.
-    public double BotRamWarningMb { get; set; } = 600;
-    public double BotRamCriticalMb { get; set; } = 1200;
+    // v0.4.22 : 600/1200 → 1000/1600 (le bot tourne vers 550-600 Mo, avec un pic d'environ 900 Mo au démarrage).
+    public const double DefaultRamWarningMb = 1000;
+    public const double DefaultRamCriticalMb = 1600;
+
+    public double BotRamWarningMb { get; set; } = DefaultRamWarningMb;
+    public double BotRamCriticalMb { get; set; } = DefaultRamCriticalMb;
+
+    // v0.4.22 : la RAM doit rester au-dessus du seuil pendant ce nombre de mesures de suite (un pic bref ne compte pas).
+    public int BotRamSustainedSamples { get; set; } = 3;
 
     // CPU du bot : alerte si dépassé pendant plusieurs mesures de suite.
     public double BotCpuWarningPercent { get; set; } = 25;
@@ -30,6 +37,8 @@ public sealed record ResourceEvent(ResourceLevel Level, string Message);
 public sealed class ResourceGuard(ResourceLimits limits)
 {
     private ResourceLevel _botRam = ResourceLevel.Normal;
+    private ResourceLevel _ramCandidate = ResourceLevel.Normal;
+    private int _ramCandidateCount;
     private bool _botCpuHigh;
     private int _botCpuHighCount;
     private bool _systemRamLow;
@@ -42,10 +51,14 @@ public sealed class ResourceGuard(ResourceLimits limits)
     {
         var events = new List<ResourceEvent>();
 
-        // RAM du bot
-        var ramLevel = sample.BotRamMb >= limits.BotRamCriticalMb ? ResourceLevel.Critique
+        // RAM du bot : un niveau ne change qu'après plusieurs mesures de suite (v0.4.22 : pics brefs ignorés,
+        // par exemple au chargement des données du serveur).
+        var measured = sample.BotRamMb >= limits.BotRamCriticalMb ? ResourceLevel.Critique
             : sample.BotRamMb >= limits.BotRamWarningMb ? ResourceLevel.Alerte
             : ResourceLevel.Normal;
+        _ramCandidateCount = measured == _ramCandidate ? _ramCandidateCount + 1 : 1;
+        _ramCandidate = measured;
+        var ramLevel = _ramCandidateCount >= Math.Max(1, limits.BotRamSustainedSamples) ? measured : _botRam;
         if (ramLevel != _botRam)
         {
             events.Add(ramLevel switch

@@ -17,11 +17,28 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     // Rayon de lecture des ressources, en petites cases du serveur (3 petites cases = 1 case du jeu).
     // v0.4.15 (D-066) : 40 → 60, soit environ 13 → 20 cases ; à augmenter petit à petit en surveillant la charge du PC.
     // v0.4.21 : 60 → 75, soit 25 cases (demande de Julien).
-    public const int ResourceRadius = 75;
+    // v0.4.22 : 75 → 90, soit 30 cases (demande de Julien).
+    public const int ResourceRadius = 90;
 
     // On relance l'abonnement aux ressources quand le personnage s'est éloigné de plus de ce nombre de cases.
     private const double ResubscribeDistance = ResourceRadius / 2.0;
     private static readonly TimeSpan MinResubscribeInterval = TimeSpan.FromSeconds(5);
+
+    // v0.4.22 : au-delà de cette taille de message, nettoyage de la mémoire juste après (au plus une fois par minute).
+    private const int LargeMessageChars = 500_000;
+    private static readonly TimeSpan MinCompactInterval = TimeSpan.FromMinutes(1);
+    private DateTime _lastCompact = DateTime.MinValue;
+
+    private void CompactMemory()
+    {
+        if (DateTime.Now - _lastCompact < MinCompactInterval)
+        {
+            return;
+        }
+        _lastCompact = DateTime.Now;
+        System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
+        GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: true);
+    }
 
     private readonly TableCache _cache = new();
     private SpacetimeConnection? _connection;
@@ -282,6 +299,11 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 LogFirstInventory();
                 LogFirstTerrain();
                 OnSubscriptionApplied();
+                // v0.4.22 : après un gros envoi (le texte reçu fait souvent plus d'1 Mo), on rend la mémoire de lecture tout de suite.
+                if (json.Length > LargeMessageChars)
+                {
+                    CompactMemory();
+                }
                 break;
 
             case TransactionEvent transaction:

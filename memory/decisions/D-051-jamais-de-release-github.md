@@ -1,6 +1,6 @@
 # D-051 — Jamais de Release ni de tag GitHub : .exe local seulement
 
-- **Statut** : Validée
+- **Statut** : Remplacée par D-076 (2026-11-26)
 - **Date** : 2026-11-22
 - **Validée par** : Julien (« JAMAIS », réponse du 2026-11-22 ; demande d'origine du 2026-11-19, inscrite dans CLAUDE.md)
 - **Liens** : remplace en partie D-010 (GitHub Releases) ; D-040 (dossiers release / old)

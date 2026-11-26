@@ -14,6 +14,18 @@ public partial class MainWindow
     private string? _lastActionFrench;
     private DateTime _lastActionSeen;
 
+    // Part faite de la fabrication en cours (celle de la recette de l'action, sinon la seule en cours), null si inconnue.
+    private double? CraftDone(PlayerSnapshot s)
+    {
+        if (s.Crafts.Count == 0 || _recipes?.CraftActions is not { } actions)
+        {
+            return null;
+        }
+        var craft = s.Action?.RecipeId is { } id ? s.Crafts.FirstOrDefault(c => c.RecipeId == id) : null;
+        craft ??= s.Crafts.Count == 1 ? s.Crafts[0] : null;
+        return craft is not null && actions.TryGetValue(craft.RecipeId, out var perItem) && perItem > 0 ? craft.Done(perItem) : null;
+    }
+
     private readonly SkillTracker _skillTracker = new();
 
     // Appelé toutes les 500 ms, seulement quand l'onglet Bot est affiché (v0.3.19).
@@ -51,9 +63,12 @@ public partial class MainWindow
         // Activité : action en cours, métier (la « jauge de métier », lue sur le serveur), ressource frappée.
         // v0.4.20 : entre deux coups de hache, le serveur dit « aucune action » une fraction de seconde : l'affichage
         // clignotait. On garde la dernière action affichée pendant ActionHold, en la marquant « en cours ».
+        // v0.4.22 : pour une fabrication, la durée de l'action n'est que celle d'un geste (la barre montait à 12 % puis
+        // retombait). On montre la vraie progression de la fabrication : gestes faits ÷ (gestes par objet × objets).
+        var craft = CraftDone(s);
         if (s.Action is { } action)
         {
-            var progress = action.Progress(nowUtc);
+            var progress = action.Type == "Craft" && craft is { } c ? c : action.Progress(nowUtc);
             _lastActionFrench = action.French;
             _lastActionSeen = DateTime.Now;
             DashActionText.Text = $"{action.French} · {progress:P0}";
@@ -61,8 +76,8 @@ public partial class MainWindow
         }
         else if (_lastActionFrench is { } held && DateTime.Now - _lastActionSeen < ActionHold)
         {
-            DashActionText.Text = $"{held} · en cours";
-            DashActionBar.Smooth(1);
+            DashActionText.Text = craft is { } c ? $"{held} · {c:P0}" : $"{held} · en cours";
+            DashActionBar.Smooth(craft ?? 1);
         }
         else
         {

@@ -37,6 +37,8 @@ public static class Queries
             // Tableau de bord (v0.3.17) : expérience des métiers, action en cours, dernier coup de récolte, temps de jeu, énergie de téléportation.
             list.Add($"SELECT * FROM experience_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM player_action_state WHERE entity_id = {e}");
+            // v0.4.22 : progression des fabrications du personnage (table publique, index sur le propriétaire).
+            list.Add($"SELECT * FROM progressive_action_state WHERE owner_entity_id = {e}");
             list.Add($"SELECT * FROM extract_outcome_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM player_state WHERE entity_id = {e}");
             list.Add($"SELECT * FROM teleportation_energy_state WHERE entity_id = {e}");
@@ -72,8 +74,8 @@ public static class Queries
         return list;
     }
 
-    // Rayon couvert par le fond de carte, en cases du jeu (la carte montre 25 cases depuis la v0.4.21, un peu de marge).
-    public const double TerrainRadius = 29; // v0.4.21 : zone lue de 25 cases
+    // Rayon couvert par le fond de carte, en cases du jeu (la carte montre 30 cases depuis la v0.4.22, un peu de marge).
+    public const double TerrainRadius = 34; // v0.4.21 : zone lue de 25 cases ; v0.4.22 : 30 cases
 
     // Fond de carte (v0.4.18) : seulement les morceaux de terrain autour de la zone lue (4 à 9 morceaux, jamais toute
     // la région), un par requête sur la clé primaire ; et les zones découvertes du personnage.

@@ -354,15 +354,42 @@
                                 <Image x:Name="BeltLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
                                 <TextBlock x:Name="BeltTitle" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
                             </StackPanel>
-                            <ListView x:Name="BeltList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
-                                <ListView.View>
-                                    <GridView>
-                                        <GridViewColumn Header="Objet" Width="190" CellTemplate="{StaticResource ItemNameCell}" />
-                                        <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
-                                        <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
-                                        <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
-                                    </GridView>
-                                </ListView.View>
+                            <!-- v0.4.22 : ceinture en vignettes (image, tier en bas à droite, nom dessous), pas en tableau -->
+                            <ListView x:Name="BeltList" MinHeight="150" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0" Background="Transparent">
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                                        <Setter Property="Padding" Value="4" />
+                                        <Setter Property="Margin" Value="2" />
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <TextBlock>
+                                                    <Run Text="{Binding Name, Mode=OneWay}" FontWeight="SemiBold" /><LineBreak />
+                                                    <Run Text="Tier" /> <Run Text="{Binding TierText, Mode=OneWay}" /><Run Text=" · quantité" /> <Run Text="{Binding Quantity, Mode=OneWay, StringFormat=N0}" />
+                                                </TextBlock>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Width="84">
+                                            <Grid Width="64" Height="64" HorizontalAlignment="Center">
+                                                <Image Source="{Binding Icon}" Width="60" Height="60" RenderOptions.BitmapScalingMode="HighQuality" />
+                                                <Border HorizontalAlignment="Right" VerticalAlignment="Bottom" Background="#E0101824" BorderBrush="{StaticResource Gold}" BorderThickness="1" CornerRadius="4" Padding="4,0">
+                                                    <TextBlock Foreground="{StaticResource Gold}" FontSize="11" FontWeight="Bold">
+                                                        <Run Text="T" /><Run Text="{Binding TierText, Mode=OneWay}" />
+                                                    </TextBlock>
+                                                </Border>
+                                            </Grid>
+                                            <TextBlock Text="{Binding Name}" FontSize="11" TextAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
                             </ListView>
                         </DockPanel>
                     </Border>
@@ -468,6 +495,12 @@
                     </Grid.RowDefinitions>
                     <Border x:Name="MapCard" Style="{StaticResource Card}">
                         <StackPanel>
+                            <!-- v0.4.22 : zoom de la carte -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <Button Content="−" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomIn_Click" ToolTip="Zoomer (moins de cases, plus de détails)" />
+                                <Button Content="+" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomOut_Click" ToolTip="Dézoomer (plus de cases ; au-delà de la zone lue, la carte gardée en mémoire)" Margin="4,0,8,0" />
+                                <TextBlock x:Name="MapZoomText" Text="vue : 30 cases" Style="{StaticResource MutedText}" VerticalAlignment="Center" />
+                            </StackPanel>
                             <Viewbox x:Name="MapBox" MaxWidth="560" MaxHeight="560" Stretch="Uniform">
                                 <local:ResourceMap x:Name="SrvMap" Width="560" Height="560" Cursor="Hand" />
                             </Viewbox>

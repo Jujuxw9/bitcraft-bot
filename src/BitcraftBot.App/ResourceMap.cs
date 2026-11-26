@@ -12,7 +12,32 @@ namespace BitcraftBot.App;
 public sealed class ResourceMap : FrameworkElement
 {
     // Rayon montré, en unités de l'écran (N, E). Les ressources sont lues sur environ 13 unités.
-    public const double RadiusUnits = 26; // v0.4.15 : zone lue d’environ 20 cases ; v0.4.21 : 25 cases
+    // v0.4.15 : zone lue d’environ 20 cases ; v0.4.21 : 25 cases ; v0.4.22 : 30 cases (un seul cercle, celui de la zone lue).
+    public const double DataRadius = 30;
+    public const double RadiusUnits = DataRadius + 1;
+
+    // v0.4.22 : zoom (1 = la zone lue remplit la carte ; plus grand = vue plus large, avec la carte gardée en mémoire).
+    public static readonly double[] ZoomSteps = [0.5, 0.75, 1, 1.5, 2];
+    private int _zoomIndex = 2;
+
+    public double Zoom => ZoomSteps[_zoomIndex];
+
+    // Rayon montré, en grandes cases.
+    public double ViewRadius => RadiusUnits * Zoom;
+
+    public event Action? ZoomChanged;
+
+    // Pas de zoom : -1 = rapprocher (moins de cases), +1 = éloigner (plus de cases).
+    public void ZoomBy(int step)
+    {
+        var next = Math.Clamp(_zoomIndex + step, 0, ZoomSteps.Length - 1);
+        if (next != _zoomIndex)
+        {
+            _zoomIndex = next;
+            InvalidateVisual();
+            ZoomChanged?.Invoke();
+        }
+    }
 
     private static readonly Brush Background = Frozen(Color.FromRgb(10, 21, 36));
     private static readonly Pen RingPen = FrozenPen(Color.FromRgb(43, 76, 112), 1);
@@ -33,6 +58,8 @@ public sealed class ResourceMap : FrameworkElement
     private ServerPosition? _player;
     private ServerPosition? _destination;
     private IReadOnlyList<NearbyResource> _resources = [];
+    // v0.4.22 : ressources vues avant, hors de la zone lue en direct (dessinées plus pâles).
+    private IReadOnlyList<NearbyResource> _remembered = [];
     private Func<NearbyResource, bool> _shown = r => r.IsTree;
     private ulong? _best;
     private ulong? _screenTarget;
@@ -47,11 +74,12 @@ public sealed class ResourceMap : FrameworkElement
     public event Action<ulong?>? ResourceClicked;
 
     public void Update(ServerPosition? player, ServerPosition? destination, IReadOnlyList<NearbyResource> resources,
-        Func<NearbyResource, bool> shown, ulong? best, ulong? screenTarget, ulong? selected)
+        Func<NearbyResource, bool> shown, ulong? best, ulong? screenTarget, ulong? selected, IReadOnlyList<NearbyResource>? remembered = null)
     {
         _player = player;
         _destination = destination;
         _resources = resources;
+        _remembered = remembered ?? [];
         _shown = shown;
         _best = best;
         _screenTarget = screenTarget;
@@ -74,7 +102,9 @@ public sealed class ResourceMap : FrameworkElement
         _terrainImage = TerrainImage.Build(chunks, explored);
         if (_terrainImage is { } image)
         {
-            _terrain = HexImage(image);
+            // v0.4.22 : image limitée à environ 2 400 points de côté (vue large = beaucoup de morceaux).
+            _hexPixels = Math.Clamp(2400 / Math.Max(image.Width, image.Height), 4, 12);
+            _terrain = HexImage(image, _hexPixels);
             TerrainText = $"fond de carte : {image.ChunkCount} morceaux de terrain" + (explored is null ? "" : ", zones non découvertes assombries");
         }
         else
@@ -86,17 +116,18 @@ public sealed class ResourceMap : FrameworkElement
         return true;
     }
 
-    // Points d'image par grande case dans l'image des hexagones (assez pour des bords nets une fois agrandie).
-    private const int HexPixels = 12;
+    // Points d'image par grande case dans l'image des hexagones (12 = bords nets ; moins quand la vue est large).
+    private int _hexPixels = 12;
     private static readonly Pen HexEdge = FrozenPen(Color.FromArgb(55, 0, 0, 0), 0.8);
 
     // v0.4.20 : chaque grande case (case du jeu) est dessinée en hexagone, comme dans le jeu : pointe en haut,
     // une ligne sur deux décalée d'une demi-case vers l'est (coordonnées décalées du serveur). Avant : un carré
     // d'un point par case, agrandi, donc très pixelisé. L'image est faite une seule fois par fond de carte reçu.
-    private static BitmapSource HexImage(TerrainImage image)
+    private static BitmapSource HexImage(TerrainImage image, int hexPixels = 12)
     {
-        var width = (int)Math.Ceiling((image.Width + 0.5) * HexPixels);
-        var height = image.Height * HexPixels;
+        var width = (int)Math.Ceiling((image.Width + 0.5) * hexPixels);
+        var height = image.Height * hexPixels;
+        var edge = hexPixels >= 8 ? HexEdge : null;
         var visual = new DrawingVisual();
         using (var dc = visual.RenderOpen())
         {
@@ -113,7 +144,7 @@ public sealed class ResourceMap : FrameworkElement
                         brush = Frozen(Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
                         brushes[argb] = brush;
                     }
-                    dc.DrawGeometry(brush, HexEdge, Hexagon((col + 0.5 + shift) * HexPixels, (row + 0.5) * HexPixels, HexPixels));
+                    dc.DrawGeometry(brush, edge, Hexagon((col + 0.5 + shift) * hexPixels, (row + 0.5) * hexPixels, hexPixels));
                 }
             }
         }
@@ -141,7 +172,7 @@ public sealed class ResourceMap : FrameworkElement
         return g;
     }
 
-    private double Scale => (Math.Min(ActualWidth, ActualHeight) / 2 - 18) / RadiusUnits;
+    private double Scale => (Math.Min(ActualWidth, ActualHeight) / 2 - 18) / ViewRadius;
 
     private Point Center => new(ActualWidth / 2, ActualHeight / 2);
 
@@ -165,19 +196,17 @@ public sealed class ResourceMap : FrameworkElement
             dc.PushClip(new RectangleGeometry(size));
             var left = c.X + (image.WestCell - 0.5 - at.ScreenEast) * scale;
             var top = c.Y - (image.NorthCell + 0.5 - at.ScreenNorth) * scale;
-            dc.DrawImage(bitmap, new Rect(left, top, bitmap.PixelWidth / (double)HexPixels * scale, image.Height * scale));
+            dc.DrawImage(bitmap, new Rect(left, top, bitmap.PixelWidth / (double)_hexPixels * scale, image.Height * scale));
             dc.DrawRectangle(TerrainVeil, null, size);
             dc.Pop();
         }
 
-        // Repères : axes, cercles à 5 et 10 cases, points cardinaux.
-        dc.DrawLine(AxisPen, new Point(c.X, c.Y - RadiusUnits * scale), new Point(c.X, c.Y + RadiusUnits * scale));
-        dc.DrawLine(AxisPen, new Point(c.X - RadiusUnits * scale, c.Y), new Point(c.X + RadiusUnits * scale, c.Y));
-        foreach (var ring in new[] { 5, 10, 15, 20, 25 })
-        {
-            dc.DrawEllipse(null, RingPen, c, ring * scale, ring * scale);
-            Text(dc, $"{ring}", new Point(c.X + ring * scale * 0.71 + 2, c.Y - ring * scale * 0.71 - 14), 11);
-        }
+        // Repères : axes et un seul cercle, la limite de la zone lue en direct (v0.4.22, demande de Julien).
+        var view = ViewRadius;
+        dc.DrawLine(AxisPen, new Point(c.X, c.Y - view * scale), new Point(c.X, c.Y + view * scale));
+        dc.DrawLine(AxisPen, new Point(c.X - view * scale, c.Y), new Point(c.X + view * scale, c.Y));
+        dc.DrawEllipse(null, RingPen, c, DataRadius * scale, DataRadius * scale);
+        Text(dc, $"{DataRadius:0}", new Point(c.X + DataRadius * scale * 0.71 + 2, c.Y - DataRadius * scale * 0.71 - 14), 11);
         Text(dc, "N", new Point(c.X - 4, 2), 13);
         Text(dc, "S", new Point(c.X - 4, ActualHeight - 18), 13);
         Text(dc, "E", new Point(ActualWidth - 14, c.Y - 9), 13);
@@ -187,6 +216,20 @@ public sealed class ResourceMap : FrameworkElement
         {
             Text(dc, "En attente de la position du personnage…", new Point(10, ActualHeight - 40), 12);
             return;
+        }
+
+        // Ressources vues avant, hors de la zone lue en direct (v0.4.22) : pâles, dessous.
+        if (_remembered.Count > 0)
+        {
+            dc.PushOpacity(0.45);
+            foreach (var r in _remembered)
+            {
+                if (_shown(r) && Visible(r))
+                {
+                    dc.DrawEllipse(r.IsTree ? OtherTreeBrush : FamilyColors.Of(r.Family), DotOutline, ToPoint(r.Position, player), 3, 3);
+                }
+            }
+            dc.Pop();
         }
 
         // Ressources : les autres d'abord (dessous), puis les arbres, puis les repères de choix.
@@ -225,7 +268,8 @@ public sealed class ResourceMap : FrameworkElement
         dc.DrawEllipse(PlayerBrush, new Pen(Brushes.White, 1.5), c, 6, 6);
     }
 
-    private bool Visible(NearbyResource r) => r.ScreenDistance <= RadiusUnits;
+    // Dans la vue : distance au personnage recalculée (les ressources gardées ont une distance ancienne).
+    private bool Visible(NearbyResource r) => _player is { } p && r.Position.ScreenDistanceTo(p) <= ViewRadius;
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {

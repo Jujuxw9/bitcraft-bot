@@ -60,3 +60,11 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 
 - Ressources lues sur 75 petites cases autour du personnage (9 morceaux de carte au plus), fond de carte sur 29 cases, carte du bot à 26 cases de rayon avec un cercle « 25 ».
 - Boutons de tier T1 à T5 ; un tier plus haut masqué dans d'anciens réglages est réaffiché au chargement, sauf en mode « ce tier seul ».
+
+## 26. v0.4.22 : carte gardée, zoom, fabrication, RAM (D-078)
+
+- **Mémoire du terrain** (`TerrainStore`) : morceaux reçus gardés en mémoire et sur le disque (`carte/<numéro>.bin`, format binaire maison « BCT1 »), réécrits seulement s'ils changent. Le fond dessiné = morceaux gardés autour du personnage dans le rayon de la vue ; recalculé quand le personnage change de morceau, quand le zoom change ou quand un morceau change.
+- **Mémoire des ressources** (`ResourceMemory`) : 40 000 au plus, en mémoire seulement ; oubliées si absentes de la lecture en direct dans la zone lue.
+- **Zoom** : 5 crans (0,5 à 2 fois la zone lue) ; image des hexagones plafonnée à environ 2 400 points de côté.
+- **Fabrication** : abonnement à `progressive_action_state` du personnage (index sur le propriétaire) ; nombre de gestes par recette tiré de `crafting_recipe_desc`.
+- **RAM** : niveau d'alerte changé après 3 mesures de suite ; ramasse-miettes forcé (avec tassement) après un message de plus de 500 000 caractères, au plus une fois par minute.

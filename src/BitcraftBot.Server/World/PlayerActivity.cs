@@ -67,6 +67,14 @@ public sealed record ActionInfo(string Type, long StartMs, long DurationMs, ulon
     public string French => ActionNames.French(Type);
 }
 
+// Fabrication en cours (progressive_action_state, v0.4.22) : gestes faits (Progress) et nombre d'objets demandés.
+public sealed record CraftProgress(int RecipeId, int Progress, int CraftCount)
+{
+    // Part faite de 0 à 1, connaissant le nombre de gestes par objet de la recette (0 si inconnu).
+    public double Done(int actionsPerItem) =>
+        actionsPerItem <= 0 || CraftCount <= 0 ? 0 : Math.Clamp(Progress / (double)(actionsPerItem * CraftCount), 0, 1);
+}
+
 // Dernier coup de récolte (extract_outcome_state) : ressource visée et dégâts du coup.
 public sealed record ExtractInfo(ulong Target, int Damage);
 
@@ -122,6 +130,12 @@ public static class PlayerActivity
         }
         return null;
     }
+
+    public static IReadOnlyList<CraftProgress> Crafts(TableCache cache, ulong player) =>
+        cache.Rows("progressive_action_state")
+            .Where(r => r.U64("owner_entity_id") == player && r.I32("recipe_id") is not null)
+            .Select(r => new CraftProgress(r.I32("recipe_id") ?? 0, r.I32("progress") ?? 0, r.I32("craft_count") ?? 0))
+            .ToList();
 
     public static ExtractInfo? LastExtract(TableCache cache, ulong player)
     {

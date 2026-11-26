@@ -25,7 +25,7 @@ public class ResourceGuardTests
     [Fact]
     public void BotRam_Warning_Then_Critical_Then_Back()
     {
-        var guard = new ResourceGuard(new ResourceLimits { BotRamWarningMb = 400, BotRamCriticalMb = 800 });
+        var guard = new ResourceGuard(new ResourceLimits { BotRamWarningMb = 400, BotRamCriticalMb = 800, BotRamSustainedSamples = 1 });
 
         var warning = guard.Evaluate(Sample(botRam: 450));
         Assert.Equal(ResourceLevel.Alerte, Assert.Single(warning).Level);

@@ -54,7 +54,7 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-048](D-048-ecran-cible-seulement.md) | L'écran ne lit plus que la cible sélectionnée | Validée | 2026-11-19 |
 | [D-049](D-049-recolte-auto-choix.md) | Récolte auto : arbres d'abord, vieux arbres, caméra W (Q/D avec précaution), clics de Julien comme indices | Validée | 2026-11-19 |
 | [D-050](D-050-camera-reponses-q024.md) | Caméra : bouton du milieu tourne la vue, W revient en 3 s et remet le zoom | Validée ; point 2 remplacé par D-053 | 2026-11-22 |
-| [D-051](D-051-jamais-de-release-github.md) | Jamais de Release ni de tag GitHub : .exe local seulement | Validée | 2026-11-22 |
+| [D-051](D-051-jamais-de-release-github.md) | Jamais de Release ni de tag GitHub : .exe local seulement | Remplacée par D-076 | 2026-11-22 |
 | [D-052](D-052-visee-verifiee-fenetres.md) | Visée vérifiée (cône de la mini-carte, contour vert, serveur) et détection des fenêtres du jeu avant toute action | Validée | 2026-11-22 |
 | [D-053](D-053-attente-apres-w-1s.md) | Après W, la caméra revient en 1 s (et pas 3 s) | Validée | 2026-11-23 |
 | [D-054](D-054-chat-gpt-reponses.md) | Module « @GPT » : Entrée permise pour répondre dans le chat Région, déclencheur « @GPT » en majuscules, 1 réponse par minute (la plus récente), phrases toutes faites sans clé API | Validée | 2026-11-23 |
@@ -95,3 +95,6 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-073](D-073-v0420-retours-v0419.md) | v0.4.20 : fond de carte en hexagones, pierre et minerai séparés, tiers d’une couleur, boutons retirés, images agrandies, chat en direct (récent en bas), activité sans clignotement | Validée | 2026-11-26 |
 | [D-074](D-074-deplacements-set-destination.md) | Déplacements : « Set destination » par défaut, marche visée pour les petits trajets | Validée | 2026-11-26 |
 | [D-075](D-075-v0421-zone-25-release.md) | v0.4.21 : zone lue et carte à 25 cases, boutons de tier T1 à T5, Release GitHub de la v0.4.21 (exception à D-051) | Validée | 2026-11-26 |
+| [D-076](D-076-releases-aux-grandes-etapes.md) | Releases GitHub aux grandes étapes seulement (une par palier : 0.4 faite, prochaine en 0.5.x) ; remplace D-051 | Validée | 2026-11-26 |
+| [D-077](D-077-site-recettes-proposition.md) | Site des recettes : proposition validée (session « site des recettes ») | Validée | 2026-11-26 |
+| [D-078](D-078-v0422-carte-memoire-craft-ram.md) | v0.4.22 : carte à 30 cases, un cercle, zoom, mémoire de la carte ; vraie progression des fabrications ; ceinture en vignettes ; seuils RAM 1000 / 1600 Mo | Validée | 2026-11-26 |
