@@ -1,5 +1,5 @@
 # Q-014 — Ennemis et danger de mort
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-072 (2026-11-26)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-16
 ## Question

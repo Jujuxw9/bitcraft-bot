@@ -1,5 +1,5 @@
 # Q-008 — Déconnexion automatique et cadence
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-072 (2026-11-26)
 - **Priorité** : Moyenne
 - **Créée le** : 2026-11-15
 ## Question

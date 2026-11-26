@@ -1,5 +1,5 @@
 # Q-003 — Interface de consignes N3
-- **Statut** : Ouverte
+- **Statut** : Résolue → D-072 (2026-11-26)
 - **Priorité** : Basse
 - **Créée le** : 2026-11-15
 ## Question

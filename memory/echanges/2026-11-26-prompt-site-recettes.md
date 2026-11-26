@@ -9,7 +9,16 @@ Julien colle le bloc ci-dessous au début d'un **nouveau chat**, quand il décid
 > **Avant toute chose**
 > 1. Lis `CLAUDE.md`, `memory/README.md`, `memory/echanges/resume-global.md`, puis ce fichier en entier : `memory/echanges/2026-11-26-prompt-site-recettes.md`. Fais `git pull --rebase` (ignore « [SYNC PC-PERSO] » et les commits « [PERSO JULIEN] » : autre projet).
 > 2. Lis D-064 (`memory/decisions/`) et `memory/echanges/2026-11-26-methode-site-recettes.md`.
-> 3. Lis le dépôt du site **Dogo eSport** que Julien te donnera (site web qu'il héberge déjà) : regarde comment il est construit, hébergé, mis à jour, et ce qu'on peut reprendre (hébergement Unraid, conteneur, nom de domaine, accès depuis l'extérieur, style). Range le lien dans `memory/technique/sources.md` et `memory/technique/liens-utilises.md`.
+> 3. Lis le dépôt **privé** `https://github.com/Jujuxw9/DOGGO-ESPORT` (site que Julien héberge déjà chez lui, accès avec `gh`) : surtout `rbrs-doggo/MISE-EN-LIGNE.txt`, `rbrs-doggo/docker/Dockerfile`, `.github/workflows/`, `rbrs-doggo/outils/deployer.py`, `rbrs-doggo/securite.py` et `rbrs-doggo/memoire/facon-de-travailler.md`. Range le lien dans `memory/technique/sources.md` et `memory/technique/liens-utilises.md`.
+>    **Attention : le dépôt `bitcraft-bot` est PUBLIC.** N'y recopie jamais d'adresse IP, de nom de domaine, d'adresse du serveur Unraid, de mot de passe ni rien de privé tiré de DOGGO-ESPORT. Écris seulement « voir `MISE-EN-LIGNE.txt` du dépôt DOGGO-ESPORT ». Ne modifie rien dans DOGGO-ESPORT.
+>
+> **Ce que Claude a déjà retenu de DOGGO-ESPORT (26/11, à confirmer avec Julien)**
+> - **Hébergement** : conteneur Docker sur Unraid ; l'image (langage et dépendances seulement) est fabriquée par GitHub et publiée ; le code reste dans le dossier `appdata` du serveur. Déploiement depuis le PC de Julien par le partage réseau du serveur, avec un script qui attend que le serveur confirme la nouvelle version. **Demander l'accord de Julien avant chaque déploiement.**
+> - **Accès depuis l'extérieur** : un sous-domaine chez OVH → box (ports 80 et 443 seulement) → **Nginx Proxy Manager** sur Unraid (HTTPS, certificat Let's Encrypt) → le site. Julien a refusé Cloudflare et veut rester chez OVH. Le même chemin peut servir au site des recettes, avec un nouveau sous-domaine.
+> - **Protection** : mot de passe administrateur (créé seulement depuis le réseau local) et mot de passe commun des amis ; mots de passe en empreinte, cookie de session sécurisé, blocage après 5 essais ratés, en-têtes de sécurité, adresse publique déclarée. Bon modèle pour « amis et guilde seulement ».
+> - **Méthode qui marche avec Julien** : tout depuis la page web (pas de saisie à la main, pas de ligne de commande), pas de bouton inutile, peu de texte (l'aide derrière un bouton « i »), tutos pas à pas pour OVH, la box et Unraid, et à chaque livraison : ce qui est déployé et ce qui n'a pas été testé. Navigateur de Julien : Brave.
+> - Python est disponible sur le PC par `py -3` (la commande `python` ouvre le Microsoft Store).
+> - Choix à faire avec Julien : reprendre la même base (même langage et même protection que DOGGO-ESPORT, plus simple à maintenir pour lui) ou un site purement statique derrière la même protection.
 >
 > **Ta méthode, dans l'ordre (ne saute pas d'étape)**
 > 1. **Cadrage, sans code.** Pose les questions à Julien **une à la fois**, attends chaque réponse et note tout dans `memory/site-recettes/cadrage.md`. Les questions de départ sont listées plus bas.
@@ -19,9 +28,9 @@ Julien colle le bloc ci-dessous au début d'un **nouveau chat**, quand il décid
 > À chaque étape : teste toi-même avant de livrer (tests automatiques + essai réel dans le navigateur), et rappelle en fin de message les questions sans réponse.
 >
 > **Ce qu'on sait déjà**
-> - **Pour qui** : Julien, ses amis (et leurs amis proches) et sa guilde. **Pas un site public** pour tous les joueurs. Donc il faut un moyen simple de limiter l'accès (à définir avec Julien : lien privé, mot de passe commun, autre). « À vérifier ».
+> - **Pour qui** : Julien, ses amis (et leurs amis proches) et sa guilde. **Pas un site public** pour tous les joueurs. Accès limité : piste, le même système que DOGGO-ESPORT (mot de passe commun des amis), à confirmer avec Julien.
 > - **But** : un site « ultra fluide et ultra simple à utiliser », qui contient toutes les recettes et répond à la question « comment je fabrique cet objet ? ».
-> - **Hébergement** : le serveur **Unraid** de Julien (petit PC chez lui, à côté de la box). Mode d'hébergement : « À vérifier » (le site Dogo eSport donnera sans doute la réponse).
+> - **Hébergement** : le serveur **Unraid** de Julien (petit PC chez lui, à côté de la box), comme DOGGO-ESPORT (voir plus haut).
 > - **Code** : même dépôt, **dossier à part** (par exemple `site-recettes/`, nom à confirmer). Mémoire du site : `memory/site-recettes/` (à créer, avec un `README.md` index).
 > - **Données disponibles** : le bot a déjà les données du jeu (fichiers `*_desc.json` dans `artifacts/release/donnees-jeu/`, dont `crafting_recipe_desc.json`, `extraction_recipe_desc.json`, objets, bâtiments, biomes ; et les icônes dans `donnees-jeu/icones`, environ 2 339 images). Le code du bot qui lit les recettes : `src/BitcraftBot.GameData/` (`RecipeBook`, `RecipePlanner`, `RawMaterials`) ; tu peux le **lire** pour comprendre, pas le modifier. D'où viennent ces fichiers et comment les mettre à jour après une mise à jour du jeu : « À vérifier », à documenter.
 > - **Copie du code serveur officiel** : `references/BitCraftPublic/` (lecture seule) : utile pour comprendre la structure des recettes.
@@ -33,11 +42,11 @@ Julien colle le bloc ci-dessous au début d'un **nouveau chat**, quand il décid
 > - **Fonctions pressenties** : recherche tolérante aux fautes (français et anglais) ; page d'objet avec l'arbre de fabrication ; total des matières premières pour une quantité choisie ; où trouver chaque matière ; métier, palier (tier) et bâtiment requis ; « utilisé dans » (recettes qui ont besoin de l'objet) ; déduction de ce qu'on a déjà ; images des objets ; marche sur téléphone et sur PC.
 >
 > **Questions de départ pour Julien (une à la fois)**
-> 1. Le lien du dépôt Dogo eSport (et ce qu'il veut en reprendre : style, hébergement, autre).
+> 1. Ce qu'il veut reprendre de DOGGO-ESPORT : hébergement, protection, style graphique, autre ?
 > 2. 3 à 5 cas concrets : « je cherche X, je veux savoir … ».
 > 3. Langue(s) du site : français, anglais, les deux ?
 > 4. Plutôt téléphone, PC, ou les deux ?
-> 5. Comment les amis et la guilde y accèdent (adresse, accès depuis l'extérieur de chez Julien, protection).
+> 5. Le nom du sous-domaine pour le site, et un seul mot de passe commun pour les amis et la guilde, ou un par groupe ?
 > 6. Des sites de recettes qu'il aime ou n'aime pas (bitjita, autres) et pourquoi.
 > 7. Faut-il des comptes (par exemple pour noter son stock), ou un site sans compte ?
 >

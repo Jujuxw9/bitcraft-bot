@@ -18,3 +18,4 @@
 
 ## Complément (2026-11-26 au soir)
 Julien : **ne jamais effacer** les vieux messages de l'archive, le but est de tout garder.
+Messages privés (Julien, 26/11 au soir) : **tout enregistrer** dans l'archive, messages privés compris. Le chatbot **ne répond jamais** aux messages privés (pour l'instant). Aujourd'hui, les messages privés ne sont lus qu'au démarrage, si le module global accepte ; les lire en direct demande une liaison permanente au module global (risque d'éjection du jeu à tester avec Julien, « À vérifier »).
