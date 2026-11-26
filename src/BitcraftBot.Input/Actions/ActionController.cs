@@ -29,16 +29,35 @@ public static class GameKeys
     public const ushort D = 0x20;
     public const ushort W = 0x2C;
 
-    public static readonly IReadOnlyDictionary<ushort, string> Allowed = new Dictionary<ushort, string>
+    // Rangée du haut du clavier (cases de la barre d'action, v0.4.17) : touches « 1 » à « 0 », « - », « = » du clavier QWERTY,
+    // soit « & é " ' ( - è _ ç à ) = » en AZERTY : même position physique.
+    public static readonly ushort[] ActionBarKeys = [0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D];
+
+    private static readonly string[] ActionBarNames = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "="];
+
+    // Touche de la case de la barre d'action (0 = touche 1). null hors de la barre.
+    public static ushort? ForSlot(int slot) => slot >= 0 && slot < ActionBarKeys.Length ? ActionBarKeys[slot] : null;
+
+    public static readonly IReadOnlyDictionary<ushort, string> Allowed = BuildAllowed();
+
+    private static Dictionary<ushort, string> BuildAllowed()
     {
-        [Shift] = "Maj",
-        [E] = "E",
-        [Z] = "Z",
-        [Q] = "Q",
-        [S] = "S",
-        [D] = "D",
-        [W] = "W",
-    };
+        var keys = new Dictionary<ushort, string>
+        {
+            [Shift] = "Maj",
+            [E] = "E",
+            [Z] = "Z",
+            [Q] = "Q",
+            [S] = "S",
+            [D] = "D",
+            [W] = "W",
+        };
+        for (var i = 0; i < ActionBarKeys.Length; i++)
+        {
+            keys[ActionBarKeys[i]] = ActionBarNames[i];
+        }
+        return keys;
+    }
 
     public static string Name(ushort scanCode) => Allowed.TryGetValue(scanCode, out var name) ? name : $"0x{scanCode:X2}";
 

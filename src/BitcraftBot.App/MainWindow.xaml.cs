@@ -141,7 +141,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.16 : archive du chat en local (Local, Région, LFG, Trade, et messages privés quand le module global les donne) dans archive-chat/chat.db à côté du .exe ; onglet CHAT de retour : tableau des messages, recherche par joueur, filtre par canal ; chatbot @gpt replié en dessous.");
+        _log.Info("Session", "Version 0.4.17 : capacités automatiques (interrupteur « Capacités auto » dans OPTIONS, coupé au départ) : pendant vos récoltes, le bot lance la capacité de la barre d'action qui va avec le métier (ex. Hewing Strikes en coupant du bois) dès que sa recharge est finie, sans passer sous 30 % d'endurance ; une case par capacité.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
@@ -151,6 +151,7 @@ public partial class MainWindow : Window
         InitStartupButtons();
         InitMeals();
         InitGpt();
+        InitAbilities();
         InitChatArchive();
         InitLayout();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);

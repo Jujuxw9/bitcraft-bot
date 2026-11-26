@@ -305,6 +305,7 @@ public partial class MainWindow
             FlushTasks();
         }
         RunMeals(reader, s, inventories);
+        RunAbilities(reader, s);
         RunGpt(reader, s);
         ArchiveChat(reader, s);
         ShowResources(reader, s, tab == MapTab);

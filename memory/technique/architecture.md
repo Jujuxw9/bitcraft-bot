@@ -285,4 +285,4 @@ Déplacées dans [hybride/architecture-serveur.md](hybride/architecture-serveur.
 
 ## 18 et suivantes : fenêtre, démarrage, archive du chat (v0.4.14 et après)
 
-Déplacées dans [architecture-suite.md](architecture-suite.md) : v0.4.14 (section 18), v0.4.15 (section 19), v0.4.16 archive du chat (section 20).
+Déplacées dans [architecture-suite.md](architecture-suite.md) : v0.4.14 (section 18), v0.4.15 (section 19), v0.4.16 archive du chat (section 20), v0.4.17 capacités automatiques (section 21).

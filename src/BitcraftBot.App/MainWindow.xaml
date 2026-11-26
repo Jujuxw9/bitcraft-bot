@@ -126,6 +126,10 @@
                                 <CheckBox x:Name="GptCheck" Style="{StaticResource SwitchCheck}" Content="Chat @gpt / @chatgpt" ToolTip="Répondre à « @gpt » et « @chatgpt » (Local, Région, LFG, Trade)" Click="GptCheck_Click" />
                                 <TextBlock x:Name="GptStatusText" Visibility="Collapsed" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
                                 <TextBlock x:Name="GptTimerText" Visibility="Collapsed" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
+                                <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
+                                <CheckBox x:Name="AbilitiesCheck" Style="{StaticResource SwitchCheck}" Content="Capacités auto" ToolTip="Pendant que vous récoltez : lance la capacité de la barre d'action qui va avec (endurance gardée au-dessus de 30 %)" Click="AbilitiesCheck_Click" />
+                                <TextBlock x:Name="AbilitiesStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" />
+                                <StackPanel x:Name="AbilityList" Margin="16,4,0,0" />
                             </StackPanel>
                         </Border>
 

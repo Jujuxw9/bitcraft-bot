@@ -41,6 +41,12 @@ public sealed class LocalSettings
     // Repas automatique (D-042). Remis à « actif » à chaque démarrage (v0.3.18) : la valeur enregistrée ne sert pas au démarrage.
     public bool AutoEatEnabled { get; set; } = true;
 
+    // Capacités automatiques (v0.4.17, D-069). Coupées tant que Julien ne les allume pas (nouveauté, jamais essayée en jeu).
+    public bool AutoAbilitiesEnabled { get; set; }
+
+    // Choix de Julien par capacité (id de ability_custom_desc → allumée ou non). Absente = choix par défaut.
+    public Dictionary<int, bool> AbilityChoices { get; set; } = [];
+
     // Arrêt d'urgence si la souris bouge pendant un geste du bot (contrôleur d'actions, v0.3.18).
     public bool StopOnMouseMove { get; set; } = true;
 

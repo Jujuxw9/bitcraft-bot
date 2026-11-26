@@ -14,9 +14,12 @@ public partial class MainWindow
         _taskJournal.SkillName = id => _gameData.Current?.Skills.GetValueOrDefault(id) ?? $"métier {id}";
         _taskJournal.ItemName = ItemName;
         _taskJournal.Subject = action => TargetResource(action)?.Name;
-        _taskJournal.SkillOf = action => TargetResource(action) is { } r
-            && _gameData.Current?.Extractions.GetValueOrDefault(r.ResourceId) is { } extraction ? extraction.SkillId : null;
+        _taskJournal.SkillOf = ActionSkill;
     }
+
+    // Métier d'une récolte : celui de la ressource visée (extraction_recipe_desc). null si pas une récolte ou inconnu.
+    private int? ActionSkill(ActionInfo action) => TargetResource(action) is { } r
+        && _gameData.Current?.Extractions.GetValueOrDefault(r.ResourceId) is { } extraction ? extraction.SkillId : null;
 
     // Ressource visée par une récolte : d'après la cible de l'action, sinon le dernier coup donné.
     // Seulement pour une récolte (essai v0.3.19 : « DeployDeployable « Young Beech Tree » », faux).
