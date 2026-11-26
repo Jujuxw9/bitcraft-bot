@@ -5,6 +5,10 @@ Règles communes : `nuit-2026-11-27-regles.md`. **Lis le bilan (surtout T-10)** 
 ## Autorisation de Julien (27/11, 00:55)
 Julien a donné son accord pour que **cette tâche seule** lance le jeu pendant qu'il dort : **20 minutes au plus**, **aucune récolte**, seulement la grande carte et de petits déplacements. Il range le chariot et le bateau avant la nuit. Règles de sécurité : `nuit-2026-11-27-regles.md` §3 (jamais de chariot ni de bateau ; ennemi : Sprint 4 et s'éloigner ; à terre : **Get Up, jamais Go Home** ; ne pas mourir ; pas d'escalade).
 
+## Situation de départ (Julien, 27/11 vers 00:55)
+- Personnage à **N 9041, E 6808**, dans la colonie d'une autre guilde, près d'un feu (bonus « Nearby Flame » : tient les ennemis à distance). **Ennemis aux alentours** : rester tout près du feu. Trajets d'essai **courts (5 cases au plus)** et **retour au point de départ** à la fin (moins d'une case d'écart). Si le bonus « Nearby Flame » disparaît (liste des bonus du serveur) : revenir au point de départ et arrêter l'essai.
+- Inventaire vide ; chariot et bateau rangés : ne jamais les sortir.
+
 ## Avant de lancer
 1. Conditions, sinon **pas d'essai** (le noter et finir proprement) : T-10 a publié une version avec le mode d'essai ; aucun processus `BitCraft` ni `BitcraftBot-v*` ne tourne (Julien levé ?) ; quota OK ; il est entre 07:00 et 07:40.
 2. Lire dans le bilan la ligne de commande exacte donnée par T-10.
