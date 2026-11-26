@@ -1,5 +1,7 @@
 # Tests — index
 
+Depuis la v0.4.5, les résultats des tests (nombre de tests automatiques, essai réel) sont écrits dans chaque journal (`memory/journal/`) et, pour les tâches planifiées, dans `memory/taches-planifiees/etat.md`. Ce tableau garde les comptes rendus détaillés.
+
 | ID | Date | Type | Titre | Résultat |
 |---|---|---|---|---|
 | [T-20261116-01](T-20261116-01-v01-affichage.md) | 2026-11-16 | intégration | v0.1 : affichage du jeu et arrêt d'urgence | OK (Verr. Num désactivé non testé) |

@@ -34,7 +34,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-061
+- [README.md](decisions/README.md) — tableau D-001 à D-070
 
 ### questions-ouvertes/
 - [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-027
@@ -74,16 +74,19 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-25-demandes-julien-session-28.md](echanges/2026-11-25-demandes-julien-session-28.md) — **demandes de Julien** du 25/11 et du 26/11 (fenêtre du bot, capacités, archive du chat, carte, démarrage automatique, voyageurs, exploration automatique), bilans des journaux, plan validé (D-064, D-066).
 - [2026-11-26-passation-session-28.md](echanges/2026-11-26-passation-session-28.md) — **passation de la session 28** : phrase de reprise, état (v0.4.15, tâches planifiées du 26/11), à vérifier, plus tard (caméra, exploration).
 - [2026-11-26-methode-site-recettes.md](echanges/2026-11-26-methode-site-recettes.md) — **site des recettes** : méthode proposée (cadrage, données du bot, site statique, maquette d'abord), réponses de Julien du 26/11 00:34.
+- [2026-11-26-prompt-site-recettes.md](echanges/2026-11-26-prompt-site-recettes.md) — **prompt de la session « site des recettes »** (à coller dans un nouveau chat) : contexte, méthode, questions de départ, règles.
 - [2026-11-24-prompt-session-taches.md](echanges/2026-11-24-prompt-session-taches.md) — **prompt** de la session « tâches » (Sonnet, quota réduit : onglet Voyageurs, bugs Recettes, tâches au fil de l'eau).
 - [2026-11-24-reprise-apres-compact.md](echanges/2026-11-24-reprise-apres-compact.md) — phrase de reprise après le /compact de la session « tâches » et état de la v0.4.13.
 
 ### technique/
 - [README.md](technique/README.md) — index
-- [architecture.md](technique/architecture.md) — architecture logicielle cible
+- [architecture.md](technique/architecture.md) — architecture logicielle cible ; suite : [architecture-suite.md](technique/architecture-suite.md) (sections 18 et suivantes, **nouvelles versions ici**)
+- [capacites.md](technique/capacites.md) — capacités de la barre d'action (v0.4.17)
+- [analyse-carte-bitjita-2026-11-26.md](technique/analyse-carte-bitjita-2026-11-26.md) — analyse de la carte de bitjita.com
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
 - [liens-utilises.md](technique/liens-utilises.md) — tous les liens utilisés, classés
-- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server et versions v0.3.5 à v0.4.4
+- [hybride/architecture-serveur.md](technique/hybride/architecture-serveur.md) — brique Server, v0.3.5 à v0.4.5 (sections 17 à 39) ; suite : [hybride/architecture-serveur-suite.md](technique/hybride/architecture-serveur-suite.md) (sections 40 et suivantes)
 - [hybride/](technique/hybride/README.md) — voie hybride : plan, livrables, constats (D-039)
 - [hybride/analyse-visee-2026-11-22.md](technique/hybride/analyse-visee-2026-11-22.md) — **analyse de la visée après l'essai R1** : méthode fiable, prochaines étapes, améliorations
 - [reglages-du-jeu.md](technique/reglages-du-jeu.md) — réglages du jeu lus dans le registre, 4 à changer ? (Q-026)
@@ -98,4 +101,4 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [T-01-v0416-archive-chat.md](taches-planifiees/T-01-v0416-archive-chat.md), [T-02-v0417-capacites.md](taches-planifiees/T-02-v0417-capacites.md), [T-03-v0418-carte.md](taches-planifiees/T-03-v0418-carte.md), [T-04-verification-memoire.md](taches-planifiees/T-04-verification-memoire.md) — prompts des quatre tâches (T-04 : vérification de la mémoire en lecture seule)
 
 ### tests/
-- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-02)
+- [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-02 ; ensuite : résultats dans les journaux et `taches-planifiees/etat.md`)

@@ -11,6 +11,11 @@ Reprendre après la passation 28 et répondre à Julien sur la méthode du site 
 - Incohérence vue : T-04 sans modèle fixé (les autres en Opus 5.5). Julien veut Opus 5.5 : à régler par lui dans l'app.
 - Méthode du site des recettes proposée : `echanges/2026-11-26-methode-site-recettes.md`.
 
+### Suite (26/11, 18:50)
+- Bilan des tâches T-01 à T-03 : les trois versions publiées (v0.4.16 à v0.4.18), tests 594 → 625, mémoire à jour (D-068 à D-070, journaux, état, architecture-suite), .exe archivés dans `artifacts/old`. Aucun écart grave au prompt. T-04 : rapport écrit, rien modifié (ligne de `etat.md` remplie ici).
+- Rapport T-04 : corrections sûres appliquées (index racine D-070 et architecture-suite, résumé global raccourci, note dans `tests/README.md`, couverture de `architecture-serveur.md`). À trancher par Julien : T-04 dans D-067, Q-002/Q-003/Q-008/Q-014, exemption de longueur des archives, tri des vieilles questions.
+- Julien : le site des recettes est pour lui, ses amis et sa guilde (pas public). Prompt de la session « site des recettes » écrit : `echanges/2026-11-26-prompt-site-recettes.md` (lien du dépôt Dogo eSport à donner par Julien).
+
 ## Décisions prises (liens D-NNN)
 Aucune (méthode du site proposée, pas encore validée).
 
