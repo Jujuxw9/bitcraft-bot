@@ -22,8 +22,8 @@ Démarrée le 2026-11-26. Julien valide chaque étape avant la suivante. Adresse
 | 2 | Claude, accord de Julien | Copier le site dans `appdata/riverwood-recipes` (9 fichiers, 1 604 images, données) | Fait (26/11, accord de Julien, 51,5 Mo) |
 | 3 | Julien | Unraid : créer le conteneur (valeurs données par Claude) | Fait (26/11 20:52) ; Claude a vérifié depuis le PC : version, page, données (533 Ko compressé), images, chemins interdits refusés |
 | 4 | Julien + Claude | Test chez soi : `http://<serveur>:8790` | Fait (26/11, Julien : « fonctionne très bien ») |
-| 5 | Julien | OVH : entrée DNS de type A, sous-domaine `bitcraft-riverwood`, même cible que les autres sous-domaines | Entrée ajoutée à 20:55, mais avec une **ancienne** adresse (erreur de Claude) : à corriger |
-| 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | — |
+| 5 | Julien | OVH : entrée DNS de type A, sous-domaine `bitcraft-riverwood`, même cible que les autres sous-domaines | Fait (26/11) : entrée corrigée par Julien vers l'adresse actuelle de la box ; vérifié par Claude chez OVH, Google et Cloudflare ; ports 80 et 443 de la box joignables |
+| 6 | Julien | NPM : nouveau Proxy Host vers le port 8790, certificat Let's Encrypt | En cours |
 | 7 | Julien | Test depuis le téléphone en 4G (Wi-Fi coupé) | — |
 | 8 | Julien | Envoyer l'adresse aux amis et à la guilde | — |
 
