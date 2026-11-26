@@ -27,3 +27,9 @@ Demande notée pendant la session 29. **Prochaine étape** (Julien, 26/11 à 20:
 - Salon de discussion de Julien et de trois amis. Commande du jeu : **`/c1`** (minuscule). Les autres : Local `/s`, Région `/y`, Trade `/t`, Looking For Group `/lfg`.
 - Julien veut : **archiver** les messages de Riverwood et que le chatbot **réponde aux « @gpt »** écrits dans Riverwood (par `/c1`).
 - Constat (code serveur) : les salons sont dans le **module global** (`chat_channel_state`, messages dans `chat_message_state` avec `target_id` = le salon), pas dans le module de région lu en direct. Aujourd'hui le bot ne lit le module global qu'au démarrage (messages privés). Suivre Riverwood en direct demande **une liaison permanente au module global**, ouverte avant le jeu : risque d'éjection à essayer avec Julien (« À vérifier »).
+
+## Réponses de Julien sur la grande carte du jeu (26/11, 20:55, en jeu)
+- Touche « . » : la grande carte s'ouvre **centrée sur le personnage**, avec le **dernier niveau de zoom** utilisé.
+- Panneau « Map Options » sur le côté : Buildings, Claims, Deployables, Placeables, Travelers, Wind, Watchtowers (à cocher ou non).
+- **Un clic gauche** sur un endroit de la carte : le personnage y va tout de suite. Pas de clic droit, pas de menu.
+- À vérifier : fermeture de la carte (« . » ou Échap) et marche qui continue carte fermée.
