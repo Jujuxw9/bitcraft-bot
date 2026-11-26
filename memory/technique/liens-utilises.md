@@ -56,3 +56,8 @@ Liens consultés par Claude pour récupérer des données, comprendre le jeu ou 
 | https://mapdata.bitjita.com/v1/manifest.json | Description des tuiles de la carte de bitjita |
 | https://bitcraft.wiki.gg/images/thumb/ | Portraits des voyageurs (v0.4.15) |
 | https://brico.app/database/traveler-task | Vérifié : pas de portraits de voyageurs sur brico.app |
+| https://github.com/Jujuxw9/DOGGO-ESPORT | Dépôt privé : modèle d'hébergement et de protection du site des recettes |
+| https://bccodex.pages.dev/recipe | Étude du calculateur de recettes existant (site des recettes) |
+| https://bitjita.com/items/1091320674 | Fiche d'objet et adresses des images de bitjita (site des recettes) |
+| https://brico.app | Brico's Toolbox, base de données communautaire (site des recettes) |
+| https://raw.githubusercontent.com/BitCraftToolBox/BitCraft_GameData/30316dd6731214624987803e5cf848a6203bcd9a/static/building_repairs_desc.json | Table des supplies du claim |
