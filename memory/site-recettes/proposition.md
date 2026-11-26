@@ -1,6 +1,8 @@
-# Proposition du site des recettes (étape 2) — à valider par Julien
+# Proposition du site des recettes (étape 2) — validée (D-077)
 
-Écrite le 2026-11-26 d'après le [cadrage](cadrage.md) et les [recherches](recherches.md). Rien n'est codé avant la validation (future décision D-NNN).
+Écrite le 2026-11-26 d'après le [cadrage](cadrage.md) et les [recherches](recherches.md). Validée par Julien le 2026-11-26 : [D-077](../decisions/D-077-site-recettes-proposition.md), avec les ajouts ci-dessous.
+
+**Ajouts de Julien** : arbre avec zoom et dézoom ; quantité bien lisible sous chaque objet ; conversion en stacks (inventaire ou cargo).
 
 ## 1. Parcours de l'utilisateur
 1. Il ouvre le site : une **grande barre de recherche** au centre, rien d'autre.
@@ -41,7 +43,7 @@ L'utilisateur peut toujours choisir une autre recette dans le menu.
 - Le code reste dans `appdata` du serveur ; déploiement depuis le PC par le partage réseau, avec un script qui attend la confirmation. **Accord de Julien avant chaque déploiement.**
 - Accès de l'extérieur : un sous-domaine OVH → box (80 et 443) → Nginx Proxy Manager → le site. Procédure écrite pas à pas, faite **ensemble** (voir `MISE-EN-LIGNE.txt` de DOGGO-ESPORT).
 - Pas de mot de passe pour l'instant (Julien). En-têtes de sécurité et « pas d'indexation par les moteurs de recherche » quand même.
-- Code dans le dossier `site-recettes/` du dépôt (nom à confirmer).
+- Code dans le dossier `website-recipes/` du dépôt (D-077). Sous-domaine : `bitcraft-riverwood`.
 
 ## 6. Style
 - Textes **100 % anglais**. Style BitCraft : fond sombre, tons bois et parchemin, accents dorés, couleurs de tier comme dans le jeu. Pas de paragraphe d'explication : l'aide derrière un bouton « i ».
