@@ -28,8 +28,14 @@ Reprendre après la passation 28 et répondre à Julien sur la méthode du site 
 - Chat : tout archiver, messages privés compris ; le chatbot ne répond jamais aux messages privés (complément de D-068).
 - Dépôt DOGGO-ESPORT lu (privé) : hébergement Docker sur Unraid, OVH + Nginx Proxy Manager, mot de passe des amis ; retenu dans le prompt du site, sans aucune adresse (le dépôt bitcraft-bot est public).
 
+### Suite (26/11, vers 20:15) : essai de la v0.4.19, v0.4.20 préparée
+- Essai de Julien : tout se remplit ; capacité 7 (Hewing Strikes) OK ; images du personnage trop petites ; carte trop pixelisée, couleurs des tiers peu claires ; chat pas en direct ; activité « Récolte » qui clignote.
+- v0.4.20 (D-073) : fond de carte en hexagones, filtres simplifiés, images × 1,75, chat récent en bas et en direct, activité tenue 2,5 s. Tests 627/627, hexagones vérifiés hors ligne. Essai réel impossible (Julien joue). Publication en attente de la fermeture du bot.
+- D-074 : déplacements par « Set destination », marche visée pour les petits trajets (Q-002). Messages privés : on reste en lecture au démarrage (D-068).
+
 ## Décisions prises (liens D-NNN)
 - [D-071](../decisions/D-071-v0419-requetes-par-morceau.md) : requêtes de zone par morceau de carte, repli corrigé.
+- [D-072](../decisions/D-072-reponses-consignes-sessions-ennemis.md), [D-073](../decisions/D-073-v0420-retours-v0419.md), [D-074](../decisions/D-074-deplacements-set-destination.md).
 
 ## Questions ouvertes créées (liens Q-NNN)
 Aucune. Question posée : le site est pour qui ?

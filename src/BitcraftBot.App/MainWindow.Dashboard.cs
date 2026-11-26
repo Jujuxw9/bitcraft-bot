@@ -9,6 +9,10 @@ namespace BitcraftBot.App;
 public partial class MainWindow
 {
     private static readonly TimeSpan SkillActiveWindow = TimeSpan.FromSeconds(20);
+    // v0.4.20 : durée pendant laquelle la dernière action reste affichée après sa fin (enchaînement des coups).
+    private static readonly TimeSpan ActionHold = TimeSpan.FromSeconds(2.5);
+    private string? _lastActionFrench;
+    private DateTime _lastActionSeen;
 
     private readonly SkillTracker _skillTracker = new();
 
@@ -45,14 +49,24 @@ public partial class MainWindow
         DashBonusText.Text = $"Bonus nourriture : {RegenText(regen)} · {active} bonus";
 
         // Activité : action en cours, métier (la « jauge de métier », lue sur le serveur), ressource frappée.
+        // v0.4.20 : entre deux coups de hache, le serveur dit « aucune action » une fraction de seconde : l'affichage
+        // clignotait. On garde la dernière action affichée pendant ActionHold, en la marquant « en cours ».
         if (s.Action is { } action)
         {
             var progress = action.Progress(nowUtc);
+            _lastActionFrench = action.French;
+            _lastActionSeen = DateTime.Now;
             DashActionText.Text = $"{action.French} · {progress:P0}";
             DashActionBar.Smooth(progress);
         }
+        else if (_lastActionFrench is { } held && DateTime.Now - _lastActionSeen < ActionHold)
+        {
+            DashActionText.Text = $"{held} · en cours";
+            DashActionBar.Smooth(1);
+        }
         else
         {
+            _lastActionFrench = null;
             DashActionText.Text = s.Walking == true ? "En marche" : "Aucune action";
             DashActionBar.Smooth(0);
         }

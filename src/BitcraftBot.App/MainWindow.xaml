@@ -260,6 +260,12 @@
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                                 <Setter Property="ToolTip" Value="{Binding Tip}" />
+                                <Style.Triggers>
+                                    <!-- v0.4.20 : nouveau message, fond doré quelques secondes -->
+                                    <DataTrigger Binding="{Binding IsNew}" Value="True">
+                                        <Setter Property="Background" Value="#40D2B65D" />
+                                    </DataTrigger>
+                                </Style.Triggers>
                             </Style>
                         </ListView.ItemContainerStyle>
                         <ListView.View>
@@ -299,7 +305,7 @@
                     <!-- v0.4.15 : image de l'objet à gauche de son nom. -->
                     <DataTemplate x:Key="ItemNameCell">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Icon}" Width="22" Height="22" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                            <Image Source="{Binding Icon}" Width="38" Height="38" Margin="0,1,8,1" RenderOptions.BitmapScalingMode="HighQuality" />
                             <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
                         </StackPanel>
                     </DataTemplate>
@@ -327,13 +333,13 @@
                     <Border Grid.Column="0" Style="{StaticResource Card}">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                                <Image x:Name="BagLogo" Width="26" Height="26" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <Image x:Name="BagLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
                                 <TextBlock x:Name="BagTitle" Text="SAC" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
                             </StackPanel>
                             <ListView x:Name="BagList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Objet" Width="160" CellTemplate="{StaticResource ItemNameCell}" />
+                                        <GridViewColumn Header="Objet" Width="190" CellTemplate="{StaticResource ItemNameCell}" />
                                         <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
                                         <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
                                         <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
@@ -345,13 +351,13 @@
                     <Border Grid.Column="1" Style="{StaticResource Card}">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                                <Image x:Name="BeltLogo" Width="26" Height="26" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <Image x:Name="BeltLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
                                 <TextBlock x:Name="BeltTitle" Text="CEINTURE D'OUTILS" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
                             </StackPanel>
                             <ListView x:Name="BeltList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Objet" Width="160" CellTemplate="{StaticResource ItemNameCell}" />
+                                        <GridViewColumn Header="Objet" Width="190" CellTemplate="{StaticResource ItemNameCell}" />
                                         <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
                                         <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
                                         <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
@@ -363,13 +369,13 @@
                     <Border Grid.Column="2" Style="{StaticResource Card}">
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
-                                <Image x:Name="BankLogo" Width="26" Height="26" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <Image x:Name="BankLogo" Width="40" Height="40" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
                                 <TextBlock x:Name="BankTitle" Text="BANQUES" Style="{StaticResource CardTitle}" Margin="0" VerticalAlignment="Center" />
                             </StackPanel>
                             <ListView x:Name="BankList" MinHeight="150" GridViewColumnHeader.Click="InventoryHeader_Click">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Objet" Width="160" CellTemplate="{StaticResource ItemNameCell}" />
+                                        <GridViewColumn Header="Objet" Width="190" CellTemplate="{StaticResource ItemNameCell}" />
                                         <GridViewColumn Header="Quantité" Width="92" DisplayMemberBinding="{Binding Quantity, StringFormat=N0}" />
                                         <GridViewColumn Header="Type" Width="92" DisplayMemberBinding="{Binding Kind}" />
                                         <GridViewColumn Header="Tier" Width="70" DisplayMemberBinding="{Binding TierText}" />
@@ -435,8 +441,6 @@
                     <StackPanel>
                         <DockPanel>
                             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                                <Button Content="Tout" Style="{StaticResource SmallButton}" Click="FamilyAll_Click" ToolTip="Tout afficher : toutes les ressources, tous les tiers" />
-                                <Button Content="Bois seul" Style="{StaticResource SmallButton}" Click="FamilyTrees_Click" Margin="0" ToolTip="Seulement le bois (arbres)" />
                             </StackPanel>
                             <TextBlock x:Name="MapPlayerText" Text="Pas connecté." FontWeight="SemiBold" VerticalAlignment="Center" />
                         </DockPanel>
@@ -447,7 +451,6 @@
                         <DockPanel Margin="0,2,0,0">
                             <TextBlock Text="Tier" Width="80" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" DockPanel.Dock="Left"
                                        ToolTip="Clic sur un tier : l'afficher ou le masquer. Clic droit : ce tier seul." />
-                            <Button Content="Tous" Style="{StaticResource SmallButton}" Click="TierAll_Click" Margin="4,0,0,0" DockPanel.Dock="Right" VerticalAlignment="Center" ToolTip="Afficher tous les tiers" />
                             <WrapPanel x:Name="TierChecks" VerticalAlignment="Center" />
                         </DockPanel>
                         <TextBlock x:Name="SrvResourceCount" Text="" Style="{StaticResource MutedText}" />

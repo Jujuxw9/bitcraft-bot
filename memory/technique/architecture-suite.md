@@ -48,3 +48,10 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - **Pourquoi** : depuis le 26/11 au soir, le serveur refuse un abonnement dont l'estimation dépasse 20 millions de lignes ; un carré de coordonnées seul sur `location_state` est estimé trop large.
 - **Comment** : chaque requête de zone (ressources, santé, sacs au sol) porte `chunk_index = N` (colonne indexée) en plus du carré ; une requête par morceau de 32 × 32 cases touché par la zone. Les morceaux du fond de carte restent ceux de la v0.4.18.
 - **Repli** : en cas de refus, une seule partie est retirée à la fois, des plus lourdes (zone autour du personnage) aux plus légères (sac, banques). Sac, banques, chat, barre d'action et voyageurs ne partent qu'en dernier.
+
+## 24. v0.4.20 : retours sur la v0.4.19 (D-073)
+
+- **Fond de carte** : l'image par case (un point par grande case) sert seulement de source de couleurs. Elle est redessinée une fois par fond reçu en hexagones (12 points d'image par case, pointe en haut, lignes impaires décalées d'une demi-case vers l'est, comme les coordonnées décalées du serveur), puis affichée à l'échelle de la carte.
+- **Filtres** : 8 catégories (pierre et minerai séparés), tiers T1 à T10 d'une couleur ; les ressources sans tier ne sont cachées que si un tier est masqué ; les anciens réglages sont convertis au chargement.
+- **Chat** : tableau tenu à jour par ajout en bas (pas refait à chaque fois), relu toutes les secondes quand l'onglet est ouvert ; refait seulement si le filtre change.
+- **Activité** : dernière action gardée 2,5 s après sa fin.

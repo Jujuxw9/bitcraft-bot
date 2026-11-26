@@ -1,12 +1,16 @@
 namespace BitcraftBot.Server.World;
 
-// Catégories de la carte (v0.4.18, D-070) : les 12 familles de ressources regroupées en 7 boutons simples.
+// Catégories de la carte (v0.4.18, D-070 ; v0.4.20 : pierre et minerai séparés) : les 12 familles en 8 boutons simples.
 public sealed record MapCategory(string Name, string Hint, IReadOnlyList<string> Families);
 
 public static class MapCategories
 {
     public const string Wood = "Bois";
-    public const string Stone = "Pierre et minerai";
+    public const string Stone = "Pierre";
+    public const string Ore = "Minerai";
+
+    // Ancien nom (v0.4.18), encore présent dans les réglages enregistrés : vaut « Pierre » et « Minerai ».
+    public const string OldStone = "Pierre et minerai";
     public const string Plants = "Plantes";
     public const string Food = "Nourriture";
     public const string Soil = "Sable et argile";
@@ -16,7 +20,8 @@ public static class MapCategories
     public static IReadOnlyList<MapCategory> All { get; } =
     [
         new(Wood, "arbres, souches, bûches", [ResourceFamilies.Trees]),
-        new(Stone, "rochers, pierre, filons de minerai", [ResourceFamilies.Rocks, ResourceFamilies.Ores]),
+        new(Stone, "rochers, pierre", [ResourceFamilies.Rocks]),
+        new(Ore, "filons de minerai", [ResourceFamilies.Ores]),
         new(Plants, "fleurs, plantes à fibres", [ResourceFamilies.Flowers, ResourceFamilies.Fibers]),
         new(Food, "baies, fruits, champignons, céréales, légumes", [ResourceFamilies.Berries, ResourceFamilies.Mushrooms, ResourceFamilies.Crops]),
         new(Soil, "sable, argile, terre, sel", [ResourceFamilies.Soils]),
@@ -42,12 +47,15 @@ public sealed class MapFilter
     public MapFilter(IEnumerable<string>? shownCategories = null, IEnumerable<int>? hiddenTiers = null)
     {
         var known = MapCategories.All.Select(c => c.Name).ToHashSet();
-        _categories = shownCategories is null ? known : shownCategories.Where(known.Contains).ToHashSet();
-        _hiddenTiers = hiddenTiers?.ToHashSet() ?? [];
+        // v0.4.20 : l'ancienne catégorie « Pierre et minerai » enregistrée vaut les deux nouvelles.
+        var shown = shownCategories?.SelectMany(c => c == MapCategories.OldStone ? [MapCategories.Stone, MapCategories.Ore] : new[] { c });
+        _categories = shown is null ? known : shown.Where(known.Contains).ToHashSet();
+        // v0.4.20 : plus de bouton « palier inconnu » : ces ressources sont toujours montrées.
+        _hiddenTiers = hiddenTiers?.Where(t => t is >= 1 and <= MaxTier).ToHashSet() ?? [];
     }
 
-    // Paliers montrés en boutons : T1 à T10, puis « ? » (palier inconnu).
-    public static IReadOnlyList<int> Tiers { get; } = [.. Enumerable.Range(1, MaxTier), UnknownTier];
+    // Paliers montrés en boutons : T1 à T10 (v0.4.20 : plus de « ? »).
+    public static IReadOnlyList<int> Tiers { get; } = [.. Enumerable.Range(1, MaxTier)];
 
     public static int TierOf(NearbyResource r) => r.Tier is { } t && t >= 1 && t <= MaxTier ? t : UnknownTier;
 
@@ -57,9 +65,12 @@ public sealed class MapFilter
 
     public bool IsShown(string category) => _categories.Contains(category);
 
-    public bool IsShown(int tier) => !_hiddenTiers.Contains(tier);
+    public bool IsShown(int tier) => TierShown(tier);
 
-    public bool Shows(NearbyResource r) => _categories.Contains(MapCategories.Of(r)) && !_hiddenTiers.Contains(TierOf(r));
+    public bool Shows(NearbyResource r) => _categories.Contains(MapCategories.Of(r)) && TierShown(TierOf(r));
+
+    // Palier inconnu : montré seulement quand aucun palier n'est masqué (sinon « T3 seul » montrerait aussi les inconnus).
+    private bool TierShown(int tier) => tier == UnknownTier ? _hiddenTiers.Count == 0 : !_hiddenTiers.Contains(tier);
 
     public bool AllShown => _hiddenTiers.Count == 0 && _categories.Count == MapCategories.All.Count;
 
@@ -108,5 +119,5 @@ public sealed class MapFilter
 
     // Nombre par catégorie, pour les paliers affichés.
     public IReadOnlyDictionary<string, int> CategoryCounts(IEnumerable<NearbyResource> resources) =>
-        resources.Where(r => !_hiddenTiers.Contains(TierOf(r))).GroupBy(MapCategories.Of).ToDictionary(g => g.Key, g => g.Count());
+        resources.Where(r => TierShown(TierOf(r))).GroupBy(MapCategories.Of).ToDictionary(g => g.Key, g => g.Count());
 }

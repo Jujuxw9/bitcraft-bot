@@ -74,9 +74,7 @@ public sealed class ResourceMap : FrameworkElement
         _terrainImage = TerrainImage.Build(chunks, explored);
         if (_terrainImage is { } image)
         {
-            var bitmap = BitmapSource.Create(image.Width, image.Height, 96, 96, PixelFormats.Bgra32, null, image.Pixels, image.Width * 4);
-            bitmap.Freeze();
-            _terrain = bitmap;
+            _terrain = HexImage(image);
             TerrainText = $"fond de carte : {image.ChunkCount} morceaux de terrain" + (explored is null ? "" : ", zones non découvertes assombries");
         }
         else
@@ -86,6 +84,61 @@ public sealed class ResourceMap : FrameworkElement
         }
         InvalidateVisual();
         return true;
+    }
+
+    // Points d'image par grande case dans l'image des hexagones (assez pour des bords nets une fois agrandie).
+    private const int HexPixels = 12;
+    private static readonly Pen HexEdge = FrozenPen(Color.FromArgb(55, 0, 0, 0), 0.8);
+
+    // v0.4.20 : chaque grande case (case du jeu) est dessinée en hexagone, comme dans le jeu : pointe en haut,
+    // une ligne sur deux décalée d'une demi-case vers l'est (coordonnées décalées du serveur). Avant : un carré
+    // d'un point par case, agrandi, donc très pixelisé. L'image est faite une seule fois par fond de carte reçu.
+    private static BitmapSource HexImage(TerrainImage image)
+    {
+        var width = (int)Math.Ceiling((image.Width + 0.5) * HexPixels);
+        var height = image.Height * HexPixels;
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+        {
+            var brushes = new Dictionary<uint, Brush>();
+            for (var row = 0; row < image.Height; row++)
+            {
+                var cellZ = image.NorthCell - row;
+                var shift = (cellZ & 1) == 1 ? 0.5 : 0.0;
+                for (var col = 0; col < image.Width; col++)
+                {
+                    var argb = image.Pixels[row * image.Width + col];
+                    if (!brushes.TryGetValue(argb, out var brush))
+                    {
+                        brush = Frozen(Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
+                        brushes[argb] = brush;
+                    }
+                    dc.DrawGeometry(brush, HexEdge, Hexagon((col + 0.5 + shift) * HexPixels, (row + 0.5) * HexPixels, HexPixels));
+                }
+            }
+        }
+        var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(visual);
+        bitmap.Freeze();
+        return bitmap;
+    }
+
+    // Hexagone pointe en haut : largeur d'une case, hauteur 4/3 de case (les lignes se recouvrent d'un quart, comme un pavage).
+    private static StreamGeometry Hexagon(double cx, double cy, double cell)
+    {
+        var half = cell / 2;
+        var tall = cell * 2 / 3;
+        var mid = cell / 3;
+        var g = new StreamGeometry();
+        using (var ctx = g.Open())
+        {
+            ctx.BeginFigure(new Point(cx, cy - tall), true, true);
+            ctx.PolyLineTo([
+                new Point(cx + half, cy - mid), new Point(cx + half, cy + mid), new Point(cx, cy + tall),
+                new Point(cx - half, cy + mid), new Point(cx - half, cy - mid)], true, true);
+        }
+        g.Freeze();
+        return g;
     }
 
     private double Scale => (Math.Min(ActualWidth, ActualHeight) / 2 - 18) / RadiusUnits;
@@ -106,13 +159,13 @@ public sealed class ResourceMap : FrameworkElement
             return;
         }
 
-        // Fond de carte (v0.4.18) : une case du jeu = un point de l'image, nord en haut, légèrement voilé pour que les points restent lisibles.
+        // Fond de carte (v0.4.18 ; v0.4.20 en hexagones) : une case du jeu = un hexagone, nord en haut, légèrement voilé pour que les points restent lisibles.
         if (_terrain is { } bitmap && _terrainImage is { } image && _player is { } at)
         {
             dc.PushClip(new RectangleGeometry(size));
             var left = c.X + (image.WestCell - 0.5 - at.ScreenEast) * scale;
             var top = c.Y - (image.NorthCell + 0.5 - at.ScreenNorth) * scale;
-            dc.DrawImage(bitmap, new Rect(left, top, image.Width * scale, image.Height * scale));
+            dc.DrawImage(bitmap, new Rect(left, top, bitmap.PixelWidth / (double)HexPixels * scale, image.Height * scale));
             dc.DrawRectangle(TerrainVeil, null, size);
             dc.Pop();
         }

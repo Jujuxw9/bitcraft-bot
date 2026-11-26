@@ -3,7 +3,7 @@
 | ID | Titre | Priorité | Statut |
 |---|---|---|---|
 | [Q-001](Q-001-perception-monde-3d.md) | Perception du monde 3D | Haute | En partie résolue : positions des ressources lues sur le serveur (D-039, H2) |
-| [Q-002](Q-002-cartographie-navigation.md) | Cartographie et navigation | Haute | Ouverte (position exacte et ressources par le serveur ; trajets : H3) |
+| [Q-002](Q-002-cartographie-navigation.md) | Cartographie et navigation | Haute | Résolue → D-074 |
 | [Q-003](Q-003-interface-consignes-n3.md) | Interface de consignes N3 | Basse | Résolue → D-072 |
 | [Q-004](Q-004-source-valeurs-donnees.md) | Source des valeurs de données de jeu | Haute | Résolue → D-033 |
 | [Q-005](Q-005-langue-code.md) | Langue du code | Moyenne | Résolue → D-012 |

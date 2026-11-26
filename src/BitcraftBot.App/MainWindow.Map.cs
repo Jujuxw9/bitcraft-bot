@@ -56,11 +56,11 @@ public partial class MainWindow
             _categoryPills[category.Name] = pill;
             FamilyChecks.Children.Add(pill);
         }
-        // Une pastille par palier, T1 à T10 puis « ? ». Clic : allumer ou éteindre ; clic droit : ce palier seul.
+        // Une pastille par palier, T1 à T10, toutes de la même couleur (v0.4.20 : plus simple). Clic : allumer ou éteindre ; clic droit : ce palier seul.
         foreach (var tier in MapFilter.Tiers)
         {
-            var name = tier == MapFilter.UnknownTier ? "?" : $"T{tier}";
-            var pill = new MapPill(TierColors.Of(tier), $"{(tier == MapFilter.UnknownTier ? "Palier inconnu" : $"Palier {tier}")}. Clic : afficher ou masquer. Clic droit : ce palier seul (ou tout).");
+
+            var pill = new MapPill(TierColors.Pill, $"Tier {tier}. Clic : afficher ou masquer. Clic droit : ce tier seul (ou tout).");
             pill.Clicked += right =>
             {
                 if (right) _mapFilter.OnlyTier(tier);
@@ -82,26 +82,6 @@ public partial class MainWindow
         ShowPills(_lastMapResources);
     }
 
-    private void FamilyAll_Click(object sender, RoutedEventArgs e)
-    {
-        _mapFilter.ShowAll();
-        MapFilterChanged();
-    }
-
-    private void FamilyTrees_Click(object sender, RoutedEventArgs e)
-    {
-        foreach (var c in MapCategories.All)
-        {
-            if (_mapFilter.IsShown(c.Name) != (c.Name == MapCategories.Wood)) _mapFilter.ToggleCategory(c.Name);
-        }
-        MapFilterChanged();
-    }
-
-    private void TierAll_Click(object sender, RoutedEventArgs e)
-    {
-        foreach (var tier in MapFilter.Tiers.Where(t => !_mapFilter.IsShown(t))) _mapFilter.ToggleTier(tier);
-        MapFilterChanged();
-    }
 
     private IReadOnlyList<NearbyResource> _lastMapResources = [];
 
@@ -117,7 +97,7 @@ public partial class MainWindow
         var byTier = _mapFilter.TierCounts(resources);
         foreach (var (tier, pill) in _tierPills)
         {
-            pill.Set(tier == MapFilter.UnknownTier ? "?" : $"T{tier}", byTier.GetValueOrDefault(tier), _mapFilter.IsShown(tier));
+            pill.Set($"T{tier}", byTier.GetValueOrDefault(tier), _mapFilter.IsShown(tier));
         }
     }
 
@@ -283,28 +263,14 @@ public partial class MainWindow
     }
 }
 
-// Couleur de chaque palier (tier) : pastilles de la carte.
+// Couleur des pastilles de tier (v0.4.20) : une seule couleur pour tous, plus simple à lire que 10 couleurs.
 public static class TierColors
 {
-    private static readonly Color[] Colors =
-    [
-        Color.FromRgb(176, 176, 176), // T1
-        Color.FromRgb(129, 199, 132), // T2
-        Color.FromRgb(79, 195, 247),  // T3
-        Color.FromRgb(92, 142, 246),  // T4
-        Color.FromRgb(186, 104, 200), // T5
-        Color.FromRgb(240, 98, 146),  // T6
-        Color.FromRgb(255, 138, 101), // T7
-        Color.FromRgb(255, 202, 40),  // T8
-        Color.FromRgb(239, 83, 80),   // T9
-        Color.FromRgb(240, 240, 240), // T10
-    ];
+    public static Brush Pill { get; } = Make(Color.FromRgb(138, 180, 248));
 
-    private static readonly Color UnknownColor = Color.FromRgb(120, 144, 156);
-
-    public static Brush Of(int tier)
+    private static Brush Make(Color color)
     {
-        var brush = new SolidColorBrush(tier is >= 1 and <= 10 ? Colors[tier - 1] : UnknownColor);
+        var brush = new SolidColorBrush(color);
         brush.Freeze();
         return brush;
     }

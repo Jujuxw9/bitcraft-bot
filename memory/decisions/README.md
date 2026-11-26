@@ -92,3 +92,5 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-070](D-070-v0418-carte-fond-filtres.md) | v0.4.18 : onglet CARTE refait (fond de carte lu sur le serveur : biomes, relief, eau, zones découvertes ; filtres en pastilles par catégorie et tier, retenus) | Validée | 2026-11-26 |
 | [D-071](D-071-v0419-requetes-par-morceau.md) | v0.4.19 : ressources demandées par morceau de carte (nouvelle limite du serveur), repli qui ne retire que la partie en trop | Validée | 2026-11-26 |
 | [D-072](D-072-reponses-consignes-sessions-ennemis.md) | Consignes dans un onglet Exploration, sessions aléatoires de 30 min à 4 h, le bot fuit toujours les ennemis | Validée | 2026-11-26 |
+| [D-073](D-073-v0420-retours-v0419.md) | v0.4.20 : fond de carte en hexagones, pierre et minerai séparés, tiers d’une couleur, boutons retirés, images agrandies, chat en direct (récent en bas), activité sans clignotement | Validée | 2026-11-26 |
+| [D-074](D-074-deplacements-set-destination.md) | Déplacements : « Set destination » par défaut, marche visée pour les petits trajets | Validée | 2026-11-26 |

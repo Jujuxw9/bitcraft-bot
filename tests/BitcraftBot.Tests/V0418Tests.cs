@@ -159,9 +159,10 @@ public class V0418Tests
     [Fact]
     public void CategoriesGroupFamilies()
     {
-        Assert.Equal(7, MapCategories.All.Count);
+        // v0.4.20 : pierre et minerai séparés, 8 catégories.
+        Assert.Equal(8, MapCategories.All.Count);
         Assert.Equal(MapCategories.Wood, MapCategories.Of(Res("Tree", 1)));
-        Assert.Equal(MapCategories.Stone, MapCategories.Of(Res("Ore Vein", 3)));
+        Assert.Equal(MapCategories.Ore, MapCategories.Of(Res("Ore Vein", 3)));
         Assert.Equal(MapCategories.Stone, MapCategories.Of(Res("Rock", 1)));
         Assert.Equal(MapCategories.Food, MapCategories.Of(Res("Mushroom", 2)));
         Assert.Equal(MapCategories.Other, MapCategories.Of(Res("Obstacle", 1)));
@@ -208,7 +209,7 @@ public class V0418Tests
     {
         var filter = new MapFilter();
         var list = new[] { Res("Tree", 1), Res("Tree", 2), Res("Ore Vein", 2) };
-        filter.ToggleCategory(MapCategories.Stone);
+        filter.ToggleCategory(MapCategories.Ore);
         Assert.Equal(1, filter.TierCounts(list)[2]);       // le minerai masqué n'est pas compté
         filter.ToggleTier(1);
         Assert.Equal(1, filter.CategoryCounts(list)[MapCategories.Wood]); // l'arbre T1 masqué n'est pas compté
@@ -221,5 +222,22 @@ public class V0418Tests
         Assert.Equal([MapCategories.Wood], filter.ShownCategories);
         Assert.False(filter.IsShown(5));
         Assert.True(filter.IsShown(4));
+    }
+
+    // v0.4.20 : ancienne catégorie « Pierre et minerai » enregistrée = les deux nouvelles ; ancien palier « ? » masqué ignoré.
+    [Fact]
+    public void OldSettingsStillWork()
+    {
+        var filter = new MapFilter([MapCategories.OldStone], [MapFilter.UnknownTier, 2]);
+        Assert.True(filter.IsShown(MapCategories.Stone));
+        Assert.True(filter.IsShown(MapCategories.Ore));
+        Assert.False(filter.IsShown(MapCategories.Wood));
+        Assert.Equal([2], filter.HiddenTiers);
+        Assert.DoesNotContain(MapFilter.UnknownTier, MapFilter.Tiers);
+        // Palier inconnu : montré tant qu'aucun palier n'est masqué.
+        var all = new MapFilter();
+        Assert.True(all.Shows(Res("Rock", null)));
+        all.OnlyTier(3);
+        Assert.False(all.Shows(Res("Rock", null)));
     }
 }
