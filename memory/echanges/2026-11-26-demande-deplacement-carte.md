@@ -33,3 +33,8 @@ Demande notée pendant la session 29. **Prochaine étape** (Julien, 26/11 à 20:
 - Panneau « Map Options » sur le côté : Buildings, Claims, Deployables, Placeables, Travelers, Wind, Watchtowers (à cocher ou non).
 - **Un clic gauche** sur un endroit de la carte : le personnage y va tout de suite. Pas de clic droit, pas de menu.
 - À vérifier : fermeture de la carte (« . » ou Échap) et marche qui continue carte fermée.
+
+## Compléments de Julien (27/11, 00:35)
+- Fermer la grande carte : **Échap** (pas sûr) ou **« . »** (sûr). Le personnage **continue de marcher** carte fermée.
+- **M (Interact) = un clic sur l'élément survolé** (celui entouré de vert). Si la souris n'est sur rien (herbe), **M et Tab ne font rien**.
+- Journal v0.4.24 : l'arbre **reste sélectionné** quand l'endurance tombe à 0 (target_state = l'arbre, Tab inutile) ; M a marché 1 fois sur 4 (souris sur l'arbre ou pas). Défaut vu : compteur d'échecs pas remis à zéro (abandon après 1 essai à 00:29).
