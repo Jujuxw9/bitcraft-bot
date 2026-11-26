@@ -209,6 +209,8 @@ public partial class MainWindow
         // v0.4.15 : noms des ressources lus au moment voulu (les données du jeu peuvent arriver après la connexion automatique).
         _serverReader = new ServerReader(_log, id => _resourceLabels.GetValueOrDefault(id));
         _serverReader.StateChanged += () => Dispatcher.BeginInvoke(ShowServerState);
+        // v0.4.23 : le lecteur range lui-même dans la mémoire de la carte les morceaux reçus (dont les zones découvertes).
+        _serverReader.TerrainMemory = _terrainStore;
         ServerConnectButton.IsEnabled = false;
         ServerDisconnectButton.IsEnabled = true;
         // Le jeu est fermé ici : la découverte par le module global est sans risque.

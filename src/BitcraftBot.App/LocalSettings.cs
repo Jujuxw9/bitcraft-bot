@@ -52,6 +52,9 @@ public sealed class LocalSettings
 
     public List<int> MapHiddenTiers { get; set; } = [];
 
+    // Ressource recherchée sur la carte (v0.4.23, nom exact des données du jeu ; null = aucune).
+    public string? MapSoughtResource { get; set; }
+
     // Arrêt d'urgence si la souris bouge pendant un geste du bot (contrôleur d'actions, v0.3.18).
     public bool StopOnMouseMove { get; set; } = true;
 

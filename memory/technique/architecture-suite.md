@@ -68,3 +68,11 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - **Zoom** : 5 crans (0,5 à 2 fois la zone lue) ; image des hexagones plafonnée à environ 2 400 points de côté.
 - **Fabrication** : abonnement à `progressive_action_state` du personnage (index sur le propriétaire) ; nombre de gestes par recette tiré de `crafting_recipe_desc`.
 - **RAM** : niveau d'alerte changé après 3 mesures de suite ; ramasse-miettes forcé (avec tassement) après un message de plus de 500 000 caractères, au plus une fois par minute.
+
+## 27. v0.4.23 : carte, ressource recherchée, overlay (D-079)
+
+- **Vue** : 7 crans (10 à 100 cases). Ordonnées multipliées par √3/2 (`ResourceMap.RowFactor`) pour le fond, les points et la limite de la zone lue ; tout est coupé au cadre. `ToCell` donne la case sous un point de la carte (préparation de « Se déplacer ici »).
+- **Zones découvertes** : `ServerReader.TerrainMemory` = la mémoire de la carte. À chaque abonnement possible (5 s au moins entre deux), le lecteur cherche les morceaux découverts (bitmap `exploration_chunks_state_v2`) à moins de 130 cases, absents de la mémoire et jamais demandés pendant cette connexion ; il en ajoute 24 au plus aux requêtes du fond de carte. Ils sont rangés dans la mémoire dès l'abonnement accepté, puis ne sont plus redemandés.
+- **Mémoire du terrain** : numéro de version (`TerrainStore.Version`) ; la carte se redessine quand il change.
+- **Ressource recherchée** (`MainWindow.Sought.cs`) : liste des ressources des données du jeu filtrée sur les mots tapés ; choix gardé dans les réglages (`MapSoughtResource`) ; la plus proche parmi la zone lue et la mémoire.
+- **Overlay** : ligne système (`SystemSummary`, dans Core) reprise de la dernière mesure CPU/RAM.

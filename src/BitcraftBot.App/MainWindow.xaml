@@ -365,6 +365,24 @@
                                     <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                                         <Setter Property="Padding" Value="4" />
                                         <Setter Property="Margin" Value="2" />
+                                        <!-- v0.4.23 : le modèle du thème dessine une ligne de tableau (rien sans colonnes) : vignette à la place. -->
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListViewItem">
+                                                    <Border x:Name="B" Background="Transparent" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="B" Property="Background" Value="#1A3657" />
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter TargetName="B" Property="Background" Value="{StaticResource Blue}" />
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                         <Setter Property="ToolTip">
                                             <Setter.Value>
                                                 <TextBlock>
@@ -497,8 +515,8 @@
                         <StackPanel>
                             <!-- v0.4.22 : zoom de la carte -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <Button Content="−" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomIn_Click" ToolTip="Zoomer (moins de cases, plus de détails)" />
-                                <Button Content="+" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomOut_Click" ToolTip="Dézoomer (plus de cases ; au-delà de la zone lue, la carte gardée en mémoire)" Margin="4,0,8,0" />
+                                <Button Content="−" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomOut_Click" ToolTip="Dézoomer (plus de cases, jusqu'à 100 ; au-delà de la zone lue, la carte gardée en mémoire)" />
+                                <Button Content="+" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomIn_Click" ToolTip="Zoomer (moins de cases, jusqu'à 10, plus de détails)" Margin="4,0,8,0" />
                                 <TextBlock x:Name="MapZoomText" Text="vue : 30 cases" Style="{StaticResource MutedText}" VerticalAlignment="Center" />
                             </StackPanel>
                             <Viewbox x:Name="MapBox" MaxWidth="560" MaxHeight="560" Stretch="Uniform">
@@ -515,7 +533,7 @@
                                 <TextBlock><Run Text="●" Foreground="#A8DAB5" /> jeune</TextBlock>
                                 <TextBlock><Run Text="●" Foreground="#8D6E63" /> mort</TextBlock>
                                 <TextBlock><Run Text="○" Foreground="#FB8C00" /> entamé</TextBlock>
-                                <TextBlock><Run Text="◯" Foreground="#D2B65D" /> meilleur</TextBlock>
+                                <TextBlock><Run Text="◯" Foreground="#D2B65D" /> recherchée</TextBlock>
                                 <TextBlock><Run Text="◯" Foreground="#F28BF5" /> cible</TextBlock>
                             </WrapPanel>
                         </StackPanel>
@@ -528,14 +546,31 @@
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition /><RowDefinition /><RowDefinition />
+                                    <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Meilleur arbre" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" />
-                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource Value}" />
-                                <TextBlock Grid.Row="1" Text="Cible écran" Style="{StaticResource Label}" Foreground="#F28BF5" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource Value}" />
-                                <TextBlock Grid.Row="2" Text="Zone lue" Style="{StaticResource Label}" />
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource Value}" />
+                                <!-- v0.4.23 (Julien) : ressource recherchée, choisie dans la liste en tapant son nom ; la plus proche est entourée d'or. -->
+                                <TextBlock Grid.Row="0" Text="Recherchée" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" VerticalAlignment="Center" />
+                                <DockPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,4">
+                                    <Button x:Name="SoughtClear" DockPanel.Dock="Right" Content="×" Width="30" Margin="4,0,0,0" Style="{StaticResource SmallButton}"
+                                            Click="SoughtClear_Click" ToolTip="Ne plus rechercher de ressource" />
+                                    <Grid>
+                                        <TextBox x:Name="SoughtBox" MinWidth="260"
+                                                 TextChanged="SoughtBox_TextChanged" PreviewKeyDown="SoughtBox_PreviewKeyDown" GotKeyboardFocus="SoughtBox_GotKeyboardFocus"
+                                                 ToolTip="Tapez le nom de la ressource (en anglais, comme dans le jeu), puis choisissez-la dans la liste" />
+                                        <Popup x:Name="SoughtPopup" PlacementTarget="{Binding ElementName=SoughtBox}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
+                                            <Border Background="{StaticResource Surface}" BorderBrush="{StaticResource Gold}" BorderThickness="1" CornerRadius="4" MinWidth="260">
+                                                <ListBox x:Name="SoughtList" MaxHeight="260" Background="Transparent" BorderThickness="0"
+                                                         PreviewMouseLeftButtonUp="SoughtList_PreviewMouseLeftButtonUp" />
+                                            </Border>
+                                        </Popup>
+                                    </Grid>
+                                </DockPanel>
+                                <TextBlock Grid.Row="1" Text="Plus proche" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource Value}" />
+                                <TextBlock Grid.Row="2" Text="Cible écran" Style="{StaticResource Label}" Foreground="#F28BF5" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource Value}" />
+                                <TextBlock Grid.Row="3" Text="Zone lue" Style="{StaticResource Label}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource Value}" />
                             </Grid>
                             <ListView x:Name="SrvResourceList" MinHeight="200" SelectionChanged="SrvResourceList_SelectionChanged">
                                 <ListView.View>

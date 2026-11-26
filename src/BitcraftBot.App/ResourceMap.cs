@@ -16,21 +16,27 @@ public sealed class ResourceMap : FrameworkElement
     public const double DataRadius = 30;
     public const double RadiusUnits = DataRadius + 1;
 
-    // v0.4.22 : zoom (1 = la zone lue remplit la carte ; plus grand = vue plus large, avec la carte gardée en mémoire).
-    public static readonly double[] ZoomSteps = [0.5, 0.75, 1, 1.5, 2];
-    private int _zoomIndex = 2;
+    // v0.4.22 : zoom ; v0.4.23 (Julien) : de 10 à 100 cases de rayon, la zone lue (30) au milieu.
+    public static readonly double[] ViewSteps = [10, 15, 20, 30, 45, 65, 100];
+    private int _zoomIndex = 3;
 
-    public double Zoom => ZoomSteps[_zoomIndex];
+    // Rayon montré, en grandes cases (une case de marge autour du dernier palier).
+    public double ViewRadius => ViewSteps[_zoomIndex] + 1;
 
-    // Rayon montré, en grandes cases.
-    public double ViewRadius => RadiusUnits * Zoom;
+    // Rayon annoncé à Julien (« vue : N cases »).
+    public double ViewCases => ViewSteps[_zoomIndex];
 
     public event Action? ZoomChanged;
+
+    // v0.4.23 : dans le jeu, une ligne de cases (N) est plus courte qu'une colonne (E) : les cases sont des hexagones
+    // réguliers, pointe en haut, donc une ligne monte de √3/2 de la largeur d'une case. Mesuré sur la carte du jeu
+    // (morceaux de 72 points de large pour 62,5 de haut). Avant, la carte du bot était étirée vers le haut.
+    public static readonly double RowFactor = Math.Sqrt(3) / 2;
 
     // Pas de zoom : -1 = rapprocher (moins de cases), +1 = éloigner (plus de cases).
     public void ZoomBy(int step)
     {
-        var next = Math.Clamp(_zoomIndex + step, 0, ZoomSteps.Length - 1);
+        var next = Math.Clamp(_zoomIndex + step, 0, ViewSteps.Length - 1);
         if (next != _zoomIndex)
         {
             _zoomIndex = next;
@@ -103,7 +109,7 @@ public sealed class ResourceMap : FrameworkElement
         if (_terrainImage is { } image)
         {
             // v0.4.22 : image limitée à environ 2 400 points de côté (vue large = beaucoup de morceaux).
-            _hexPixels = Math.Clamp(2400 / Math.Max(image.Width, image.Height), 4, 12);
+            _hexPixels = Math.Clamp(2400 / Math.Max(image.Width, image.Height), 3, 12);
             _terrain = HexImage(image, _hexPixels);
             TerrainText = $"fond de carte : {image.ChunkCount} morceaux de terrain" + (explored is null ? "" : ", zones non découvertes assombries");
         }
@@ -125,8 +131,9 @@ public sealed class ResourceMap : FrameworkElement
     // d'un point par case, agrandi, donc très pixelisé. L'image est faite une seule fois par fond de carte reçu.
     private static BitmapSource HexImage(TerrainImage image, int hexPixels = 12)
     {
+        var rowPixels = hexPixels * RowFactor;
         var width = (int)Math.Ceiling((image.Width + 0.5) * hexPixels);
-        var height = image.Height * hexPixels;
+        var height = (int)Math.Ceiling(image.Height * rowPixels);
         var edge = hexPixels >= 8 ? HexEdge : null;
         var visual = new DrawingVisual();
         using (var dc = visual.RenderOpen())
@@ -144,7 +151,7 @@ public sealed class ResourceMap : FrameworkElement
                         brush = Frozen(Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
                         brushes[argb] = brush;
                     }
-                    dc.DrawGeometry(brush, edge, Hexagon((col + 0.5 + shift) * hexPixels, (row + 0.5) * hexPixels, hexPixels));
+                    dc.DrawGeometry(brush, edge, Hexagon((col + 0.5 + shift) * hexPixels, (row + 0.5) * rowPixels, hexPixels));
                 }
             }
         }
@@ -154,12 +161,13 @@ public sealed class ResourceMap : FrameworkElement
         return bitmap;
     }
 
-    // Hexagone pointe en haut : largeur d'une case, hauteur 4/3 de case (les lignes se recouvrent d'un quart, comme un pavage).
+    // Hexagone régulier pointe en haut (v0.4.23) : largeur d'une case, hauteur 2/√3 de case ; les lignes sont
+    // espacées de √3/2 de case, elles se recouvrent d'un quart de hauteur, comme le pavage du jeu.
     private static StreamGeometry Hexagon(double cx, double cy, double cell)
     {
         var half = cell / 2;
-        var tall = cell * 2 / 3;
-        var mid = cell / 3;
+        var tall = cell / Math.Sqrt(3);
+        var mid = tall / 2;
         var g = new StreamGeometry();
         using (var ctx = g.Open())
         {
@@ -177,7 +185,17 @@ public sealed class ResourceMap : FrameworkElement
     private Point Center => new(ActualWidth / 2, ActualHeight / 2);
 
     private Point ToPoint(ServerPosition p, ServerPosition player) =>
-        new(Center.X + (p.ScreenEast - player.ScreenEast) * Scale, Center.Y - (p.ScreenNorth - player.ScreenNorth) * Scale);
+        new(Center.X + (p.ScreenEast - player.ScreenEast) * Scale, Center.Y - (p.ScreenNorth - player.ScreenNorth) * Scale * RowFactor);
+
+    // Point de la carte → position (cases E, N), pour « Se déplacer ici ».
+    public (double East, double North)? ToCell(Point at)
+    {
+        if (_player is not { } player || Scale <= 0)
+        {
+            return null;
+        }
+        return (player.ScreenEast + (at.X - Center.X) / Scale, player.ScreenNorth - (at.Y - Center.Y) / (Scale * RowFactor));
+    }
 
     protected override void OnRender(DrawingContext dc)
     {
@@ -189,24 +207,40 @@ public sealed class ResourceMap : FrameworkElement
         {
             return;
         }
+        // v0.4.23 : tout est coupé au bord de la carte (avant, le cercle de 30 cases débordait quand on zoomait).
+        dc.PushClip(new RectangleGeometry(size));
+        try
+        {
+            RenderInside(dc, size, c, scale);
+        }
+        finally
+        {
+            dc.Pop();
+        }
+    }
+
+    private void RenderInside(DrawingContext dc, Rect size, Point c, double scale)
+    {
 
         // Fond de carte (v0.4.18 ; v0.4.20 en hexagones) : une case du jeu = un hexagone, nord en haut, légèrement voilé pour que les points restent lisibles.
         if (_terrain is { } bitmap && _terrainImage is { } image && _player is { } at)
         {
-            dc.PushClip(new RectangleGeometry(size));
             var left = c.X + (image.WestCell - 0.5 - at.ScreenEast) * scale;
-            var top = c.Y - (image.NorthCell + 0.5 - at.ScreenNorth) * scale;
-            dc.DrawImage(bitmap, new Rect(left, top, bitmap.PixelWidth / (double)_hexPixels * scale, image.Height * scale));
+            var top = c.Y - (image.NorthCell + 0.5 - at.ScreenNorth) * scale * RowFactor;
+            dc.DrawImage(bitmap, new Rect(left, top, bitmap.PixelWidth / (double)_hexPixels * scale, bitmap.PixelHeight / (double)_hexPixels * scale));
             dc.DrawRectangle(TerrainVeil, null, size);
-            dc.Pop();
         }
 
         // Repères : axes et un seul cercle, la limite de la zone lue en direct (v0.4.22, demande de Julien).
         var view = ViewRadius;
-        dc.DrawLine(AxisPen, new Point(c.X, c.Y - view * scale), new Point(c.X, c.Y + view * scale));
-        dc.DrawLine(AxisPen, new Point(c.X - view * scale, c.Y), new Point(c.X + view * scale, c.Y));
-        dc.DrawEllipse(null, RingPen, c, DataRadius * scale, DataRadius * scale);
-        Text(dc, $"{DataRadius:0}", new Point(c.X + DataRadius * scale * 0.71 + 2, c.Y - DataRadius * scale * 0.71 - 14), 11);
+        dc.DrawLine(AxisPen, new Point(c.X, 0), new Point(c.X, ActualHeight));
+        dc.DrawLine(AxisPen, new Point(0, c.Y), new Point(ActualWidth, c.Y));
+        // Limite de la zone lue : un ovale, puisque les lignes N sont plus courtes que les colonnes E.
+        dc.DrawEllipse(null, RingPen, c, DataRadius * scale, DataRadius * scale * RowFactor);
+        if (DataRadius < view)
+        {
+            Text(dc, $"{DataRadius:0}", new Point(c.X + DataRadius * scale * 0.71 + 2, c.Y - DataRadius * scale * RowFactor * 0.71 - 14), 11);
+        }
         Text(dc, "N", new Point(c.X - 4, 2), 13);
         Text(dc, "S", new Point(c.X - 4, ActualHeight - 18), 13);
         Text(dc, "E", new Point(ActualWidth - 14, c.Y - 9), 13);
@@ -254,7 +288,8 @@ public sealed class ResourceMap : FrameworkElement
         }
         foreach (var (id, pen, radius) in new[] { (_best, BestPen, 11.0), (_screenTarget, ScreenTargetPen, 14.0), (_selected, SelectedPen, 9.5) })
         {
-            if (id is { } entity && _resources.FirstOrDefault(r => r.EntityId == entity) is { } r && Visible(r))
+            // v0.4.23 : la ressource recherchée peut être une ressource gardée en mémoire (hors de la zone lue).
+            if (id is { } entity && (_resources.FirstOrDefault(r => r.EntityId == entity) ?? _remembered.FirstOrDefault(r => r.EntityId == entity)) is { } r && Visible(r))
             {
                 dc.DrawEllipse(null, pen, ToPoint(r.Position, player), radius, radius);
             }

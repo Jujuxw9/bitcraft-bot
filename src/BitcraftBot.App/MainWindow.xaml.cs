@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.22 : carte à 30 cases avec un seul cercle, zoom + et −, mémoire de la carte (terrain gardé sur le disque, ressources déjà vues en pâle) ; vraie progression des fabrications ; ceinture en vignettes ; seuils RAM 1000 / 1600 Mo, pics brefs ignorés, mémoire rendue après les gros envois.");
+        _log.Info("Session", "Version 0.4.23 : carte : boutons + et − remis dans le bon sens, zoom de 10 à 100 cases, rien ne dépasse du cadre, hexagones aux vraies proportions du jeu, zones déjà découvertes lues une fois et gardées ; « ressource recherchée » (choisie par son nom) à la place du meilleur arbre ; ceinture d'outils réparée ; overlay avec CPU et RAM.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
@@ -726,8 +726,12 @@ public partial class MainWindow : Window
         }
     }
 
+    // Dernière mesure CPU/RAM (reprise par l'overlay, v0.4.23).
+    private ResourceSample? _lastResourceSample;
+
     private void ShowResources(ResourceSample s)
     {
+        _lastResourceSample = s;
         BotCpuText.Text = $"Bot : CPU {s.BotCpuPercent:0.0} %";
         BotRamText.Text = $"Bot : RAM {s.BotRamMb:0} Mo";
         GameCpuText.Text = s.GameRamMb is { } gr ? $"Jeu : CPU {s.GameCpuPercent ?? 0:0} %, RAM {gr / 1024:0.0} Go" : "Jeu : fermé";

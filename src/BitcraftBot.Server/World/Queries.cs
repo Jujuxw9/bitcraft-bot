@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false, bool withBags = true)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false, bool withBags = true, IReadOnlyList<ulong>? terrainExtra = null)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -68,7 +68,7 @@ public static class Queries
             }
             if (withTerrain)
             {
-                list.AddRange(Terrain(a, entityId));
+                list.AddRange(Terrain(a, entityId, terrainExtra));
             }
         }
         return list;
@@ -79,10 +79,14 @@ public static class Queries
 
     // Fond de carte (v0.4.18) : seulement les morceaux de terrain autour de la zone lue (4 à 9 morceaux, jamais toute
     // la région), un par requête sur la clé primaire ; et les zones découvertes du personnage.
-    public static IReadOnlyList<string> Terrain(Area a, ulong entityId)
+    // v0.4.23 : extra = morceaux déjà découverts à garder en mémoire (lus une seule fois, en plus de ceux autour).
+    public static IReadOnlyList<string> Terrain(Area a, ulong entityId, IReadOnlyList<ulong>? extra = null)
     {
         var list = TerrainChunk.ChunksAround(a.CenterX / 3.0, a.CenterZ / 3.0, TerrainRadius)
-            .Select(c => string.Create(CultureInfo.InvariantCulture, $"SELECT * FROM terrain_chunk_state WHERE chunk_index = {TerrainChunk.IndexOf(c.X, c.Z)}"))
+            .Select(c => TerrainChunk.IndexOf(c.X, c.Z))
+            .Concat(extra ?? [])
+            .Distinct()
+            .Select(i => string.Create(CultureInfo.InvariantCulture, $"SELECT * FROM terrain_chunk_state WHERE chunk_index = {i}"))
             .ToList();
         list.Add(string.Create(CultureInfo.InvariantCulture, $"SELECT * FROM exploration_chunks_state_v2 WHERE entity_id = {entityId}"));
         return list;

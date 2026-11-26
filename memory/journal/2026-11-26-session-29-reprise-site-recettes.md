@@ -57,3 +57,10 @@ Aucune. Question posée : le site est pour qui ?
 - Après 14:00 : bilan des tâches T-01 à T-04 (`taches-planifiees/etat.md`), rapport de la mémoire.
 - Julien teste la dernière version sortie.
 - 27/11 ou après : caméra, exploration automatique, cadrage du site des recettes.
+
+### Suite (26/11, 20:40 → 20:50, après /compact) : essai de la v0.4.22, v0.4.23
+- Journal v0.4.22 (10 min) : zone de 30 cases acceptée (aucun refus), RAM 570 à 600 Mo, 69 morceaux découverts lus, 9 morceaux de terrain gardés sur le disque ; fabrication allée au bout (110 étapes, 2 min 38 s).
+- Retours de Julien (3 captures) : + et − inversés, cercle qui sort du cadre, hexagones étirés, zoom voulu de 10 à 100, zones visitées absentes, ceinture vide, overlay à détailler, « meilleur » remplacé par une ressource recherchée choisie.
+- Cause de la ceinture vide : modèle des lignes de tableau du thème (rien sans colonnes).
+- **v0.4.23** (D-079) publiée en local, tests 635/635, pas d'essai serveur (jeu ouvert).
+- Prochaine étape demandée par Julien : **« Se déplacer ici »** (Set destination sur la grande carte du jeu, touche « . »).

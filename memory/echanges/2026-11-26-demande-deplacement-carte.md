@@ -1,6 +1,6 @@
 # Demande de Julien : « Se déplacer ici » depuis la carte du bot (2026-11-26, plus tard)
 
-Demande notée pendant la session 29. **Pas encore planifiée** : à faire plus tard, petit à petit, avec les essais de Julien.
+Demande notée pendant la session 29. **Prochaine étape** (Julien, 26/11 à 20:40 : « super important », dès que la carte est stable, D-079). Petit à petit, avec les essais de Julien.
 
 ## Ce que veut Julien
 - **Clic droit sur la carte du bot** → petit menu → **« Se déplacer ici »**. Le bot dit au jeu d'aller à cet endroit.

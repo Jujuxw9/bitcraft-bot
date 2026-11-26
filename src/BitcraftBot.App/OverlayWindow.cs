@@ -24,6 +24,8 @@ public sealed class OverlayWindow : Window
     private readonly TextBlock _server = Line(13, FontWeights.SemiBold);
     private readonly TextBlock _screen = Line(13, FontWeights.SemiBold);
     private readonly TextBlock _meal = Line(13, FontWeights.SemiBold);
+    // v0.4.23 (Julien) : deuxième ligne, le système (CPU et RAM du bot, du jeu).
+    private readonly TextBlock _system = Line(11.5, FontWeights.Normal);
 
     // Point d'accroche (pixels écran) : milieu du bord bas de la pastille.
     private (int X, int Y)? _anchor;
@@ -50,7 +52,14 @@ public sealed class OverlayWindow : Window
             CornerRadius = new CornerRadius(13),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(14, 4, 14, 5),
-            Child = new StackPanel { Orientation = Orientation.Horizontal, Children = { _server, _screen, _meal } },
+            Child = new StackPanel
+            {
+                Children =
+                {
+                    new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Children = { _server, _screen, _meal } },
+                    _system,
+                },
+            },
         };
         SizeChanged += (_, _) => Replace();
     }
@@ -81,6 +90,13 @@ public sealed class OverlayWindow : Window
         _meal.Foreground = color;
     }
 
+    // Ligne du système (cachée si aucune mesure).
+    public void ShowSystem(string? text)
+    {
+        _system.Visibility = text is null ? Visibility.Collapsed : Visibility.Visible;
+        _system.Text = text ?? "";
+    }
+
     // Place la pastille dans l'espace libre entre les icônes de gauche et la barre d'action (zone en pixels écran).
     // Relevé sur une capture 1920 × 1080 : icônes de gauche jusqu'à x ≈ 265, barre d'action à partir de x ≈ 612,
     // icônes centrées vers y ≈ 1045. Le bas de la pastille est donc à 98,5 % de la hauteur, son milieu à 23 % de la largeur.
@@ -106,7 +122,7 @@ public sealed class OverlayWindow : Window
     }
 
     private static TextBlock Line(double size, FontWeight weight) =>
-        new() { FontSize = size, FontWeight = weight, FontFamily = new FontFamily("Segoe UI"), Foreground = new SolidColorBrush(Color.FromRgb(233, 223, 196)) };
+        new() { FontSize = size, FontWeight = weight, FontFamily = new FontFamily("Segoe UI"), Foreground = new SolidColorBrush(Color.FromRgb(233, 223, 196)), HorizontalAlignment = HorizontalAlignment.Center };
 
     [DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hWnd, int index);

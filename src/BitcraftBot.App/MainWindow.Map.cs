@@ -72,6 +72,7 @@ public partial class MainWindow
         }
         ShowPills([]);
         InitMapMemory();
+        InitSought();
     }
 
     private void MapFilterChanged()
@@ -115,7 +116,7 @@ public partial class MainWindow
     {
         if (!visible)
         {
-            var bestHidden = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
+            var bestHidden = NearestSought(s, []);
             var targetHidden = CurrentHudTarget();
             LogMatches(bestHidden, _targetMatcher.Match(targetHidden?.Name, targetHidden?.Health, s.Resources), targetHidden);
             return;
@@ -131,11 +132,17 @@ public partial class MainWindow
         ShowTerrain(reader, s.Position);
         SrvResourceCount.Text = $"{shown.Count} / {s.Resources.Count} ressources · {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs";
 
-        var best = s.Resources.FirstOrDefault(ResourceNames.IsHarvestTarget);
+        // v0.4.23 : la ressource recherchée par Julien (la plus proche), à la place du « meilleur arbre ».
+        var remembered = _resourceMemory.Update(s.Resources, reader.ResourceArea);
+        var best = NearestSought(s, remembered);
         var target = CurrentHudTarget();
         var match = _targetMatcher.Match(target?.Name, target?.Health, s.Resources);
 
-        SrvBestTree.Text = best is null ? "aucun arbre mûr dans la zone lue" : Describe(best);
+        SrvBestTree.Text = _sought is null
+            ? "choisissez une ressource ci-dessus"
+            : best is null || s.Position is not { } here
+                ? $"aucune « {_sought} » dans la zone lue ni dans la mémoire de la carte"
+                : Describe(best, here);
         SrvScreenTarget.Text = target is not { Name: { } targetName }
             ? "aucune cible lue à l'écran"
             : match is null
@@ -149,7 +156,6 @@ public partial class MainWindow
             : "—";
 
         UpdateRows(shown.Take(MaxRowsShown).ToList(), best?.EntityId, match?.Resource.EntityId);
-        var remembered = _resourceMemory.Update(s.Resources, reader.ResourceArea);
         SrvMap.Update(s.Position, s.Walking == true ? s.Destination : null, s.Resources, Shown, best?.EntityId, match?.Resource.EntityId, _selectedResource, remembered);
         LogMatches(best, match, target);
     }
@@ -160,6 +166,11 @@ public partial class MainWindow
 
     private static string Describe(NearbyResource r) =>
         $"{r.Name}, {r.Position.ScreenText}, à {r.ScreenDistance:0.0} cases ({r.Direction}), santé {ResourceRow.FormatHealth(r.Health, r.MaxHealth)}";
+
+    // Distance et direction recalculées (une ressource gardée en mémoire a une distance ancienne).
+    private static string Describe(NearbyResource r, ServerPosition from) =>
+        $"{r.Name}, {r.Position.ScreenText}, à {r.Position.ScreenDistanceTo(from):0.0} cases " +
+        $"({ResourceNames.Direction(r.Position.ScreenEast - from.ScreenEast, r.Position.ScreenNorth - from.ScreenNorth)}), santé {ResourceRow.FormatHealth(r.Health, r.MaxHealth)}";
 
     // Met à jour le tableau sur place quand l'ordre ne change pas (la sélection et le défilement restent).
     private void UpdateRows(IReadOnlyList<NearbyResource> shown, ulong? best, ulong? screenTarget)
@@ -207,7 +218,7 @@ public partial class MainWindow
         _loggedScreenTargetSure = match?.Sure ?? false;
         if (best?.EntityId != _loggedBest && best is not null)
         {
-            _log.Detail("Serveur", $"Meilleur arbre : {Describe(best)}.");
+            _log.Detail("Serveur", $"Ressource recherchée la plus proche : {Describe(best)}.");
         }
         _loggedBest = best?.EntityId;
     }
@@ -227,11 +238,15 @@ public partial class MainWindow
         {
             var read = store.LoadAll();
             _terrainStore = store;
+            if (_serverReader is { } reader)
+            {
+                reader.TerrainMemory = store;
+            }
             _log.Info("Carte", $"Mémoire de la carte : {read} morceaux de terrain gardés (dossier « {TerrainStore.FolderName} » à côté du .exe).");
         });
         SrvMap.ZoomChanged += () =>
         {
-            MapZoomText.Text = $"vue : {SrvMap.ViewRadius - 1:0} cases";
+            MapZoomText.Text = $"vue : {SrvMap.ViewCases:0} cases";
             _terrainArea = null;
         };
     }
@@ -241,7 +256,7 @@ public partial class MainWindow
     private void MapZoomOut_Click(object sender, RoutedEventArgs e) => SrvMap.ZoomBy(1);
 
     // Morceau de carte et vue du dernier fond dessiné : on ne recalcule que si l'un change.
-    private (int X, int Z, double View)? _terrainArea;
+    private (int X, int Z, double View, int Version)? _terrainArea;
 
     // Fond de carte : refait seulement quand les morceaux à montrer (ou les zones découvertes) changent.
     // Les morceaux reçus en direct vont dans la mémoire ; on dessine ceux de la mémoire autour du personnage.
@@ -252,18 +267,20 @@ public partial class MainWindow
         IReadOnlyCollection<TerrainChunk> chunks = live;
         if (_terrainStore is { } store && position is { } p)
         {
-            var changed = false;
             foreach (var chunk in live)
             {
-                changed |= store.Put(chunk);
+                store.Put(chunk);
             }
-            var area = (TerrainChunk.ChunkOf(p.ScreenEast, p.ScreenNorth).X, TerrainChunk.ChunkOf(p.ScreenEast, p.ScreenNorth).Z, SrvMap.ViewRadius);
-            if (!changed && _terrainArea == area)
+            // v0.4.23 : la mémoire reçoit aussi les zones découvertes lues par le lecteur du serveur : on redessine
+            // dès qu'elle change (numéro de version), pas seulement quand un morceau lu en direct change.
+            var area = (TerrainChunk.ChunkOf(p.ScreenEast, p.ScreenNorth).X, TerrainChunk.ChunkOf(p.ScreenEast, p.ScreenNorth).Z, SrvMap.ViewRadius, store.Version);
+            if (_terrainArea == area)
             {
                 return;
             }
             _terrainArea = area;
-            chunks = store.Around(p.ScreenEast, p.ScreenNorth, SrvMap.ViewRadius + 4);
+            // Les lignes (N) sont plus courtes que les colonnes (E) : la carte montre plus de lignes que de colonnes.
+            chunks = store.Around(p.ScreenEast, p.ScreenNorth, SrvMap.ViewRadius / ResourceMap.RowFactor + 4);
         }
         if (SrvMap.SetTerrain(chunks, explored) && !_terrainShownLogged && chunks.Count > 0)
         {

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using BitcraftBot.Core.Monitoring;
 using BitcraftBot.Perception.Capture;
 using BitcraftBot.Server;
 
@@ -55,6 +56,7 @@ public partial class MainWindow
         _overlay.Show(server, serverColor, screen, screenColor);
         // Toujours affiché (demande de Julien, v0.3.16) : repas automatique activé ou non.
         _overlay.ShowMeal(_settings.AutoEatEnabled ? "● Repas" : "○ Repas", _settings.AutoEatEnabled ? _mealOverlayBrush : OffBrush);
+        _overlay.ShowSystem(_lastResourceSample is { } sample ? SystemSummary.Overlay(sample) : null);
         if (!_overlay.IsVisible)
         {
             _overlay.Show();

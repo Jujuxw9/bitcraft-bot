@@ -61,6 +61,19 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private readonly Dictionary<ulong, (Row Row, TerrainChunk? Chunk)> _terrainChunks = [];
     private (Row? Row, ExploredChunks? Explored) _explored;
     private readonly object _terrainLock = new();
+
+    // v0.4.23 : mémoire de la carte (donnée par l'application). Le lecteur y range les morceaux reçus et demande une fois
+    // au serveur les morceaux déjà découverts par le personnage qu'elle n'a pas encore (zones visitées avant le bot).
+    public TerrainStore? TerrainMemory { get; set; }
+
+    // Rayon (grandes cases) où l'on va chercher les morceaux découverts : la vue la plus large (100 cases) et de la marge.
+    public const double DiscoveredRadius = 130;
+
+    // Morceaux découverts demandés par abonnement (un peu à la fois : chaque abonnement renvoie aussi tout le reste).
+    public const int DiscoveredPerSubscription = 24;
+
+    private readonly HashSet<ulong> _terrainAsked = [];
+    private IReadOnlyList<ulong> _terrainExtra = [];
     private bool _inventoryLogged;
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
@@ -177,6 +190,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         _terrainRefused = false;
         _bagsRefused = false;
         _terrainLogged = false;
+        _terrainAsked.Clear();
+        _terrainExtra = [];
         lock (_terrainLock)
         {
             _terrainChunks.Clear();
@@ -298,6 +313,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 log.Info(Category, $"Abonnement accepté ({json.Length / 1024.0:0} Ko reçus) : " + DescribeCounts());
                 LogFirstInventory();
                 LogFirstTerrain();
+                StoreTerrain();
                 OnSubscriptionApplied();
                 // v0.4.22 : après un gros envoi (le texte reçu fait souvent plus d'1 Mo), on rend la mémoire de lecture tout de suite.
                 if (json.Length > LargeMessageChars)
@@ -391,7 +407,47 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     // Requêtes de suivi du personnage, sans les parties déjà refusées par le serveur.
     private IReadOnlyList<string> FollowQueries(ulong entity, Area? area) =>
         Queries.FollowPlayer(_identity!, entity, area, withHealth: !_healthRefused, withInventory: !_inventoryRefused,
-            withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused, withBags: !_bagsRefused);
+            withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused, withBags: !_bagsRefused,
+            terrainExtra: _terrainExtra);
+
+    // Range dans la mémoire de la carte les morceaux de terrain reçus (v0.4.23).
+    private void StoreTerrain()
+    {
+        if (TerrainMemory is not { } store)
+        {
+            return;
+        }
+        var added = 0;
+        foreach (var chunk in TerrainChunks())
+        {
+            if (store.Put(chunk))
+            {
+                added++;
+            }
+        }
+        if (added > 0 && _terrainExtra.Count > 0)
+        {
+            log.Info(Category, $"Mémoire de la carte : {added} morceau(x) ajouté(s), {store.Count} gardés en tout.");
+        }
+    }
+
+    // Morceaux découverts par le personnage autour de lui, absents de la mémoire et pas encore demandés (les plus proches d'abord).
+    private List<ulong> MissingDiscovered(ServerPosition p)
+    {
+        if (TerrainMemory is not { } store || _terrainRefused || Explored() is not { } explored)
+        {
+            return [];
+        }
+        return TerrainChunk.ChunksAround(p.ScreenEast, p.ScreenNorth, DiscoveredRadius)
+            .Where(c => explored.IsExplored(c.X, c.Z))
+            .Select(c => (Index: TerrainChunk.IndexOf(c.X, c.Z),
+                Distance: Math.Abs((c.X + 0.5) * TerrainChunk.Size - p.ScreenEast) + Math.Abs((c.Z + 0.5) * TerrainChunk.Size - p.ScreenNorth)))
+            .Where(c => !store.Contains(c.Index) && !_terrainAsked.Contains(c.Index))
+            .OrderBy(c => c.Distance)
+            .Take(DiscoveredPerSubscription)
+            .Select(c => c.Index)
+            .ToList();
+    }
 
     // Une fois par connexion : un extrait brut d'un inventaire, pour vérifier le format réel des poches (v0.3.14).
     private void LogFirstInventory()
@@ -484,9 +540,23 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         {
             return;
         }
-        var moved = _area is not { } a || new ServerPosition(a.CenterX, a.CenterZ).DistanceTo(p) > ResubscribeDistance;
-        if (!moved || DateTime.Now - _lastSubscribe < MinResubscribeInterval)
+        if (DateTime.Now - _lastSubscribe < MinResubscribeInterval)
         {
+            return;
+        }
+        var moved = _area is not { } a || new ServerPosition(a.CenterX, a.CenterZ).DistanceTo(p) > ResubscribeDistance;
+        // v0.4.23 : morceaux déjà découverts à ranger dans la mémoire de la carte (demandés une seule fois chacun).
+        var missing = MissingDiscovered(p);
+        if (!moved && missing.Count == 0)
+        {
+            return;
+        }
+        _terrainExtra = missing;
+        _terrainAsked.UnionWith(missing);
+        var extra = missing.Count > 0 ? $" ; {missing.Count} morceau(x) de carte déjà découvert(s) à garder en mémoire" : "";
+        if (!moved)
+        {
+            Subscribe(FollowQueries(entity, _area), $"carte{extra}");
             return;
         }
         var previous = _area;
@@ -495,7 +565,7 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
         var why = previous is { } old
             ? $"ressources autour de {p.ScreenText} : le personnage s'est éloigné de {new ServerPosition(old.CenterX, old.CenterZ).ScreenDistanceTo(p):0.0} cases écran du centre de l'ancienne zone"
             : $"ressources autour de {p.ScreenText}";
-        Subscribe(FollowQueries(entity, _area), why);
+        Subscribe(FollowQueries(entity, _area), why + extra);
     }
 
     private void Subscribe(IReadOnlyList<string> queries, string why)

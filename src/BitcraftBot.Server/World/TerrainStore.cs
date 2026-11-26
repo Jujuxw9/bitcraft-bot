@@ -18,6 +18,20 @@ public sealed class TerrainStore
         _folder = folder;
     }
 
+    // Augmente à chaque morceau nouveau ou changé (la carte se redessine quand il change).
+    public int Version => Volatile.Read(ref _version);
+
+    private int _version;
+
+    // Le morceau est-il gardé ?
+    public bool Contains(ulong index)
+    {
+        lock (_lock)
+        {
+            return _chunks.ContainsKey(index);
+        }
+    }
+
     public int Count
     {
         get
@@ -68,6 +82,7 @@ public sealed class TerrainStore
                 return false;
             }
             _chunks[chunk.Index] = chunk;
+            _version++;
         }
         try
         {
