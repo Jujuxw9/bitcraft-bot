@@ -115,3 +115,17 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - Tableau : 6 colonnes ; `ResourceRow.Details` au survol de la ligne.
 - `MainWindow.Map.cs` : `OnTerrainReady` (journal), `RunMapTest` (option `--essai-carte` avec `--sans-lancer-jeu` : vues 30, 100, 200, 1280 × 800 ; mesures, images `captures-essai/vueNN-*.png`, taille de la fenêtre remise).
 
+
+## 33. v0.4.29 : « Se déplacer ici » (D-086)
+
+- `Server/World/Travel.cs` (classes pures, testées dans `V0429Tests`) :
+  - `MapScale` : lecture de la barre de la grande carte (`ParseBar` : deux nombres entre parenthèses, 1 à 30 000), `Calibrate` (trois lectures : centre, droite, bas → ordre (N, E) ou (E, N), cases par pixel, refus si zoom hors 0,01-0,5, échelles différentes de plus de 15 %, centre à plus de 3 cases du serveur), `ToScreen`, `Correct`, `OnTarget` (≤ 1 case).
+  - `PathCheck` : ligne droite + parallèles à ± 1 case, pas de 0,5 case, sur le relief gardé (`FromChunks` lit `TerrainStore`) ; refus : > 30 cases, relief inconnu, écart de sol ≥ 5 (escalade), eau ≥ 5 (nage).
+  - `TravelGuard` : état du trajet à chaque instantané (en route, arrivé, bloqué, trop long, danger = vie qui baisse, à terre = vie 0, liaison perdue) ; `FleePoint` (10 cases à l'opposé).
+  - `GetUpChooser` : centre de « Get Up » seulement si « Go Home » est lu une fois, ailleurs (> 100 px).
+- `Input/Actions/ActionController.cs` : `GameKeys.Forbidden` (0x0C, 0x0D, V 0x2F, B 0x30), vérifiée dans `PressAsync` avant `Allowed` ; ces touches ne sont plus dans `Allowed`. Nouvelles touches permises : `MapKey` 0x34, `MapKeyNumpad` 0x53 ; `Sprint` = 0x05 (case 4).
+- `Perception/Ocr/OcrReader.ReadLinesAsync` : lignes lues avec leur rectangle (ramené à l'image par `ToFrame`).
+- `App/MainWindow.Travel.cs` : menu du clic droit (`OnMapRightClick`, branché sur `ResourceMap.CellRightClicked`), `TravelToAsync` (contrôle, geste, départ, suivi), `SetDestinationAsync` (ouvrir, mesurer, viser, cliquer, fermer), `GetUpAsync`, captures de la fenêtre du jeu (`images/analyse/` si trouvé en remontant depuis le .exe, sinon `captures-essai/deplacement/`), modes `--essai-deplacement` et `--essai-menu-deplacement`.
+- `MainWindow.Actions.cs` : la grande carte ouverte par le bot (`_travelMapAllowedUntil`) ne bloque pas ses propres gestes (D-052 garde toutes les autres fenêtres).
+- `LocalSettings` : `TravelEnabled` (vrai), `MapKeyScanCode` (0x34). OPTIONS : interrupteur « Déplacements ».
+- Zones de l'écran (mesurées sur `images/analyse/20261116_analyse_carte-monde_001.png`) : barre du bas x 30-69 %, y 91-97,5 % ; souris permise x de 40 px à 80 %, y de 40 px à 88 % (hors « Map Options », boussole, barre).

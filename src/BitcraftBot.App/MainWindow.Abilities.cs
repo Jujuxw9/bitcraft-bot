@@ -167,7 +167,8 @@ public partial class MainWindow
             ShowAbilityState(decision.Reason);
             return;
         }
-        if (GameKeys.ForSlot(press.Slot.Slot) is not { } key)
+        // v0.4.29 : cases « - » et « = » (chariot, bateau) jamais utilisées.
+        if (GameKeys.ForSlot(press.Slot.Slot) is not { } key || GameKeys.Forbidden.Contains(key))
         {
             ShowAbilityState($"touche {press.Slot.Key} pas prise en charge");
             return;

@@ -277,7 +277,7 @@ public partial class MainWindow
         SrvMap.SeenText = _resourceMemory.SeenText;
         SrvMap.TerrainReady += OnTerrainReady;
         // v0.4.28 : clic droit = case visée, notée au journal (le menu « Se déplacer ici » viendra avec T-10).
-        SrvMap.CellRightClicked += (east, north) => _log.Detail("Carte", $"Clic droit sur la carte : case E {east:0}, N {north:0}.");
+        SrvMap.CellRightClicked += OnMapRightClick;
         if (IsTestRun && IsMapTestRun)
         {
             Tabs.SelectedItem = MapTabItem;

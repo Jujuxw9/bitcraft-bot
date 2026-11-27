@@ -129,6 +129,8 @@
                                 <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
                                 <CheckBox x:Name="ResumeCheck" Style="{StaticResource SwitchCheck}" Content="Reprise des récoltes" ToolTip="Quand une récolte s'arrête faute d'endurance : attend l'endurance, resélectionne la ressource (Tab) et relance (M), sans bouger" Click="ResumeCheck_Click" />
                                 <TextBlock x:Name="ResumeStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,8" TextWrapping="Wrap" />
+                                <CheckBox x:Name="TravelCheck" Style="{StaticResource SwitchCheck}" Content="Déplacements" ToolTip="Clic droit sur la carte du bot : « Se déplacer ici » (petits trajets, sans escalade ni nage)" Click="TravelCheck_Click" />
+                                <TextBlock x:Name="TravelStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,8" TextWrapping="Wrap" />
                                 <CheckBox x:Name="AbilitiesCheck" Style="{StaticResource SwitchCheck}" Content="Capacités auto" ToolTip="Pendant que vous récoltez : lance la capacité de la barre d'action qui va avec (endurance gardée au-dessus de 30 %)" Click="AbilitiesCheck_Click" />
                                 <TextBlock x:Name="AbilitiesStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,0" TextWrapping="Wrap" />
                                 <StackPanel x:Name="AbilityList" Margin="16,4,0,0" />

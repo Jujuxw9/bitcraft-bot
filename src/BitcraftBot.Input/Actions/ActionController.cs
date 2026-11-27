@@ -41,6 +41,9 @@ public static class GameKeys
     // Touche de la case de la barre d'action (0 = touche 1). null hors de la barre.
     public static ushort? ForSlot(int slot) => slot >= 0 && slot < ActionBarKeys.Length ? ActionBarKeys[slot] : null;
 
+    // Déclarée avant Allowed (ordre d'initialisation).
+    public static readonly IReadOnlySet<ushort> Forbidden = new HashSet<ushort> { 0x0C, 0x0D, V, B };
+
     public static readonly IReadOnlyDictionary<ushort, string> Allowed = BuildAllowed();
 
     private static Dictionary<ushort, string> BuildAllowed()
@@ -56,13 +59,36 @@ public static class GameKeys
             [W] = "W",
             [Tab] = "Tab",
             [Interact] = "M",
+            [MapKey] = "carte (« . » clavier principal)",
+            [MapKeyNumpad] = "carte (« . » pavé numérique)",
         };
         for (var i = 0; i < ActionBarKeys.Length; i++)
         {
-            keys[ActionBarKeys[i]] = ActionBarNames[i];
+            // v0.4.29 : « - » et « = » (chariot, bateau) jamais permis, même si une capacité y est rangée.
+            if (!Forbidden.Contains(ActionBarKeys[i]))
+            {
+                keys[ActionBarKeys[i]] = ActionBarNames[i];
+            }
         }
         return keys;
     }
+
+    // v0.4.29 (règles de Julien, 27/11) : touches JAMAIS envoyées, quoi qu'il arrive. Vérifiées avant la liste permise.
+    // « - » (0x0C) = chariot, « = » (0x0D) = bateau à voile ; V (0x2F) et B (0x30) : Maj + V = Quick Deploy/Store,
+    // Maj + B = Quick Board. V et B ne sont jamais utiles au bot : interdites seules aussi.
+    public const ushort V = 0x2F;
+    public const ushort B = 0x30;
+
+    // v0.4.29 : touche de la grande carte du jeu (« . »). Deux candidates tant que T-11 n'a pas trouvé la bonne :
+    // 0x34 = position du « . » QWERTY (touche « : » en AZERTY) ; 0x53 = « . » du pavé numérique.
+    public const ushort MapKey = 0x34;
+    public const ushort MapKeyNumpad = 0x53;
+
+    // Sprint = case 4 de la barre (touche « ' » en AZERTY, position du « 4 »).
+    public const ushort Sprint = 0x05;
+
+    // Vrai si la touche (ou la combinaison) est interdite.
+    public static bool IsForbidden(IEnumerable<ushort> keys) => keys.Any(Forbidden.Contains);
 
     public static string Name(ushort scanCode) => Allowed.TryGetValue(scanCode, out var name) ? name : $"0x{scanCode:X2}";
 
@@ -268,6 +294,12 @@ public sealed class ActionController
     // Appuie sur une touche ou une combinaison (ex. Maj + E) : appui dans l'ordre, relâchement dans l'ordre inverse.
     public async Task<ActionResult> PressAsync(string label, params ushort[] keys)
     {
+        if (keys.Length > 0 && GameKeys.IsForbidden(keys))
+        {
+            var forbidden = $"{label} : touche interdite (chariot, bateau, Quick Deploy/Board), jamais envoyée";
+            Log?.Invoke(ActionLogLevel.Erreur, forbidden);
+            return new ActionResult(ActionOutcome.Refuse, forbidden);
+        }
         if (keys.Length == 0 || keys.Any(k => !GameKeys.Allowed.ContainsKey(k)))
         {
             var refused = $"{label} : touche non autorisée ({string.Join(" + ", keys.Select(GameKeys.Name))})";

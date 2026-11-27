@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.28 : carte, affichage : carte plus grande (carrée, toute la hauteur), tableau plus étroit (famille, âge et position au survol), fond de carte calculé hors de l’interface (rapide à 200 cases), points plus petits quand on dézoome, clic droit préparé.");
+        _log.Info("Session", "Version 0.4.29 : « Se déplacer ici » : clic droit sur la carte du bot, le bot ouvre la grande carte du jeu, vise la case (barre du bas lue) et clique (Set destination) ; 30 cases au plus, sans escalade ni nage ; touches du chariot et du bateau interdites ; vie qui baisse = Sprint et fuite ; à terre = Get Up seulement ; interrupteur « Déplacements » dans OPTIONS ; mode d’essai --essai-deplacement.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
@@ -160,6 +160,7 @@ public partial class MainWindow : Window
         InitGpt();
         InitAbilities();
         InitResume();
+        InitTravel();
         InitChatArchive();
         InitLayout();
         _gameData.Loaded += _ => Dispatcher.BeginInvoke(LoadRecipesInBackground);

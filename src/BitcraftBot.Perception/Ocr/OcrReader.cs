@@ -57,6 +57,51 @@ public sealed class OcrReader
 
     private readonly SemaphoreSlim _gate = new(1, 1);
 
+    // v0.4.29 (fenêtre « à terre ») : lignes lues avec leur rectangle, en pixels de l'image d'origine (frame).
+    public async Task<IReadOnlyList<(string Text, ScreenRect Box)>> ReadLinesAsync(Frame frame, ScreenRect zone, TextStyle style, int threshold, int scale = DefaultScale)
+    {
+        var prepared = Prepare(frame, zone, style, threshold, scale);
+        if (prepared is null)
+        {
+            return [];
+        }
+        var (pixels, width, height) = prepared.Value;
+        using var bitmap = SoftwareBitmap.CreateCopyFromBuffer(pixels.AsBuffer(), BitmapPixelFormat.Bgra8, width, height);
+        await _gate.WaitAsync();
+        try
+        {
+            var result = await _engine.RecognizeAsync(bitmap);
+            var lines = new List<(string, ScreenRect)>();
+            foreach (var line in result.Lines)
+            {
+                if (line.Words.Count == 0)
+                {
+                    continue;
+                }
+                var left = line.Words.Min(w => w.BoundingRect.X);
+                var top = line.Words.Min(w => w.BoundingRect.Y);
+                var right = line.Words.Max(w => w.BoundingRect.X + w.BoundingRect.Width);
+                var bottom = line.Words.Max(w => w.BoundingRect.Y + w.BoundingRect.Height);
+                lines.Add((line.Text, ToFrame(zone, scale, left, top, right, bottom)));
+            }
+            return lines;
+        }
+        finally
+        {
+            _gate.Release();
+        }
+    }
+
+    // Rectangle de l'image agrandie (avec marge) → rectangle de l'image d'origine.
+    public static ScreenRect ToFrame(ScreenRect zone, int scale, double left, double top, double right, double bottom)
+    {
+        var x0 = (int)Math.Round((left - Margin) / scale) + zone.X;
+        var y0 = (int)Math.Round((top - Margin) / scale) + zone.Y;
+        var x1 = (int)Math.Round((right - Margin) / scale) + zone.X;
+        var y1 = (int)Math.Round((bottom - Margin) / scale) + zone.Y;
+        return new ScreenRect(x0, y0, Math.Max(1, x1 - x0), Math.Max(1, y1 - y0));
+    }
+
     // Marge blanche ajoutée autour du texte : l'OCR lit mieux un texte qui ne touche pas les bords.
     private const int Margin = 12;
 

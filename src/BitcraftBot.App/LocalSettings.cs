@@ -47,6 +47,12 @@ public sealed class LocalSettings
     // Reprise automatique des récoltes arrêtées faute d'endurance (v0.4.24, demande de Julien). Allumée par défaut.
     public bool AutoResumeEnabled { get; set; } = true;
 
+    // « Se déplacer ici » depuis la carte du bot (v0.4.29, T-10). Allumé par défaut (chaque trajet est demandé par Julien).
+    public bool TravelEnabled { get; set; } = true;
+
+    // Touche de la grande carte du jeu (scancode) : 0x34 (« . » QWERTY) ou 0x53 (pavé numérique). Trouvée par l'essai T-11.
+    public ushort MapKeyScanCode { get; set; } = 0x34;
+
     // Choix de Julien par capacité (id de ability_custom_desc → allumée ou non). Absente = choix par défaut.
     public Dictionary<int, bool> AbilityChoices { get; set; } = [];
 

@@ -26,7 +26,9 @@ public partial class MainWindow
             ScreenNotReady = () => _situation is { Place: Perception.Screen.Place.Jeu, Game: Perception.Screen.GameScreen.Accueil or Perception.Screen.GameScreen.Connexion or Perception.Screen.GameScreen.Chargement } s
                 ? $"le jeu n'est pas prêt ({Perception.Screen.GameScreens.French(s.Game!.Value)})"
                 // D-052 : une fenêtre du jeu ouverte (vue il y a moins de 3 s) bloque toute action.
+                // v0.4.29 : la grande carte ouverte par le bot pour un déplacement ne bloque pas ses propres gestes.
                 : _view is { Windows.Count: > 0 } v && DateTime.Now - v.At < TimeSpan.FromSeconds(3)
+                  && !(DateTime.Now < _travelMapAllowedUntil && v.Windows.All(w => w.Kind == Perception.Screen.WindowKind.Carte))
                     ? $"fenêtre du jeu ouverte ({string.Join(", ", v.Windows.Select(w => w.French))})"
                     // v0.4.5 : chat ouvert (Julien écrit) : une touche du bot partirait dans le chat.
                     : ChatLikelyOpen(DateTime.Now) ? "chat du jeu ouvert"

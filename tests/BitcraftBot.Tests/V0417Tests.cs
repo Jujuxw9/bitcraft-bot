@@ -173,7 +173,7 @@ public class V0417Tests
         Assert.Equal((ushort)0x0D, GameKeys.ForSlot(11));
         Assert.Null(GameKeys.ForSlot(12));
         Assert.Equal("7", GameKeys.Name(0x08));
-        Assert.All(GameKeys.ActionBarKeys, k => Assert.True(GameKeys.Allowed.ContainsKey(k)));
+        Assert.All(GameKeys.ActionBarKeys, k => Assert.Equal(!GameKeys.Forbidden.Contains(k), GameKeys.Allowed.ContainsKey(k)));
         Assert.False(GameKeys.Allowed.ContainsKey(GameKeys.Enter));
     }
 
