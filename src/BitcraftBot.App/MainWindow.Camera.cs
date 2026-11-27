@@ -99,6 +99,8 @@ public partial class MainWindow
         if (scanCode == GameKeys.W)
         {
             var was = _camera.State;
+            // v0.4.25 : W recentre la caméra, la vue change : le point retenu pour la reprise n'est plus valable.
+            _cameraMoves++;
             _camera.OnReset(DateTime.Now);
             CheckAfterW();
             if (was != CameraState.Recentree)
@@ -120,6 +122,7 @@ public partial class MainWindow
         {
             return;
         }
+        _cameraMoves++;
         if (_camera.OnMoved(at, by) is { } e)
         {
             WriteCameraEvent(e);
@@ -129,7 +132,7 @@ public partial class MainWindow
 
     private void OnMouseButton(DateTime at, MouseButton button, int x, int y)
     {
-        if (button == MouseButton.Gauche || !GameIsForeground() || CurrentGame() is not { } game)
+        if (!GameIsForeground() || CurrentGame() is not { } game)
         {
             return;
         }
@@ -140,6 +143,12 @@ public partial class MainWindow
         }
         var area = GameWindowLocator.GetClientArea(game.Handle);
         if (area.IsEmpty || x < area.X || y < area.Y || x >= area.X + area.Width || y >= area.Y + area.Height)
+        {
+            return;
+        }
+        // v0.4.25 : dernier clic (gauche ou droit) dans le jeu, retenu pour la reprise des récoltes.
+        RememberGameClick(at, x, y);
+        if (button == MouseButton.Gauche)
         {
             return;
         }

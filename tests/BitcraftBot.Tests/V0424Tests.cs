@@ -4,7 +4,7 @@ using Xunit;
 
 namespace BitcraftBot.Tests;
 
-// v0.4.24 : reprise automatique des récoltes (Tab jusqu'à la bonne cible, puis Interact, vérifié par le serveur).
+// v0.4.24 : reprise automatique des récoltes (Interact, vérifié par le serveur). Tab retiré en v0.4.25.
 public class V0424Tests
 {
     private const ulong Tree = 42;
@@ -26,6 +26,8 @@ public class V0424Tests
         MaxStamina = 98,
         Target = target,
         Resources = [Res(Tree, "Mature Birch Tree", treeHealth), Res(Lavender, "Lavender", 10)],
+        // v0.4.25 : clic de Julien sur l'arbre juste avant la récolte (point de la souris pour la reprise).
+        LastClick = new ClickPoint(900, 500, T0.AddSeconds(-1), Here, 0),
     };
 
     [Fact]
@@ -36,9 +38,10 @@ public class V0424Tests
         var stop = r.Update(In(1, null, 2));
         Assert.Contains("faute d'endurance", stop.Log);
         Assert.Equal(ResumeStep.Rien, r.Update(In(30, null, 60)).Step); // endurance pas encore revenue
-        Assert.Equal(ResumeStep.Tab, r.Update(In(60, null, 97, target: Lavender)).Step);
-        Assert.Equal(ResumeStep.Rien, r.Update(In(60.3, null, 97, target: Lavender)).Step); // pause entre deux Tab
-        Assert.Equal(ResumeStep.Interact, r.Update(In(61, null, 97, target: Tree)).Step);
+        // v0.4.25 : plus de Tab, la souris va sur le point du clic puis M (même si la cible du jeu est autre chose).
+        var hover = r.Update(In(60, null, 97, target: Lavender));
+        Assert.Equal(ResumeStep.Interact, hover.Step);
+        Assert.Equal((900, 500), (hover.X, hover.Y));
         var confirmed = r.Update(In(62, "Extract", 96, target: Tree));
         Assert.Contains("reprise", confirmed.Log);
         Assert.False(confirmed.Alert);
@@ -73,21 +76,6 @@ public class V0424Tests
         var d = wrong.Update(In(61, "Extract", 98, actionTarget: Lavender));
         Assert.True(d.Alert);
         Assert.Contains("Lavender", d.Log);
-    }
-
-    [Fact]
-    public void GivesUpAfterTooManyTabs()
-    {
-        var r = new HarvestResume();
-        r.Update(In(0, "Extract", 50));
-        r.Update(In(1, null, 1));
-        for (var i = 0; i < HarvestResume.MaxTabs; i++)
-        {
-            Assert.Equal(ResumeStep.Tab, r.Update(In(60 + i, null, 98, target: Lavender)).Step);
-        }
-        var last = r.Update(In(60 + HarvestResume.MaxTabs, null, 98, target: Lavender));
-        Assert.True(last.Alert);
-        Assert.False(r.Active);
     }
 
     [Fact]

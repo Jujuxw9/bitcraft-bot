@@ -21,8 +21,9 @@ public class V0423Tests
             SystemCpuPercent = 10, SystemRamTotalMb = 32000, SystemRamAvailableMb = 16000, GameCpuPercent = 16.6, GameRamMb = 4421,
         };
         var text = SystemSummary.Overlay(sample, CultureInfo.GetCultureInfo("fr-FR"));
-        Assert.StartsWith("Bot : CPU 2,5 %, RAM 605 Mo", text);
-        Assert.Contains("Jeu : CPU 16,5 %", text);
+        // v0.4.25 : ligne courte (overlay plus étroit).
+        Assert.StartsWith("Bot 2,5 % · 605 Mo", text);
+        Assert.Contains("Jeu 17 % · 4,3 Go", text);
     }
 
     [Fact]

@@ -82,3 +82,11 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `HarvestResume` (Server/World, sans écran) : machine à états récolte → attente de l'endurance → sélection (Tab) → confirmation. Entrées : action en cours, dernier coup, position, endurance, cible sélectionnée (`target_state`, nouvel abonnement), ressources lues.
 - `MainWindow.Resume.cs` : appel toutes les 500 ms ; touches envoyées par le contrôleur d'actions (mêmes sécurités que les capacités). Touches ajoutées à la liste blanche : Tab (0x0F) et Interact = M AZERTY (0x27).
 - Journal : catégorie « Reprise » (états, cible sélectionnée dans le jeu, alertes).
+
+## 29. v0.4.25 : reprise à la souris, overlay étroit (D-082)
+
+- `HarvestResume` : plus d'étape Tab. Phases récolte → attente de l'endurance → relance → confirmation. Nouvelles entrées : dernier clic de Julien (`ClickPoint` : point écran, heure, position du personnage, compteur de caméra) et compteur de caméra actuel. `PointProblem` dit si le point est encore sur la ressource. `NotSent()` : geste refusé par le contrôleur, refait sans compter d'échec.
+- `MainWindow.Camera.cs` : chaque clic (gauche ou droit) dans la fenêtre du jeu est retenu ; molette, bouton du milieu, Q, D et W augmentent le compteur de caméra.
+- `MainWindow.Resume.cs` : `MoveAsync` (souris seule), 150 ms, mesure des pixels verts dans un carré de 48 px autour du point (journal), vérification que la souris n'a pas bougé, puis M.
+- `ActionController.MoveAsync` : même chemin humain et même arrêt d'urgence que `ClickAsync`, sans clic.
+- `SystemSummary.Overlay` : ligne courte ; `OverlayWindow` : police et marges réduites, `MaxWidth` 300.

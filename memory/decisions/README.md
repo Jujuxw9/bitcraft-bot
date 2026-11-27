@@ -101,3 +101,4 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-079](D-079-v0423-carte-recherche-ceinture-overlay.md) | v0.4.23 : zoom 10 à 100 cases (+ et − remis), carte coupée au cadre, vraies proportions des hexagones, zones découvertes gardées ; ressource recherchée ; ceinture réparée ; overlay CPU / RAM | Validée | 2026-11-26 |
 | [D-080](D-080-v0424-reprise-recoltes.md) | v0.4.24 : reprise automatique des récoltes (Tab vérifié par le serveur, puis M) ; ceinture en bandeau, banque plus grande | Validée | 2026-11-26 |
 | [D-081](D-081-taches-nuit-2026-11-27.md) | Tâches planifiées de la nuit du 27/11 (T-05 à T-16, 01:00 à 12:00), quota, bilan unique, essai en jeu T-11, sécurité en jeu, mémoire des ressources 72 h | Validée | 2026-11-27 |
+| [D-082](D-082-v0425-reprise-souris-overlay.md) | v0.4.25 : reprise des récoltes à la souris (point du clic de Julien, plus de Tab), compteur d'échecs remis à zéro, overlay plus étroit | Validée | 2026-11-27 |

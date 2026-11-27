@@ -21,11 +21,13 @@ public sealed class OverlayWindow : Window
     private const int WS_EX_NOACTIVATE = 0x08000000;
     private const uint WDA_EXCLUDEFROMCAPTURE = 0x11;
 
-    private readonly TextBlock _server = Line(13, FontWeights.SemiBold);
-    private readonly TextBlock _screen = Line(13, FontWeights.SemiBold);
-    private readonly TextBlock _meal = Line(13, FontWeights.SemiBold);
+    private readonly TextBlock _server = Line(12, FontWeights.SemiBold);
+    private readonly TextBlock _screen = Line(12, FontWeights.SemiBold);
+    private readonly TextBlock _meal = Line(12, FontWeights.SemiBold);
     // v0.4.23 (Julien) : deuxième ligne, le système (CPU et RAM du bot, du jeu).
-    private readonly TextBlock _system = Line(11.5, FontWeights.Normal);
+    // v0.4.25 : police plus petite, marges réduites, largeur bornée (Julien trouvait l'overlay trop large).
+    private readonly TextBlock _system = Line(10.5, FontWeights.Normal);
+    public const double MaxOverlayWidth = 300;
 
     // Point d'accroche (pixels écran) : milieu du bord bas de la pastille.
     private (int X, int Y)? _anchor;
@@ -43,15 +45,16 @@ public sealed class OverlayWindow : Window
         ResizeMode = ResizeMode.NoResize;
         SizeToContent = SizeToContent.WidthAndHeight;
         Title = "BitCraft Bot — overlay";
-        _meal.Margin = new Thickness(14, 0, 0, 0);
-        _screen.Margin = new Thickness(14, 0, 0, 0);
+        _meal.Margin = new Thickness(10, 0, 0, 0);
+        _screen.Margin = new Thickness(10, 0, 0, 0);
         Content = new Border
         {
             Background = new SolidColorBrush(Color.FromArgb(190, 11, 24, 40)),
             BorderBrush = new SolidColorBrush(Color.FromArgb(200, 210, 182, 93)),
-            CornerRadius = new CornerRadius(13),
+            CornerRadius = new CornerRadius(11),
             BorderThickness = new Thickness(1),
-            Padding = new Thickness(14, 4, 14, 5),
+            Padding = new Thickness(10, 3, 10, 4),
+            MaxWidth = MaxOverlayWidth,
             Child = new StackPanel
             {
                 Children =
@@ -61,6 +64,7 @@ public sealed class OverlayWindow : Window
                 },
             },
         };
+        _system.TextTrimming = TextTrimming.CharacterEllipsis;
         SizeChanged += (_, _) => Replace();
     }
 

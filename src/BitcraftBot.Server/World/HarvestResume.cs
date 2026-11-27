@@ -2,12 +2,20 @@ namespace BitcraftBot.Server.World;
 
 // Reprise automatique des récoltes (v0.4.24, demande de Julien) : quand une récolte (arbre, buisson, plante… jamais une
 // fabrication) s'arrête faute d'endurance alors que la ressource n'est pas épuisée, le bot attend que l'endurance
-// remonte, sélectionne la ressource avec Tab (le serveur dit quelle cible est sélectionnée : target_state), puis appuie
-// sur Interact (M). Il vérifie sur le serveur que c'est bien cette ressource qui est frappée. Le personnage ne bouge pas.
-// Arrêt : ressource épuisée, sac plein, Julien bouge ou fait autre chose, ou essai raté deux fois.
-public enum ResumeStep { Rien, Tab, Interact }
+// remonte, puis relance la récolte. Il vérifie sur le serveur que c'est bien cette ressource qui est frappée.
+// Le personnage ne bouge pas. Arrêt : ressource épuisée, sac plein, Julien bouge ou fait autre chose, ou M sans effet
+// deux fois de suite.
+// v0.4.25 : M (Interact) agit sur l'élément que la souris survole (contour vert). Tab est retiré (inutile : l'arbre reste
+// sélectionné). Le bot retient le point de l'écran où Julien a cliqué pour lancer la récolte ; pour reprendre, il pose
+// la souris sur ce point puis appuie sur M. Ce point n'est valable que si le personnage n'a pas bougé (moins d'une
+// demi-case) et si la caméra n'a pas été tournée depuis le clic. Sans point valable : rien n'est appuyé.
+public enum ResumeStep { Rien, Interact }
 
-public sealed record ResumeDecision(ResumeStep Step, string State, string? Log = null, bool Alert = false);
+// Clic de Julien dans le jeu (gauche ou droit), en pixels écran, avec la position du personnage et le compteur de
+// mouvements de caméra à ce moment-là.
+public sealed record ClickPoint(int X, int Y, DateTimeOffset At, ServerPosition? Position, int CameraMoves);
+
+public sealed record ResumeDecision(ResumeStep Step, string State, string? Log = null, bool Alert = false, int X = 0, int Y = 0);
 
 public sealed record ResumeInput
 {
@@ -18,10 +26,13 @@ public sealed record ResumeInput
     public ServerPosition? Position { get; init; }
     public double? Stamina { get; init; }
     public double? MaxStamina { get; init; }
-    // Cible sélectionnée dans le jeu (target_state), 0 ou null = aucune.
+    // Cible sélectionnée dans le jeu (target_state), 0 ou null = aucune. Seulement pour le journal depuis la v0.4.25.
     public ulong? Target { get; init; }
     public IReadOnlyList<NearbyResource> Resources { get; init; } = [];
     public bool BagFull { get; init; }
+    // Dernier clic de Julien dans le jeu, et nombre de mouvements de caméra vus depuis le démarrage du bot.
+    public ClickPoint? LastClick { get; init; }
+    public int CameraMoves { get; init; }
 }
 
 public sealed class HarvestResume
@@ -32,29 +43,71 @@ public sealed class HarvestResume
     public const double ResumeAbove = 0.95;
     // Déplacement (cases du jeu) au-delà duquel Julien est parti.
     public const double MovedCases = 1.0;
-    public const int MaxTabs = 8;
-    public static readonly TimeSpan TabPause = TimeSpan.FromMilliseconds(700);
+    // Déplacement au-delà duquel le point de la souris n'est plus sur la ressource (la caméra suit le personnage).
+    public const double PointMovedCases = 0.5;
+    // Le clic qui lance une récolte arrive au plus ClickBefore avant que le serveur la montre (ou juste après).
+    public static readonly TimeSpan ClickBefore = TimeSpan.FromSeconds(8);
+    public static readonly TimeSpan ClickAfter = TimeSpan.FromSeconds(1);
+    public static readonly TimeSpan RetryPause = TimeSpan.FromMilliseconds(700);
     public static readonly TimeSpan ConfirmTimeout = TimeSpan.FromSeconds(5);
     public const int MaxFailures = 2;
 
-    private enum Phase { Rien, Recolte, Attente, Selection, Confirmation }
+    private enum Phase { Rien, Recolte, Attente, Relance, Confirmation }
 
     private Phase _phase;
     private ulong _resource;
     private string _name = "";
     private ServerPosition _anchor;
-    private int _tabs;
     private int _failures;
     private DateTimeOffset _lastKey;
     private DateTimeOffset _pressedAt;
+    private DateTimeOffset _extractSince;
+    private ClickPoint? _point;
 
     public bool Active => _phase != Phase.Rien;
+
+    // Point de la souris retenu pour la ressource suivie (null = aucun).
+    public ClickPoint? Point => _point;
+
+    public int Failures => _failures;
+
+    // Le geste n'a pas pu partir (contrôleur qui refuse) : on refera l'essai, sans le compter comme un échec.
+    public void NotSent()
+    {
+        if (_phase == Phase.Confirmation)
+        {
+            _phase = Phase.Relance;
+        }
+    }
+
+    // Le point est-il encore sur la ressource ? null = oui, sinon la raison.
+    public static string? PointProblem(ClickPoint? point, ServerPosition? now, int cameraMoves)
+    {
+        if (point is null)
+        {
+            return "aucun clic retenu";
+        }
+        if (point.CameraMoves != cameraMoves)
+        {
+            return "caméra tournée depuis le clic";
+        }
+        if (point.Position is not { } from || now is not { } p)
+        {
+            return "position pas lue";
+        }
+        if (p.ScreenDistanceTo(from) > PointMovedCases)
+        {
+            return "personnage déplacé depuis le clic";
+        }
+        return null;
+    }
 
     public ResumeDecision Update(ResumeInput i)
     {
         if (!i.Enabled)
         {
             _phase = Phase.Rien;
+            _failures = 0;
             return new(ResumeStep.Rien, "coupée");
         }
         var action = i.Action;
@@ -69,7 +122,8 @@ public sealed class HarvestResume
             }
             string? log = null;
             var alert = false;
-            if (_phase == Phase.Confirmation)
+            var ours = _phase == Phase.Confirmation;
+            if (ours)
             {
                 if (t == _resource)
                 {
@@ -82,19 +136,32 @@ public sealed class HarvestResume
                     alert = true;
                 }
             }
-            if (_phase is not Phase.Recolte || _resource != t)
+            else if (_phase is not Phase.Recolte || _resource != t)
             {
-                _tabs = 0;
+                // Nouvelle récolte lancée par Julien : compteur remis à zéro (défaut du 27/11 à 00:29), nouveau point.
+                _failures = 0;
+                _extractSince = i.Now;
                 if (t != _resource)
                 {
-                    _failures = 0;
+                    _point = null;
                 }
             }
+            if (!ours && i.LastClick is { } c && c.At >= _extractSince - ClickBefore && c.At <= _extractSince + ClickAfter
+                && PointProblem(c, i.Position, i.CameraMoves) is null)
+            {
+                // Clic de Julien qui a lancé (ou relancé) cette récolte, personnage arrêté : c'est le meilleur point.
+                _point = c;
+            }
             _phase = alert ? Phase.Rien : Phase.Recolte;
+            if (alert)
+            {
+                _point = null;
+            }
             _resource = t;
             _name = Name(i, t);
             _anchor = i.Position ?? _anchor;
-            return new(ResumeStep.Rien, alert ? "arrêtée (autre ressource frappée)" : $"suit la récolte de « {_name} »", log, alert);
+            var known = _point is null ? " (pas de clic retenu)" : " (point de la souris retenu)";
+            return new(ResumeStep.Rien, alert ? "arrêtée (autre ressource frappée)" : $"suit la récolte de « {_name} »{known}", log, alert);
         }
 
         // Une autre action (fabrication, marche…) : Julien fait autre chose.
@@ -102,7 +169,8 @@ public sealed class HarvestResume
         {
             var was = _phase;
             _phase = Phase.Rien;
-            return new(ResumeStep.Rien, "attend une récolte", was is Phase.Attente or Phase.Selection ? $"Reprise de « {_name} » annulée : vous faites autre chose ({action.French})." : null);
+            _failures = 0;
+            return new(ResumeStep.Rien, "attend une récolte", was is Phase.Attente or Phase.Relance ? $"Reprise de « {_name} » annulée : vous faites autre chose ({action.French})." : null);
         }
 
         if (_phase == Phase.Rien)
@@ -139,19 +207,19 @@ public sealed class HarvestResume
                 }
                 _phase = Phase.Attente;
                 return new(ResumeStep.Rien, $"attend l'endurance pour reprendre « {_name} »",
-                    $"Récolte de « {_name} » arrêtée faute d'endurance ({st:0}/{max:0}) : reprise quand l'endurance sera revenue.");
+                    $"Récolte de « {_name} » arrêtée faute d'endurance ({st:0}/{max:0}) : reprise quand l'endurance sera revenue"
+                    + (_point is null ? " (attention : aucun clic retenu sur la ressource)." : "."));
 
             case Phase.Attente:
                 if (i.Stamina is { } s2 && i.MaxStamina is { } m2 && s2 >= m2 * ResumeAbove)
                 {
-                    _phase = Phase.Selection;
-                    _tabs = 0;
-                    return Select(i);
+                    _phase = Phase.Relance;
+                    return Relaunch(i);
                 }
                 return new(ResumeStep.Rien, $"attend l'endurance ({i.Stamina ?? 0:0}/{i.MaxStamina ?? 0:0}) pour reprendre « {_name} »");
 
-            case Phase.Selection:
-                return Select(i);
+            case Phase.Relance:
+                return Relaunch(i);
 
             case Phase.Confirmation:
                 if (i.Now - _pressedAt < ConfirmTimeout)
@@ -163,40 +231,37 @@ public sealed class HarvestResume
                 {
                     return Stop($"Reprise de « {_name} » : M n'a rien lancé {MaxFailures} fois de suite. Reprise arrêtée.", alert: true);
                 }
-                _phase = Phase.Selection;
-                _tabs = 0;
+                _phase = Phase.Relance;
                 return new(ResumeStep.Rien, "nouvel essai", $"Reprise de « {_name} » : M n'a rien lancé, nouvel essai.");
         }
         return new(ResumeStep.Rien, "attend une récolte");
     }
 
-    // Sélection de la ressource : Tab jusqu'à ce que le serveur montre la bonne cible, puis Interact.
-    private ResumeDecision Select(ResumeInput i)
+    // Relance : souris posée sur le point retenu, puis Interact (M). Sans point valable : rien n'est appuyé.
+    private ResumeDecision Relaunch(ResumeInput i)
     {
-        if (i.Now - _lastKey < TabPause)
+        if (i.Now - _lastKey < RetryPause)
         {
-            return new(ResumeStep.Rien, $"sélectionne « {_name} »…");
+            return new(ResumeStep.Rien, $"relance « {_name} »…");
         }
-        if (i.Target == _resource)
+        if (PointProblem(_point, i.Position, i.CameraMoves) is { } why)
         {
-            _phase = Phase.Confirmation;
-            _pressedAt = i.Now;
-            _lastKey = i.Now;
-            return new(ResumeStep.Interact, $"relance « {_name} »…", $"Reprise : « {_name} » sélectionnée (confirmé par le serveur), touche Interact.");
+            return Stop($"Reprise de « {_name} » impossible ({why}) : cliquez une fois sur la ressource, le bot retiendra ce point.",
+                state: "reprise impossible : cliquez une fois sur l'arbre");
         }
-        if (_tabs >= MaxTabs)
-        {
-            return Stop($"Reprise de « {_name} » : pas sélectionnée après {MaxTabs} appuis sur Tab (cible du jeu : {(i.Target is { } t && t != 0 ? Name(i, t) : "aucune")}). Reprise arrêtée.", alert: true);
-        }
-        _tabs++;
+        _phase = Phase.Confirmation;
+        _pressedAt = i.Now;
         _lastKey = i.Now;
-        return new(ResumeStep.Tab, $"sélectionne « {_name} » (Tab {_tabs}/{MaxTabs})…");
+        var point = _point!;
+        return new(ResumeStep.Interact, $"relance « {_name} »…",
+            $"Reprise : souris posée sur « {_name} » (point du clic en ({point.X}, {point.Y})), puis touche Interact.", X: point.X, Y: point.Y);
     }
 
-    private ResumeDecision Stop(string? log, bool alert = false)
+    private ResumeDecision Stop(string? log, bool alert = false, string state = "attend une récolte")
     {
         _phase = Phase.Rien;
-        return new(ResumeStep.Rien, "attend une récolte", log, alert);
+        _failures = 0;
+        return new(ResumeStep.Rien, state, log, alert);
     }
 
     private static string Name(ResumeInput i, ulong id) =>

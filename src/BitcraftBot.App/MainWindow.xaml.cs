@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.24 : reprise automatique des récoltes arrêtées faute d'endurance (Tab jusqu'à la bonne cible, vérifiée par le serveur, puis M) ; onglet Personnage : ceinture en bandeau, sac et banques plus grands.");
+        _log.Info("Session", "Version 0.4.25 : reprise des récoltes fiable (souris posée sur le point de votre clic, puis M ; plus de Tab ; compteur d'échecs remis à zéro) ; overlay plus étroit.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

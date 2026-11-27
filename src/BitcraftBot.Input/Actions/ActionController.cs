@@ -358,6 +358,47 @@ public sealed class ActionController
         });
     }
 
+    // v0.4.25 (reprise des récoltes) : déplace la souris d'une façon humaine jusqu'à (x, y), dans la zone autorisée,
+    // SANS cliquer. Mêmes sécurités que ClickAsync (souris bougée par Julien pendant le geste = arrêt d'urgence).
+    public async Task<ActionResult> MoveAsync(string label, int x, int y, SafeArea area, HumanMouse mouse)
+    {
+        if (!area.Contains(x, y))
+        {
+            var refused = $"{label} : souris hors de la zone autorisée ({x}, {y})";
+            Log?.Invoke(ActionLogLevel.Erreur, refused);
+            return new ActionResult(ActionOutcome.Refuse, refused);
+        }
+        return await RunAsync(label, $"souris en ({x}, {y})", async token =>
+        {
+            var (fromX, fromY) = _device.CursorPosition();
+            (int X, int Y)? expected = null;
+            var elapsed = 0.0;
+            foreach (var step in mouse.Path(fromX, fromY, x, y, area))
+            {
+                EnsureStillAllowed(token);
+                if (expected is { } e && Options.StopOnMouseMove)
+                {
+                    var (cx, cy) = _device.CursorPosition();
+                    if (Math.Abs(cx - e.X) > Options.MouseTolerancePx || Math.Abs(cy - e.Y) > Options.MouseTolerancePx)
+                    {
+                        Halt("souris bougée pendant un geste du bot");
+                        throw new OperationCanceledException(token);
+                    }
+                }
+                var wait = (int)Math.Round(step.AtMs - elapsed);
+                if (wait > 0)
+                {
+                    await _delay(wait, token);
+                }
+                elapsed = step.AtMs;
+                _device.MoveTo(step.X, step.Y);
+                expected = (step.X, step.Y);
+            }
+            // Dernier point exact (le chemin humain finit sur la cible, on s'en assure).
+            _device.MoveTo(x, y);
+        });
+    }
+
     // Écrit un message dans le chat du jeu, comme Julien (D-054, D-055) :
     // chat fermé vérifié → Entrée → chat ouvert vérifié → canal « Région » vérifié → texte tapé → Entrée →
     // chat refermé vérifié (sinon Échap). Si quelque chose ne va pas, rien n'est envoyé et le chat est refermé.
