@@ -28,7 +28,8 @@ public static class GameKeys
     public const ushort S = 0x1F;
     public const ushort D = 0x20;
     public const ushort W = 0x2C;
-    // v0.4.24 : reprise des récoltes. Tab = cible suivante ; Interact = M en AZERTY (touche à droite de L : code 0x27).
+    // v0.4.24 : reprise des récoltes. Tab = cible suivante (plus envoyée depuis v0.4.25, gardée dans la liste) ;
+    // Interact = M en AZERTY (touche à droite de L : code 0x27).
     public const ushort Tab = 0x0F;
     public const ushort Interact = 0x27;
 

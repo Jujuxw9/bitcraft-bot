@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.32 : clic droit sur une ressource de la carte ou du tableau (ou bouton « Y aller… » de la plus proche) : « Aller à cette ressource » ou « Récolter jusqu’à épuisement » ; le bot va sur une case voisine, vous donnez le premier coup, la reprise des récoltes continue jusqu’à épuisement.");
+        _log.Info("Session", "Version 0.4.33 : contrôle du dépôt (mise en forme, textes d’aide corrigés, tests ajoutés), aucun changement de comportement ; toujours : clic droit sur une ressource de la carte pour y aller ou la récolter jusqu’à épuisement.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

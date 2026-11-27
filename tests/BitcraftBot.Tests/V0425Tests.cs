@@ -21,17 +21,17 @@ public class V0425Tests
 
     private static ResumeInput In(double seconds, string? action, double stamina, ClickPoint? click = null, int cameraMoves = 0,
         ServerPosition? at = null) => new()
-    {
-        Now = T0.AddSeconds(seconds),
-        Enabled = true,
-        Action = action is null ? null : new ActionInfo(action, 0, 1000, Tree, null),
-        Position = at ?? Here,
-        Stamina = stamina,
-        MaxStamina = 98,
-        Resources = [Res(15000)],
-        LastClick = click,
-        CameraMoves = cameraMoves,
-    };
+        {
+            Now = T0.AddSeconds(seconds),
+            Enabled = true,
+            Action = action is null ? null : new ActionInfo(action, 0, 1000, Tree, null),
+            Position = at ?? Here,
+            Stamina = stamina,
+            MaxStamina = 98,
+            Resources = [Res(15000)],
+            LastClick = click,
+            CameraMoves = cameraMoves,
+        };
 
     [Fact]
     public void PointValidity()
@@ -177,8 +177,17 @@ public class V0425Tests
     {
         var sample = new ResourceSample
         {
-            At = DateTime.Now, BotCpuPercent = 12.3, BotRamMb = 1588, BotManagedMb = 50, BotThreads = 20, BotHandles = 500,
-            SystemCpuPercent = 10, SystemRamTotalMb = 32000, SystemRamAvailableMb = 16000, GameCpuPercent = 100, GameRamMb = 12000,
+            At = DateTime.Now,
+            BotCpuPercent = 12.3,
+            BotRamMb = 1588,
+            BotManagedMb = 50,
+            BotThreads = 20,
+            BotHandles = 500,
+            SystemCpuPercent = 10,
+            SystemRamTotalMb = 32000,
+            SystemRamAvailableMb = 16000,
+            GameCpuPercent = 100,
+            GameRamMb = 12000,
         };
         var text = SystemSummary.Overlay(sample, CultureInfo.GetCultureInfo("fr-FR"));
         Assert.True(text.Length <= SystemSummary.MaxLength, text);

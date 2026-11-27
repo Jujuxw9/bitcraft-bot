@@ -89,7 +89,10 @@ public partial class MainWindow
         var (logo, color) = BuffLogo(name, good);
         var badge = new Border
         {
-            Width = 34, Height = 34, CornerRadius = new CornerRadius(17), VerticalAlignment = VerticalAlignment.Center,
+            Width = 34,
+            Height = 34,
+            CornerRadius = new CornerRadius(17),
+            VerticalAlignment = VerticalAlignment.Center,
             Background = (Brush)new BrushConverter().ConvertFromString(color)!,
             Child = new TextBlock { Text = logo, FontSize = 17, FontFamily = new FontFamily("Segoe UI Emoji"), Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         };
@@ -107,8 +110,13 @@ public partial class MainWindow
         row.Children.Add(text);
         return new Border
         {
-            Background = (Brush)FindResource("Track"), BorderBrush = (Brush)FindResource("CardBorder"), BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8), Padding = new Thickness(6, 4, 8, 4), Margin = new Thickness(0, 0, 8, 6), Child = row,
+            Background = (Brush)FindResource("Track"),
+            BorderBrush = (Brush)FindResource("CardBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(6, 4, 8, 4),
+            Margin = new Thickness(0, 0, 8, 6),
+            Child = row,
         };
     }
 

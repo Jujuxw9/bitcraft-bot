@@ -153,3 +153,11 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `App/MainWindow.Travel.cs` : `OnMapRightClick` ajoute les entrées de la ressource sous le clic ; `--essai-menu-deplacement` essaie aussi le menu de la ressource la plus proche (à plus de 3 cases).
 - Journal : catégorie « Récolte guidée ».
 - Tests : `V0432Tests`.
+
+## 37. v0.4.33 : contrôle du dépôt (T-15, aucun changement de comportement)
+
+- Mise en forme : `dotnet format whitespace` sur 13 fichiers (139 remarques d'espaces anciennes) ; `dotnet format --verify-no-changes` passe maintenant sans remarque.
+- Textes corrigés : bulle d'aide de « Reprise des récoltes » (`MainWindow.xaml`, parlait encore de Tab), commentaire de `GameKeys.Tab` (plus envoyée depuis v0.4.25, toujours dans la liste permise).
+- Tests : `V0433Tests` (mémoire des ressources à 72 h pile, texte « vue il y a », positions refusées, barre de la grande carte illisible ou hors bornes, touches du chariot et du bateau jamais permises).
+- Documentation : `README.md` racine (état v0.4.33), `tests/README.md` (nouveau), en-tête de `architecture.md`.
+- Rapport complet : `controle-depot-2026-11-27.md`.

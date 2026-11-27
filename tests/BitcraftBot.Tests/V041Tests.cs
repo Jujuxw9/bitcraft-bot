@@ -218,7 +218,12 @@ public class V041CameraReliabilityTests
         ];
         var pairs = clicks.Select(c => new BitcraftBot.Server.Aim.CameraPair
         {
-            East = c.E, North = c.N, PixelX = c.X, PixelY = c.Y, ClientWidth = 1920, ClientHeight = 1080,
+            East = c.E,
+            North = c.N,
+            PixelX = c.X,
+            PixelY = c.Y,
+            ClientWidth = 1920,
+            ClientHeight = 1080,
         }).ToList();
         var fit = BitcraftBot.Server.Aim.CameraFit.Compute(pairs)!;
         Assert.False(fit.Reliable);

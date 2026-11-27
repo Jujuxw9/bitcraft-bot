@@ -15,3 +15,4 @@
 - [raccourcis-du-jeu.md](raccourcis-du-jeu.md) — touches du jeu (Maj + E pour manger, souris, clavier AZERTY) et touches du bot
 - [analyse-carte-bitjita-2026-11-26.md](analyse-carte-bitjita-2026-11-26.md) — analyse de la carte de bitjita.com (tuiles de terrain, densité par palier, entités) et faisabilité pour la v0.4.18
 - [deplacement-etude.md](deplacement-etude.md) — étude du déplacement automatique (T-09, 27/11) : clic sur la grande carte (calibration par la barre des coordonnées), vérification, relief (escalade dès 5 de hauteur, nage dès 5 d'eau), ennemis, Get Up, sécurité, mode d'essai, plan pour T-10
+- [controle-depot-2026-11-27.md](controle-depot-2026-11-27.md) — contrôle complet du dépôt (T-15, v0.4.33) : build, mise en forme, code mort, sécurité du dépôt public, tests ajoutés, documentation, ce qui reste

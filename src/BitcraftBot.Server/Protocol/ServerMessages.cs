@@ -43,23 +43,23 @@ public static class ServerMessages
                 return new SubscriptionEvent(ReadTables(body.GetProperty("update"), schema));
 
             case "TransactionUpdate":
-            {
-                string? reducer = body.TryGetProperty("reducer_call", out var call) && call.TryGetProperty("reducer_name", out var rn)
-                    ? rn.GetString()
-                    : null;
-                if (body.TryGetProperty("status", out var status))
                 {
-                    if (status.TryGetProperty("Committed", out var committed))
+                    string? reducer = body.TryGetProperty("reducer_call", out var call) && call.TryGetProperty("reducer_name", out var rn)
+                        ? rn.GetString()
+                        : null;
+                    if (body.TryGetProperty("status", out var status))
                     {
-                        return new TransactionEvent(ReadTables(committed, schema), reducer, null);
+                        if (status.TryGetProperty("Committed", out var committed))
+                        {
+                            return new TransactionEvent(ReadTables(committed, schema), reducer, null);
+                        }
+                        if (status.TryGetProperty("Failed", out var failed))
+                        {
+                            return new TransactionEvent([], reducer, failed.ValueKind == JsonValueKind.String ? failed.GetString() : failed.GetRawText());
+                        }
                     }
-                    if (status.TryGetProperty("Failed", out var failed))
-                    {
-                        return new TransactionEvent([], reducer, failed.ValueKind == JsonValueKind.String ? failed.GetString() : failed.GetRawText());
-                    }
+                    return new TransactionEvent([], reducer, null);
                 }
-                return new TransactionEvent([], reducer, null);
-            }
 
             case "TransactionUpdateLight":
                 return new TransactionEvent(ReadTables(body.GetProperty("update"), schema), null, null);

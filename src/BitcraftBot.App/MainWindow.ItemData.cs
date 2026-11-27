@@ -19,7 +19,7 @@ public partial class MainWindow
     // Chargé en tâche de fond après les données du jeu (≈ 12 Mo de recettes).
     private void LoadRecipesInBackground()
     {
-        if (_recipesLoading ||!RecipeBook.CanLoad(GameDataLoader.Folder))
+        if (_recipesLoading || !RecipeBook.CanLoad(GameDataLoader.Folder))
         {
             return;
         }

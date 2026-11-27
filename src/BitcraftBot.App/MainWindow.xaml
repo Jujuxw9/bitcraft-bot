@@ -127,7 +127,7 @@
                                 <TextBlock x:Name="GptStatusText" Visibility="Collapsed" Text="" Margin="0,6,0,0" TextWrapping="Wrap" />
                                 <TextBlock x:Name="GptTimerText" Visibility="Collapsed" Text="" Margin="0,2,0,0" TextWrapping="Wrap" Style="{StaticResource MutedText}" />
                                 <Border Height="1" Background="{StaticResource CardBorder}" Margin="0,12" />
-                                <CheckBox x:Name="ResumeCheck" Style="{StaticResource SwitchCheck}" Content="Reprise des récoltes" ToolTip="Quand une récolte s'arrête faute d'endurance : attend l'endurance, resélectionne la ressource (Tab) et relance (M), sans bouger" Click="ResumeCheck_Click" />
+                                <CheckBox x:Name="ResumeCheck" Style="{StaticResource SwitchCheck}" Content="Reprise des récoltes" ToolTip="Quand une récolte s'arrête faute d'endurance : attend l'endurance, pose la souris sur le point de votre dernier clic et relance (M), sans bouger" Click="ResumeCheck_Click" />
                                 <TextBlock x:Name="ResumeStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,8" TextWrapping="Wrap" />
                                 <CheckBox x:Name="TravelCheck" Style="{StaticResource SwitchCheck}" Content="Déplacements" ToolTip="Clic droit sur la carte du bot : « Se déplacer ici » (petits trajets, sans escalade ni nage)" Click="TravelCheck_Click" />
                                 <TextBlock x:Name="TravelStatusText" Text="" Style="{StaticResource MutedText}" Margin="0,4,0,8" TextWrapping="Wrap" />

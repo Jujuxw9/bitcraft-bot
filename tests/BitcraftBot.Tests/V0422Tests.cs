@@ -9,8 +9,15 @@ public class V0422Tests
 {
     private static ResourceSample Ram(double mb) => new()
     {
-        At = DateTime.Now, BotCpuPercent = 1, BotRamMb = mb, BotManagedMb = 50, BotThreads = 20, BotHandles = 500,
-        SystemCpuPercent = 10, SystemRamTotalMb = 32000, SystemRamAvailableMb = 16000,
+        At = DateTime.Now,
+        BotCpuPercent = 1,
+        BotRamMb = mb,
+        BotManagedMb = 50,
+        BotThreads = 20,
+        BotHandles = 500,
+        SystemCpuPercent = 10,
+        SystemRamTotalMb = 32000,
+        SystemRamAvailableMb = 16000,
     };
 
     [Fact]

@@ -163,7 +163,10 @@ public partial class MainWindow
         var middle = new StackPanel { Margin = new Thickness(0, 0, 12, 0) };
         middle.Children.Add(new TextBlock
         {
-            Text = traveler, FontWeight = FontWeights.Bold, FontSize = 14, Foreground = TravBrush("Gold"),
+            Text = traveler,
+            FontWeight = FontWeights.Bold,
+            FontSize = 14,
+            Foreground = TravBrush("Gold"),
             ToolTip = c.Desc?.Description is { Length: > 0 } d ? d : $"Tâche n° {c.Task.TaskId}",
         });
         var items = new WrapPanel { Margin = new Thickness(0, 4, 0, 0) };
@@ -221,8 +224,12 @@ public partial class MainWindow
         row.Children.Add(text);
         return new Border
         {
-            Background = TravBrush("Track"), CornerRadius = new CornerRadius(5), Padding = new Thickness(3, 1, 8, 1), Margin = new Thickness(0, 0, 6, 4),
-            Child = row, ToolTip = r.Harvest is { } h ? $"Récolte sur « {h.Place} »" : "Source inconnue (butin, commerce…)",
+            Background = TravBrush("Track"),
+            CornerRadius = new CornerRadius(5),
+            Padding = new Thickness(3, 1, 8, 1),
+            Margin = new Thickness(0, 0, 6, 4),
+            Child = row,
+            ToolTip = r.Harvest is { } h ? $"Récolte sur « {h.Place} »" : "Source inconnue (butin, commerce…)",
         };
     }
 
@@ -232,7 +239,8 @@ public partial class MainWindow
         var holder = new Grid { Width = 52, Height = 52, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Left };
         holder.Children.Add(new Border
         {
-            CornerRadius = new CornerRadius(26), Background = TravBrush("GoldDim"),
+            CornerRadius = new CornerRadius(26),
+            Background = TravBrush("GoldDim"),
             Child = new TextBlock { Text = traveler[..1], FontSize = 24, FontWeight = FontWeights.Bold, Foreground = TravBrush("Bg"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center },
         });
         var image = new Image { Stretch = Stretch.UniformToFill, Clip = new EllipseGeometry(new Point(26, 26), 26, 26) };
@@ -274,9 +282,14 @@ public partial class MainWindow
                   + (i.Missing > 0 ? $"\nIl manque : {i.Missing:N0}" : "") + (i.Shared ? "\n(aussi demandé par une autre tâche)" : "");
         return new Border
         {
-            Background = TravBrush("Track"), BorderBrush = TravBrush("CardBorder"), BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(5), Padding = new Thickness(4, 2, 8, 2), Margin = new Thickness(0, 0, 6, 4),
-            Child = row, ToolTip = tip,
+            Background = TravBrush("Track"),
+            BorderBrush = TravBrush("CardBorder"),
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(5),
+            Padding = new Thickness(4, 2, 8, 2),
+            Margin = new Thickness(0, 0, 6, 4),
+            Child = row,
+            ToolTip = tip,
         };
     }
 }

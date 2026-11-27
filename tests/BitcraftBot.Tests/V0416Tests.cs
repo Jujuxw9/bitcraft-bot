@@ -116,8 +116,14 @@ public class V0416Tests
     {
         var json = System.Text.Json.JsonSerializer.Serialize(new
         {
-            entity_id = 9, username = "Alice", title_id = 0, sender_entity_id = 42, receiver_entity_id = Me,
-            text = "tu vends du bois ?", timestamp = Now.ToUnixTimeSeconds(), language_code = new { some = "fr" },
+            entity_id = 9,
+            username = "Alice",
+            title_id = 0,
+            sender_entity_id = 42,
+            receiver_entity_id = Me,
+            text = "tu vends du bois ?",
+            timestamp = Now.ToUnixTimeSeconds(),
+            language_code = new { some = "fr" },
         });
         var cache = new TableCache();
         cache.Apply(new TableChange(DirectMessages.Table, [Row.Parse(json, null)], []));

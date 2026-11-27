@@ -6,22 +6,20 @@ Agent autonome pour BitCraft Online : lecture de l'état du jeu, prise de décis
 
 ## État
 
-**v0.3.18** :
-- Voie hybride (D-039) : le bot lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré) : position, vie, endurance, faim, ressources proches, sac et banques, bonus, expérience des métiers, action en cours. Vérifié en réel.
-- **Tableau de bord** dans l'onglet Bot : tout l'état du personnage d'un coup d'œil, dont le métier en cours et sa progression (la jauge de métier, lue sur le serveur).
-- Lecture de l'écran (HUD) en contrôle : cible sélectionnée, menus ouverts (D-044 : le serveur d'abord).
-- Données du jeu (BitCraft_GameData, jamais republiées), surveillance CPU/RAM.
-- H2 : **carte des arbres** autour du joueur, avec leur âge, leur santé, leur distance et leur direction.
-- 5 onglets (D-043), **thème aux couleurs de BitCraft**, peu de texte, fenêtre adaptative (D-046).
-- **Contrôleur d'actions commun** (D-045) : toutes les touches et tous les clics passent par les mêmes sécurités.
-- Overlay sur l'écran du jeu : état du bot et rappel des touches.
-- Sécurité : bouton « Arrêter », durée maximale, arrêt si la souris bouge, pause des actions quand on tape au clavier, journaux (plus de touche `Num 5` depuis la v0.3.19, D-047). Déconnexion du serveur garantie à la fermeture. Capture du jeu avec `Num 0`.
-- Repas automatique (Maj + E) quand la faim passe sous 30 % ou que le bonus de nourriture est fini (D-042, actif au démarrage, alerte s'il n'y a pas de nourriture ; vérifié en réel).
-- Images des objets dans l'onglet Recettes.
+**v0.4.33** (27/11/2026) :
+- Voie hybride (D-039) : le bot lit le serveur officiel **en lecture seule**, avec le jeton du joueur (code reçu par e-mail, jeton chiffré) : position, vie, endurance, faim, ressources proches, sac et banques, bonus, expérience des métiers, action en cours, capacités.
+- 6 onglets (D-043, D-083) : Bot (tableau de bord, options, sécurité), Chat (archive locale du chat, recherche), Personnage, Voyageurs, Carte, Paramètres (avec le journal). Onglet Recettes retiré en v0.4.26 ; le livre des recettes sert encore ailleurs.
+- **Carte** : fond lu sur le serveur (biomes, relief, eau, zones découvertes), zoom jusqu'à 200 cases, ressources vues gardées 72 h sur le disque, filtres par catégorie et par tier.
+- **Déplacement** (v0.4.29 à v0.4.32) : clic droit sur la carte du bot → « Se déplacer ici » (30 cases au plus, sans escalade ni nage), « Aller à cette ressource », « Récolter jusqu'à épuisement ». **Pas encore essayé en jeu.**
+- Reprise des récoltes quand l'endurance tombe (souris posée sur le point du dernier clic, puis M) ; capacités automatiques (coupées au départ) ; repas automatique (Maj + E).
+- **Contrôleur d'actions commun** (D-045) : toutes les touches et tous les clics passent par les mêmes sécurités. Touches du chariot et du bateau (`-`, `=`, Maj + V, Maj + B) **jamais** envoyées. Vie qui baisse : Sprint et fuite. À terre : « Get Up », jamais « Go Home ».
+- Lecture de l'écran en contrôle : cible en haut de l'écran, fenêtres ouvertes, chat ouvert, grande carte.
+- Overlay sur l'écran du jeu : état du bot, charge du bot et du jeu.
+- Sécurité : bouton « Arrêter », durée maximale, arrêt si la souris bouge, pause quand on tape au clavier, journaux. Déconnexion du serveur garantie à la fermeture.
 
 Règle : connecter le bot **avant** de lancer le jeu. Si le jeu est déjà lancé, le bot refuse de se connecter, sinon le jeu serait éjecté.
 
-Prochaine étape : H3 (aller au meilleur arbre), avec le contrôleur d'actions. Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
+Suite : essai réel du déplacement avec Julien. Voir [memory/echanges/resume-global.md](memory/echanges/resume-global.md) et l'[architecture](memory/technique/architecture.md).
 
 ## Principe
 
@@ -63,7 +61,7 @@ Les versions marquées d'un tag `vX.Y.Z` sont aussi construites par `.github/wor
 |---|---|
 | [memory/](memory/README.md) | Mémoire du projet : contexte, décisions, questions ouvertes, journal |
 | `src/` | Code C# : App, Core, Perception, Input, GameData, Server |
-| `tests/` | Tests xUnit |
+| [tests/](tests/README.md) | Tests xUnit |
 | [images/](images/README.md) | Captures d'écran (référence UI, entraînement, analyse) |
 | [models/](models/README.md) | Modèles de vision `.onnx` (voie B, en pause) |
 | [tools/](tools/README.md) | Scripts utilitaires |

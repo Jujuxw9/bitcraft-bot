@@ -13,8 +13,14 @@ public class GptChatTests
     private static string Json(ulong id, ulong owner, string user, int channel, string text, DateTimeOffset at) =>
         System.Text.Json.JsonSerializer.Serialize(new
         {
-            entity_id = id, username = user, title_id = 0, channel_id = channel, target_id = 0, text,
-            timestamp = at.ToUnixTimeSeconds(), owner_entity_id = owner,
+            entity_id = id,
+            username = user,
+            title_id = 0,
+            channel_id = channel,
+            target_id = 0,
+            text,
+            timestamp = at.ToUnixTimeSeconds(),
+            owner_entity_id = owner,
         });
 
     private static ChatMessage Msg(ulong id, string text, DateTimeOffset at, ulong owner = 42, int channel = 3, string user = "fr/Bob") =>

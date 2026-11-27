@@ -17,8 +17,17 @@ public class V0423Tests
         Assert.Equal(590, SystemSummary.RoundRam(588));
         var sample = new ResourceSample
         {
-            At = DateTime.Now, BotCpuPercent = 2.3, BotRamMb = 603, BotManagedMb = 50, BotThreads = 20, BotHandles = 500,
-            SystemCpuPercent = 10, SystemRamTotalMb = 32000, SystemRamAvailableMb = 16000, GameCpuPercent = 16.6, GameRamMb = 4421,
+            At = DateTime.Now,
+            BotCpuPercent = 2.3,
+            BotRamMb = 603,
+            BotManagedMb = 50,
+            BotThreads = 20,
+            BotHandles = 500,
+            SystemCpuPercent = 10,
+            SystemRamTotalMb = 32000,
+            SystemRamAvailableMb = 16000,
+            GameCpuPercent = 16.6,
+            GameRamMb = 4421,
         };
         var text = SystemSummary.Overlay(sample, CultureInfo.GetCultureInfo("fr-FR"));
         // v0.4.25 : ligne courte (overlay plus étroit).

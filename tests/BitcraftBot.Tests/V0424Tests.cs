@@ -17,18 +17,18 @@ public class V0424Tests
 
     private static ResumeInput In(double seconds, string? action, double stamina, ulong? target = null, int treeHealth = 15000,
         ulong? actionTarget = Tree, ServerPosition? at = null) => new()
-    {
-        Now = T0.AddSeconds(seconds),
-        Enabled = true,
-        Action = action is null ? null : new ActionInfo(action, 0, 1000, actionTarget, null),
-        Position = at ?? Here,
-        Stamina = stamina,
-        MaxStamina = 98,
-        Target = target,
-        Resources = [Res(Tree, "Mature Birch Tree", treeHealth), Res(Lavender, "Lavender", 10)],
-        // v0.4.25 : clic de Julien sur l'arbre juste avant la récolte (point de la souris pour la reprise).
-        LastClick = new ClickPoint(900, 500, T0.AddSeconds(-1), Here, 0),
-    };
+        {
+            Now = T0.AddSeconds(seconds),
+            Enabled = true,
+            Action = action is null ? null : new ActionInfo(action, 0, 1000, actionTarget, null),
+            Position = at ?? Here,
+            Stamina = stamina,
+            MaxStamina = 98,
+            Target = target,
+            Resources = [Res(Tree, "Mature Birch Tree", treeHealth), Res(Lavender, "Lavender", 10)],
+            // v0.4.25 : clic de Julien sur l'arbre juste avant la récolte (point de la souris pour la reprise).
+            LastClick = new ClickPoint(900, 500, T0.AddSeconds(-1), Here, 0),
+        };
 
     [Fact]
     public void ResumesAfterStaminaRunsOut()
