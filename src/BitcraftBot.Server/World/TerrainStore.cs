@@ -11,6 +11,9 @@ public sealed class TerrainStore
 
     private readonly string _folder;
     private readonly Dictionary<ulong, TerrainChunk> _chunks = [];
+    // v0.4.27 : date (UTC) où chaque morceau a été reçu du serveur pour la dernière fois (ou écrit sur le disque).
+    private readonly Dictionary<ulong, DateTime> _receivedAt = [];
+    public Func<DateTime> Clock { get; set; } = () => DateTime.UtcNow;
     private readonly object _lock = new();
 
     public TerrainStore(string folder)
@@ -29,6 +32,15 @@ public sealed class TerrainStore
         lock (_lock)
         {
             return _chunks.ContainsKey(index);
+        }
+    }
+
+    // Morceau gardé et reçu il y a moins de maxAge ? (v0.4.27 : il peut être pris dans la mémoire au lieu du serveur.)
+    public bool IsFresh(ulong index, TimeSpan maxAge)
+    {
+        lock (_lock)
+        {
+            return _chunks.ContainsKey(index) && _receivedAt.TryGetValue(index, out var at) && Clock() - at < maxAge;
         }
     }
 
@@ -55,11 +67,16 @@ public sealed class TerrainStore
         {
             try
             {
-                if (Read(File.ReadAllBytes(file)) is { } chunk)
+                var bytes = File.ReadAllBytes(file);
+                if (Read(bytes) is { } chunk)
                 {
+                    var written = new DateTime(BitConverter.ToInt64(bytes, Magic.Length), DateTimeKind.Utc);
                     lock (_lock)
                     {
-                        _chunks.TryAdd(chunk.Index, chunk);
+                        if (_chunks.TryAdd(chunk.Index, chunk))
+                        {
+                            _receivedAt[chunk.Index] = written;
+                        }
                     }
                     read++;
                 }
@@ -77,6 +94,7 @@ public sealed class TerrainStore
     {
         lock (_lock)
         {
+            _receivedAt[chunk.Index] = Clock();
             if (_chunks.TryGetValue(chunk.Index, out var known) && SameCells(known, chunk))
             {
                 return false;

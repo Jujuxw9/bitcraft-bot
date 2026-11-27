@@ -14,7 +14,7 @@ public static class Queries
     ];
 
     // Étape 2 : suivre le personnage (position, vie, endurance, faim), et les ressources autour de lui.
-    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false, bool withBags = true, IReadOnlyList<ulong>? terrainExtra = null)
+    public static IReadOnlyList<string> FollowPlayer(string hexIdentity, ulong entityId, Area? area, bool withHealth = true, bool withInventory = true, bool withExtras = true, bool withTasks = true, bool withTerrain = false, bool withBags = true, IReadOnlyList<ulong>? terrainExtra = null, Func<ulong, bool>? terrainSkip = null)
     {
         var e = entityId.ToString(CultureInfo.InvariantCulture);
         var list = new List<string>(FindPlayer(hexIdentity))
@@ -70,7 +70,7 @@ public static class Queries
             }
             if (withTerrain)
             {
-                list.AddRange(Terrain(a, entityId, terrainExtra));
+                list.AddRange(Terrain(a, entityId, terrainExtra, terrainSkip));
             }
         }
         return list;
@@ -82,9 +82,12 @@ public static class Queries
     // Fond de carte (v0.4.18) : seulement les morceaux de terrain autour de la zone lue (4 à 9 morceaux, jamais toute
     // la région), un par requête sur la clé primaire ; et les zones découvertes du personnage.
     // v0.4.23 : extra = morceaux déjà découverts à garder en mémoire (lus une seule fois, en plus de ceux autour).
-    public static IReadOnlyList<string> Terrain(Area a, ulong entityId, IReadOnlyList<ulong>? extra = null)
+    // v0.4.27 : skip = morceaux à ne pas redemander (gardés depuis moins de 24 h, hors des 3 × 3 autour du personnage).
+    public static IReadOnlyList<string> Terrain(Area a, ulong entityId, IReadOnlyList<ulong>? extra = null, Func<ulong, bool>? skip = null)
     {
+        var (cx, cz) = TerrainChunk.ChunkOf(a.CenterX / 3.0, a.CenterZ / 3.0);
         var list = TerrainChunk.ChunksAround(a.CenterX / 3.0, a.CenterZ / 3.0, TerrainRadius)
+            .Where(c => skip is null || Math.Abs(c.X - cx) <= 1 && Math.Abs(c.Z - cz) <= 1 || !skip(TerrainChunk.IndexOf(c.X, c.Z)))
             .Select(c => TerrainChunk.IndexOf(c.X, c.Z))
             .Concat(extra ?? [])
             .Distinct()

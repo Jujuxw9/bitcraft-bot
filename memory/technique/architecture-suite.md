@@ -97,3 +97,11 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - Page RECETTES retirée de `MainWindow.xaml` ; `RecipeView.cs` supprimé.
 - `MainWindow.Recipes.cs` devient `MainWindow.ItemData.cs` : chargement du livre des recettes en tâche de fond (`_recipes`), téléchargement unique des images, `IconImage` / `SetIconAsync` (onglet Voyageurs). Lus aussi par `MainWindow.Inventory.cs` (noms, tiers, images), `MainWindow.Dashboard.cs` (`CraftActions`) et `MainWindow.Travelers.cs` (planificateur, matières premières).
 - `GameData` inchangé (`RecipeBook`, `RecipePlanner`, `RawMaterials`, tables téléchargées).
+
+## 31. v0.4.27 : carte, données (D-084)
+
+- `ResourceMemory` (Server/World) : mémoire des ressources vues, avec date « vue le » (horloge injectable pour les tests), 200 000 au plus, `Cleanup()` (72 h), `Save` / `Load` (fichier BCR1 `carte/ressources/ressources.bin`), contrôle `Valid` (position dans le monde), compteurs de rejets et doublons, `SeenText` pour le survol.
+- `MainWindow.Map.cs` : chargement en arrière-plan au démarrage puis nettoyage ; minuterie d'une minute (`MaintainResourceMemory`) : nettoyage chaque heure, écriture toutes les 2 min si changé ; écriture aussi à la fermeture (`OnClosing`). La mémoire suit même onglet Carte caché.
+- `ResourceMap` : crans de zoom jusqu'à 200 ; survol d'une ressource pâle = nom et « vue il y a N h » ; fond gris-bleu (#18222E), comme `TerrainColors.Unknown`.
+- `ServerReader.DiscoveredRadius` = 230 ; `TerrainFreshFor` = 24 h : `Queries.Terrain(..., skip)` ne redemande pas un morceau frais de `TerrainStore` (`IsFresh`, date de réception gardée, relue depuis le fichier), sauf les 3 × 3 autour du personnage.
+- Journal : « Abonnement accepté (N Ko reçus ; K abonnements en M min, X par minute, Y Mo en tout) » ; « Mémoire de la carte : … morceau(x) illisible(s) rejeté(s) ».

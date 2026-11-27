@@ -175,7 +175,8 @@ public static class TerrainColors
     private static readonly (byte R, byte G, byte B) Shallow = (78, 140, 196);
     private static readonly (byte R, byte G, byte B) Deep = (22, 56, 112);
 
-    public const uint Unknown = 0xFF0A1524; // fond quand le morceau n'est pas lu (même bleu nuit qu'avant)
+    // v0.4.27 : morceau jamais lu (pas découvert : le jeu ne le montre pas non plus) en gris-bleu discret, plus en noir.
+    public const uint Unknown = 0xFF18222E;
 
     public static string BiomeName(uint biomes) =>
         (biomes & 0xFF) is var b && b < BiomeNames.Count ? BiomeNames[(int)b] : $"biome {biomes & 0xFF}";

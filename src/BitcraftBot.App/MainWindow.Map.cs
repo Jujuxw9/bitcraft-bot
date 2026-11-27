@@ -116,6 +116,11 @@ public partial class MainWindow
     {
         if (!visible)
         {
+            // v0.4.27 : la mémoire des ressources suit aussi quand l'onglet Carte est caché.
+            if (_resourcesLoaded)
+            {
+                _resourceMemory.Update(s.Resources, reader.ResourceArea);
+            }
             var bestHidden = NearestSought(s, []);
             var targetHidden = CurrentHudTarget();
             LogMatches(bestHidden, _targetMatcher.Match(targetHidden?.Name, targetHidden?.Health, s.Resources), targetHidden);
@@ -133,7 +138,7 @@ public partial class MainWindow
         SrvResourceCount.Text = $"{shown.Count} / {s.Resources.Count} ressources · {s.Resources.Count(ResourceNames.IsHarvestTarget)} arbres mûrs";
 
         // v0.4.23 : la ressource recherchée par Julien (la plus proche), à la place du « meilleur arbre ».
-        var remembered = _resourceMemory.Update(s.Resources, reader.ResourceArea);
+        var remembered = _resourcesLoaded ? _resourceMemory.Update(s.Resources, reader.ResourceArea) : [];
         var best = NearestSought(s, remembered);
         var target = CurrentHudTarget();
         var match = _targetMatcher.Match(target?.Name, target?.Health, s.Resources);
@@ -244,11 +249,86 @@ public partial class MainWindow
             }
             _log.Info("Carte", $"Mémoire de la carte : {read} morceaux de terrain gardés (dossier « {TerrainStore.FolderName} » à côté du .exe).");
         });
+        // v0.4.27 (D-084) : ressources vues, gardées sur le disque 72 h (lecture en arrière-plan, puis nettoyage).
+        _ = Task.Run(() =>
+        {
+            var read = 0;
+            try
+            {
+                read = _resourceMemory.Load(ResourceMemoryPath);
+            }
+            catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+            {
+                _log.Alerte("Carte", $"Mémoire des ressources illisible : {ex.Message}");
+            }
+            _resourcesLoaded = true;
+            _log.Info("Carte", $"Mémoire des ressources : {read} lues sur le disque.");
+            CleanupResourceMemory();
+        });
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+        timer.Tick += (_, _) => MaintainResourceMemory();
+        timer.Start();
+        SrvMap.SeenText = _resourceMemory.SeenText;
         SrvMap.ZoomChanged += () =>
         {
             MapZoomText.Text = $"vue : {SrvMap.ViewCases:0} cases";
             _terrainArea = null;
         };
+    }
+
+    private volatile bool _resourcesLoaded;
+    private DateTime _lastResourceCleanup = DateTime.Now;
+    private DateTime _lastResourceSave = DateTime.Now;
+    private static readonly TimeSpan ResourceCleanupEvery = TimeSpan.FromHours(1);
+    private static readonly TimeSpan ResourceSaveEvery = TimeSpan.FromMinutes(2);
+
+    private static string ResourceMemoryPath =>
+        System.IO.Path.Combine(AppContext.BaseDirectory, TerrainStore.FolderName, ResourceMemory.FolderName, ResourceMemory.FileName);
+
+    // Nettoyage (plus de 72 h sans être revue) : une ligne de journal à chaque fois.
+    private void CleanupResourceMemory()
+    {
+        _lastResourceCleanup = DateTime.Now;
+        var (removed, kept) = _resourceMemory.Cleanup();
+        var rejected = _resourceMemory.RejectedPosition + _resourceMemory.Duplicates > 0
+            ? $" ; rejetées depuis le démarrage : {_resourceMemory.RejectedPosition} sans position valable, {_resourceMemory.Duplicates} doublons"
+            : "";
+        _log.Info("Carte", $"Mémoire des ressources : {kept} gardées, {removed} retirées (plus de 72 h){rejected}.");
+    }
+
+    // Toutes les minutes : nettoyage si une heure est passée, écriture sur le disque toutes les 2 min si quelque chose a changé.
+    private void MaintainResourceMemory()
+    {
+        if (!_resourcesLoaded)
+        {
+            return;
+        }
+        if (DateTime.Now - _lastResourceCleanup >= ResourceCleanupEvery)
+        {
+            CleanupResourceMemory();
+        }
+        if (DateTime.Now - _lastResourceSave >= ResourceSaveEvery && _resourceMemory.Dirty)
+        {
+            _lastResourceSave = DateTime.Now;
+            _ = Task.Run(SaveResourceMemory);
+        }
+    }
+
+    private void SaveResourceMemory()
+    {
+        if (!_resourcesLoaded)
+        {
+            return;
+        }
+        try
+        {
+            var written = _resourceMemory.Save(ResourceMemoryPath);
+            _log.Detail("Carte", $"Mémoire des ressources écrite : {written} ressources.");
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException)
+        {
+            _log.Alerte("Carte", $"Mémoire des ressources pas écrite : {ex.Message}");
+        }
     }
 
     private void MapZoomIn_Click(object sender, RoutedEventArgs e) => SrvMap.ZoomBy(-1);

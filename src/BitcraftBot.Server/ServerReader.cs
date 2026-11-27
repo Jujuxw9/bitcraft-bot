@@ -67,7 +67,8 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     public TerrainStore? TerrainMemory { get; set; }
 
     // Rayon (grandes cases) où l'on va chercher les morceaux découverts : la vue la plus large (100 cases) et de la marge.
-    public const double DiscoveredRadius = 130;
+    // v0.4.27 : 130 → 230 (vue jusqu’à 200 cases).
+    public const double DiscoveredRadius = 230;
 
     // Morceaux découverts demandés par abonnement (un peu à la fois : chaque abonnement renvoie aussi tout le reste).
     public const int DiscoveredPerSubscription = 24;
@@ -78,6 +79,9 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private uint _requestId;
     private DateTime _lastSubscribe = DateTime.MinValue;
     private long _messages;
+    private int _appliedCount;
+    private long _appliedChars;
+    private DateTime? _firstApplied;
     private long _transactions;
 
     public ReaderState State { get; private set; } = ReaderState.Deconnecte;
@@ -310,7 +314,13 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
             case SubscriptionEvent subscription:
                 _cache.Reset(subscription.Tables);
                 LastUpdate = DateTime.Now;
-                log.Info(Category, $"Abonnement accepté ({json.Length / 1024.0:0} Ko reçus) : " + DescribeCounts());
+                _appliedCount++;
+                _appliedChars += json.Length;
+                _firstApplied ??= DateTime.Now;
+                var minutes = Math.Max(1, (DateTime.Now - _firstApplied.Value).TotalMinutes);
+                // v0.4.27 : mesure des échanges (taille de cet envoi, nombre d'abonnements par minute, total reçu).
+                log.Info(Category, $"Abonnement accepté ({json.Length / 1024.0:0} Ko reçus ; {_appliedCount} abonnements en {minutes:0} min, " +
+                    $"{_appliedCount / minutes:0.0} par minute, {_appliedChars / 1024.0 / 1024.0:0.0} Mo en tout) : " + DescribeCounts());
                 LogFirstInventory();
                 LogFirstTerrain();
                 StoreTerrain();
@@ -408,7 +418,10 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
     private IReadOnlyList<string> FollowQueries(ulong entity, Area? area) =>
         Queries.FollowPlayer(_identity!, entity, area, withHealth: !_healthRefused, withInventory: !_inventoryRefused,
             withExtras: !_extrasRefused, withTasks: !_tasksRefused, withTerrain: !_terrainRefused, withBags: !_bagsRefused,
-            terrainExtra: _terrainExtra);
+            terrainExtra: _terrainExtra, terrainSkip: TerrainMemory is { } store ? i => store.IsFresh(i, TerrainFreshFor) : null);
+
+    // v0.4.27 : un morceau de terrain gardé depuis moins de 24 h n'est pas redemandé (sauf les 3 × 3 autour du personnage).
+    public static readonly TimeSpan TerrainFreshFor = TimeSpan.FromHours(24);
 
     // Range dans la mémoire de la carte les morceaux de terrain reçus (v0.4.23).
     private void StoreTerrain()
@@ -425,9 +438,11 @@ public sealed class ServerReader(SessionLog log, Func<int, ResourceLabel?> descr
                 added++;
             }
         }
-        if (added > 0 && _terrainExtra.Count > 0)
+        var unreadable = _cache.Rows("terrain_chunk_state").Count - TerrainChunks().Count;
+        if (added > 0 && _terrainExtra.Count > 0 || unreadable > 0)
         {
-            log.Info(Category, $"Mémoire de la carte : {added} morceau(x) ajouté(s), {store.Count} gardés en tout.");
+            log.Info(Category, $"Mémoire de la carte : {added} morceau(x) ajouté(s), {store.Count} gardés en tout" +
+                (unreadable > 0 ? $", {unreadable} morceau(x) illisible(s) rejeté(s)." : "."));
         }
     }
 

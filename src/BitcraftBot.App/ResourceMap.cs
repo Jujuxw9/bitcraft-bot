@@ -17,7 +17,7 @@ public sealed class ResourceMap : FrameworkElement
     public const double RadiusUnits = DataRadius + 1;
 
     // v0.4.22 : zoom ; v0.4.23 (Julien) : de 10 à 100 cases de rayon, la zone lue (30) au milieu.
-    public static readonly double[] ViewSteps = [10, 15, 20, 30, 45, 65, 100];
+    public static readonly double[] ViewSteps = [10, 15, 20, 30, 45, 65, 100, 140, 200];
     private int _zoomIndex = 3;
 
     // Rayon montré, en grandes cases (une case de marge autour du dernier palier).
@@ -45,7 +45,8 @@ public sealed class ResourceMap : FrameworkElement
         }
     }
 
-    private static readonly Brush Background = Frozen(Color.FromRgb(10, 21, 36));
+    // v0.4.27 : même couleur que les zones inconnues du fond de carte (avant : bleu nuit presque noir).
+    private static readonly Brush Background = Frozen(Color.FromRgb(0x18, 0x22, 0x2E));
     private static readonly Pen RingPen = FrozenPen(Color.FromRgb(43, 76, 112), 1);
     private static readonly Pen AxisPen = FrozenPen(Color.FromRgb(26, 51, 80), 1);
     private static readonly Brush TextBrush = Frozen(Color.FromRgb(147, 168, 191));
@@ -305,6 +306,35 @@ public sealed class ResourceMap : FrameworkElement
 
     // Dans la vue : distance au personnage recalculée (les ressources gardées ont une distance ancienne).
     private bool Visible(NearbyResource r) => _player is { } p && r.Position.ScreenDistanceTo(p) <= ViewRadius;
+
+    // v0.4.27 : texte « vue il y a N h » d'une ressource gardée en mémoire (donné par la fenêtre).
+    public Func<ulong, string?>? SeenText { get; set; }
+
+    private ulong? _hovered;
+
+    // Survol d'une ressource gardée (pâle) : son nom et depuis quand elle n'a pas été revue.
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (_player is not { } player)
+        {
+            return;
+        }
+        var at = e.GetPosition(this);
+        var near = _remembered
+            .Where(r => _shown(r) && Visible(r))
+            .Select(r => (r, d: (ToPoint(r.Position, player) - at).Length))
+            .Where(x => x.d <= 8)
+            .OrderBy(x => x.d)
+            .Select(x => x.r)
+            .FirstOrDefault();
+        if (near?.EntityId == _hovered)
+        {
+            return;
+        }
+        _hovered = near?.EntityId;
+        ToolTip = near is null ? null : $"{near.Name}{(near.Tier is { } t ? $" (T{t})" : "")} — {SeenText?.Invoke(near.EntityId) ?? "gardée en mémoire"}";
+    }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {

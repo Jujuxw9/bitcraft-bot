@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.26 : onglet Recettes retiré (les recettes ont leur site) ; images, tiers, barre de fabrication et voyageurs gardés.");
+        _log.Info("Session", "Version 0.4.27 : carte, données : zoom jusqu’à 200 cases, morceaux découverts cherchés à 230 cases, ressources vues gardées 72 h sur le disque, terrain gardé pas redemandé, zones inconnues en gris-bleu.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();
@@ -873,6 +873,8 @@ public partial class MainWindow : Window
                 _safety.RequestStop(StopReason.Manuel);
             }
             _actions.Halt("fermeture du bot");
+            // v0.4.27 : la mémoire des ressources est écrite une dernière fois avant de fermer.
+            await Task.Run(SaveResourceMemory);
             await CloseServerReaderAsync();
             _closeReady = true;
             _ = Dispatcher.BeginInvoke(Close);
