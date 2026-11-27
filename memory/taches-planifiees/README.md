@@ -40,3 +40,5 @@ Créé le 2026-11-26 (session 28) à la demande de Julien (D-067). Chaque tâche
 
 ## Nuit du 27/11/2026 (D-081)
 12 tâches, T-05 à T-16, de 01:00 à 12:00. Règles propres à cette nuit (elles priment) : [nuit-2026-11-27-regles.md](nuit-2026-11-27-regles.md). Bilan unique : [bilan-nuit-2026-11-27.md](bilan-nuit-2026-11-27.md). Fiches : [T-05](T-05-v0425-overlay-reprise.md), [T-06](T-06-v0426-sans-recettes.md), [T-07](T-07-v0427-carte-donnees.md), [T-08](T-08-v0428-carte-affichage.md), [T-09](T-09-etude-deplacement.md), [T-10](T-10-v0429-se-deplacer-ici.md), [T-11](T-11-essai-reel-en-jeu.md), [T-12](T-12-v0430-corrections-essai.md), [T-13](T-13-v0431-petits-defauts.md), [T-14](T-14-v0432-recolter-ressource.md), [T-15](T-15-controle-depot.md), [T-16](T-16-controle-memoire-bilan.md).
+
+**Résultat de la nuit** (T-16) : 11 tâches faites, v0.4.25 à v0.4.33 publiées, essai en jeu T-11 bloqué sur l'écran d'accueil (pas d'accès à l'écran en tâche planifiée, Q-028). Résumé pour Julien en tête du bilan ; reprise : [../echanges/2026-11-27-passation-nuit.md](../echanges/2026-11-27-passation-nuit.md).

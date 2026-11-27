@@ -1,6 +1,6 @@
 # Q-025 — Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion
 
-- **Statut** : Résolue → D-052, D-056 (2026-11-23) ; à essayer : la touche Interact (M)
+- **Statut** : Résolue → D-052, D-056 (2026-11-23) ; touche Interact (M) utilisée par la reprise des récoltes depuis la v0.4.24 (Julien, 27/11 : M = clic sur l'élément survolé)
 - **Priorité** : Haute
 - **Créée le** : 2026-11-22
 - **Liens** : D-050, D-049, D-024, analyse `technique/hybride/analyse-visee-2026-11-22.md`
@@ -27,3 +27,4 @@ Une visée fiable a besoin de connaître la direction de la caméra (Q3), et de 
 ## Réponses de Julien (2026-11-23, 23:00) : question résolue
 - **Point 1** : le panneau du haut (nom, santé) change **seulement après le clic**, pas au survol. Avant de cliquer, seul le contour vert montre la cible.
 - **Point 2, suite** : Julien a donné la touche **M** à « Interact » (case vide avant). À essayer : que fait Interact (ressource la plus proche ? cible actuelle ?) — **À vérifier**. M n'est pas encore dans les touches autorisées du bot (D-045).
+- **Réglé (27/11)** : M = clic sur l'élément **survolé** par la souris (contour vert), constaté par Julien sur l'essai v0.4.24 ; M est permise et utilisée par la reprise des récoltes (D-080, D-082).

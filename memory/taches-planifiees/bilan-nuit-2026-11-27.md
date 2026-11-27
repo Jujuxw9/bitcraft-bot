@@ -3,7 +3,68 @@
 Fichier unique, rempli par chaque tâche à la fin de son passage (règles : `nuit-2026-11-27-regles.md`). Julien le lit au réveil ; T-16 le résume en tête.
 
 ## Résumé pour Julien (écrit par T-16)
-_À remplir par T-16._
+
+**En bref** : 11 tâches sur 12 ont fait leur travail. 9 versions sorties (v0.4.25 à v0.4.33). Tout passe les tests (756/756) et chaque version a démarré sans erreur, **jeu fermé**. Mais **rien n'a pu être essayé dans le jeu** : l'essai de 07:00 (T-11) est resté bloqué sur l'écran d'accueil du jeu.
+
+### Quelle version lancer
+`artifacts\release\BitcraftBot-v0.4.33.exe` (la dernière, elle contient tout).
+
+### Ce qui a été fait cette nuit
+- **v0.4.25** : reprise des récoltes à la souris. Le bot pose la souris sur ton dernier clic, puis M. Plus de Tab. Overlay plus étroit.
+- **v0.4.26** : onglet RECETTES retiré (il vit sur le site). Le reste est gardé.
+- **v0.4.27** : carte jusqu'à 200 cases. Les zones noires venaient de morceaux jamais demandés : corrigé. Ressources vues gardées 72 h.
+- **v0.4.28** : carte grande, tableau plus étroit, pas de gel à 200 cases.
+- **v0.4.29 et v0.4.30** : clic droit sur la carte du bot → « **Se déplacer ici** » (30 cases au plus, sans escalade ni nage). Chariot et bateau interdits. Vie qui baisse = Sprint et fuite. À terre = Get Up seulement.
+- **v0.4.31** : la cible en haut de l'écran est de nouveau lue. Barre de fabrication jusqu'à 100 %. Conseil si tu mines ou pêches sans capacités.
+- **v0.4.32** : clic droit sur une ressource → « **Aller à cette ressource** » ou « **Récolter jusqu'à épuisement** ». Tu donnes le premier coup, le bot continue.
+- **v0.4.33** : contrôle du code, aucun changement de comportement.
+- T-09 : étude écrite du déplacement. T-16 : contrôle de la mémoire et ce résumé.
+
+### Ce qui n'a pas marché
+- **T-11 (essai en jeu)** : le bot a lancé le jeu, mais le jeu attend « Press any button » puis « Enter BitCraft ». Une tâche planifiée n'a pas le droit de cliquer à l'écran, et le bot ne fait pas ces clics (règle D-052). Jeu ouvert 40 s, refermé. Ton personnage n'a pas bougé.
+- Donc **le déplacement, la cible, la reprise à la souris n'ont jamais été vus dans le vrai jeu.** Les premiers essais seront avec toi.
+
+### À essayer, dans l'ordre (avec la v0.4.33)
+1. Entrer en jeu, terrain plat, **sans ennemi proche**. Onglet CARTE : clic droit sur une case à 5-10 cases → « Se déplacer ici ». Puis **Alt + Tab** vers le jeu et ne plus toucher souris ni clavier. Le personnage doit y aller. Si la grande carte du jeu reste ouverte : la refermer avec la même touche.
+2. Clic droit sur un arbre à 5-15 cases → « Récolter jusqu'à épuisement », Alt + Tab. À l'arrivée, **un clic sur l'arbre**. Laisser l'endurance tomber : le bot doit relancer jusqu'à ce que l'arbre soit épuisé.
+3. Couper un gros arbre toi-même, **souris immobile après ton clic**, endurance à 0 deux fois : la reprise doit relancer seule.
+4. Regarder la cible en haut de l'écran (onglet CARTE, « Cible écran »).
+5. Une petite fabrication : la barre doit finir à 100 % (« terminée »).
+6. Dézoomer la carte jusqu'à 200 près de Keldan : plus de noir là où tu es passé, pas de gel.
+7. Miner 1 min sans Heavy Swings : une ligne « [Conseil] » à la fin.
+8. Regarder l'overlay (plus étroit) et les onglets PERSONNAGE et VOYAGEURS (images, tiers).
+Après chaque essai, Claude lit le journal (`artifacts/release/journaux/v0.4.33/`).
+
+### Toutes tes questions (regroupées)
+**Déplacement** (fiche Q-029) :
+1. Touche de la grande carte : « . » du pavé numérique, ou Maj + « ; » ?
+2. Après une fuite : reprendre le trajet seul, ou s'arrêter ? (aujourd'hui : s'arrêter)
+3. Eau peu profonde (1 à 4) permise ?
+4. 30 cases au plus pour commencer : d'accord ?
+5. Après un Get Up : aller ramasser le cargo tombé, ou s'arrêter ? (aujourd'hui : s'arrêter)
+6. Interrupteur « Déplacements » allumé d'office : d'accord ?
+7. Départ : attendre ton Alt + Tab (20 s), ou le bot met lui-même le jeu devant ?
+8. Arrêt à 2 cases de la ressource : assez près pour les gros arbres ? Premier coup automatique, à essayer ensemble ? Allumer la reprise des récoltes d'office pour « Récolter jusqu'à épuisement » ?
+
+**Démarrage du jeu** (fiche Q-028) :
+9. Le bot peut-il faire seul les 2 clics de démarrage (accueil, « Enter BitCraft ») quand c'est lui qui a lancé le jeu ? Sinon : permettre l'écran du jeu aux tâches planifiées ?
+
+**Reprise des récoltes** :
+10. La souris qui se pose seule sur l'arbre te gêne-t-elle ?
+11. Si le contour vert est bien mesuré : en faire une condition (pas de M sans contour) ?
+
+**Carte** :
+12. Le gris-bleu des zones inconnues te va ?
+13. À 100 cases, des carrés plus sombres alignés : tu les vois aussi ?
+14. Carte limitée par la hauteur : ça te va, ou réduire la bande des filtres ?
+15. Essayer ensemble de ne lire les colonies et banques qu'une fois (≈ 360 Ko de moins à chaque relecture) ?
+
+**Conseil en fin de récolte** :
+16. Conseil aussi pour le bois (Hewing Strikes) ? Durée minimale de 20 s : ça te va ?
+
+### Quota de la nuit (abonnement Pro)
+- Premier relevé (00:50) : 5 h 7 %, semaine 29 %. Dernier relevé (T-16, 12:01) : 5 h 7 %, semaine 41 %.
+- La nuit a pris **environ 12 points de la semaine**. La limite de 5 h n'a jamais dépassé 50 % (plus haut : 50 % à 05:04). Aucune tâche arrêtée pour le quota.
 
 ## Point de départ (session principale, 27/11 vers 00:50)
 - Dernière version : **v0.4.24** (D-080), publiée, tests 640/640.
@@ -139,3 +200,13 @@ _À remplir par T-16._
 - À essayer par Julien : rien de nouveau (v0.4.33 = v0.4.32 + textes et tests) ; la bulle d'aide de « Reprise des récoltes » dans OPTIONS.
 - Questions pour Julien : aucune nouvelle.
 - Consignes pour les tâches suivantes : **T-16** : tests 756 ; README racine et `tests/README.md` à jour ; aucune décision nouvelle (pas de D-NNN). Prochaine version libre : **v0.4.34**.
+
+## T-16 — contrôle de la mémoire, bilan final, phrase de reprise (pas de version)
+- Début / fin : 12:00 / 12:05 · quota début : 5 h 7 %, semaine 41 % · fin : 5 h 11 %, semaine 41 %
+- Fait : vérificateur de la mémoire lancé (0 erreur ; 1 attention : `echanges/2026-11-15-prompt-init-repo.md` 304 lignes, archive, laissé tel quel). Corrigé : **lignes d'index rangées hors des tableaux** (26 décisions D-064 à D-089, 17 lignes du journal, Q-028 étaient écrites après le gabarit, donc hors tableau) ; `memory/README.md` (D-001 à D-089, Q-001 à Q-029, fichiers de la nuit, étude du déplacement, contrôle du dépôt, nouvelle passation ; essai v0.4.4 et passation 29 marqués dépassés) ; Q-015 et Q-025 mises à jour (détection des fenêtres codée en v0.4.5 ; Interact = M utilisée) ; demande de déplacement marquée « faite, pas essayée en jeu ». **Q-029 ouverte** (réglages du déplacement, 8 points de T-09 à T-14 regroupés). `resume-global.md` réécrit (10 lignes). Résumé pour Julien en tête de ce bilan. Passation `echanges/2026-11-27-passation-nuit.md`. Mémoire automatique de Claude vérifiée (une leçon ajoutée : pas d'accès à l'écran en tâche planifiée).
+- Testé (comment) : vérificateur à 0 erreur après les corrections ; liens relus.
+- Pas fait / reporté : aucun code, aucune version (fiche). Pas de découpage du fichier de 304 lignes (archive, Julien accepte un peu plus).
+- Problèmes rencontrés : aucun.
+- À essayer par Julien : voir le résumé en tête.
+- Questions pour Julien : toutes regroupées dans le résumé en tête.
+- Consignes pour la suite : reprendre par la phrase de `echanges/2026-11-27-passation-nuit.md`. Prochaine version libre : **v0.4.34**. Prochaine décision : D-090 ; prochaine question : Q-030.

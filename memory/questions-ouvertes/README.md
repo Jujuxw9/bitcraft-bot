@@ -16,7 +16,7 @@
 | [Q-012](Q-012-purge-captures-historique.md) | Effacer les captures déjà poussées de l'historique Git ? | Basse | Résolue (non) |
 | [Q-013](Q-013-ecorce-ou-troncs.md) | Quel « bois » ramener : écorce, troncs, ou les deux ? | Haute | Résolue → D-027 |
 | [Q-014](Q-014-ennemis-et-danger.md) | Ennemis et danger de mort | Haute | Résolue → D-072 |
-| [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Haute | En partie résolue → D-052 (détection à coder) |
+| [Q-015](Q-015-fenetres-du-jeu.md) | Gérer les fenêtres internes du jeu | Haute | Résolue → D-052 (détection codée en v0.4.5) |
 | [Q-016](Q-016-lecture-coordonnees.md) | Meilleur moyen de lire les coordonnées | Haute | Résolue (modèles de chiffres, T-20261116-04 OK) |
 | [Q-017](Q-017-mode-test-mouvements.md) | Mode test : mouvements « humains » souris et caméra | Moyenne | Résolue → D-035 |
 | [Q-018](Q-018-notifications-ecran.md) | Notifications à l'écran qui masquent le HUD | Moyenne | En partie traitée (montée de niveau, v0.3.4) |
@@ -26,9 +26,11 @@
 | [Q-022](Q-022-touche-urgence-hors-jeu.md) | Num 5 doit-elle arrêter le bot quand on tape ailleurs ? | Moyenne | Résolue → D-041 |
 | [Q-023](Q-023-recolte-automatique.md) | Récolte automatique : arbre ou roche, vieux arbres, zoom, écoute des clics | Haute | Résolue → D-049 |
 | [Q-024](Q-024-camera-boutons.md) | Caméra : bouton du milieu, retour de W, molette | Moyenne | Résolue → D-050 |
-| [Q-025](Q-025-visee-fiable.md) | Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion | Haute | Résolue → D-052, D-056 (à essayer : Interact = M) |
+| [Q-025](Q-025-visee-fiable.md) | Visée fiable : survol, touche d'interaction, cône de la mini-carte, écrans d'accueil et de connexion | Haute | Résolue → D-052, D-056 (Interact = M, utilisé par la reprise des récoltes depuis v0.4.24) |
 | [Q-026](Q-026-reglages-du-jeu.md) | Changer 4 réglages du jeu pour fiabiliser la visée (collision et adoucissement de la caméra, coffres, herbe) ? | Haute | Résolue → D-056 |
 | [Q-027](Q-027-chat-gpt.md) | Module « @GPT » : le bot répond dans le chat (lever l'interdiction d'Entrée de D-024, qui, où, ton, fréquence, clé API) ? | Basse | Résolue → D-054, D-055 |
+| [Q-028](Q-028-clics-demarrage-jeu.md) | Le bot peut-il faire seul les deux clics de démarrage du jeu (accueil, « Enter BitCraft ») quand il a lancé le jeu ? (exception à D-052) | Moyenne | Ouverte |
+| [Q-029](Q-029-reglages-deplacement.md) | Réglages du déplacement automatique : touche de la carte, reprise après fuite, eau peu profonde, 30 cases, cargo après Get Up, interrupteur, Alt + Tab, 2 cases et premier coup | Haute | Ouverte |
 
 ## Gabarit
 
@@ -41,4 +43,3 @@
 ## Pistes / options
 ## Ce qui bloque
 ```
-| [Q-028](Q-028-clics-demarrage-jeu.md) | Le bot peut-il faire seul les deux clics de démarrage du jeu (accueil, « Enter BitCraft ») quand il a lancé le jeu ? (exception à D-052) | Moyenne | Ouverte |

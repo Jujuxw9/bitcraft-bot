@@ -67,22 +67,6 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-061](D-061-v0410-chat-plafonds-pause-amis-infos-onglet.md) | v0.4.10 : plafonds, pause quand Julien écrit, amis et liste noire, ton selon canal et heure, infos du jeu, onglet CHAT | Validée |
 | [D-062](D-062-v0412-recettes-simples-voyageurs-listes.md) | v0.4.12 : recettes simples sans paquets, plan d'actions, voyageurs en trois listes, interrupteurs | Validée |
 | [D-063](D-063-v0413-ecran-epure-recettes-images-claims.md) | v0.4.13 : écrans épurés, arbre de recettes en rectangles, images en local, overlay déplacé, colonies lues | Validée |
-
-## Gabarit
-
-```markdown
-# D-NNN — Titre
-
-- **Statut** : Validée | Proposée | Remplacée par D-NNN
-- **Date** : AAAA-MM-JJ
-- **Validée par** : Julien
-- **Liens** : Q-NNN, D-NNN
-
-## Contexte
-## Décision
-## Alternatives écartées
-## Conséquences
-```
 | [D-064](D-064-plan-lots-v0414-v0416-site-recettes.md) | Plan : v0.4.14 fenêtre, v0.4.15 archive du chat, v0.4.16 capacités ; overlay sans touche ; site des recettes sur Unraid, même dépôt | Validée | 2026-11-25 |
 | [D-065](D-065-v0414-fenetre-barres-parametres-overlay.md) | v0.4.14 : barres animées, PERSONNAGE (Où au survol), curseur main, filtre par palier, PARAMÈTRES refait, overlay en bas, touche tenue | Validée | 2026-11-25 |
 | [D-066](D-066-v0415-demarrage-sequence-voyageurs-personnage.md) | v0.4.15 : démarrage en séquence (serveur → écran → jeu par Steam), voyageurs, personnage, overlay ; suite en tâches planifiées | Validée | 2026-11-26 |
@@ -109,3 +93,19 @@ Gabarit : voir [memory/README.md](../README.md) et le modèle ci-dessous.
 | [D-087](D-087-v0430-corrections-deplacement.md) | v0.4.30 : « Se déplacer ici » corrigé après relecture : attente du retour sur le jeu (Alt + Tab, 20 s), carte lente mieux attendue, touche de la carte jamais rappuyée pour rien ; clics de démarrage pas codés (Q-028) | Validée | 2026-11-27 |
 | [D-088](D-088-v0431-petits-defauts.md) | v0.4.31 : cible de nouveau lue (panneau sombre du jeu depuis le 23/11), barre de fabrication jusqu’à 100 %, conseil `[Conseil]` en fin de pêche / minage sans capacités | Validée | 2026-11-27 |
 | [D-089](D-089-v0432-recolter-ressource.md) | v0.4.32 : « Aller à cette ressource » / « Récolter jusqu’à épuisement » (carte, tableau, bouton « Y aller… ») ; case voisine à 2 cases ; premier coup laissé à Julien, puis reprise des récoltes jusqu’à épuisement ; fuite si la vie baisse | Validée | 2026-11-27 |
+
+## Gabarit
+
+```markdown
+# D-NNN — Titre
+
+- **Statut** : Validée | Proposée | Remplacée par D-NNN
+- **Date** : AAAA-MM-JJ
+- **Validée par** : Julien
+- **Liens** : Q-NNN, D-NNN
+
+## Contexte
+## Décision
+## Alternatives écartées
+## Conséquences
+```

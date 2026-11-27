@@ -34,10 +34,10 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [regles-et-risques.md](00-contexte/regles-et-risques.md) — règles BitCraft, risque accepté, interdits du projet
 
 ### decisions/
-- [README.md](decisions/README.md) — tableau D-001 à D-078
+- [README.md](decisions/README.md) — tableau D-001 à D-089
 
 ### questions-ouvertes/
-- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-027
+- [README.md](questions-ouvertes/README.md) — tableau Q-001 à Q-029
 
 ### journal/
 - [README.md](journal/README.md) — liste des sessions
@@ -64,7 +64,7 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-19-essai-v040.md](echanges/2026-11-19-essai-v040.md) — essai v0.4.0 (fait le 22/11 : formule de la caméra pas fiable, voir l'analyse de la visée)
 - [2026-11-22-essai-v041.md](echanges/2026-11-22-essai-v041.md) — essai v0.4.2 (fait le 22/11 : connexion pas reconnue, lectures de texte en même temps → v0.4.3)
 - [2026-11-23-essai-v043.md](echanges/2026-11-23-essai-v043.md) — essai v0.4.3 (fait le 23/11 : fenêtres OK, cône figé après W, 20 « écran inconnu » en chasse)
-- [2026-11-23-essai-v044.md](echanges/2026-11-23-essai-v044.md) — **essai v0.4.4 à faire** (sprint, barre d'action, sacs au sol, contrôle après W)
+- [2026-11-23-essai-v044.md](echanges/2026-11-23-essai-v044.md) — essai v0.4.4 (archive, version dépassée) (sprint, barre d'action, sacs au sol, contrôle après W)
 - [2026-11-23-passation-v044.md](echanges/2026-11-23-passation-v044.md) — **passation** : prompt pour le prochain chat (après la v0.4.4)
 - [2026-11-23-passation-v045.md](echanges/2026-11-23-passation-v045.md) — **passation** après la v0.4.5 (module « @GPT » branché, envoi réel ; chat ouvert reconnu ; prochaines étapes).
 - [2026-11-23-passation-v046.md](echanges/2026-11-23-passation-v046.md) — **passation** après la v0.4.6 (recettes en logigramme ; chat qui marche ; W à revoir ; prochaines étapes).
@@ -76,7 +76,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [2026-11-26-methode-site-recettes.md](echanges/2026-11-26-methode-site-recettes.md) — **site des recettes** : méthode proposée (cadrage, données du bot, site statique, maquette d'abord), réponses de Julien du 26/11 00:34.
 - [2026-11-26-prompt-site-recettes.md](echanges/2026-11-26-prompt-site-recettes.md) — **prompt de la session « site des recettes »** (à coller dans un nouveau chat) : contexte, méthode, questions de départ, règles.
 - [2026-11-26-demande-deplacement-carte.md](echanges/2026-11-26-demande-deplacement-carte.md) — **demande de Julien (plus tard)** : clic droit sur la carte du bot, « Se déplacer ici » ou « Aller à cette ressource », chemin sans escalade.
-- [2026-11-26-passation-session-29.md](echanges/2026-11-26-passation-session-29.md) — **passation de la session 29** (à lire pour reprendre) : phrase de reprise, v0.4.19 à v0.4.22, questions en attente (Riverwood, essai v0.4.22), plus tard.
+- [2026-11-26-passation-session-29.md](echanges/2026-11-26-passation-session-29.md) — passation de la session 29 (traitée ; remplacée par la passation de la nuit du 27/11) : phrase de reprise, v0.4.19 à v0.4.22, questions en attente (Riverwood, essai v0.4.22), plus tard.
+- [2026-11-27-passation-nuit.md](echanges/2026-11-27-passation-nuit.md) — **passation après la nuit du 27/11** (à lire pour reprendre) : phrase de reprise, v0.4.25 à v0.4.33, essais à faire avec Julien, questions.
 - [2026-11-24-prompt-session-taches.md](echanges/2026-11-24-prompt-session-taches.md) — **prompt** de la session « tâches » (Sonnet, quota réduit : onglet Voyageurs, bugs Recettes, tâches au fil de l'eau).
 - [2026-11-24-reprise-apres-compact.md](echanges/2026-11-24-reprise-apres-compact.md) — phrase de reprise après le /compact de la session « tâches » et état de la v0.4.13.
 
@@ -84,6 +85,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 - [README.md](technique/README.md) — index
 - [architecture.md](technique/architecture.md) — architecture logicielle cible ; suite : [architecture-suite.md](technique/architecture-suite.md) (sections 18 et suivantes, **nouvelles versions ici**)
 - [capacites.md](technique/capacites.md) — capacités de la barre d'action (v0.4.17)
+- [deplacement-etude.md](technique/deplacement-etude.md) — étude du déplacement automatique (T-09, 27/11)
+- [controle-depot-2026-11-27.md](technique/controle-depot-2026-11-27.md) — contrôle complet du dépôt (T-15, v0.4.33)
 - [analyse-carte-bitjita-2026-11-26.md](technique/analyse-carte-bitjita-2026-11-26.md) — analyse de la carte de bitjita.com
 - [analyse-bitcraftpublic.md](technique/analyse-bitcraftpublic.md) — analyse du code serveur
 - [sources.md](technique/sources.md) — liens analysés
@@ -100,7 +103,8 @@ Règle de découpage : dès qu'un fichier dépasse ~300 lignes ou mélange plusi
 ### taches-planifiees/
 - [README.md](taches-planifiees/README.md) — **règles communes** des tâches planifiées, heures, prompts
 - [etat.md](taches-planifiees/etat.md) — état de chaque tâche (démarrée, finie, questions pour Julien)
-- [T-01-v0416-archive-chat.md](taches-planifiees/T-01-v0416-archive-chat.md), [T-02-v0417-capacites.md](taches-planifiees/T-02-v0417-capacites.md), [T-03-v0418-carte.md](taches-planifiees/T-03-v0418-carte.md), [T-04-verification-memoire.md](taches-planifiees/T-04-verification-memoire.md) — prompts des quatre tâches (T-04 : vérification de la mémoire en lecture seule)
+- [T-01-v0416-archive-chat.md](taches-planifiees/T-01-v0416-archive-chat.md), [T-02-v0417-capacites.md](taches-planifiees/T-02-v0417-capacites.md), [T-03-v0418-carte.md](taches-planifiees/T-03-v0418-carte.md), [T-04-verification-memoire.md](taches-planifiees/T-04-verification-memoire.md) — prompts des quatre tâches du 26/11 (T-04 : vérification de la mémoire en lecture seule)
+- [nuit-2026-11-27-regles.md](taches-planifiees/nuit-2026-11-27-regles.md), [bilan-nuit-2026-11-27.md](taches-planifiees/bilan-nuit-2026-11-27.md) — nuit du 27/11 (T-05 à T-16, D-081) : règles communes et **bilan de la nuit** (résumé pour Julien en tête) ; fiches `T-05` à `T-16` dans le même dossier
 
 ### tests/
 - [README.md](tests/README.md) — tableau des tests (T-20261116-01 à T-20261123-02 ; ensuite : résultats dans les journaux et `taches-planifiees/etat.md`)

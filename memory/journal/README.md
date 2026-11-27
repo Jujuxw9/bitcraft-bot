@@ -31,23 +31,6 @@
 | [25](2026-11-24-session-25-taches-voyageurs.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.11 : onglet Voyageurs (tâches comparées au stock), onglets PERSONNAGE et CARTE réparés |
 | [26](2026-11-24-session-26-taches-v0412.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.12 : recettes simples et plan d'actions, voyageurs en trois listes, listes triables, interrupteurs, Paramètres compactés ; D-062 |
 | [27](2026-11-24-session-27-taches-v0413.md) | 2026-11-24 | Claude Code (session tâches) | v0.4.13 : écrans épurés, arbre de recettes en rectangles, toutes les images en local, overlay au-dessus de la barre d'action, colonies lues ; D-063 |
-
-Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
-
-## Gabarit
-
-```markdown
-# Session NN — AAAA-MM-JJ — Sujet
-
-- **Agent** : Claude (chat) | Claude Code | autre
-- **Durée / poste** : …
-
-## Objectif
-## Réalisé
-## Décisions prises (liens D-NNN)
-## Questions ouvertes créées (liens Q-NNN)
-## Prochaines étapes
-```
 | [28](2026-11-25-session-28-opus-v0414.md) | 2026-11-25 | Claude Code (Opus 5.5) | Bilan des journaux, plan (D-064), v0.4.14 fenêtre (D-065), v0.4.15 démarrage en séquence, voyageurs, personnage (D-066), analyse de bitjita, tâches planifiées (D-067), passation |
 | [29](2026-11-26-session-29-reprise-site-recettes.md) | 2026-11-26 | Claude Code (Opus 5.5) | Reprise, bilan des tâches T-01 à T-04, prompt du site des recettes, v0.4.19 (requêtes par morceau, D-071), v0.4.20 (hexagones, D-073), v0.4.21 (25 cases, Release, D-075) |
 | [T-01](2026-11-26-tache-T01-v0416-archive-chat.md) | 2026-11-26 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.16 : archive du chat en local (SQLite), messages privés à la découverte, onglet CHAT avec tableau, recherche, filtre ; D-068 |
@@ -65,3 +48,21 @@ Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
 | [T-13](2026-11-27-tache-T13-v0431-petits-defauts.md) | 2026-11-27 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.31 : cible de nouveau lue (panneau sombre du jeu depuis le 23/11), barre de fabrication jusqu’à 100 %, conseil `[Conseil]` en fin de pêche / minage sans capacités ; D-088 |
 | [T-14](2026-11-27-tache-T14-v0432-recolter-ressource.md) | 2026-11-27 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.32 : « Aller à cette ressource » / « Récolter jusqu’à épuisement » (case voisine, premier coup laissé à Julien, reprise jusqu’à épuisement, fuite) ; D-089 |
 | [T-15](2026-11-27-tache-T15-controle-depot.md) | 2026-11-27 | Claude Code (Opus 5.5, tâche planifiée) | v0.4.33 : contrôle du dépôt (mise en forme, textes d’aide corrigés, 14 tests, README et `tests/README.md`), aucun changement de comportement ; rapport `technique/controle-depot-2026-11-27.md` |
+| [T-16](2026-11-27-tache-T16-controle-memoire-bilan.md) | 2026-11-27 | Claude Code (Opus 5.5, tâche planifiée) | Contrôle de la mémoire (index réparés, Q-029 ouverte), résumé du bilan de la nuit pour Julien, passation `echanges/2026-11-27-passation-nuit.md` |
+
+Nommage : `AAAA-MM-JJ-session-NN-sujet.md`.
+
+## Gabarit
+
+```markdown
+# Session NN — AAAA-MM-JJ — Sujet
+
+- **Agent** : Claude (chat) | Claude Code | autre
+- **Durée / poste** : …
+
+## Objectif
+## Réalisé
+## Décisions prises (liens D-NNN)
+## Questions ouvertes créées (liens Q-NNN)
+## Prochaines étapes
+```
