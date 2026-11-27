@@ -41,3 +41,4 @@
 ## Pistes / options
 ## Ce qui bloque
 ```
+| [Q-028](Q-028-clics-demarrage-jeu.md) | Le bot peut-il faire seul les deux clics de démarrage du jeu (accueil, « Enter BitCraft ») quand il a lancé le jeu ? (exception à D-052) | Moyenne | Ouverte |

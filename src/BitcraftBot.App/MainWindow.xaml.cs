@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.29 : « Se déplacer ici » : clic droit sur la carte du bot, le bot ouvre la grande carte du jeu, vise la case (barre du bas lue) et clique (Set destination) ; 30 cases au plus, sans escalade ni nage ; touches du chariot et du bateau interdites ; vie qui baisse = Sprint et fuite ; à terre = Get Up seulement ; interrupteur « Déplacements » dans OPTIONS ; mode d’essai --essai-deplacement.");
+        _log.Info("Session", "Version 0.4.30 : « Se déplacer ici » corrigé après relecture : le bot attend que vous repassiez sur le jeu (Alt + Tab, 20 s au plus) avant d’ouvrir la carte ; carte lente à s’ouvrir ou à se fermer mieux attendue ; touche de la carte jamais rappuyée si rien ne s’est ouvert.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

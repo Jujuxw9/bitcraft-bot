@@ -163,6 +163,19 @@ public partial class MainWindow
         {
             var start = _lastSnapshot!.Position!.Value;
             _log.Info(TravelLog, $"{(flee ? "Fuite" : "Déplacement")} vers N {north:0}, E {east:0} depuis {start.ScreenText} ({check.Detail}).");
+            // v0.4.30 (T-12) : le clic du menu laisse le bot au premier plan ; attendre le retour sur le jeu (20 s au plus).
+            if (_actions.WhyNot() is { } notYet)
+            {
+                _log.Info(TravelLog, $"En attente avant d'ouvrir la carte : {notYet}. Repassez sur le jeu (Alt + Tab, sans cliquer dedans) puis lâchez souris et clavier ; 20 s au plus.");
+                TravelStatusText.Text = "Repassez sur le jeu (Alt + Tab), puis ne touchez plus à rien…";
+                if (await ActionReadiness.WaitAsync(_actions.WhyNot, TimeSpan.FromSeconds(20), TimeSpan.FromMilliseconds(500), () => _travelStop) is { } still)
+                {
+                    _log.Info(TravelLog, $"Déplacement abandonné avant tout geste : {still}.");
+                    TravelStatusText.Text = $"Pas parti : {still}.";
+                    return false;
+                }
+                _log.Detail(TravelLog, "Jeu prêt : début du geste.");
+            }
             TravelStatusText.Text = $"En route vers N {north:0}, E {east:0}…";
             for (var attempt = 1; attempt <= 2; attempt++)
             {
@@ -267,8 +280,7 @@ public partial class MainWindow
         new(c.X + 40, c.Y + 40, c.X + (int)(c.Width * 0.80), c.Y + (int)(c.Height * 0.88));
 
     // Zone de la barre du bas de la carte, en pixels de l'image du jeu (mesurée sur la capture du 16/11 : x 30-69 %, y 91-97,5 %).
-    private static ScreenRect MapBarZone(Frame f) =>
-        new((int)(f.Width * 0.30), (int)(f.Height * 0.91), (int)(f.Width * 0.39), (int)(f.Height * 0.065));
+    private static ScreenRect MapBarZone(Frame f) => WorldMapZones.BarZone(f);
 
     private async Task<string?> ReadBarTextAsync()
     {
@@ -284,7 +296,7 @@ public partial class MainWindow
         foreach (var threshold in new[] { 140, 110, 170 })
         {
             var text = await _ocr.ReadAsync(frame, MapBarZone(frame), TextStyle.DarkText, threshold);
-            if (MapScale.ParseBar(text) is not null || text.Contains("destination", StringComparison.OrdinalIgnoreCase))
+            if (MapScale.ParseBar(text) is not null || WorldMapZones.SaysSetDestination(text))
             {
                 return text;
             }
@@ -305,12 +317,29 @@ public partial class MainWindow
             _log.Info(TravelLog, $"Arrêt : carte pas ouverte ({pressed.Detail}).");
             return null;
         }
-        await Task.Delay(600);
-        var text = await ReadBarTextAsync();
-        if (text is null || !text.Contains("destination", StringComparison.OrdinalIgnoreCase))
+        // v0.4.30 (T-12) : la carte peut s'ouvrir lentement : trois lectures (0,6 s, 1 s, 1,4 s).
+        string? text = null;
+        for (var i = 0; i < 3 && !WorldMapZones.SaysSetDestination(text); i++)
         {
-            _log.Alerte(TravelLog, $"Carte non ouverte (barre lue : « {text} ») : même touche pour refermer une éventuelle fenêtre.");
-            await CloseMapAsync(key, false);
+            await Task.Delay(i == 0 ? 600 : 400);
+            text = await ReadBarTextAsync();
+        }
+        if (!WorldMapZones.SaysSetDestination(text))
+        {
+            var frame = await Task.Run(CaptureGameNow);
+            var seen = frame is not null && GameWindows.IsWorldMap(frame);
+            if (WorldMapZones.AfterKey(text, seen) == MapOpenOutcome.ARefermer)
+            {
+                _log.Alerte(TravelLog, $"Carte vue mais barre illisible (« {text} ») : même touche pour la refermer.");
+                await SaveTravelCaptureAsync("carte-barre-illisible");
+                await CloseMapAsync(key, false);
+            }
+            else
+            {
+                // Rien d'ouvert : ne pas rappuyer (un second appui ouvrirait la carte pour rien).
+                _travelMapAllowedUntil = DateTime.MinValue;
+                _log.Alerte(TravelLog, $"Carte non ouverte par la touche 0x{key:X2} (barre lue : « {text} ») : rien rappuyé.");
+            }
             return null;
         }
         _log.Detail(TravelLog, $"Carte ouverte, barre : « {text} ».");
@@ -320,9 +349,14 @@ public partial class MainWindow
     private async Task CloseMapAsync(ushort key, bool afterClick)
     {
         var pressed = await ActAsync(() => _actions.PressAsync("Déplacement : fermer la carte", key));
+        // v0.4.30 (T-12) : la carte peut mettre un peu de temps à disparaître : trois regards (0,5 s, 1 s, 1,5 s) avant l'alerte.
         await Task.Delay(500);
-        var frame = await Task.Run(CaptureGameNow);
-        var stillOpen = frame is not null && GameWindows.IsWorldMap(frame);
+        var closed = pressed.Done && await ActionReadiness.UntilAsync(async () =>
+        {
+            var frame = await Task.Run(CaptureGameNow);
+            return frame is null || !GameWindows.IsWorldMap(frame);
+        }, 3, TimeSpan.FromMilliseconds(500));
+        var stillOpen = pressed.Done && !closed;
         if (!pressed.Done || stillOpen)
         {
             _actions.Halt("grande carte du jeu peut-être restée ouverte : vérifier le jeu");

@@ -129,3 +129,10 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `MainWindow.Actions.cs` : la grande carte ouverte par le bot (`_travelMapAllowedUntil`) ne bloque pas ses propres gestes (D-052 garde toutes les autres fenêtres).
 - `LocalSettings` : `TravelEnabled` (vrai), `MapKeyScanCode` (0x34). OPTIONS : interrupteur « Déplacements ».
 - Zones de l'écran (mesurées sur `images/analyse/20261116_analyse_carte-monde_001.png`) : barre du bas x 30-69 %, y 91-97,5 % ; souris permise x de 40 px à 80 %, y de 40 px à 88 % (hors « Map Options », boussole, barre).
+
+## 34. v0.4.30 : corrections de « Se déplacer ici » (D-087)
+
+- `Perception/Screen/WorldMapZones.cs` : zone de la barre de la grande carte (`BarZone`, déplacée depuis `MainWindow.Travel.cs`), `SaysSetDestination`, `AfterKey` (carte ouverte / à refermer / rien d'ouvert : ne rien rappuyer).
+- `Input/Actions/ActionReadiness.cs` : `WaitAsync` (attend que le contrôleur permette les actions, 20 s au plus pour le trajet ; s'arrête tout de suite si les actions sont bloquées ou le jeu introuvable, ou sur demande d'arrêt) ; `UntilAsync` (vérification répétée, pour la carte qui se referme).
+- `App/MainWindow.Travel.cs` : `TravelToAsync` attend le retour sur le jeu avant le premier geste (le clic du menu laisse le bot au premier plan) ; `OpenMapAsync` lit la barre trois fois et ne rappuie que si la carte est vue ; `CloseMapAsync` regarde trois fois avant l'alerte.
+- Tests : `V0430Tests` (barre lue par OCR sur `images/reference-ui/fenetres/carte-du-monde_001.png`, attente du premier plan avec un faux clavier, limites de l'attente, fermeture lente).
