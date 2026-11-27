@@ -14,3 +14,4 @@
 - [capacites.md](capacites.md) — capacités de la barre d'action : métier, endurance, recharge, effet, choix par défaut du bot (v0.4.17, D-069)
 - [raccourcis-du-jeu.md](raccourcis-du-jeu.md) — touches du jeu (Maj + E pour manger, souris, clavier AZERTY) et touches du bot
 - [analyse-carte-bitjita-2026-11-26.md](analyse-carte-bitjita-2026-11-26.md) — analyse de la carte de bitjita.com (tuiles de terrain, densité par palier, entités) et faisabilité pour la v0.4.18
+- [deplacement-etude.md](deplacement-etude.md) — étude du déplacement automatique (T-09, 27/11) : clic sur la grande carte (calibration par la barre des coordonnées), vérification, relief (escalade dès 5 de hauteur, nage dès 5 d'eau), ennemis, Get Up, sécurité, mode d'essai, plan pour T-10
