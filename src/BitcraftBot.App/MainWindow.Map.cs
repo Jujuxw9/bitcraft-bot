@@ -154,11 +154,17 @@ public partial class MainWindow
                 ? $"« {targetName} » {ResourceRow.FormatHealth(target.Health, target.MaxHealth)} : introuvable à moins de {ScreenTargetMatcher.MaxDistance:0} cases"
                 : $"{Describe(match.Resource)}{(match.Sure ? " — c'est bien elle (même santé)" : " — probable (même nom)")}";
         // La zone est relue quand le personnage s'éloigne de la moitié du rayon (20 petites cases ≈ 7 cases du jeu).
+        // v0.4.28 : texte court ; le détail (centre, fond de carte) au survol.
         SrvArea.Text = reader.ResourceArea is { } a && reader.ResourceAreaUpdated is { } at
-            ? $"centre {new ServerPosition(a.CenterX, a.CenterZ).ScreenText}, rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss} (relue dès que vous vous éloignez d’environ 15 cases)"
-              + (reader.HealthRefused ? " — santé refusée par le serveur" : "")
-              + (reader.TerrainRefused ? " — fond de carte refusé par le serveur" : SrvMap.TerrainText is { } t ? $" — {t}" : "")
+            ? $"rayon ≈ {ServerReader.ResourceRadius / 3} cases, relue à {at:HH:mm:ss}"
+              + (reader.HealthRefused ? " — santé refusée" : "")
+              + (reader.TerrainRefused ? " — fond refusé" : "")
             : "—";
+        SrvArea.ToolTip = reader.ResourceArea is { } a2
+            ? $"Centre {new ServerPosition(a2.CenterX, a2.CenterZ).ScreenText} ; relue dès que vous vous éloignez d’environ 15 cases."
+              + (reader.HealthRefused ? " Santé refusée par le serveur." : "")
+              + (reader.TerrainRefused ? " Fond de carte refusé par le serveur." : SrvMap.TerrainText is { } t ? $" {t}." : "")
+            : null;
 
         UpdateRows(shown.Take(MaxRowsShown).ToList(), best?.EntityId, match?.Resource.EntityId);
         SrvMap.Update(s.Position, s.Walking == true ? s.Destination : null, s.Resources, Shown, best?.EntityId, match?.Resource.EntityId, _selectedResource, remembered);
@@ -269,6 +275,24 @@ public partial class MainWindow
         timer.Tick += (_, _) => MaintainResourceMemory();
         timer.Start();
         SrvMap.SeenText = _resourceMemory.SeenText;
+        SrvMap.TerrainReady += OnTerrainReady;
+        // v0.4.28 : clic droit = case visée, notée au journal (le menu « Se déplacer ici » viendra avec T-10).
+        SrvMap.CellRightClicked += (east, north) => _log.Detail("Carte", $"Clic droit sur la carte : case E {east:0}, N {north:0}.");
+        if (IsTestRun && IsMapTestRun)
+        {
+            Tabs.SelectedItem = MapTabItem;
+            // Premier vrai fond reçu, puis 25 s pour laisser arriver les ressources.
+            SrvMap.TerrainReady += build =>
+            {
+                if (build.Chunks > 0 && !_mapTestStarted)
+                {
+                    _mapTestStarted = true;
+                    var wait = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromSeconds(25) };
+                    wait.Tick += (_, _) => { wait.Stop(); RunMapTest(); };
+                    wait.Start();
+                }
+            };
+        }
         SrvMap.ZoomChanged += () =>
         {
             MapZoomText.Text = $"vue : {SrvMap.ViewCases:0} cases";
@@ -362,26 +386,99 @@ public partial class MainWindow
             // Les lignes (N) sont plus courtes que les colonnes (E) : la carte montre plus de lignes que de colonnes.
             chunks = store.Around(p.ScreenEast, p.ScreenNorth, SrvMap.ViewRadius / ResourceMap.RowFactor + 4);
         }
-        if (SrvMap.SetTerrain(chunks, explored) && !_terrainShownLogged && chunks.Count > 0)
+        _lastExploredCount = explored?.Count;
+        SrvMap.SetTerrain(chunks, explored);
+    }
+
+    private int? _lastExploredCount;
+
+    // v0.4.28 : le fond est calculé en arrière-plan ; quand il est prêt, une ligne de journal (la première fois,
+    // puis à chaque changement, en détail) avec la durée du calcul.
+    private void OnTerrainReady(TerrainBuild build)
+    {
+        if (build.Chunks == 0)
+        {
+            return;
+        }
+        if (!_terrainShownLogged)
         {
             _terrainShownLogged = true;
-            _log.Info("Carte", $"Fond de carte dessiné : {chunks.Count} morceaux de terrain, zones découvertes {(explored is null ? "pas lues" : $"lues ({explored.Count} morceaux découverts)")}.");
-            if (Environment.GetCommandLineArgs().Any(a => a.Equals("--sans-lancer-jeu", StringComparison.OrdinalIgnoreCase)))
+            _log.Info("Carte", $"Fond de carte dessiné : {build.Chunks} morceaux de terrain, zones découvertes {(_lastExploredCount is { } n ? $"lues ({n} morceaux découverts)" : "pas lues")}.");
+            if (IsTestRun && !IsMapTestRun)
             {
                 // Essai de Claude (jeu jamais lancé) : image de la fenêtre enregistrée par le bot lui-même,
                 // car la capture de l'écran sort blanche quand la session Windows est verrouillée.
-                Dispatcher.BeginInvoke(SaveTestCapture, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+                Dispatcher.BeginInvoke(() => SaveTestCapture(), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
             }
         }
+        _log.Detail("Carte", $"Fond de carte prêt : vue {build.ViewCases:0} cases, {build.Chunks} morceaux, image {build.Width}×{build.Height} points, calculée en {build.Milliseconds} ms (hors interface).");
+        _terrainWaiter?.TrySetResult(build);
     }
 
-    private void SaveTestCapture()
+    private static bool IsTestRun => Environment.GetCommandLineArgs().Any(a => a.Equals("--sans-lancer-jeu", StringComparison.OrdinalIgnoreCase));
+
+    private static bool IsMapTestRun => Environment.GetCommandLineArgs().Any(a => a.Equals("--essai-carte", StringComparison.OrdinalIgnoreCase));
+
+    private TaskCompletionSource<TerrainBuild>? _terrainWaiter;
+    private bool _mapTestStarted;
+
+    // v0.4.28, essai de Claude (« --sans-lancer-jeu --essai-carte ») : onglet Carte ouvert, puis vues 30, 100 et 200 cases,
+    // et 100 cases dans une fenêtre de 1280 × 800 ; pour chacune : durée du calcul du fond, durée du dessin, plus long
+    // blocage de l'interface, et image de la fenêtre. La taille de la fenêtre est remise comme avant à la fin.
+    private async void RunMapTest()
+    {
+        _log.Info("Carte", "Essai de la carte : vues 30, 100 et 200 cases, puis 1280 × 800.");
+        var (oldWidth, oldHeight, oldState) = (Width, Height, WindowState);
+        var steps = new (double Cases, double? Width, double? Height)[] { (30, null, null), (100, null, null), (200, null, null), (100, 1280, 800) };
+        foreach (var (cases, width, height) in steps)
+        {
+            if (width is { } w && height is { } h)
+            {
+                WindowState = WindowState.Normal;
+                Width = w;
+                Height = h;
+            }
+            var maxBlock = 0.0;
+            var last = DateTime.Now;
+            var probe = new System.Windows.Threading.DispatcherTimer(System.Windows.Threading.DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(20) };
+            probe.Tick += (_, _) =>
+            {
+                var now = DateTime.Now;
+                maxBlock = Math.Max(maxBlock, (now - last).TotalMilliseconds);
+                last = now;
+            };
+            probe.Start();
+            _terrainWaiter = new TaskCompletionSource<TerrainBuild>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var before = SrvMap.ViewCases;
+            SrvMap.ZoomTo(cases);
+            TerrainBuild? build = null;
+            if (SrvMap.ViewCases != before)
+            {
+                var done = await Task.WhenAny(_terrainWaiter.Task, Task.Delay(15000));
+                build = done == _terrainWaiter.Task ? _terrainWaiter.Task.Result : null;
+            }
+            await Task.Delay(1500);
+            probe.Stop();
+            var file = SaveTestCapture($"vue{cases:0}{(width is null ? "" : "-1280x800")}");
+            _log.Info("Carte", $"Essai de la carte, vue {cases:0} cases{(width is null ? "" : " (fenêtre 1280 × 800)")} : "
+                + (build is null ? "fond inchangé" : $"fond {build.Chunks} morceaux, image {build.Width}×{build.Height}, calculé en {build.Milliseconds} ms hors interface")
+                + $" ; dessin de la carte {SrvMap.LastRenderMs:0.0} ms ; carte {SrvMap.ActualWidth:0}×{SrvMap.ActualHeight:0} dans une fenêtre {ActualWidth:0}×{ActualHeight:0}"
+                + $" ; interface bloquée au plus {Math.Max(0, maxBlock - 20):0} ms ; image {(file is null ? "pas enregistrée" : System.IO.Path.GetFileName(file))}.");
+        }
+        WindowState = oldState;
+        Width = oldWidth;
+        Height = oldHeight;
+        SrvMap.ZoomTo(30);
+        _log.Info("Carte", "Essai de la carte fini (taille de la fenêtre remise).");
+    }
+
+    private string? SaveTestCapture(string name = "carte")
     {
         try
         {
             if (Content is not FrameworkElement root || root.ActualWidth < 10)
             {
-                return;
+                return null;
             }
             var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap((int)root.ActualWidth, (int)root.ActualHeight, 96, 96, PixelFormats.Pbgra32);
             var visual = new DrawingVisual();
@@ -392,16 +489,18 @@ public partial class MainWindow
             bitmap.Render(visual);
             var folder = System.IO.Path.Combine(AppContext.BaseDirectory, "captures-essai");
             System.IO.Directory.CreateDirectory(folder);
-            var file = System.IO.Path.Combine(folder, $"carte-{DateTime.Now:HHmmss}.png");
+            var file = System.IO.Path.Combine(folder, $"{name}-{DateTime.Now:HHmmss}.png");
             var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
             encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bitmap));
             using var stream = System.IO.File.Create(file);
             encoder.Save(stream);
             _log.Info("Carte", $"Essai : image de la fenêtre enregistrée ({file}).");
+            return file;
         }
         catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or InvalidOperationException)
         {
             _log.Info("Carte", $"Essai : image de la fenêtre impossible ({ex.Message}).");
+            return null;
         }
     }
 }

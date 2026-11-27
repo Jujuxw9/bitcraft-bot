@@ -105,3 +105,13 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `ResourceMap` : crans de zoom jusqu'à 200 ; survol d'une ressource pâle = nom et « vue il y a N h » ; fond gris-bleu (#18222E), comme `TerrainColors.Unknown`.
 - `ServerReader.DiscoveredRadius` = 230 ; `TerrainFreshFor` = 24 h : `Queries.Terrain(..., skip)` ne redemande pas un morceau frais de `TerrainStore` (`IsFresh`, date de réception gardée, relue depuis le fichier), sauf les 3 × 3 autour du personnage.
 - Journal : « Abonnement accepté (N Ko reçus ; K abonnements en M min, X par minute, Y Mo en tout) » ; « Mémoire de la carte : … morceau(x) illisible(s) rejeté(s) ».
+
+## 32. v0.4.28 : carte, affichage (D-085)
+
+- `HexRaster` (Server/World, sans WPF) : image des hexagones calculée point par point (centre de case le plus proche = pavage exact), en parallèle ; bords sombres si ≥ 8 points par case ; `PixelsPerCell` limite l'image à ≈ 2 400 points.
+- `ResourceMap.SetTerrain` : assemblage (`TerrainImage.Build`) et image en arrière-plan (`Task.Run`), posée par le fil de l'interface ; un calcul dépassé est jeté (numéro de calcul). Taille demandée = points par case à l'écran (2 à 12), comprise dans la signature. Événement `TerrainReady(TerrainBuild)` (morceaux, taille, ms, vue).
+- `ResourceMap` se mesure carrée (`MeasureOverride` : min largeur / hauteur) ; plus de `Viewbox`. `DotScale(vue)` réduit les points au dézoom. `CellRightClicked(east, north)` au clic droit (pour T-10). `ZoomTo(cases)`. `LastRenderMs`.
+- Disposition (`MainWindow.Layout.cs`) : colonne de la carte en taille automatique, `MapCard.MaxWidth` = 69 % de la largeur (`LayoutRules.MapShare`).
+- Tableau : 6 colonnes ; `ResourceRow.Details` au survol de la ligne.
+- `MainWindow.Map.cs` : `OnTerrainReady` (journal), `RunMapTest` (option `--essai-carte` avec `--sans-lancer-jeu` : vues 30, 100, 200, 1280 × 800 ; mesures, images `captures-essai/vueNN-*.png`, taille de la fenêtre remise).
+

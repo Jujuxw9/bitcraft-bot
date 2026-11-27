@@ -31,6 +31,9 @@ public sealed class ResourceRow : INotifyPropertyChanged
     public string Kind { get; }
     public string Position { get; }
 
+    // v0.4.28 : colonnes retirées du tableau, montrées au survol de la ligne.
+    public string Details => $"{Name} — {Kind}{(Age is { Length: > 0 } a && a != "—" ? $", {a}" : "")}, position {Position}";
+
     public string Health { get => _health; private set => Set(ref _health, value); }
     public string Distance { get => _distance; private set => Set(ref _distance, value); }
     public string Direction { get => _direction; private set => Set(ref _direction, value); }

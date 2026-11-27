@@ -28,6 +28,13 @@ public sealed class ResourceMap : FrameworkElement
 
     public event Action? ZoomChanged;
 
+    // v0.4.28 : vue choisie directement (essai de la carte) : le cran le plus proche.
+    public void ZoomTo(double cases)
+    {
+        var index = Array.FindIndex(ViewSteps, v => v >= cases);
+        ZoomBy((index < 0 ? ViewSteps.Length - 1 : index) - _zoomIndex);
+    }
+
     // v0.4.23 : dans le jeu, une ligne de cases (N) est plus courte qu'une colonne (E) : les cases sont des hexagones
     // réguliers, pointe en haut, donc une ligne monte de √3/2 de la largeur d'une case. Mesuré sur la carte du jeu
     // (morceaux de 72 points de large pour 62,5 de haut). Avant, la carte du bot était étirée vers le haut.
@@ -97,89 +104,90 @@ public sealed class ResourceMap : FrameworkElement
     // Fond de carte (v0.4.18) : texte pour l'écran (null si aucun morceau).
     public string? TerrainText { get; private set; }
 
-    // Refait l'image du fond seulement si les morceaux reçus ont changé. Renvoie true si l'image a été refaite.
+    // Refait l'image du fond seulement si les morceaux reçus ont changé. Renvoie true si un nouveau calcul a commencé.
+    // v0.4.28 : le calcul (assemblage des morceaux puis hexagones point par point) se fait en arrière-plan ;
+    // l'image est posée sur la carte quand elle est prête (TerrainReady). Un calcul dépassé est jeté.
     public bool SetTerrain(IReadOnlyCollection<TerrainChunk> chunks, ExploredChunks? explored)
     {
-        var signature = TerrainImage.SignatureOf(chunks, explored);
+        // v0.4.28 : l'image est calculée à la taille où elle sera vue (points par case à l'écran) : pas de bords
+        // d'hexagones écrasés quand on dézoome (fond granuleux), et moins de calcul.
+        var wanted = WantedHexPixels();
+        var signature = TerrainImage.SignatureOf(chunks, explored) + "|" + wanted;
         if (signature == _terrainSignature)
         {
             return false;
         }
         _terrainSignature = signature;
-        _terrainImage = TerrainImage.Build(chunks, explored);
-        if (_terrainImage is { } image)
+        var job = ++_terrainJob;
+        var list = chunks.ToList();
+        _ = Task.Run(() =>
         {
-            // v0.4.22 : image limitée à environ 2 400 points de côté (vue large = beaucoup de morceaux).
-            _hexPixels = Math.Clamp(2400 / Math.Max(image.Width, image.Height), 3, 12);
-            _terrain = HexImage(image, _hexPixels);
-            TerrainText = $"fond de carte : {image.ChunkCount} morceaux de terrain" + (explored is null ? "" : ", zones non découvertes assombries");
-        }
-        else
-        {
-            _terrain = null;
-            TerrainText = null;
-        }
-        InvalidateVisual();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var image = TerrainImage.Build(list, explored);
+            BitmapSource? bitmap = null;
+            var hexPixels = 12;
+            if (image is not null)
+            {
+                hexPixels = Math.Max(2, Math.Min(wanted, HexRaster.PixelsPerCell(image)));
+                var pixels = HexRaster.Render(image, hexPixels, out var width, out var height);
+                bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Pbgra32, null, pixels, width * 4);
+                bitmap.Freeze();
+            }
+            var ms = watch.ElapsedMilliseconds;
+            Dispatcher.BeginInvoke(() =>
+            {
+                if (job != _terrainJob)
+                {
+                    return;
+                }
+                _terrainImage = image;
+                _terrain = bitmap;
+                _hexPixels = hexPixels;
+                TerrainText = image is null ? null
+                    : $"fond de carte : {image.ChunkCount} morceaux de terrain" + (explored is null ? "" : ", zones non découvertes assombries");
+                InvalidateVisual();
+                TerrainReady?.Invoke(new TerrainBuild(image?.ChunkCount ?? 0, bitmap?.PixelWidth ?? 0, bitmap?.PixelHeight ?? 0, ms, ViewCases));
+            });
+        });
         return true;
     }
 
+    private int _terrainJob;
+
+    // Points par case à l'écran (arrondi au-dessus), entre 2 et 12.
+    private int WantedHexPixels()
+    {
+        var side = ActualWidth > 0 ? Math.Min(ActualWidth, ActualHeight) : 560;
+        var dpi = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        return Math.Clamp((int)Math.Ceiling((side / 2 - 18) / ViewRadius * dpi), 2, 12);
+    }
+
+    // Fond prêt : nombre de morceaux, taille de l'image, durée du calcul en arrière-plan (ms), vue (cases).
+    public event Action<TerrainBuild>? TerrainReady;
+
     // Points d'image par grande case dans l'image des hexagones (12 = bords nets ; moins quand la vue est large).
     private int _hexPixels = 12;
-    private static readonly Pen HexEdge = FrozenPen(Color.FromArgb(55, 0, 0, 0), 0.8);
 
-    // v0.4.20 : chaque grande case (case du jeu) est dessinée en hexagone, comme dans le jeu : pointe en haut,
-    // une ligne sur deux décalée d'une demi-case vers l'est (coordonnées décalées du serveur). Avant : un carré
-    // d'un point par case, agrandi, donc très pixelisé. L'image est faite une seule fois par fond de carte reçu.
-    private static BitmapSource HexImage(TerrainImage image, int hexPixels = 12)
+    // v0.4.28 : carte carrée, aussi grande que la place donnée (avant : 560 × 560 fixe, agrandie par un Viewbox).
+    protected override Size MeasureOverride(Size availableSize)
     {
-        var rowPixels = hexPixels * RowFactor;
-        var width = (int)Math.Ceiling((image.Width + 0.5) * hexPixels);
-        var height = (int)Math.Ceiling(image.Height * rowPixels);
-        var edge = hexPixels >= 8 ? HexEdge : null;
-        var visual = new DrawingVisual();
-        using (var dc = visual.RenderOpen())
+        var side = Math.Min(availableSize.Width, availableSize.Height);
+        if (double.IsInfinity(side))
         {
-            var brushes = new Dictionary<uint, Brush>();
-            for (var row = 0; row < image.Height; row++)
-            {
-                var cellZ = image.NorthCell - row;
-                var shift = (cellZ & 1) == 1 ? 0.5 : 0.0;
-                for (var col = 0; col < image.Width; col++)
-                {
-                    var argb = image.Pixels[row * image.Width + col];
-                    if (!brushes.TryGetValue(argb, out var brush))
-                    {
-                        brush = Frozen(Color.FromArgb((byte)(argb >> 24), (byte)(argb >> 16), (byte)(argb >> 8), (byte)argb));
-                        brushes[argb] = brush;
-                    }
-                    dc.DrawGeometry(brush, edge, Hexagon((col + 0.5 + shift) * hexPixels, (row + 0.5) * rowPixels, hexPixels));
-                }
-            }
+            side = double.IsInfinity(availableSize.Width) ? availableSize.Height : availableSize.Width;
         }
-        var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
-        bitmap.Render(visual);
-        bitmap.Freeze();
-        return bitmap;
+        if (double.IsInfinity(side) || double.IsNaN(side))
+        {
+            side = 560;
+        }
+        side = Math.Max(MinSide, side);
+        return new Size(side, side);
     }
 
-    // Hexagone régulier pointe en haut (v0.4.23) : largeur d'une case, hauteur 2/√3 de case ; les lignes sont
-    // espacées de √3/2 de case, elles se recouvrent d'un quart de hauteur, comme le pavage du jeu.
-    private static StreamGeometry Hexagon(double cx, double cy, double cell)
-    {
-        var half = cell / 2;
-        var tall = cell / Math.Sqrt(3);
-        var mid = tall / 2;
-        var g = new StreamGeometry();
-        using (var ctx = g.Open())
-        {
-            ctx.BeginFigure(new Point(cx, cy - tall), true, true);
-            ctx.PolyLineTo([
-                new Point(cx + half, cy - mid), new Point(cx + half, cy + mid), new Point(cx, cy + tall),
-                new Point(cx - half, cy + mid), new Point(cx - half, cy - mid)], true, true);
-        }
-        g.Freeze();
-        return g;
-    }
+    private const double MinSide = 240;
+
+    // Durée du dernier dessin sur le fil de l'interface (ms), pour les mesures de l'essai.
+    public double LastRenderMs { get; private set; }
 
     private double Scale => (Math.Min(ActualWidth, ActualHeight) / 2 - 18) / ViewRadius;
 
@@ -200,6 +208,7 @@ public sealed class ResourceMap : FrameworkElement
 
     protected override void OnRender(DrawingContext dc)
     {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
         var size = new Rect(0, 0, ActualWidth, ActualHeight);
         dc.DrawRectangle(Background, null, size);
         var c = Center;
@@ -217,6 +226,7 @@ public sealed class ResourceMap : FrameworkElement
         finally
         {
             dc.Pop();
+            LastRenderMs = watch.Elapsed.TotalMilliseconds;
         }
     }
 
@@ -253,6 +263,10 @@ public sealed class ResourceMap : FrameworkElement
             return;
         }
 
+        // v0.4.28 : points plus petits quand on dézoome (à 140-200 cases ils se chevauchaient), sans contour au-delà de 65 cases.
+        var dot = DotScale(ViewCases);
+        var outline = dot < 1 ? null : DotOutline;
+
         // Ressources vues avant, hors de la zone lue en direct (v0.4.22) : pâles, dessous.
         if (_remembered.Count > 0)
         {
@@ -261,7 +275,7 @@ public sealed class ResourceMap : FrameworkElement
             {
                 if (_shown(r) && Visible(r))
                 {
-                    dc.DrawEllipse(r.IsTree ? OtherTreeBrush : FamilyColors.Of(r.Family), DotOutline, ToPoint(r.Position, player), 3, 3);
+                    dc.DrawEllipse(r.IsTree ? OtherTreeBrush : FamilyColors.Of(r.Family), outline, ToPoint(r.Position, player), 3 * dot, 3 * dot);
                 }
             }
             dc.Pop();
@@ -272,7 +286,7 @@ public sealed class ResourceMap : FrameworkElement
         {
             if (!r.IsTree && _shown(r) && Visible(r))
             {
-                dc.DrawEllipse(FamilyColors.Of(r.Family), DotOutline, ToPoint(r.Position, player), 3.5, 3.5);
+                dc.DrawEllipse(FamilyColors.Of(r.Family), outline, ToPoint(r.Position, player), 3.5 * dot, 3.5 * dot);
             }
         }
         foreach (var r in _resources.Where(r => r.IsTree && _shown(r) && Visible(r)))
@@ -285,7 +299,7 @@ public sealed class ResourceMap : FrameworkElement
                 "Mort" => (DeadBrush, 4.0),
                 _ => (OtherTreeBrush, 4.0),
             };
-            dc.DrawEllipse(brush, r.Health < r.MaxHealth ? DamagedPen : DotOutline, p, radius, radius);
+            dc.DrawEllipse(brush, r.Health < r.MaxHealth ? DamagedPen : outline, p, radius * dot, radius * dot);
         }
         foreach (var (id, pen, radius) in new[] { (_best, BestPen, 11.0), (_screenTarget, ScreenTargetPen, 14.0), (_selected, SelectedPen, 9.5) })
         {
@@ -301,8 +315,21 @@ public sealed class ResourceMap : FrameworkElement
         {
             dc.DrawLine(DestinationPen, c, ToPoint(d, player));
         }
-        dc.DrawEllipse(PlayerBrush, new Pen(Brushes.White, 1.5), c, 6, 6);
+        // Le personnage reste bien visible à toutes les vues (taille fixe, contour blanc).
+        dc.DrawEllipse(PlayerBrush, PlayerPen, c, 6, 6);
     }
+
+    private static readonly Pen PlayerPen = FrozenPen(Colors.White, 1.5);
+
+    // Taille des points selon la vue : 1 jusqu'à 45 cases, puis plus petits (0,45 à 200 cases).
+    public static double DotScale(double viewCases) => viewCases switch
+    {
+        <= 45 => 1.0,
+        <= 65 => 0.85,
+        <= 100 => 0.7,
+        <= 140 => 0.55,
+        _ => 0.45,
+    };
 
     // Dans la vue : distance au personnage recalculée (les ressources gardées ont une distance ancienne).
     private bool Visible(NearbyResource r) => _player is { } p && r.Position.ScreenDistanceTo(p) <= ViewRadius;
@@ -354,6 +381,19 @@ public sealed class ResourceMap : FrameworkElement
         ResourceClicked?.Invoke(nearest);
     }
 
+    // v0.4.28 : clic droit sur la carte = la case visée (E, N), pour « Se déplacer ici » (T-10). Pas encore de menu.
+    public event Action<double, double>? CellRightClicked;
+
+    protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseRightButtonUp(e);
+        if (ToCell(e.GetPosition(this)) is { } cell)
+        {
+            CellRightClicked?.Invoke(cell.East, cell.North);
+            e.Handled = true;
+        }
+    }
+
     private void Text(DrawingContext dc, string text, Point at, double size)
     {
         var formatted = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Font, size, TextBrush,
@@ -379,3 +419,6 @@ public sealed class ResourceMap : FrameworkElement
         return pen;
     }
 }
+
+// v0.4.28 : résultat d'un calcul du fond de carte (pour le journal et les mesures).
+public sealed record TerrainBuild(int Chunks, int Width, int Height, long Milliseconds, double ViewCases);

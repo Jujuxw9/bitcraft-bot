@@ -517,18 +517,16 @@
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    <!-- v0.4.28 : la carte prend la plus grande part de l'onglet (carrée, toute la hauteur), le tableau est plus étroit. -->
                     <Border x:Name="MapCard" Style="{StaticResource Card}">
-                        <StackPanel>
+                        <DockPanel>
                             <!-- v0.4.22 : zoom de la carte -->
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <Button Content="−" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomOut_Click" ToolTip="Dézoomer (plus de cases, jusqu'à 100 ; au-delà de la zone lue, la carte gardée en mémoire)" />
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                                <Button Content="−" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomOut_Click" ToolTip="Dézoomer (plus de cases, jusqu'à 200 ; au-delà de la zone lue, la carte gardée en mémoire)" />
                                 <Button Content="+" Width="34" Style="{StaticResource SmallButton}" Click="MapZoomIn_Click" ToolTip="Zoomer (moins de cases, jusqu'à 10, plus de détails)" Margin="4,0,8,0" />
                                 <TextBlock x:Name="MapZoomText" Text="vue : 30 cases" Style="{StaticResource MutedText}" VerticalAlignment="Center" />
                             </StackPanel>
-                            <Viewbox x:Name="MapBox" MaxWidth="560" MaxHeight="560" Stretch="Uniform">
-                                <local:ResourceMap x:Name="SrvMap" Width="560" Height="560" Cursor="Hand" />
-                            </Viewbox>
-                            <WrapPanel Margin="0,8,0,0" MaxWidth="560">
+                            <WrapPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
                                 <WrapPanel.Resources>
                                     <Style TargetType="TextBlock" BasedOn="{StaticResource MutedText}">
                                         <Setter Property="Margin" Value="0,0,12,2" />
@@ -541,8 +539,11 @@
                                 <TextBlock><Run Text="○" Foreground="#FB8C00" /> entamé</TextBlock>
                                 <TextBlock><Run Text="◯" Foreground="#D2B65D" /> recherchée</TextBlock>
                                 <TextBlock><Run Text="◯" Foreground="#F28BF5" /> cible</TextBlock>
+                                <TextBlock ToolTip="Ressources vues avant, hors de la zone lue : survol = depuis quand (gardées 72 h)"><Run Text="●" Foreground="#5581C995" /> pâle = vue avant (survol : il y a…)</TextBlock>
                             </WrapPanel>
-                        </StackPanel>
+                            <local:ResourceMap x:Name="SrvMap" Cursor="Hand" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               ToolTipService.InitialShowDelay="300" />
+                        </DockPanel>
                     </Border>
                     <Border x:Name="MapList" Grid.Column="1" Style="{StaticResource Card}">
                         <DockPanel>
@@ -560,7 +561,7 @@
                                     <Button x:Name="SoughtClear" DockPanel.Dock="Right" Content="×" Width="30" Margin="4,0,0,0" Style="{StaticResource SmallButton}"
                                             Click="SoughtClear_Click" ToolTip="Ne plus rechercher de ressource" />
                                     <Grid>
-                                        <TextBox x:Name="SoughtBox" MinWidth="260"
+                                        <TextBox x:Name="SoughtBox" MinWidth="150"
                                                  TextChanged="SoughtBox_TextChanged" PreviewKeyDown="SoughtBox_PreviewKeyDown" GotKeyboardFocus="SoughtBox_GotKeyboardFocus"
                                                  ToolTip="Tapez le nom de la ressource (en anglais, comme dans le jeu), puis choisissez-la dans la liste" />
                                         <Popup x:Name="SoughtPopup" PlacementTarget="{Binding ElementName=SoughtBox}" Placement="Bottom" StaysOpen="False" AllowsTransparency="True">
@@ -572,24 +573,27 @@
                                     </Grid>
                                 </DockPanel>
                                 <TextBlock Grid.Row="1" Text="Plus proche" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource Value}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
                                 <TextBlock Grid.Row="2" Text="Cible écran" Style="{StaticResource Label}" Foreground="#F28BF5" />
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource Value}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
                                 <TextBlock Grid.Row="3" Text="Zone lue" Style="{StaticResource Label}" />
-                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource Value}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
                             </Grid>
+                            <!-- v0.4.28 : 6 colonnes (famille, âge et position au survol d'une ligne). -->
                             <ListView x:Name="SrvResourceList" MinHeight="200" SelectionChanged="SrvResourceList_SelectionChanged">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                                        <Setter Property="ToolTip" Value="{Binding Details}" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="" Width="34" DisplayMemberBinding="{Binding Mark}" />
-                                        <GridViewColumn Header="Nom" Width="190" DisplayMemberBinding="{Binding Name}" />
-                                        <GridViewColumn Header="Famille" Width="120" DisplayMemberBinding="{Binding Kind}" />
-                                        <GridViewColumn Header="Âge" Width="70" DisplayMemberBinding="{Binding Age}" />
-                                        <GridViewColumn Header="Santé" Width="140" DisplayMemberBinding="{Binding Health}" />
-                                        <GridViewColumn Header="Dist." Width="60" DisplayMemberBinding="{Binding Distance}" />
-                                        <GridViewColumn Header="Dir." Width="50" DisplayMemberBinding="{Binding Direction}" />
-                                        <GridViewColumn Header="Position" Width="120" DisplayMemberBinding="{Binding Position}" />
-                                        <GridViewColumn Header="Tier" Width="55" DisplayMemberBinding="{Binding Tier}" />
+                                        <GridViewColumn Header="" Width="28" DisplayMemberBinding="{Binding Mark}" />
+                                        <GridViewColumn Header="Nom" Width="170" DisplayMemberBinding="{Binding Name}" />
+                                        <GridViewColumn Header="Tier" Width="40" DisplayMemberBinding="{Binding Tier}" />
+                                        <GridViewColumn Header="Dist." Width="48" DisplayMemberBinding="{Binding Distance}" />
+                                        <GridViewColumn Header="Dir." Width="40" DisplayMemberBinding="{Binding Direction}" />
+                                        <GridViewColumn Header="Santé" Width="135" DisplayMemberBinding="{Binding Health}" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>

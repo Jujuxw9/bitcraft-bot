@@ -34,7 +34,10 @@ public partial class MainWindow
         // Image du jeu (v0.4.13) : un quart de la fenêtre (la moitié en largeur et en hauteur), en bas à gauche.
         GameImageCard.Width = Math.Max(260, Math.Min(width * 0.5, width - (narrow ? 40 : 340)));
         // Carte : carte et tableau côte à côte, ou l'un sous l'autre.
+        // v0.4.28 : la carte est carrée et prend toute la hauteur, jusqu'à 69 % de la largeur (avant : 560 points fixes) ;
+        // le tableau prend le reste.
         Stack2(MapGrid, MapCard, MapList, narrow, GridLength.Auto);
+        MapCard.MaxWidth = narrow ? double.PositiveInfinity : width * LayoutRules.MapShare;
         // Paramètres : journal à droite, ou sous les réglages.
         Stack2(SettingsGrid, SettingsLeft, SettingsLog, narrow, new GridLength(1, GridUnitType.Star));
         // v0.4.14 : petites cartes (sécurité, affichage, système) sur 3 colonnes si la place le permet.
@@ -86,4 +89,7 @@ public partial class MainWindow
 public static class LayoutRules
 {
     public static int DashboardColumns(double width) => width >= 1500 ? 4 : width >= 760 ? 2 : 1;
+
+    // v0.4.28 : part la plus grande de la largeur que la carte peut prendre.
+    public const double MapShare = 0.69;
 }
