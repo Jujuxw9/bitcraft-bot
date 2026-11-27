@@ -52,8 +52,23 @@ public static class BarReader
         return first < 0 ? 0 : Math.Clamp((end - first + 1) / (double)(end - start + 1), 0, 1);
     }
 
-    // Vrai si le fond crème du panneau cible est visible sur tous les points de contrôle.
-    public static bool IsTargetPanelVisible(Frame frame)
+    // Vrai si le panneau de la cible est affiché (ancienne apparence crème ou nouvelle sombre).
+    public static bool IsTargetPanelVisible(Frame frame) => GetTargetPanelStyle(frame) != TargetPanelStyle.None;
+
+    // Apparence du panneau de la cible : absent, crème (texte foncé) ou sombre (texte clair, depuis le 23/11/2026).
+    public static TargetPanelStyle GetTargetPanelStyle(Frame frame)
+    {
+        if (MatchesCream(frame))
+        {
+            return TargetPanelStyle.Cream;
+        }
+        return MatchesDark(frame) ? TargetPanelStyle.Dark : TargetPanelStyle.None;
+    }
+
+    // Écart permis par canal pour reconnaître la couleur du panneau sombre (compression, éclairage).
+    public const int DarkPanelTolerance = 8;
+
+    private static bool MatchesCream(Frame frame)
     {
         foreach (var (x, y) in HudLayout.TargetPanelProbes)
         {
@@ -71,6 +86,23 @@ public static class BarReader
         return true;
     }
 
+    private static bool MatchesDark(Frame frame)
+    {
+        foreach (var (x, y, er, eg, eb) in HudLayout.DarkTargetPanelProbes)
+        {
+            if (!Fits(frame, y, x))
+            {
+                return false;
+            }
+            var (r, g, b) = Pixel(frame, x, y);
+            if (Math.Abs(r - er) > DarkPanelTolerance || Math.Abs(g - eg) > DarkPanelTolerance || Math.Abs(b - eb) > DarkPanelTolerance)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private static bool Fits(Frame frame, int row, int maxX) => row >= 0 && row < frame.Height && maxX < frame.Width;
 
     private static (byte R, byte G, byte B) Pixel(Frame frame, int x, int y)
@@ -78,4 +110,11 @@ public static class BarReader
         var i = (y * frame.Width + x) * 4;
         return (frame.Pixels[i + 2], frame.Pixels[i + 1], frame.Pixels[i]);
     }
+}
+
+public enum TargetPanelStyle
+{
+    None,
+    Cream,
+    Dark,
 }

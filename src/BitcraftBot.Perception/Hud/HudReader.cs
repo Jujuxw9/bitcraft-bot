@@ -30,22 +30,29 @@ public sealed class HudReader(OcrReader ocrReader, IReadOnlyList<string>? knownT
     // Remplacée quand les données du jeu (D-033) sont chargées.
     public IReadOnlyList<string>? KnownTargetNames { get; set; } = knownTargetNames;
 
+    private static readonly System.Text.RegularExpressions.Regex TierOne = new(@"\bTier [Il|](?=\s|$)");
+
     public async Task<HudState> ReadAsync(Frame frame)
     {
         var watch = Stopwatch.StartNew();
         var zonesRead = new HashSet<string>();
         TargetReading? target = null;
         // Panneau de la cible absent : aucune lecture de texte (rien ne coûte).
-        if (BarReader.IsTargetPanelVisible(frame))
+        var panelStyle = BarReader.GetTargetPanelStyle(frame);
+        if (panelStyle != TargetPanelStyle.None)
         {
-            var name = HudParser.CleanName(await ocrReader.ReadAsync(frame, HudLayout.TargetName, TextStyle.DarkText, 150), titleCase: false);
+            // Panneau crème : texte foncé ; panneau sombre (depuis le 23/11/2026) : texte clair.
+            var textStyle = panelStyle == TargetPanelStyle.Cream ? TextStyle.DarkText : TextStyle.BrightText;
+            var name = HudParser.CleanName(await ocrReader.ReadAsync(frame, HudLayout.TargetName, textStyle, 150), titleCase: false);
             if (name is not null && KnownTargetNames is { } knownNames)
             {
                 // Correction par le nom connu le plus proche ; sinon on garde le texte lu tel quel.
                 name = NameMatcher.BestMatch(name, knownNames) ?? name;
             }
-            var category = HudParser.CleanName(await ocrReader.ReadAsync(frame, HudLayout.TargetCategory, TextStyle.DarkText, 150), titleCase: false);
+            var category = HudParser.CleanName(await ocrReader.ReadAsync(frame, HudLayout.TargetCategory, textStyle, 150), titleCase: false);
             category = category?.Replace('—', '-').Replace('–', '-');
+            // Le « 1 » de la police claire est parfois lu comme un « I » ou un « l ».
+            category = category is null ? null : TierOne.Replace(category, "Tier 1");
             var rawHealth = await ocrReader.ReadAsync(frame, HudLayout.TargetHealth, TextStyle.BrightText, 225);
             var targetHealth = HudParser.ParseFraction(rawHealth);
             target = new TargetReading(name, category, targetHealth?.Value, targetHealth?.Max, rawHealth);

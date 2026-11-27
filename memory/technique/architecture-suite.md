@@ -136,3 +136,12 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `Input/Actions/ActionReadiness.cs` : `WaitAsync` (attend que le contrôleur permette les actions, 20 s au plus pour le trajet ; s'arrête tout de suite si les actions sont bloquées ou le jeu introuvable, ou sur demande d'arrêt) ; `UntilAsync` (vérification répétée, pour la carte qui se referme).
 - `App/MainWindow.Travel.cs` : `TravelToAsync` attend le retour sur le jeu avant le premier geste (le clic du menu laisse le bot au premier plan) ; `OpenMapAsync` lit la barre trois fois et ne rappuie que si la carte est vue ; `CloseMapAsync` regarde trois fois avant l'alerte.
 - Tests : `V0430Tests` (barre lue par OCR sur `images/reference-ui/fenetres/carte-du-monde_001.png`, attente du premier plan avec un faux clavier, limites de l'attente, fermeture lente).
+
+## 35. v0.4.31 : petits défauts (D-088)
+
+- `Perception/Hud/HudLayout.cs` : `DarkTargetPanelProbes` (4 points et leur couleur : bord gauche, cadre du haut, fond) pour le panneau cible sombre du jeu (depuis le 23/11/2026) ; zones de texte inchangées.
+- `Perception/Hud/BarReader.cs` : `GetTargetPanelStyle` (absent, crème, sombre ; écart permis 8 par canal) ; `IsTargetPanelVisible` s'en sert.
+- `Perception/Hud/HudReader.cs` : texte foncé sur le panneau crème, clair sur le sombre ; « Tier I » corrigé en « Tier 1 ».
+- `Server/World/CraftBarTracker.cs` : part faite de la fabrication suivie (recette retenue après la fin de l'action, la moins avancée si la même recette tourne dans deux ateliers, dernière part gardée si les objets sont ramassés) ; `App/MainWindow.Dashboard.cs` l'utilise et la remet à zéro à la fin de l'affichage ou sur une autre action.
+- `Server/World/TaskJournal.cs` : `TaskInput.Abilities` (capacités du serveur), suivi des débuts de recharge pendant la tâche, `SkillAbilities` (capacités du métier sur la barre, fourni par `App/MainWindow.Tasks.cs`), événement « Conseil » après la fin d'une tâche de minage ou de pêche (`AdvisedSkills`, au moins 20 s).
+- Tests : `V0431Tests` (captures `images/reference-ui/cible-sombre/`, barre de fabrication, conseil).

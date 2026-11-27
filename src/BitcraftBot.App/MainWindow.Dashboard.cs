@@ -13,18 +13,13 @@ public partial class MainWindow
     private static readonly TimeSpan ActionHold = TimeSpan.FromSeconds(2.5);
     private string? _lastActionFrench;
     private DateTime _lastActionSeen;
+    private bool _lastActionWasCraft;
 
-    // Part faite de la fabrication en cours (celle de la recette de l'action, sinon la seule en cours), null si inconnue.
-    private double? CraftDone(PlayerSnapshot s)
-    {
-        if (s.Crafts.Count == 0 || _recipes?.CraftActions is not { } actions)
-        {
-            return null;
-        }
-        var craft = s.Action?.RecipeId is { } id ? s.Crafts.FirstOrDefault(c => c.RecipeId == id) : null;
-        craft ??= s.Crafts.Count == 1 ? s.Crafts[0] : null;
-        return craft is not null && actions.TryGetValue(craft.RecipeId, out var perItem) && perItem > 0 ? craft.Done(perItem) : null;
-    }
+    // Part faite de la fabrication en cours (v0.4.31 : recette et dernière part retenues jusqu'à la fin de l'affichage).
+    private readonly CraftBarTracker _craftBar = new();
+
+    private double? CraftDone(PlayerSnapshot s) =>
+        _recipes?.CraftActions is { } actions ? _craftBar.Update(s.Action, s.Crafts, actions) : null;
 
     private readonly SkillTracker _skillTracker = new();
 
@@ -65,23 +60,31 @@ public partial class MainWindow
         // clignotait. On garde la dernière action affichée pendant ActionHold, en la marquant « en cours ».
         // v0.4.22 : pour une fabrication, la durée de l'action n'est que celle d'un geste (la barre montait à 12 % puis
         // retombait). On montre la vraie progression de la fabrication : gestes faits ÷ (gestes par objet × objets).
+        if (s.Action is { Type: not "Craft" })
+        {
+            // Autre action (coupe, marche…) : la fabrication suivie est terminée.
+            _craftBar.Reset();
+        }
         var craft = CraftDone(s);
         if (s.Action is { } action)
         {
             var progress = action.Type == "Craft" && craft is { } c ? c : action.Progress(nowUtc);
             _lastActionFrench = action.French;
+            _lastActionWasCraft = action.Type == "Craft";
             _lastActionSeen = DateTime.Now;
             DashActionText.Text = $"{action.French} · {progress:P0}";
             DashActionBar.Smooth(progress);
         }
         else if (_lastActionFrench is { } held && DateTime.Now - _lastActionSeen < ActionHold)
         {
-            DashActionText.Text = craft is { } c ? $"{held} · {c:P0}" : $"{held} · en cours";
+            craft = _lastActionWasCraft ? craft : null;
+            DashActionText.Text = craft is { } c ? $"{held} · {(c >= 1 ? "terminée" : c.ToString("P0"))}" : $"{held} · en cours";
             DashActionBar.Smooth(craft ?? 1);
         }
         else
         {
             _lastActionFrench = null;
+            _craftBar.Reset();
             DashActionText.Text = s.Walking == true ? "En marche" : "Aucune action";
             DashActionBar.Smooth(0);
         }

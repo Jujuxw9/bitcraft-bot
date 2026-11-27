@@ -25,6 +25,17 @@ public static class HudLayout
     // Points où le fond crème du panneau cible est visible quand le panneau est affiché.
     public static readonly (int X, int Y)[] TargetPanelProbes = [(720, 40), (1100, 90), (1240, 90)];
 
+    // Depuis une mise à jour du jeu (vers le 23/11/2026), le panneau cible est sombre, texte clair, aux mêmes places.
+    // Points de contrôle et couleur attendue : bord gauche, cadre du haut, puis le fond du panneau.
+    // Le bord et le cadre, plus clairs que le fond, distinguent le panneau des menus plein écran (fond uni).
+    public static readonly (int X, int Y, byte R, byte G, byte B)[] DarkTargetPanelProbes =
+    [
+        (720, 40, 46, 43, 59),
+        (1000, 20, 60, 57, 74),
+        (1100, 90, 38, 36, 48),
+        (1240, 90, 38, 36, 48),
+    ];
+
     // Zones affichées en surimpression dans la fenêtre de supervision (v0.3.20 : la cible seulement ;
     // position, zone et région restent mesurées ici pour les tests et un éventuel retour).
     public static IReadOnlyList<(string Name, ScreenRect Rect)> AllZones { get; } =

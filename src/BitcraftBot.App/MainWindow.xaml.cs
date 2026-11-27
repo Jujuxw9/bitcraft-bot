@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.30 : « Se déplacer ici » corrigé après relecture : le bot attend que vous repassiez sur le jeu (Alt + Tab, 20 s au plus) avant d’ouvrir la carte ; carte lente à s’ouvrir ou à se fermer mieux attendue ; touche de la carte jamais rappuyée si rien ne s’est ouvert.");
+        _log.Info("Session", "Version 0.4.31 : cible en haut de l’écran de nouveau lue (nouveau panneau sombre du jeu) ; barre de fabrication jusqu’à 100 % même avec d’autres ateliers ou des objets ramassés tout de suite ; conseil en fin de pêche ou de minage sans capacités.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

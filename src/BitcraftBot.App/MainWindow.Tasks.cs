@@ -15,7 +15,14 @@ public partial class MainWindow
         _taskJournal.ItemName = ItemName;
         _taskJournal.Subject = action => TargetResource(action)?.Name;
         _taskJournal.SkillOf = ActionSkill;
+        _taskJournal.SkillAbilities = SkillAbilitiesOnBar;
     }
+
+    // v0.4.31 : capacités spéciales de la première barre qui aident ce métier (pour le conseil de fin de tâche).
+    private IReadOnlyList<(int Id, string Name)> SkillAbilitiesOnBar(int skill) =>
+        _abilities is { } book && _taskSnapshot is { } s
+            ? AbilityPlanner.Usable(s.ActionBar, book.Abilities).Where(x => x.Def.SkillId == skill).Select(x => (x.Def.Id, x.Def.Name)).ToList()
+            : [];
 
     // Métier d'une récolte : celui de la ressource visée (extraction_recipe_desc). null si pas une récolte ou inconnu.
     private int? ActionSkill(ActionInfo action) => TargetResource(action) is { } r
@@ -41,7 +48,7 @@ public partial class MainWindow
         var items = inventoriesKnown && s.EntityId is { } me
             ? inventories.Where(i => i.Owner == me).SelectMany(i => i.Stacks).ToList()
             : null;
-        WriteJournalEvents(_taskJournal.Update(new TaskInput(DateTime.Now, s.Skills, s.Action, items, s.Position)));
+        WriteJournalEvents(_taskJournal.Update(new TaskInput(DateTime.Now, s.Skills, s.Action, items, s.Position, s.Abilities)));
     }
 
     // Liaison coupée : la tâche en cours est écrite telle quelle (sans le bilan des objets).
