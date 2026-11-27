@@ -309,6 +309,7 @@ public partial class MainWindow
         RunMeals(reader, s, inventories);
         RunAbilities(reader, s);
         RunResume(reader, s);
+        RunHarvestWatch(s);
         RunGpt(reader, s);
         ArchiveChat(reader, s);
         ShowResources(reader, s, tab == MapTab);

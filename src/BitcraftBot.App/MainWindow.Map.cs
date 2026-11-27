@@ -122,6 +122,7 @@ public partial class MainWindow
                 _resourceMemory.Update(s.Resources, reader.ResourceArea);
             }
             var bestHidden = NearestSought(s, []);
+            _nearestSought = bestHidden;
             var targetHidden = CurrentHudTarget();
             LogMatches(bestHidden, _targetMatcher.Match(targetHidden?.Name, targetHidden?.Health, s.Resources), targetHidden);
             return;
@@ -140,6 +141,8 @@ public partial class MainWindow
         // v0.4.23 : la ressource recherchée par Julien (la plus proche), à la place du « meilleur arbre ».
         var remembered = _resourcesLoaded ? _resourceMemory.Update(s.Resources, reader.ResourceArea) : [];
         var best = NearestSought(s, remembered);
+        _nearestSought = best;
+        NearestGoButton.IsEnabled = best is not null;
         var target = CurrentHudTarget();
         var match = _targetMatcher.Match(target?.Name, target?.Health, s.Resources);
 

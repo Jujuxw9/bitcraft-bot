@@ -575,14 +575,18 @@
                                     </Grid>
                                 </DockPanel>
                                 <TextBlock Grid.Row="1" Text="Plus proche" Style="{StaticResource Label}" Foreground="{StaticResource Gold}" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="SrvBestTree" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
+                                <DockPanel Grid.Row="1" Grid.Column="1">
+                                    <Button x:Name="NearestGoButton" DockPanel.Dock="Right" Content="Y aller…" Margin="6,0,0,0" Padding="6,1" FontSize="11" IsEnabled="False"
+                                            Click="NearestGoButton_Click" ToolTip="Aller à la ressource recherchée la plus proche, ou la récolter jusqu'à épuisement" />
+                                    <TextBlock x:Name="SrvBestTree" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
+                                </DockPanel>
                                 <TextBlock Grid.Row="2" Text="Cible écran" Style="{StaticResource Label}" Foreground="#F28BF5" />
                                 <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SrvScreenTarget" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
                                 <TextBlock Grid.Row="3" Text="Zone lue" Style="{StaticResource Label}" />
                                 <TextBlock Grid.Row="3" Grid.Column="1" x:Name="SrvArea" Text="—" Style="{StaticResource Value}" TextWrapping="Wrap" FontSize="12" />
                             </Grid>
                             <!-- v0.4.28 : 6 colonnes (famille, âge et position au survol d'une ligne). -->
-                            <ListView x:Name="SrvResourceList" MinHeight="200" SelectionChanged="SrvResourceList_SelectionChanged">
+                            <ListView x:Name="SrvResourceList" MinHeight="200" SelectionChanged="SrvResourceList_SelectionChanged" PreviewMouseRightButtonUp="SrvResourceList_PreviewMouseRightButtonUp">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem" BasedOn="{StaticResource {x:Type ListViewItem}}">
                                         <Setter Property="ToolTip" Value="{Binding Details}" />

@@ -81,6 +81,11 @@ public partial class MainWindow
     {
         _log.Detail("Carte", $"Clic droit sur la carte : case E {east:0}, N {north:0}.");
         var menu = BuildTravelMenu(east, north, out _);
+        // v0.4.32 (T-14) : ressource sous le clic = « Aller à cette ressource » / « Récolter jusqu'à épuisement ».
+        if (_lastSnapshot is { } snap && ResourceApproach.At(snap.Resources.Where(_mapFilter.Shows), east, north) is { } res)
+        {
+            AddResourceItems(menu, res);
+        }
         menu.PlacementTarget = SrvMap;
         menu.Placement = PlacementMode.MousePoint;
         menu.IsOpen = true;
@@ -624,6 +629,18 @@ public partial class MainWindow
             {
                 await TravelToAsync(Math.Round(p.ScreenEast + de), Math.Round(p.ScreenNorth + dn), flee: false);
             }
+        }
+        // v0.4.32 (T-14) : menu de la ressource la plus proche (à plus de 3 cases), puis « Récolter » → refus « jeu fermé » attendu.
+        var near = _lastSnapshot?.Resources.Where(r => r.Position.ScreenDistanceTo(p) > 3).OrderBy(r => r.Position.ScreenDistanceTo(p)).FirstOrDefault();
+        if (near is not null)
+        {
+            var menu = BuildResourceMenu(near);
+            _log.Info(TravelLog, $"Essai du menu de ressource : « {near.Name} » à {near.Position.ScreenDistanceTo(p):0.0} cases → « {string.Join(" / ", menu.Items.OfType<MenuItem>().Select(m => $"{m.Header}{(m.IsEnabled ? "" : " (grisé)")}"))} ».");
+            await GoToResourceAsync(near, harvest: true);
+        }
+        else
+        {
+            _log.Info(TravelLog, "Essai du menu de ressource : aucune ressource lue à plus de 3 cases.");
         }
         _log.Info(TravelLog, "Essai du menu fini.");
     }

@@ -145,3 +145,11 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `Server/World/CraftBarTracker.cs` : part faite de la fabrication suivie (recette retenue après la fin de l'action, la moins avancée si la même recette tourne dans deux ateliers, dernière part gardée si les objets sont ramassés) ; `App/MainWindow.Dashboard.cs` l'utilise et la remet à zéro à la fin de l'affichage ou sur une autre action.
 - `Server/World/TaskJournal.cs` : `TaskInput.Abilities` (capacités du serveur), suivi des débuts de recharge pendant la tâche, `SkillAbilities` (capacités du métier sur la barre, fourni par `App/MainWindow.Tasks.cs`), événement « Conseil » après la fin d'une tâche de minage ou de pêche (`AdvisedSkills`, au moins 20 s).
 - Tests : `V0431Tests` (captures `images/reference-ui/cible-sombre/`, barre de fabrication, conseil).
+
+## 36. v0.4.32 : aller à une ressource, la récolter jusqu'à épuisement (D-089)
+
+- `Server/World/ResourceApproach.cs` : `ResourceApproach.At` (ressource sous un clic, 1,5 case), `Candidates` / `Choose` (8 cases à 2 cases de la ressource, la plus proche du personnage d'abord, vérifiées par `PathCheck` via `CheckTravel`) ; `HarvestWatch` (attente du premier coup, récolte, finie, abandon ; aucun geste, seulement des lignes de journal).
+- `App/MainWindow.Harvest.cs` : entrées de menu (`AddResourceItems`), clic droit sur le tableau, bouton `NearestGoButton` (« Y aller… »), `GoToResourceAsync` (case voisine puis `TravelToAsync`), `RunHarvestWatch` (appelé toutes les 500 ms après `RunResume`), fuite `FleeFromHarvestAsync` si la vie baisse.
+- `App/MainWindow.Travel.cs` : `OnMapRightClick` ajoute les entrées de la ressource sous le clic ; `--essai-menu-deplacement` essaie aussi le menu de la ressource la plus proche (à plus de 3 cases).
+- Journal : catégorie « Récolte guidée ».
+- Tests : `V0432Tests`.
