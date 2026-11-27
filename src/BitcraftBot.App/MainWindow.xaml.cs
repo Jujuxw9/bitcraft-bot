@@ -21,7 +21,7 @@ using Frame = BitcraftBot.Perception.Capture.Frame;
 
 namespace BitcraftBot.App;
 
-// Fenêtre de supervision (D-005). Onglets (v0.3.16) : Bot, Personnage, Carte, Recettes, Paramètres :
+// Fenêtre de supervision (D-005). Onglets (v0.3.16) : Bot, Personnage, Carte, Paramètres… (onglet Recettes retiré en v0.4.26, D-083) :
 // affiche le jeu en direct, lit la cible sélectionnée à l'écran (le reste vient du serveur), gère la sécurité, écrit le journal.
 // Seule action envoyée au jeu : Maj + E, si le repas automatique est coché (D-042).
 public partial class MainWindow : Window
@@ -148,7 +148,7 @@ public partial class MainWindow : Window
     {
         _log.Info("Session", $"Démarrage du programme. Version {_version}. Poste : {Environment.MachineName}, {Environment.OSVersion}.");
         _log.Info("Session", $"Journal : {_log.FilePath}");
-        _log.Info("Session", "Version 0.4.25 : reprise des récoltes fiable (souris posée sur le point de votre clic, puis M ; plus de Tab ; compteur d'échecs remis à zéro) ; overlay plus étroit.");
+        _log.Info("Session", "Version 0.4.26 : onglet Recettes retiré (les recettes ont leur site) ; images, tiers, barre de fabrication et voyageurs gardés.");
         InitServerTab();
         InitTaskJournal();
         InitCamera();

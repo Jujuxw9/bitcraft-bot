@@ -599,50 +599,6 @@
             </Grid>
         </TabItem>
 
-        <!-- RECETTES (BitCraft_GameData) -->
-        <TabItem Header="RECETTES">
-            <Grid x:Name="RecipeGrid">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="340" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Border Grid.ColumnSpan="2" Style="{StaticResource Card}">
-                    <DockPanel>
-                        <TextBlock Text="CHERCHER" Style="{StaticResource CardTitle}" Margin="0,0,16,0" VerticalAlignment="Center" />
-                        <TextBlock x:Name="RecipeSearchInfo" DockPanel.Dock="Right" Text="" Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="12,0,0,0" />
-                        <StackPanel Orientation="Horizontal">
-                            <TextBox x:Name="RecipeSearchBox" FontSize="15" Width="420" VerticalContentAlignment="Center"
-                                     TextChanged="RecipeSearchBox_TextChanged" KeyDown="RecipeSearchBox_KeyDown"
-                                     ToolTip="Nom en anglais : plank, oak, ingot… (Entrée : rechercher, Échap : effacer)" />
-                            <Button x:Name="RecipeSearchButton" Content="Rechercher" Margin="8,0,0,0" IsEnabled="False"
-                                    Click="RecipeSearchButton_Click" ToolTip="Lancer la recherche (ou touche Entrée)" />
-                            <Button x:Name="RecipeClearButton" Content="✕ Effacer" Style="{StaticResource SmallButton}" Margin="8,0,0,0" IsEnabled="False"
-                                    Click="RecipeClearButton_Click" ToolTip="Vider le champ de recherche (ou touche Échap)" />
-                            <Button x:Name="RecipeBackButton" Content="← Retour" Style="{StaticResource SmallButton}" Margin="8,0,0,0" IsEnabled="False"
-                                    Click="RecipeBackButton_Click" ToolTip="Aucune fiche précédente" ToolTipService.ShowOnDisabled="True" />
-                            <TextBlock Text="Quantité" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="20,0,6,0" />
-                            <TextBox x:Name="RecipeQuantityBox" Text="1" Width="70" VerticalContentAlignment="Center"
-                                     TextChanged="RecipeQuantityBox_TextChanged" ToolTip="Combien d'exemplaires de l'objet tu veux : l'arborescence et le plan d'actions s'adaptent" />
-                        </StackPanel>
-                    </DockPanel>
-                </Border>
-                <Border Grid.Row="1" Style="{StaticResource Card}" Padding="4">
-                    <ListBox x:Name="RecipeResults" BorderThickness="0" Background="Transparent" SelectionChanged="RecipeResults_SelectionChanged" />
-                </Border>
-                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}">
-                    <ScrollViewer x:Name="RecipeDetailsScroll" VerticalScrollBarVisibility="Auto">
-                        <StackPanel x:Name="RecipeDetails">
-                            <TextBlock Text="Choisissez un objet." Style="{StaticResource MutedText}" />
-                        </StackPanel>
-                    </ScrollViewer>
-                </Border>
-            </Grid>
-        </TabItem>
-
         <!-- PARAMÈTRES : réglages à gauche, journal à droite -->
         <TabItem x:Name="SettingsTabItem" Header="PARAMÈTRES">
             <Grid x:Name="SettingsGrid">

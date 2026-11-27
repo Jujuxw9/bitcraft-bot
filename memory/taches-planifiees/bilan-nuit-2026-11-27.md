@@ -36,3 +36,13 @@ _À remplir par T-16._
 - À essayer par Julien : couper un gros arbre **sans toucher la souris après ton clic**, laisser l'endurance tomber deux fois ; dans le journal, catégorie « Reprise » : « Point de la souris retenu », « Contour vert autour du point … », puis « Récolte … reprise (confirmé par le serveur) ». Regarder la largeur de l'overlay.
 - Questions pour Julien : 1) la souris qui se pose seule sur l'arbre te gêne-t-elle quand tu es là ? 2) si le contour vert est bien mesuré, faut-il en faire une condition (pas de M sans contour) ?
 - Consignes pour les tâches suivantes : nouveau geste `ActionController.MoveAsync` (souris seule, mêmes sécurités) utilisable pour « Se déplacer ici » (T-10). `_cameraMoves` (MainWindow.Resume.cs) compte les mouvements de caméra. T-11 peut essayer la reprise si un arbre est à portée (cliquer l'arbre, laisser tomber l'endurance).
+
+## T-06 — onglet Recettes retiré (v0.4.26)
+- Début / fin : 02:00 / 02:06 · quota début : 5 h 23 %, semaine 31 % · fin : 5 h 27 %, semaine 31 %
+- Fait : carte des dépendances (journal T-06) ; page RECETTES et dessin de la fiche (`RecipeView`) retirés ; gardés car utilisés ailleurs : livre des recettes (noms, tiers, barre de fabrication, voyageurs), planificateur et matières premières (Voyageurs), images des objets et leur téléchargement, toutes les données du jeu téléchargées. `MainWindow.Recipes.cs` → `MainWindow.ItemData.cs`. D-083, architecture-suite §30, `architecture.md` (6 onglets).
+- Testé (comment) : build 0 avertissement, tests 653/653 (4 nouveaux dans `V0426Tests` : onglet absent, autres onglets présents, livre et images toujours chargés, tables toujours téléchargées). v0.4.26 publiée ; essai sans le jeu 55 s (02:04) : aucun « Abonnement refusé », aucune erreur, « Recettes chargées : 9322 objets », 5 inventaires reçus.
+- Pas fait / reporté : onglets Personnage et Voyageurs pas regardés à l'écran (pas de clic dans le bot la nuit) ; leur code n'a pas changé. Petites fonctions du livre qui ne servent plus qu'aux tests (recherche par nom, résumé) gardées.
+- Problèmes rencontrés : aucun.
+- À essayer par Julien : lancer la v0.4.26 : plus d'onglet RECETTES ; regarder PERSONNAGE (images et tiers du sac, de la ceinture, des banques), VOYAGEURS (images, matières premières) et la barre de fabrication du tableau de bord pendant une fabrication.
+- Questions pour Julien : aucune.
+- Consignes pour les tâches suivantes : le livre des recettes est dans `MainWindow.ItemData.cs` (`_recipes`, `IconImage`) ; ne pas retirer `RecipeBook`, `RecipePlanner`, `RawMaterials` ni les tables `crafting_recipe_desc` / `building_type_desc` / `item_conversion_recipe_desc`. Prochaine version libre : v0.4.27.

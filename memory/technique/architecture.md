@@ -32,7 +32,7 @@ La sécurité peut couper la boucle à tout moment, quelle que soit l'étape en 
 
 | Brique | Rôle | Contenu en v0.1 |
 |---|---|---|
-| **App** | La fenêtre que voit Julien (WPF) | 7 onglets (D-043) : Bot (tableau de bord, image du jeu, repas automatique, sécurité), Chat, Personnage, Voyageurs (v0.4.11), Carte, Recettes, Paramètres (avec le journal) |
+| **App** | La fenêtre que voit Julien (WPF) | 6 onglets (D-043) : Bot (tableau de bord, image du jeu, repas automatique, sécurité), Chat, Personnage, Voyageurs (v0.4.11), Carte, Paramètres (avec le journal) ; onglet Recettes retiré en v0.4.26 (D-083) |
 | **Core** | Le « cerveau » : règles, sécurité, journal | Surveillance de sécurité (durée max ; touche d'urgence supprimée en v0.3.19, D-047), journal de session, horloge |
 | **Perception** | Les « yeux » | Recherche de la fenêtre du jeu, capture de l'écran |
 | **Input** | Les « mains » (et l'écoute du clavier) | Écoute de Num 0 (capture) et des touches tapées par Julien (pause des actions 3 s) ; **contrôleur d'actions commun** (D-045) : toute touche ou tout clic passe par lui, avec les mêmes sécurités ; mouvements humains de souris et de caméra (pour H3) |

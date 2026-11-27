@@ -28,7 +28,7 @@ public sealed class GameDataStore
         "food_desc",
         "tool_type_desc",
         "skill_desc",
-        // Onglet Recettes (v0.3.14) : recettes d'artisanat et types d'ateliers.
+        // Livre des recettes (v0.3.14) : recettes d'artisanat et types d'ateliers (barre de fabrication, onglet Voyageurs).
         "crafting_recipe_desc",
         "building_type_desc",
         // Repas automatique (v0.3.15) : bonus des aliments (« Food Regen »).

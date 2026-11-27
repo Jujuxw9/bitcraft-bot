@@ -90,3 +90,10 @@ Suite de [architecture.md](architecture.md), découpée le 2026-11-26 (T-01) pou
 - `MainWindow.Resume.cs` : `MoveAsync` (souris seule), 150 ms, mesure des pixels verts dans un carré de 48 px autour du point (journal), vérification que la souris n'a pas bougé, puis M.
 - `ActionController.MoveAsync` : même chemin humain et même arrêt d'urgence que `ClickAsync`, sans clic.
 - `SystemSummary.Overlay` : ligne courte ; `OverlayWindow` : police et marges réduites, `MaxWidth` 300.
+
+
+## 30. v0.4.26 : onglet Recettes retiré (D-083)
+
+- Page RECETTES retirée de `MainWindow.xaml` ; `RecipeView.cs` supprimé.
+- `MainWindow.Recipes.cs` devient `MainWindow.ItemData.cs` : chargement du livre des recettes en tâche de fond (`_recipes`), téléchargement unique des images, `IconImage` / `SetIconAsync` (onglet Voyageurs). Lus aussi par `MainWindow.Inventory.cs` (noms, tiers, images), `MainWindow.Dashboard.cs` (`CraftActions`) et `MainWindow.Travelers.cs` (planificateur, matières premières).
+- `GameData` inchangé (`RecipeBook`, `RecipePlanner`, `RawMaterials`, tables téléchargées).
